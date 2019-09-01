@@ -409,13 +409,13 @@ local function MoveMicroButtons()
 	end
 	CharacterMicroButton:SetPoint("BOTTOMRIGHT", Minimap, "BOTTOMLEFT", 3, -8)
 	SpellbookMicroButton:SetPoint("BOTTOMRIGHT", CharacterMicroButton, "TOPRIGHT", 0, -21)
-	QuestLogMicroButton:SetPoint("BOTTOMRIGHT", SpellbookMicroButton, "TOPRIGHT", 0, -21)
 	if UnitLevel("player") >= 10 then
-	  TalentMicroButton:SetPoint("BOTTOMRIGHT", QuestLogMicroButton, "TOPRIGHT", 0, -21)
-	  SocialsMicroButton:SetPoint("BOTTOMRIGHT", TalentMicroButton, "TOPRIGHT", 0, -21)
-	else
-	  SocialsMicroButton:SetPoint("BOTTOMRIGHT", QuestLogMicroButton, "TOPRIGHT", 0, -21)
+	  TalentMicroButton:SetPoint("BOTTOMRIGHT", SpellbookMicroButton, "TOPRIGHT", 0, -21)
+	  QuestLogMicroButton:SetPoint("BOTTOMRIGHT", TalentMicroButton, "TOPRIGHT", 0, -21)
+	  	else
+	  QuestLogMicroButton:SetPoint("BOTTOMRIGHT", SpellbookMicroButton, "TOPRIGHT", 0, -21)
 	end
+	SocialsMicroButton:SetPoint("BOTTOMRIGHT", QuestLogMicroButton, "TOPRIGHT", 0, -21)
 	WorldMapMicroButton:SetPoint("BOTTOMRIGHT", SocialsMicroButton, "TOPRIGHT", 0, -21) 
 	MainMenuMicroButton:SetPoint("BOTTOMRIGHT", WorldMapMicroButton, "TOPRIGHT", 0, -21)
 	HelpMicroButton:SetPoint("BOTTOMRIGHT", MainMenuMicroButton, "TOPRIGHT", 0, -21) 
