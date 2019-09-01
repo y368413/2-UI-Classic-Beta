@@ -39,11 +39,17 @@ local S_CONTAINER_SLOTS = "^" .. (string.gsub(string.gsub(CONTAINER_SLOTS, "%%([
 
 -- Localization. 
 -- *Just enUS so far. 
+if GetLocale() == "zhCN" or GetLocale() == "zhTW" then
+local L = {
+	["BoE"] = "|cFF00DDFF    _|r", -- Bind on Equip 
+	["BoU"] = "|cff1eff00装绑|r"  -- Bind on Use
+}
+else
 local L = {
 	["BoE"] = "BoE", -- Bind on Equip 
 	["BoU"] = "BoU"  -- Bind on Use
 }
-
+end
 -- FontString & Texture Caches
 local Cache_ItemBind = {}
 local Cache_ItemGarbage = {}
@@ -212,23 +218,6 @@ local Cache_GetItemGarbage = function(button)
 	return ItemGarbage
 end
 
-local Cache_GetUncollected = function(button)
-	local Uncollected = GetPluginContainter(button):CreateTexture()
-	Uncollected:SetDrawLayer("OVERLAY")
-	Uncollected:SetPoint("CENTER", 0, 0)
-	Uncollected:SetSize(24,24)
-	Uncollected:SetTexture([[Interface\Transmogrify\Transmogrify]])
-	Uncollected:SetTexCoord(0.804688, 0.875, 0.171875, 0.230469)
-	Uncollected:Hide()
-
-	-- Move Pawn out of the way
-	RefreshPawn(button)
-
-	-- Store the reference for the next time
-	Cache_Uncollected[button] = Uncollected
-
-	return Uncollected
-end
 
 -----------------------------------------------------------
 -- Main Update
@@ -250,48 +239,18 @@ local Update = function(self)
 		RefreshScanner(self)
 
 		---------------------------------------------------
-		-- Uncollected Appearance
-		---------------------------------------------------
-		if (itemRarity and itemRarity > 1) and (not C_TransmogCollection.PlayerHasTransmog(itemID)) then 
-			local unknown
-			for i = ScannerTip:NumLines(),2,-1 do 
-				local line = _G[ScannerTipName.."TextLeft"..i]
-				if line then 
-					local msg = line:GetText()
-					--if msg and (string_find(msg, TRANSMOGRIFY_STYLE_UNCOLLECTED) or string_find(msg, TRANSMOGRIFY_TOOLTIP_APPEARANCE_UNKNOWN)) then
-					if msg and (string_find(msg, S_TRANSMOGRIFY_STYLE_UNCOLLECTED) or string_find(msg, S_TRANSMOGRIFY_TOOLTIP_APPEARANCE_UNKNOWN)) then
-					unknown = true
-						break
-					end
-				end
-			end 
-			if (unknown) then 
-				local Uncollected = Cache_Uncollected[self] or Cache_GetUncollected(self)
-				Uncollected:Show()
-			else 
-				if Cache_Uncollected[self] then 
-					Cache_Uncollected[self]:Hide()
-				end	
-			end
-		else
-			if Cache_Uncollected[self] then 
-				Cache_Uncollected[self]:Hide()
-			end	
-		end
-
-		---------------------------------------------------
 		-- ItemBind
 		---------------------------------------------------
-		--if (itemRarity and (itemRarity > 1)) and ((bindType == 2) or (bindType == 3)) and (not IsItemBound(self)) then
-			--local ItemBind = Cache_ItemBind[self] or Cache_GetItemBind(self)
-			--local r, g, b = GetItemQualityColor(itemRarity)
-			--ItemBind:SetTextColor(r * 2/3, g * 2/3, b * 2/3)
-			--ItemBind:SetText((bindType == 3) and L["BoU"] or L["BoE"])
-		--else 
-			--if Cache_ItemBind[self] then 
-				--Cache_ItemBind[self]:SetText("")
-			--end	
-		--end
+		if (itemRarity and (itemRarity > 1)) and ((bindType == 2) or (bindType == 3)) and (not IsItemBound(self)) then
+			local ItemBind = Cache_ItemBind[self] or Cache_GetItemBind(self)
+			local r, g, b = GetItemQualityColor(itemRarity)
+			ItemBind:SetTextColor(r * 2/3, g * 2/3, b * 2/3)
+			ItemBind:SetText((bindType == 3) and L["BoU"] or L["BoE"])
+		else 
+			if Cache_ItemBind[self] then 
+				Cache_ItemBind[self]:SetText("")
+			end	
+		end
 
 		---------------------------------------------------
 		-- ItemLevel

@@ -568,8 +568,8 @@ local function Item_OnEnter(self)
 	elseif ( self.pointType == "Beta" ) then
 		GameTooltip:SetText(self.itemLink, HIGHLIGHT_FONT_COLOR.r, HIGHLIGHT_FONT_COLOR.g, HIGHLIGHT_FONT_COLOR.b);
 		GameTooltip:Show();
-	else
-		GameTooltip:SetHyperlink(self.itemLink);
+	--else
+		--GameTooltip:SetHyperlink(self.itemLink);
 	end
 	if ( IsModifiedClick("DRESSUP") ) then
 		ShowInspectCursor();

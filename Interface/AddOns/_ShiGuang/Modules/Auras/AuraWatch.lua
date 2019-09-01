@@ -2,6 +2,9 @@
 local M, R, U, I = unpack(ns)
 local A = M:GetModule("Auras")
 
+-- Libs
+I.LibClassicDurations = LibStub("LibClassicDurations")
+I.LibClassicDurations:RegisterFrame("_ShiGuang")
 local LCD = I.LibClassicDurations
 
 local maxFrames = 12 -- Max Tracked Auras

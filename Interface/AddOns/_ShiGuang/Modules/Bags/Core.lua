@@ -135,7 +135,7 @@ function module:CreateSortButton(name)
 		else
 			if MaoRUISettingDB["Bags"]["ReverseSort"] then
 				if InCombatLockdown() then
-					UIErrorsFrame:AddMessage(DB.InfoColor..ERR_NOT_IN_COMBAT)
+					UIErrorsFrame:AddMessage(I.InfoColor..ERR_NOT_IN_COMBAT)
 				else
 					SortBags()
 					wipe(sortCache)

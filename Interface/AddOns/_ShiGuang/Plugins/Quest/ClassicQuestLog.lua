@@ -395,9 +395,7 @@ end
 
 function cql:ListEntryOnClick()
    local index = self.index
-   if self.index==0 then
-		return -- this is a fake header/war campaign; don't do anything
-		elseif self.isHeader then
+   if self.isHeader then
 		ShiGuangPerDB[self.questTitle] = not ShiGuangPerDB[self.questTitle] or nil
    else
       if IsModifiedClick("CHATLINK") and ChatEdit_GetActiveWindow() then

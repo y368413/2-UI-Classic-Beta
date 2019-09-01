@@ -7,5 +7,6 @@
 	<Script file="AddOns\Skada.lua"/>
 	<Script file="AddOns\TMW.lua"/>
 	<Script file="AddOns\WeakAuras.lua"/>
+	<Script file="AddOns\Details.lua"/>
 	<Script file="AddOns\PremadeGroupsFilter.lua"/>
 </Ui>
