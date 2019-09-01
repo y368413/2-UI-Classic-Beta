@@ -12,11 +12,11 @@
 
 ## X-Repple: 2 UI
 
-SortBags.lua
-
 main.lua
 common\Wildpants.xml
 components\components.xml
 
 legacy.lua
 BagBrother.lua
+Combuctor_Binding.lua
+Combuctor_ItemInfo.lua

@@ -869,7 +869,9 @@ local function importData()
 			MaoRUISettingDB[key][value] = {}
 		elseif arg1 == "r" or arg1 == "g" or arg1 == "b" then
 			local color = select(4, strsplit(":", option))
-			MaoRUISettingDB[key][value][arg1] = tonumber(color)
+			if MaoRUISettingDB[key][value] then
+				MaoRUISettingDB[key][value][arg1] = tonumber(color)
+			end
 		elseif key == "AuraWatchList" then
 			if value == "Switcher" then
 				local index, state = select(3, strsplit(":", option))

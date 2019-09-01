@@ -10,6 +10,27 @@ local LE_ITEM_CLASS_WEAPON, LE_ITEM_CLASS_ARMOR, EJ_LOOT_SLOT_FILTER_ARTIFACT_RE
 local GetContainerNumSlots, GetContainerItemInfo, PickupContainerItem = GetContainerNumSlots, GetContainerItemInfo, PickupContainerItem
 local C_NewItems_IsNewItem, C_Timer_After = C_NewItems.IsNewItem, C_Timer.After
 local IsControlKeyDown, IsAltKeyDown, DeleteCursorItem = IsControlKeyDown, IsAltKeyDown, DeleteCursorItem
+local SortBankBags, SortBags, InCombatLockdown = SortBankBags, SortBags, InCombatLockdown
+
+local sortCache = {}
+function module:ReverseSort()
+	for bag = 0, 4 do
+		local numSlots = GetContainerNumSlots(bag)
+		for slot = 1, numSlots do
+			local texture, _, locked = GetContainerItemInfo(bag, slot)
+			if (slot <= numSlots/2) and texture and not locked and not sortCache["b"..bag.."s"..slot] then
+				PickupContainerItem(bag, slot)
+				PickupContainerItem(bag, numSlots+1 - slot)
+				sortCache["b"..bag.."s"..slot] = true
+				C_Timer_After(.1, module.ReverseSort)
+				return
+			end
+		end
+	end
+
+	NDui_Backpack.isSorting = false
+	NDui_Backpack:BAG_UPDATE()
+end
 
 function module:UpdateAnchors(parent, bags)
 	local anchor = parent
@@ -110,10 +131,20 @@ function module:CreateSortButton(name)
 	local bu = M.CreateButton(self, 24, 24, true, "Interface\\Icons\\ABILITY_SEAL")
 	bu:SetScript("OnClick", function()
 		if name == "Bank" then
-			-- BANK SORT
+			SortBankBags()
 		else
-			-- BAG SORT
-			-- NDuiDB["Bags"]["ReverseSort"]
+			if MaoRUISettingDB["Bags"]["ReverseSort"] then
+				if InCombatLockdown() then
+					UIErrorsFrame:AddMessage(DB.InfoColor..ERR_NOT_IN_COMBAT)
+				else
+					SortBags()
+					wipe(sortCache)
+					NDui_Backpack.isSorting = true
+					C_Timer_After(.5, module.ReverseSort)
+				end
+			else
+				SortBags()
+			end
 		end
 	end)
 	M.AddTooltip(bu, "ANCHOR_TOP", U["Sort"])
@@ -173,7 +204,7 @@ function module:OnLogin()
 	Backpack:HookScript("OnHide", function() PlaySound(SOUNDKIT.IG_BACKPACK_CLOSE) end)
 
 	local f = {}
-	local onlyBags, bagAzeriteItem, bagEquipment, bagConsumble, bagsJunk, onlyBank, bankAzeriteItem, bankLegendary, bankEquipment, bankConsumble, onlyReagent, bagMountPet, bankMountPet = self:GetFilters()
+	local onlyBags, bagAmmo, bagEquipment, bagConsumble, bagsJunk, onlyBank, bankAmmo, bankLegendary, bankEquipment, bankConsumble, onlyReagent, bagMountPet, bankMountPet = self:GetFilters()
 
 	function Backpack:OnInit()
 		local MyContainer = self:GetContainerClass()
@@ -184,6 +215,9 @@ function module:OnLogin()
 
 		f.junk = MyContainer:New("Junk", {Columns = bagsWidth, Parent = f.main})
 		f.junk:SetFilter(bagsJunk, true)
+
+		f.ammoItem = MyContainer:New("AmmoItem", {Columns = bagsWidth, Parent = f.main})
+		f.ammoItem:SetFilter(bagAmmo, true)
 
 		f.equipment = MyContainer:New("Equipment", {Columns = bagsWidth, Parent = f.main})
 		f.equipment:SetFilter(bagEquipment, true)
@@ -198,6 +232,9 @@ function module:OnLogin()
 		f.bank:SetFilter(onlyBank, true)
 		f.bank:SetPoint("BOTTOMRIGHT", f.main, "BOTTOMLEFT", -10, 0)
 		f.bank:Hide()
+
+		f.bankAmmoItem = MyContainer:New("BankAmmoItem", {Columns = bankWidth, Parent = f.bank})
+		f.bankAmmoItem:SetFilter(bankAmmo, true)
 
 		f.bankLegendary = MyContainer:New("BankLegendary", {Columns = bankWidth, Parent = f.bank})
 		f.bankLegendary:SetFilter(bankLegendary, true)
@@ -338,8 +375,8 @@ function module:OnLogin()
 		local width, height = self:LayoutButtons("grid", self.Settings.Columns, 5, 5, -offset + 5)
 		self:SetSize(width + 10, height + offset)
 
-		module:UpdateAnchors(f.main, {f.equipment, f.bagCompanion, f.consumble, f.junk})
-		module:UpdateAnchors(f.bank, {f.bankEquipment, f.bankLegendary, f.bankCompanion, f.bankConsumble})
+		module:UpdateAnchors(f.main, {f.ammoItem, f.equipment, f.bagCompanion, f.consumble, f.junk})
+		module:UpdateAnchors(f.bank, {f.bankAmmoItem, f.bankEquipment, f.bankLegendary, f.bankCompanion, f.bankConsumble})
 	end
 
 	function MyContainer:OnCreate(name, settings)
@@ -351,8 +388,8 @@ function module:OnLogin()
 		M.CreateMF(self, settings.Parent, true)
 
 		local label
-		if strmatch(name, "AzeriteItem$") then
-			label = U["Azerite Armor"]
+		if strmatch(name, "AmmoItem$") then
+			label = INVTYPE_AMMO
 		elseif strmatch(name, "Equipment$") then
 			if itemSetFilter then
 				label = EQUIPSET_EQUIP 
@@ -378,13 +415,15 @@ function module:OnLogin()
 			module.CreateBagBar(self, settings, 4)
 			buttons[2] = module.CreateRestoreButton(self, f)
 			buttons[3] = module.CreateBagToggle(self)
-			if deleteButton then buttons[4] = module.CreateDeleteButton(self) end
+			buttons[4] = module.CreateSortButton(self, name)
+			if deleteButton then buttons[5] = module.CreateDeleteButton(self) end
 		elseif name == "Bank" then
 			module.CreateBagBar(self, settings, 7)
 			buttons[2] = module.CreateBagToggle(self)
+			buttons[3] = module.CreateSortButton(self, name)
 		end
 
-		for i = 1, 4 do
+		for i = 1, 5 do
 			local bu = buttons[i]
 			if not bu then break end
 			if i == 1 then
@@ -429,5 +468,6 @@ function module:OnLogin()
 	BankFrame.GetRight = function() return f.bank:GetRight() end
 	BankFrameItemButton_Update = M.Dummy
 
+	SetSortBagsRightToLeft(not MaoRUISettingDB["Bags"]["ReverseSort"])
 	SetInsertItemsLeftToRight(false)
 end

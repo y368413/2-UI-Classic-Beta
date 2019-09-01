@@ -101,7 +101,7 @@ end)
 
 info.onMouseUp = function(self, btn)
 	if btn == "RightButton" then
-		MaoRUIDB["RepairType"] = mod(MaoRUIDB["RepairType"] + 1, 3)
+		MaoRUIDB["RepairType"] = mod(MaoRUIDB["RepairType"] + 1, 2)
 		self:onEnter()
 	else
 		if InCombatLockdown() then UIErrorsFrame:AddMessage(I.InfoColor..ERR_NOT_IN_COMBAT) return end

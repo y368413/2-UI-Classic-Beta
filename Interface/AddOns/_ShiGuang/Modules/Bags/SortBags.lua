@@ -1,11 +1,16 @@
---## Author: shirsig
+-- shirsig, https://github.com/shirsig/SortBags
 
-local _G, _M = getfenv(0), {}
-setfenv(1, setmetatable(_M, {__index=_G}))
+local _G = getfenv(0)
+local select, pairs, ipairs, tonumber = select, pairs, ipairs, tonumber
+local min, abs, mod, ceil = min, abs, mod, ceil
+local gsub, strfind, tinsert, sort, format = gsub, strfind, tinsert, sort, format
+local GetContainerItemLink, GetContainerItemInfo, GetContainerNumSlots, GetBagName, GetItemInfo = GetContainerItemLink, GetContainerItemInfo, GetContainerNumSlots, GetBagName, GetItemInfo
+local ClearCursor, PickupContainerItem, BankButtonIDToInvSlotID = ClearCursor, PickupContainerItem, BankButtonIDToInvSlotID
 
-CreateFrame('GameTooltip', 'SortBagsTooltip', nil, 'GameTooltipTemplate')
-
+local Start, LT, Move, TooltipInfo, Sort, Stack, Initialize, ContainerClass, Item
 local CONTAINERS
+
+local sortTooltip = CreateFrame("GameTooltip", "SortBagsTooltip", nil, "GameTooltipTemplate")
 
 function _G.SortBags()
 	CONTAINERS = {0, 1, 2, 3, 4}
@@ -27,7 +32,7 @@ end
 
 local function set(...)
 	local t = {}
-	local n = select('#', ...)
+	local n = select("#", ...)
 	for i = 1, n do
 		t[select(i, ...)] = true
 	end
@@ -36,7 +41,7 @@ end
 
 local function union(...)
 	local t = {}
-	local n = select('#', ...)
+	local n = select("#", ...)
 	for i = 1, n do
 		for k in pairs(select(i, ...)) do
 			t[k] = true
@@ -122,7 +127,7 @@ local CLASSES = {
 local model, itemStacks, itemClasses, itemSortKeys
 
 do
-	local f = CreateFrame'Frame'
+	local f = CreateFrame("Frame")
 	f:Hide()
 
 	local timeout
@@ -135,7 +140,7 @@ do
 	end
 
 	local delay = 0
-	f:SetScript('OnUpdate', function(_, arg1)
+	f:SetScript("OnUpdate", function(_, arg1)
 		delay = delay - arg1
 		if delay <= 0 then
 			delay = .2
@@ -190,26 +195,26 @@ function Move(src, dst)
 end
 
 function TooltipInfo(container, position)
-	-- local chargesPattern = '^' .. gsub(gsub(ITEM_SPELL_CHARGES_P1, '%%d', '(%%d+)'), '%%%d+%$d', '(%%d+)') .. '$' TODO retail
-	local chargesPattern = '^' .. gsub(gsub(ITEM_SPELL_CHARGES, '%%d', '(%%d+)'), '%%%d+%$d', '(%%d+)') .. '$'
+	-- local chargesPattern = "^" .. gsub(gsub(ITEM_SPELL_CHARGES_P1, "%%d", "(%%d+)"), "%%%d+%$d", "(%%d+)") .. "$" TODO retail
+	local chargesPattern = "^" .. gsub(gsub(ITEM_SPELL_CHARGES, "%%d", "(%%d+)"), "%%%d+%$d", "(%%d+)") .. "$"
 
-	SortBagsTooltip:SetOwner(UIParent, 'ANCHOR_NONE')
-	SortBagsTooltip:ClearLines()
+	sortTooltip:SetOwner(UIParent, "ANCHOR_NONE")
+	sortTooltip:ClearLines()
 
 	if container == BANK_CONTAINER then
-		SortBagsTooltip:SetInventoryItem('player', BankButtonIDToInvSlotID(position))
+		sortTooltip:SetInventoryItem("player", BankButtonIDToInvSlotID(position))
 	else
-		SortBagsTooltip:SetBagItem(container, position)
+		sortTooltip:SetBagItem(container, position)
 	end
 
 	local charges, usable, soulbound, quest, conjured
-	for i = 1, SortBagsTooltip:NumLines() do
-		local text = getglobal('SortBagsTooltipTextLeft' .. i):GetText()
+	for i = 1, sortTooltip:NumLines() do
+		local text = _G[sortTooltip:GetName().."TextLeft"..i]:GetText()
 
 		local _, _, chargeString = strfind(text, chargesPattern)
 		if chargeString then
 			charges = tonumber(chargeString)
-		elseif strfind(text, '^' .. ITEM_SPELL_TRIGGER_ONUSE) then
+		elseif strfind(text, "^" .. ITEM_SPELL_TRIGGER_ONUSE) then
 			usable = true
 		elseif text == ITEM_SOULBOUND then
 			soulbound = true
@@ -371,9 +376,9 @@ end
 function Item(container, position)
 	local link = GetContainerItemLink(container, position)
 	if link then
-		local _, _, itemID, enchantID, suffixID, uniqueID = strfind(link, 'item:(%d+):(%d*):(%d*):(%d*)')
+		local _, _, itemID, enchantID, suffixID, uniqueID = strfind(link, "item:(%d+):(%d*):(%d*):(%d*)")
 		itemID = tonumber(itemID)
-		local _, _, quality, _, _, _, _, stack, slot, _, _, classId, subClassId = GetItemInfo('item:' .. itemID)
+		local _, _, quality, _, _, _, _, stack, slot, _, _, classId, subClassId = GetItemInfo("item:" .. itemID)
 		local charges, usable, soulbound, quest, conjured = TooltipInfo(container, position)
 
 		local sortKey = {}
@@ -453,7 +458,7 @@ function Item(container, position)
 		tinsert(sortKey, enchantID)
 		tinsert(sortKey, uniqueID)
 
-		local key = format('%s:%s:%s:%s:%s:%s', itemID, enchantID, suffixID, uniqueID, charges, (soulbound and 1 or 0))
+		local key = format("%s:%s:%s:%s:%s:%s", itemID, enchantID, suffixID, uniqueID, charges, (soulbound and 1 or 0))
 
 		itemStacks[key] = stack
 		itemSortKeys[key] = sortKey

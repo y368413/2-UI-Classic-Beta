@@ -2,8 +2,8 @@
 local _, ns = ...
 local M, R, U, I = unpack(ns)
 local QuickQuestCheckButton = CreateFrame("CheckButton", nil, QuestWatchFrame, "OptionsCheckButtonTemplate")
-QuickQuestCheckButton:SetPoint("TOPLEFT", QuestWatchFrame, -2, 16)
-QuickQuestCheckButton:SetSize(21, 21)
+QuickQuestCheckButton:SetPoint("TOPLEFT", QuestWatchFrame, 2, 26)
+QuickQuestCheckButton:SetSize(26, 26)
 QuickQuestCheckButton:SetHitRectInsets(0, -10, 0, 0)
 QuickQuestCheckButton:RegisterEvent("PLAYER_LOGIN")
 QuickQuestCheckButton:SetScript("OnEvent", function(self) self:SetChecked(MaoRUISettingDB["Misc"].AutoQuest) end)
@@ -115,8 +115,7 @@ QuickQuest:Register("QUEST_GREETING", function()
 	local available = GetNumAvailableQuests()
 	if(available > 0) then
 		for index = 1, available do
-			local isTrivial, _, _, _, isIgnored = GetAvailableQuestInfo(index)
-			if((not isTrivial and not isIgnored) or IsTrackingHidden()) then
+			if IsTrackingHidden() then
 				SelectAvailableQuest(index)
 			end
 		end

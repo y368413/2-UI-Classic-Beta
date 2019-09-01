@@ -19,7 +19,6 @@ local BuyMerchantItem = BuyMerchantItem
 local GetMerchantItemLink = GetMerchantItemLink
 local GetMerchantItemMaxStack = GetMerchantItemMaxStack
 local GetItemQualityColor = GetItemQualityColor
-local Screenshot = Screenshot
 local GetTime, GetCVarBool, SetCVar = GetTime, GetCVarBool, SetCVar
 local GetNumLootItems, LootSlot = GetNumLootItems, LootSlot
 local GetNumSavedInstances = GetNumSavedInstances
@@ -44,7 +43,6 @@ function MISC:OnLogin()
 	self:MoveDurabilityFrame()
 	self:MoveTicketStatusFrame()
 	self:AlertFrame_Setup()
-	--self:UpdateScreenShot()
 	self:UpdateFasterLoot()
 	self:UpdateErrorBlocker()
 	self:TradeTargetInfo()
