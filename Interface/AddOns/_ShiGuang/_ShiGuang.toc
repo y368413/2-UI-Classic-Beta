@@ -2,9 +2,9 @@
 ## Title:-|cFFFFFF00 2|r|cFFFF0000 UI |r Classic -
 ## Author: ShiGuang、TuTu、Siweia
 ## Notes: Time Flies...
-## Version: 0.1.6
-## SavedVariables: MaoRUIDB,ShiGuangDB,CurrencyTrackingDB,VLegionToDo,CastbarsDB,iKeystonesDB,iKeystonesConfig,DialogKeyDB,AzeritePowerWeightsDB,TinyRosterDB
-## SavedVariablesPerCharacter: MaoRUISettingDB,ShiGuangPerDB,DEX_SAVE
+## Version: 0.1.7
+## SavedVariables: MaoRUIDB,ShiGuangDB,CastbarsDB,NameplateSCTDB,DialogKeyDB,TinyRosterDB
+## SavedVariablesPerCharacter: MaoRUISettingDB,ShiGuangPerDB
 
 ## X-Support: Classic
 ## X-Repple: 2 UI
