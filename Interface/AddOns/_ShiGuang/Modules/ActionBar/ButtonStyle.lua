@@ -400,7 +400,7 @@ end
 
 local HotSpotMicroMenu = CreateFrame("Frame","MicroMenuHolder",UIParent)
 local MicroButtons = {
-CharacterMicroButton, SpellbookMicroButton, TalentMicroButton, SocialsMicroButton, QuestLogMicroButton, GuildMicroButton, LFDMicroButton, CollectionsMicroButton, EJMicroButton, StoreMicroButton, MainMenuMicroButton, WorldMapMicroButton, HelpMicroButton} --, PVPMicroButton, SocialsMicroButton
+CharacterMicroButton, SpellbookMicroButton, QuestLogMicroButton, TalentMicroButton, SocialsMicroButton, WorldMapMicroButton, MainMenuMicroButton, HelpMicroButton, GuildMicroButton, LFDMicroButton, CollectionsMicroButton, EJMicroButton, StoreMicroButton} --, PVPMicroButton, SocialsMicroButton
 local function MoveMicroButtons()
 	for _, menu in pairs(MicroButtons) do
 		menu:SetParent(HotSpotMicroMenu)
