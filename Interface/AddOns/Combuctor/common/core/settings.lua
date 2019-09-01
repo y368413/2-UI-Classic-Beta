@@ -48,7 +48,7 @@ local FrameDefaults = {
 	hiddenBags = {},
 
 	rules = AsArray({
-		'all', 'all/all', 'all/normal', 'all/reagent',
+		'all', 'all/normal', 'all/trade', 'all/reagent', 'all/keys', 'all/quiver',
 		'equip', 'equip/all', 'equip/armor', 'equip/weapon', 'equip/trinket',
 		'binding', 'binding/account', 'binding/equip', 'binding/use', 'binding/all', "binding/soulbound",
 		'use', 'use/all', 'use/consume', 'use/enhance',
@@ -113,6 +113,7 @@ function Addon:StartupSettings()
 		emptySlots = true, colorSlots = true,
 		normalColor = {1, 1, 1},
 		quiverColor = {1, .87, .68},
+		soulColor = {0.64, 0.39, 1},
 		reagentColor = {1, .87, .68},
 		leatherColor = {1, .6, .45},
 		enchantColor = {0.64, 0.83, 1},

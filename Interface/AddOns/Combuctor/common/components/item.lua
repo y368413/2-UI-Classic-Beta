@@ -67,7 +67,7 @@ function ItemSlot:Create()
 
 	item:SetScript('OnShow', item.OnShow)
 	item:SetScript('OnHide', item.OnHide)
-    if item:GetScript('PreClick') then item:HookScript('PreClick', item.OnPreClick) else item:SetScript('PreClick', item.OnPreClick) end --abyui
+	item:SetScript('PreClick', item.OnPreClick)
 	item:HookScript('OnDragStart', item.OnDragStart)
 	item:HookScript('OnClick', item.OnClick)
 	item:SetScript('OnEnter', item.OnEnter)
@@ -314,6 +314,7 @@ function ItemSlot:UpdateUpgradeIcon()
 		self.UpgradeIcon:SetShown(isUpgrade)
 	end
 end
+
 
 function ItemSlot:SetLocked(locked)
 	SetItemButtonDesaturated(self, locked)

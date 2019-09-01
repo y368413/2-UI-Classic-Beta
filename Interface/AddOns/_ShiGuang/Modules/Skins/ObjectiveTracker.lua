@@ -20,7 +20,7 @@ function S:QuestTracker()
 	hooksecurefunc(tracker, "SetPoint", function(self, _, parent)
 		if parent == "MinimapCluster" or parent == _G.MinimapCluster then
 			self:ClearAllPoints()
-			self:SetPoint("TOPLEFT", frame)
+			self:SetPoint("TOPLEFT", frame, 5, -5)
 		end
 	end)
 
@@ -52,10 +52,12 @@ function S:QuestTracker()
 	end
 	hooksecurefunc("QuestLog_Update", Showlevel)
 
+	--if not NDuiDB["Skins"]["QuestTracker"] then return end
+
 	local header = CreateFrame("Frame", nil, frame)
 	header:SetAllPoints(frame)
 	header:Hide()
-	M.CreateFS(header, 16, QUEST_LOG, true, "TOPLEFT", 30, 18)
+	M.CreateFS(header, 16, QUEST_LOG, true, "TOPLEFT", 30, 16)
 
 	local bg = header:CreateTexture(nil, "ARTWORK")
 	bg:SetTexture("Interface\\LFGFrame\\UI-LFG-SEPARATOR")
@@ -64,7 +66,7 @@ function S:QuestTracker()
 	bg:SetPoint("TOPLEFT", 0, 20)
 	bg:SetSize(250, 30)
 
-	-- ModernQuestWatch, Gethe
+	-- ModernQuestWatch, Ketho
 	local function onMouseUp(self)
 		if IsShiftKeyDown() then -- untrack quest
 			local questID = GetQuestIDFromLogIndex(self.questIndex)
@@ -137,7 +139,7 @@ function S:QuestTracker()
 				if numObjectives > 0 then
 					local headerText = _G["QuestWatchLine"..watchTextIndex]
 					if watchTextIndex > 1 then
-						headerText:SetPoint("TOPLEFT", "QuestWatchLine"..(watchTextIndex - 1), "BOTTOMLEFT", 0, -5)
+						headerText:SetPoint("TOPLEFT", "QuestWatchLine"..(watchTextIndex - 1), "BOTTOMLEFT", 0, -10)
 					end
 					watchTextIndex = watchTextIndex + 1
 					local objectivesGroup = {}
@@ -160,4 +162,13 @@ function S:QuestTracker()
 			frame[GetQuestIndexForWatch(frame.watchIndex) and "Show" or "Hide"](frame)
 		end
 	end)
+
+	local function autoQuestWatch(_, questIndex)
+		-- tracking otherwise untrackable quests (without any objectives) would still count against the watch limit
+		-- calling AddQuestWatch() while on the max watch limit silently fails
+		if GetCVarBool("autoQuestWatch") and GetNumQuestLeaderBoards(questIndex) ~= 0 and GetNumQuestWatches() < MAX_WATCHABLE_QUESTS then
+			AutoQuestWatch_Insert(questIndex, QUEST_WATCH_NO_EXPIRE)
+		end
+	end
+	M:RegisterEvent("QUEST_ACCEPTED", autoQuestWatch)
 end

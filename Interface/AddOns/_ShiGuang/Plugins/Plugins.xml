@@ -19,5 +19,5 @@
 	<!--Include file="Notice\Notice.xml"/-->
 	<!--Include file="TOTxp\TOTxp.xml"/-->
 	<Include file="UnitFrames\UnitFrames.xml"/>
-	<Script file="MacroMr.lua"/>
+	<!--Script file="MacroMr.lua"/-->
 </Ui>

@@ -15,14 +15,15 @@ for k, v in pairs(LOCALIZED_CLASS_NAMES_MALE) do
 	I.ClassList[v] = k
 end
 I.ClassColors = {}
-RAID_CLASS_COLORS["SHAMAN"] = CreateColor(0.0, 0.44, 0.87) -- Shaman class color
+RAID_CLASS_COLORS["SHAMAN"] = CreateColor(0, 0.44, 0.87) -- Shaman class color
+RAID_CLASS_COLORS["SHAMAN"].colorStr = "ff0070dd"
 local colors = CUSTOM_CLASS_COLORS or RAID_CLASS_COLORS
-for class in pairs(colors) do
+for class, value in pairs(colors) do
 	I.ClassColors[class] = {}
-	I.ClassColors[class].r = colors[class].r
-	I.ClassColors[class].g = colors[class].g
-	I.ClassColors[class].b = colors[class].b
-	I.ClassColors[class].colorStr = colors[class].colorStr
+	I.ClassColors[class].r = value.r
+	I.ClassColors[class].g = value.g
+	I.ClassColors[class].b = value.b
+	I.ClassColors[class].colorStr = value.colorStr
 end
 I.r, I.g, I.b = I.ClassColors[I.MyClass].r, I.ClassColors[I.MyClass].g, I.ClassColors[I.MyClass].b
 I.MyColor = format("|cff%02x%02x%02x", I.r*255, I.g*255, I.b*255)

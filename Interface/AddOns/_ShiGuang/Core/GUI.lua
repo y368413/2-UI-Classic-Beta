@@ -141,10 +141,11 @@ local defaultSettings = {
 		CastBarstyle = true,
 		QuestTrackerSkinTitle = true,
 		WeakAuras = true,
+		InfobarLine = true,
 		Details = true,
 		PGFSkin = true,
 		Rematch = true,
-		InfobarLine = true,
+		QuestTracker = true,
 	},
 	Tooltip = {
 		CombatHide = true,
