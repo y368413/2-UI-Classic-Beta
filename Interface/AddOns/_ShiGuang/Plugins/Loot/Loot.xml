@@ -1,0 +1,14 @@
+﻿<Ui xmlns="http://www.blizzard.com/wow/ui/">
+	<Script file="Loot.lua"/>
+	<Script file="RollHistory.lua"/>
+	<!--Script file="ChatLoot.lua"/-->
+	<!--Script file="EasyConfirm.lua"/-->
+	<Script file="MasterGypsy.lua"/>
+	<Script file="EncounterJournalPlusInstanceInfo.lua"/>
+	<Frame name="EncounterJournalPlus_InstanceInfo">
+    <Scripts>
+      <OnLoad function="EncounterJournalPlus_InstanceInfo_OnLoad"></OnLoad>
+      <OnEvent function="EncounterJournalPlus_InstanceInfo_OnEvent"></OnEvent>
+    </Scripts>
+  </Frame>
+</Ui>

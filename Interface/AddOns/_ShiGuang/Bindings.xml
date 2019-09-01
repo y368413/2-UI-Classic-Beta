@@ -1,0 +1,4 @@
+﻿<Bindings>
+	<Binding name="RELOADUI" description="Reloads the UI." header="ACE3" category="BINDING_HEADER_ACE3"> ReloadUI() </Binding>
+	<Binding name="CLASSIC_QUEST_LOG_TOGGLE" header="CLASSIC_QUEST_LOG" category="BINDING_HEADER_ACE3"> ClassicQuestLog:ToggleWindow() </Binding>
+</Bindings>

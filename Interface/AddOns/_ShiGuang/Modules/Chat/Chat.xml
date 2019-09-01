@@ -1,0 +1,10 @@
+﻿<Ui xmlns="http://www.blizzard.com/wow/ui/">
+	<Script file="Chat.lua"/>
+	<Script file="Chatbar.lua"/>
+	<Script file="Urlcopy.lua"/>
+	<Script file="Filter.lua"/>
+	<Script file="ChatMod.lua"/>
+	<Script file="VirtualScrollList-1.0.lua"/>
+	<Script file="WhisperPop.lua"/>
+	<!--Script file="EnhancedChatFilterLite.lua"/-->
+</Ui>

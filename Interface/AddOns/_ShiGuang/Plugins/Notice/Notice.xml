@@ -1,0 +1,9 @@
+﻿<Ui xmlns="http://www.blizzard.com/wow/ui/">
+	<Script file="PvPPP.lua"/>
+	<Script file="Reminder.lua"/>
+	<Script file="HardYards.lua"/>
+	<Script file="PhotoRobot.lua"/>
+	<Script file="iKeystones.lua"/>
+	<Script file="TransmogHeadsUp.lua"/>
+	<Script file="IncentiveProgram.lua"/>
+</Ui>
