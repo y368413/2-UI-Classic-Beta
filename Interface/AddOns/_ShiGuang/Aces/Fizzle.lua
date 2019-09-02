@@ -34,11 +34,11 @@ local items, nditems -- our item slot tables
 -- Return an options table full of goodies!
 
 function Fizzle:OnEnable()
-    self:SecureHookScript(CharacterFrame, "OnShow", "CharacterFrame_OnShow")
-    self:SecureHookScript(CharacterFrame, "OnHide", "CharacterFrame_OnHide")
+    Fizzle:SecureHookScript(CharacterFrame, "OnShow", "CharacterFrame_OnShow")
+    Fizzle:SecureHookScript(CharacterFrame, "OnHide", "CharacterFrame_OnHide")
 
     if not bordersCreated then
-        self:MakeTypeTable()
+        Fizzle:MakeTypeTable()
     end
 end
 
@@ -47,7 +47,7 @@ function Fizzle:OnDisable()
         _G[item .. "FizzleS"]:SetText("")
     end
 
-    self:HideBorders()
+    Fizzle:HideBorders()
 end
 
 function Fizzle:CreateBorder(slottype, slot, name, hasText)
@@ -118,12 +118,12 @@ function Fizzle:MakeTypeTable()
     }
 
     for _, item in ipairs(items) do
-        self:CreateBorder("Character", item, "Fizzle", true)
+        Fizzle:CreateBorder("Character", item, "Fizzle", true)
     end
 
     -- Same again, but for ND items, and only creating a border
     for _, nditem in ipairs(nditems) do
-        self:CreateBorder("Character", nditem, "Fizzle", false)
+        Fizzle:CreateBorder("Character", nditem, "Fizzle", false)
     end
 end
 
@@ -187,26 +187,26 @@ function Fizzle:UpdateItems()
 
             --Finally, colour the borders
             if defaults.Border then
-                self:ColourBorders(id, item)
+                Fizzle:ColourBorders(id, item)
             end
         end
 
         -- Colour the borders of ND items
         if defaults.Border then
-            self:ColourBordersND()
+            Fizzle:ColourBordersND()
         end
     end
 end
 
 function Fizzle:CharacterFrame_OnShow()
-    self:RegisterEvent("UNIT_INVENTORY_CHANGED", "UpdateItems")
-    self:RegisterBucketEvent("UPDATE_INVENTORY_DURABILITY", 0.5, "UpdateItems")
-    self:UpdateItems()
+    Fizzle:RegisterEvent("UNIT_INVENTORY_CHANGED", "UpdateItems")
+    Fizzle:RegisterBucketEvent("UPDATE_INVENTORY_DURABILITY", 0.5, "UpdateItems")
+    Fizzle:UpdateItems()
 end
 
 function Fizzle:CharacterFrame_OnHide()
-    self:UnregisterEvent("UNIT_INVENTORY_CHANGED")
-    self:UnregisterBucket("UPDATE_INVENTORY_DURABILITY")
+    Fizzle:UnregisterEvent("UNIT_INVENTORY_CHANGED")
+    Fizzle:UnregisterBucket("UPDATE_INVENTORY_DURABILITY")
 end
 
 -- Border colouring split into two functions so I only need to iterate over each table once.
@@ -244,9 +244,9 @@ end
 -- Toggle the border colouring
 function Fizzle:BorderToggle()
     if not defaults.Border then
-        self:HideBorders()
+        Fizzle:HideBorders()
     else
-        self:UpdateItems()
+        Fizzle:UpdateItems()
     end
 end
 

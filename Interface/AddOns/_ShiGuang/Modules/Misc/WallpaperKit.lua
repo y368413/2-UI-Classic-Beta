@@ -8,31 +8,14 @@ if not MaoRUISettingDB["Misc"]["WallpaperKit"] then return end
 local WallpaperKitcfg = {}
 -- DISPLAY
 WallpaperKitcfg.show = {
-	-- TEXT
-	name = true, guild = true,
-	-- TEXTURES
-	background = true, auratexture = true, classicon = true, factionicon = true, toptexture = true, bottomtexture = true,
-	-- MODELS
-	playermodel = true, petmodel = true, battlepetmodel = true,
+	name = true, guild = true,	-- TEXT
+	background = true, auratexture = true, classicon = true, factionicon = true, toptexture = true, bottomtexture = true,	-- TEXTURES
+	playermodel = true, petmodel = true, battlepetmodel = true,	-- MODELS
 }
-WallpaperKitcfg.color = {
-	class = (CUSTOM_CLASS_COLORS or RAID_CLASS_COLORS)[select(2, UnitClass("player"))],
-}
--- PLAYER MODEL SETTING
-WallpaperKitcfg.playermodel = {
-	animation = 4, rotation = -21, camdistance = 1.5,   --动画 、旋转、缩放
-	pos = { Y = 1, Z = -0.1, },
-}
--- PET MODEL SETTINGS
-WallpaperKitcfg.petmodel = {
-	rotation = 45, camdistance = 1.8,
-	pos = { Y = -3.8, Z = -1.2, }, 
-}
--- BATTLEPET MODEL SETTINGS
-WallpaperKitcfg.battlepetmodel = {
-	rotation = 20, camdistance = 3,
-	pos = { Y = 0, Z = -1.25, },
-}
+WallpaperKitcfg.color = {class = (CUSTOM_CLASS_COLORS or RAID_CLASS_COLORS)[select(2, UnitClass("player"))],}
+WallpaperKitcfg.playermodel = {animation = 4, rotation = -21, camdistance = 1.5, pos = { Y = 1, Z = -0.1, },}  -- PLAYER MODEL SETTING  动画 、旋转、缩放 、位置
+WallpaperKitcfg.petmodel = {rotation = 45, camdistance = 1.8, pos = { Y = -3.8, Z = -1.2, },}  -- PET MODEL SETTINGS
+WallpaperKitcfg.battlepetmodel = {rotation = 20, camdistance = 3, pos = { Y = 0, Z = -1.25, },}  -- BATTLEPET MODEL SETTINGS
 -- TOP / BOTTOM TEXTURE
 WallpaperKitcfg.background = {
 	top = { size = 0.1, gradient = true,
@@ -46,26 +29,15 @@ WallpaperKitcfg.background = {
 }
 -- TEXT
 WallpaperKitcfg.text ={
-	name = { size = 43, flag = "OUTLINE",
-		pos = { point = "TOP", X = -0.21, Y = -0.08, },
-	},
+	name = { size = 43, flag = "OUTLINE", pos = { point = "TOP", X = -0.21, Y = -0.08, },},
 	guild = { size = 36, flag = "OUTLINE", },
 }
 -- CENTER AURA
-WallpaperKitcfg.aura = {
-	classcolor = true, size = 0.15, texture = "Interface\\AddOns\\_ShiGuang\\Media\\Modules\\Wallpaper\\AuraWings", color = {1,1,1,1},
-	pos = { point = "CENTER", X = 0, Y = 0, },
-}
+WallpaperKitcfg.aura = {classcolor = true, size = 0.15, texture = "Interface\\AddOns\\_ShiGuang\\Media\\Modules\\Wallpaper\\AuraWings", color = {1,1,1,1},pos = { point = "CENTER", X = 0, Y = 0, },}
 -- CENTER CLASSICON
-WallpaperKitcfg.classicon = { size = 21,
-  font = "Interface\\Addons\\_ShiGuang\\Media\\Fonts\\RedCircl.ttf",
-	text = "--- |cFFFFFF00 2 |r|cFFFF0000 UI|r ---",
-	pos = { point = "BOTTOM", X = 0, Y = 43, },
-}
+WallpaperKitcfg.classicon = { size = 21, font = "Interface\\Addons\\_ShiGuang\\Media\\Fonts\\RedCircl.ttf", text = "--- |cFFFFFF00 2 |r|cFFFF0000 UI|r ---", pos = { point = "BOTTOM", X = 0, Y = 43, },}
 -- FACTION ICON
-WallpaperKitcfg.factionicon = { size = 0.8,
-	pos = { point = "CENTER", X = -430, Y = -21, },
-}
+WallpaperKitcfg.factionicon = { size = 0.8, pos = { point = "CENTER", X = -430, Y = -21, },}
 ------------------------------- FUNCTIONS-----------------------------
 local function OnEvent(self)
 	if UIParent:IsShown() and self:IsShown() then self:Disable() return end
@@ -216,7 +188,7 @@ function SlashCmdList.WALLPAPERKIT(msg, editbox) -- 4.
 if WallpaperKit:IsShown() then WallpaperKit:Disable() else WallpaperKit:Enable() end end
 function button_OnClick() WallpaperKit:Disable(); if UnitIsAFK("player") then SendChatMessage("", "AFK"); end end
 local hidebutton = CreateFrame("BUTTON", nil, WallpaperKit)
-hidebutton:SetSize(60000,60000)
+hidebutton:SetSize(UIParent:GetWidth(),UIParent:GetHeight())
 hidebutton:SetPoint("CENTER")
 hidebutton.t = hidebutton:CreateTexture(nil,"BACKGROUND",nil,0)
 hidebutton:SetScript("OnClick", button_OnClick)

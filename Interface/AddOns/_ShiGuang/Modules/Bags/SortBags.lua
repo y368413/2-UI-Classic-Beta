@@ -27,7 +27,7 @@ function _G.GetSortBagsRightToLeft(enabled)
 end
 
 function _G.SetSortBagsRightToLeft(enabled)
-	SortBagsRightToLeft = enabled and 1 or nil
+	_G.SortBagsRightToLeft = enabled and 1 or nil
 end
 
 local function set(...)

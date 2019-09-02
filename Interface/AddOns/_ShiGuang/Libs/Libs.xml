@@ -2,6 +2,8 @@
 	<Script file="LibStub.lua"/>
 	<Script file="CallbackHandler-1.0.lua"/>
 	<Script file="LibClassicCasterino\LibClassicCasterino.lua"/>
+	<Script file="LibAuraTypes\LibAuraTypes.lua"/>
+	<Script file="LibSpellLocks\LibSpellLocks.lua"/>
 	<Include file="LibClassicDurations\LibClassicDurations.xml"/>
 
 	<Include file="cargBags\cargBags.xml"/>

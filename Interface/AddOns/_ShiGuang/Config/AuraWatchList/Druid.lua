@@ -33,6 +33,7 @@ local list = {
 		{AuraID = 203123, UnitID = "target", Caster = "player"},	-- 割碎
 		{AuraID = 106830, UnitID = "target", Caster = "player"},	-- 痛击
 		{AuraID = 192090, UnitID = "target", Caster = "player"},	-- 痛击
+		{AuraID = 8921, UnitID = "target", Caster = "player"},	-- 月火术
 		{AuraID = 164812, UnitID = "target", Caster = "player"},	-- 月火术
 		{AuraID = 155625, UnitID = "target", Caster = "player"},	-- 月火术
 		{AuraID = 164815, UnitID = "target", Caster = "player"},	-- 阳炎术

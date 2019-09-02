@@ -20,7 +20,7 @@ local function DefaultSettings()
 	SetCVar("screenshotQuality", 10)
 	SetCVar("showTutorials", 0)
 	SetCVar("overrideArchive", 0)
-	SetCVar("WorldTextScale", 1.5)
+	SetCVar("WorldTextScale", 1)
 	--SetCVar("showQuestTrackingTooltips", 1)
 	SetCVar("showTargetOfTarget",1) --目标的目标
 	SetCVar("worldPreloadNonCritical", 0)								--加快蓝条，读完蓝条再载入游戏模组
