@@ -463,7 +463,7 @@ local function HideBlizzard()
 	SetCVar("namePlateMinScale", 1)  --default is 0.8
 	SetCVar("namePlateMaxScale", 1)
 	
-	SetCVar("nameplateMaxDistance", 43)
+	SetCVar("nameplateMaxDistance", "6e1")
 	SetCVar("nameplateOverlapH", .5)
 	SetCVar("nameplateOverlapV", .7)
 	SetCVar("nameplateMinAlpha", MaoRUISettingDB["Nameplate"]["MinAlpha"])

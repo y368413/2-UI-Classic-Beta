@@ -28,6 +28,7 @@ local function DefaultSettings()
 	setglobal("MAX_EQUIPMENT_SETS_PER_PLAYER",100)
 	--CompactRaidFrameContainer:SetScale(0.85)
 	SetCVar("chatClassColorOverride", "0")
+	SetCVar("nameplateMaxDistance", "6e1")
 end
 
 local function ForceDefaultSettings()

@@ -8,7 +8,7 @@ hooksecurefunc(StaticPopupDialogs["CONFIRM_LEAVE_BATTLEFIELD"],"OnShow",function
 end)
 --------------------------------------Hide the left/right end cap------------------------
 MainMenuBarLeftEndCap:Hide()  MainMenuBarRightEndCap:Hide()   
--------------------------------------------------------------------------------  Auto Reagent Bank
+--[[-----------------------------------------------------------------------------  Auto Reagent Bank
 local AutoReagentBank = CreateFrame("Frame")
 AutoReagentBank:RegisterEvent("BANKFRAME_OPENED")
 AutoReagentBank:SetScript("OnEvent", function(self, event, ...)
@@ -27,7 +27,7 @@ AutoReagentBank:SetScript("OnEvent", function(self, event, ...)
 	
 	BankFrameItemButton_Update_PASS = true
 	DepositReagentBank()
-end)
+end)]]
 
 --[[----------------------------------------------------------------------------- ItemQualityIcons
 hooksecurefunc("SetItemButtonQuality", function(button, quality, itemIDOrLink)

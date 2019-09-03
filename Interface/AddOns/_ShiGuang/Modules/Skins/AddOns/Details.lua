@@ -14,7 +14,7 @@ local function ReskinDetails()
 		instance:SetBackdropTexture("None")
 		instance:MenuAnchor(16, 3)
 		instance:ToolbarMenuButtonsSize(1)
-		instance:AttributeMenu(true, 0, 3, DB.Font[1], 13, {1, 1, 1}, 1, true)
+		instance:AttributeMenu(true, 0, 3, I.Font[1], 13, {1, 1, 1}, 1, true)
 		instance:SetBarSettings(18, MaoRUIDB["ResetDetails"] and "normTex" or nil)
 		instance:SetBarTextSettings(13, I.Font[1], nil, nil, nil, true, true, nil, nil, nil, nil, nil, nil, false, nil, false, nil)
 
