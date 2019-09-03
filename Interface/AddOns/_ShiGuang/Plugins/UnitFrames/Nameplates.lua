@@ -252,12 +252,13 @@ local function UpdateHealthColor(unitFrame)
 
 	if r ~= unitFrame.r or g ~= unitFrame.g or b ~= unitFrame.b then
 		hp:SetStatusBarColor(r, g, b)
-		hp.Shadow:SetBackdropColor(r/3, g/3, b/3)
 		unitFrame.r, unitFrame.g, unitFrame.b = r, g, b
 	end
 
 	if not MaoRUISettingDB["Nameplate"]["TankMode"] and I.Role ~= "Tank" then
 			hp.Shadow:SetBackdropBorderColor(0, 0, 0)
+	else
+		hp.Shadow:SetBackdropBorderColor(0, 0, 0)
 	end
 end
 
@@ -296,20 +297,18 @@ local function UpdateSelectionHighlight(unitFrame)
 	if UnitIsUnit(unit, "target") and not UnitIsUnit(unit, "player") and MaoRUISettingDB["Nameplate"]["Arrow"] then
 		unitFrame.redarrowleft:Show()
 		unitFrame.redarrowright:Show()
+		if glow then glow:Show() end
 	else
 		unitFrame.redarrowleft:Hide()
 		unitFrame.redarrowright:Hide()
+		if glow then glow:Hide() end
 	end
 
 	if not MaoRUISettingDB["Nameplate"]["Numberstyle"] then	
-		if MaoRUISettingDB["Nameplate"]["nameonly"] then
-		  unitFrame.redarrowleft:SetPoint("BOTTOM", unitFrame.name, "TOP", 0, 0)
-		else
 			unitFrame.redarrowleft:SetRotation(math.rad(90))
 			unitFrame.redarrowleft:SetPoint("RIGHT", unitFrame.healthBar, "LEFT", 1, 0)
 			unitFrame.redarrowright:SetRotation(math.rad(-90))
 			unitFrame.redarrowright:SetPoint("LEFT", unitFrame.healthBar, "RIGHT", -1, 0)
-		end
 	else
 			unitFrame.redarrowleft:SetPoint("BOTTOM", unitFrame.name, "TOP", 0, 0)
 	end
@@ -572,13 +571,13 @@ local function OnNamePlateCreated(namePlate)
 		local redarrowleft = unitFrame:CreateTexture(nil, "OVERLAY")
 		redarrowleft:SetSize(21, 21)
 		redarrowleft:SetTexture("Interface\\Addons\\_ShiGuang\\Media\\Modules\\Raid\\textureArrowAbove")
-		--redarrowleft:SetPoint("LEFT", namePlate.UnitFrame.healthBar, "LEFT", -8, -10)
+		redarrowleft:SetPoint("RIGHT", namePlate.UnitFrame.healthBar, "LEFT", 1, 0)
 		redarrowleft:Hide()
 		unitFrame.redarrowleft = redarrowleft
 		local redarrowright = unitFrame:CreateTexture(nil, "OVERLAY")
 		redarrowright:SetSize(21, 21)
 		redarrowright:SetTexture("Interface\\Addons\\_ShiGuang\\Media\\Modules\\Raid\\textureArrowAbove")
-		--redarrowright:SetPoint("LEFT", namePlate.UnitFrame.healthBar, "LEFT", -8, -10)
+		redarrowright:SetPoint("LEFT", namePlate.UnitFrame.healthBar, "RIGHT", -1, 0)
 		redarrowright:Hide()
 		unitFrame.redarrowright = redarrowright
 	else
@@ -612,6 +611,7 @@ local function OnNamePlateRemoved(unit)
 	local namePlate = C_NamePlate.GetNamePlateForUnit(unit)
 	local unitFrame = namePlate.UnitFrame
 	SetUnit(unitFrame, nil)
+	CastingBarFrame_SetUnit(unitFrame.castBar, nil, false, true)
 end
 
 local function NamePlates_OnEvent(self, event, ...)

@@ -40,15 +40,11 @@ local S_CONTAINER_SLOTS = "^" .. (string.gsub(string.gsub(CONTAINER_SLOTS, "%%([
 -- Localization. 
 -- *Just enUS so far. 
 if GetLocale() == "zhCN" or GetLocale() == "zhTW" then
-local L = {
-	["BoE"] = "|cFF00DDFF    _|r", -- Bind on Equip 
-	["BoU"] = "|cff1eff00装绑|r"  -- Bind on Use
-}
+	Combuctor_ItemInfoBoE = "|cff1eff00装绑|r"; -- Bind on Equip 
+	Combuctor_ItemInfoBoU = "|cFF00DDFF    _|r";  -- Bind on Use
 else
-local L = {
-	["BoE"] = "BoE", -- Bind on Equip 
-	["BoU"] = "BoU"  -- Bind on Use
-}
+	Combuctor_ItemInfoBoE = "BoE"; -- Bind on Equip 
+	Combuctor_ItemInfoBoU = "BoU"; -- Bind on Use
 end
 -- FontString & Texture Caches
 local Cache_ItemBind = {}
@@ -162,7 +158,7 @@ end
 local Cache_GetItemBind = function(button)
 	local ItemBind = GetPluginContainter(button):CreateFontString()
 	ItemBind:SetDrawLayer("ARTWORK")
-	ItemBind:SetPoint("BOTTOMLEFT", 2, 2)
+	ItemBind:SetPoint("BOTTOM", 2, 2)
 	ItemBind:SetFontObject(_G.NumberFont_Outline_Med or _G.NumberFontNormal) 
 	ItemBind:SetFont(ItemBind:GetFont(), 11, "OUTLINE")
 	ItemBind:SetShadowOffset(1, -1)
@@ -245,7 +241,7 @@ local Update = function(self)
 			local ItemBind = Cache_ItemBind[self] or Cache_GetItemBind(self)
 			local r, g, b = GetItemQualityColor(itemRarity)
 			ItemBind:SetTextColor(r * 2/3, g * 2/3, b * 2/3)
-			ItemBind:SetText((bindType == 3) and L["BoU"] or L["BoE"])
+			ItemBind:SetText((bindType == 3) and Combuctor_ItemInfoBoU or Combuctor_ItemInfoBoE)
 		else 
 			if Cache_ItemBind[self] then 
 				Cache_ItemBind[self]:SetText("")
