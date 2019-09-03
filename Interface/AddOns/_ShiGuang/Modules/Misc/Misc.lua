@@ -34,7 +34,6 @@ local IsGuildMember, BNGetGameAccountInfoByGUID, C_FriendList_IsFriend = IsGuild
 function MISC:OnLogin()
 	self:AddAlerts()
 	self:Expbar()
-	self:Focuser()
 	self:MailBox()
 	self:ShowItemLevel()
 	self:QuestNotifier()
@@ -56,8 +55,6 @@ function MISC:OnLogin()
 		SetCVar("cameraDistanceMaxZoomFactor", 2.6)
 	end
 
-	-- Hide Bossbanner
-	if MaoRUISettingDB["Misc"]["HideBanner"] then BossBanner:UnregisterAllEvents() end
 	-- Auto chatBubbles
 	if MaoRUIDB["AutoBubbles"] then
 		local function updateBubble()
@@ -141,7 +138,7 @@ end
 -- Reanchor DurabilityFrame
 function MISC:MoveDurabilityFrame()
 	hooksecurefunc(DurabilityFrame, "SetPoint", function(self, _, parent)
-		if parent == "MinimapCluster" or parent == MinimapCluster then
+		if parent ~= Minimap then
 			self:ClearAllPoints()
 			self:SetPoint("TOPRIGHT", Minimap, "BOTTOMRIGHT", 0, -30)
 		end
@@ -425,6 +422,8 @@ function MISC:MenuButton_Show(_, unit)
 end
 
 function MISC:MenuButton_Add()
+	if not MaoRUISettingDB["Misc"]["EnhancedMenu"] then return end
+
 	MISC.MenuButtonList = {
 		["name"] = COPY_NAME,
 		["guild"] = gsub(CHAT_GUILD_INVITE_SEND, HEADER_COLON, ""),

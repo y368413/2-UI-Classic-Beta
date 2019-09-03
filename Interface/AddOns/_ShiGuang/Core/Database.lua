@@ -15,8 +15,10 @@ for k, v in pairs(LOCALIZED_CLASS_NAMES_MALE) do
 	I.ClassList[v] = k
 end
 I.ClassColors = {}
-RAID_CLASS_COLORS["SHAMAN"] = CreateColor(0, 0.44, 0.87) -- Shaman class color
-RAID_CLASS_COLORS["SHAMAN"].colorStr = "ff0070dd"
+--RAID_CLASS_COLORS["SHAMAN"].r = 0
+--RAID_CLASS_COLORS["SHAMAN"].g = .44
+--RAID_CLASS_COLORS["SHAMAN"].b = .87
+--RAID_CLASS_COLORS["SHAMAN"].colorStr = "ff0070dd"
 local colors = CUSTOM_CLASS_COLORS or RAID_CLASS_COLORS
 for class, value in pairs(colors) do
 	I.ClassColors[class] = {}

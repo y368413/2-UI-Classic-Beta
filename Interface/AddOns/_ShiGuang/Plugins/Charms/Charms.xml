@@ -5,5 +5,5 @@
 	<Script file="kAutoOpen.lua"/>
 	<Script file="xMerchant.lua"/>
 	<Script file="StatPriority.lua"/>
-	<!--Script file="FriendGroups.lua"/-->
+	<Script file="FriendGroups.lua"/>
 </Ui>

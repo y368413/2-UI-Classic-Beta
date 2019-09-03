@@ -41,7 +41,7 @@ function module:AddNewAuraWatch(class, list)
 				local name = GetSpellInfo(spellID)
 				if not name then
 					wipe(v)
-					if I.isDeveloper then
+					if I.isClassic then
 						print(format("|cffFF0000XXX:|r '%s' %s", class, spellID))
 					end
 				end
@@ -68,6 +68,7 @@ function module:AddNewAuraWatch(class, list)
 end
 
 function module:AddDeprecatedGroup()
+	if I.isClassic then return end
 	if not MaoRUISettingDB["AuraWatch"]["DeprecatedAuras"] then return end
 
 	for name, value in pairs(R.DeprecatedAuras) do

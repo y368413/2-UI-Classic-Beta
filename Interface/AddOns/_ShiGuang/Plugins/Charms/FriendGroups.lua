@@ -1,4 +1,4 @@
---## Author: Mikeprod  ## Version: 1.13_classic    Fix for 8.2 by y368413
+--## Author: Mikeprod  ## Version: 1.13_classic-fix1    Fix for 8.2 by y368413
 local hooks = {}
 
 local function Hook(source, target, secure)
@@ -90,7 +90,7 @@ local function FriendGroups_UpdateFriendButton(button)
 			button.background:SetColorTexture(FRIENDS_WOW_BACKGROUND_COLOR.r, FRIENDS_WOW_BACKGROUND_COLOR.g, FRIENDS_WOW_BACKGROUND_COLOR.b, FRIENDS_WOW_BACKGROUND_COLOR.a)
 			if info.afk then
 				button.status:SetTexture(FRIENDS_TEXTURE_AFK)
-			elseif ( info.dnd ) then
+			elseif info.dnd then
 				button.status:SetTexture(FRIENDS_TEXTURE_DND)
 			else
 				button.status:SetTexture(FRIENDS_TEXTURE_ONLINE)
@@ -499,7 +499,7 @@ local function FriendGroups_Update(forceUpdate)
 		if not WowFriendGroups[i] then
 			WowFriendGroups[i] = {}
 		end
-		local note = select(7,C_FriendList.GetFriendInfoByIndex(i))
+		local note = C_FriendList.GetFriendInfoByIndex(i) and C_FriendList.GetFriendInfoByIndex(i).notes
 		NoteAndGroups(note, WowFriendGroups[i])
 		for group in pairs(WowFriendGroups[i]) do
 			IncrementGroup(group, true)
@@ -531,7 +531,7 @@ local function FriendGroups_Update(forceUpdate)
 		if not WowFriendGroups[j] then
 			WowFriendGroups[j] = {}
 		end
-		local note = select(7,C_FriendList.GetFriendInfoByIndex(j))
+		local note = C_FriendList.GetFriendInfoByIndex(j) and C_FriendList.GetFriendInfoByIndex(j).notes
 		NoteAndGroups(note, WowFriendGroups[j])
 		for group in pairs(WowFriendGroups[j]) do
 			IncrementGroup(group)
@@ -544,7 +544,7 @@ local function FriendGroups_Update(forceUpdate)
 
 	buttonCount = buttonCount + GroupCount
 	-- 1.5 is a magic number which preventq the list scroll to be too long
-	totalScrollHeight = totalButtonHeight + GroupCount * FRIENDS_BUTTON_HEIGHTS[FRIENDS_BUTTON_TYPE_DIVIDER] / 1.5
+	totalScrollHeight = totalButtonHeight + GroupCount * FRIENDS_BUTTON_HEIGHTS[FRIENDS_BUTTON_TYPE_DIVIDER]
 
 	FriendsFrameFriendsScrollFrame.totalFriendListEntriesHeight = totalScrollHeight
 	FriendsFrameFriendsScrollFrame.numFriendListEntries = addButtonIndex
@@ -690,7 +690,7 @@ local function FriendGroups_OnClick(self, button)
     
     local group = self.info:GetText() or ""
     if button == "RightButton" then
-        --MSA_ToggleDropDownMenu(1, group, FriendGroups_Menu, "cursor", 0, 0)
+        --ToggleDropDownMenu(1, group, FriendGroups_Menu, "cursor", 0, 0)
         ShiGuangDB["FriendGroupsHideOffline"] = not ShiGuangDB["FriendGroupsHideOffline"]
         FriendGroups_Update()
     else
@@ -700,30 +700,32 @@ local function FriendGroups_OnClick(self, button)
 end
 
 local function FriendGroups_Rename(self, old)
-    local input = self.editBox:GetText()
-    if input == "" then return end
-    local groups = {}
-    for i = 1, BNGetNumFriends() do
-        local presenceID, _, _, _, _, _, _, _, _, _, _, _, noteText = BNGetFriendInfo(i)
-        local note = NoteAndGroups(noteText, groups)
-        if groups[old] then
-            groups[old] = nil
-            groups[input] = true
-            note = CreateNote(note, groups)
-            BNSetFriendNote(presenceID, note)
-        end
-    end
-    for i = 1, C_FriendList.GetNumFriends() do
-        local note = select(7, C_FriendList.GetFriendInfoByIndex(i))
-        note = NoteAndGroups(note, groups)
-        if groups[old] then
-            groups[old] = nil
-            groups[input] = true
-            note = CreateNote(note, groups)
-            SetFriendNotes(i, note)
-        end
-    end
-    FriendGroups_Update()
+	local input = self.editBox:GetText()
+	if input == "" then
+		return
+	end
+	local groups = {}
+	for i = 1, BNGetNumFriends() do
+		local presenceID, _, _, _, _, _, _, _, _, _, _, _, noteText = BNGetFriendInfo(i)
+		local note = NoteAndGroups(noteText, groups)
+		if groups[old] then
+			groups[old] = nil
+			groups[input] = true
+			note = CreateNote(note, groups)
+			BNSetFriendNote(presenceID, note)
+		end
+	end
+	for i = 1, C_FriendList.GetNumFriends() do
+		local note = C_FriendList.GetFriendInfoByIndex(i) and C_FriendList.GetFriendInfoByIndex(i).notes
+		note = NoteAndGroups(note, groups)
+		if groups[old] then
+			groups[old] = nil
+			groups[input] = true
+			note = CreateNote(note, groups)
+			SetFriendNotes(i, note)
+		end
+	end
+	FriendGroups_Update()
 end
 
 local function FriendGroups_Create(self, data)
@@ -779,7 +781,10 @@ local function InviteOrGroup(clickedgroup, invite)
 		end
 	end
 	for i = 1, C_FriendList.GetNumFriends() do
-		local name, _, _, _, connected, _, noteText = C_FriendList.GetFriendInfoByIndex(i)
+		local friend_info = C_FriendList.GetFriendInfoByIndex(i)
+		local name = friend_info.name
+		local connected = friend_info.connected
+		local noteText = friend_info.notes
 		local note = NoteAndGroups(noteText, groups)
 		if groups[clickedgroup] then
 			if invite and connected then
@@ -804,20 +809,19 @@ local menu_items = {
  
 FriendGroups_Menu.initialize = function(self, level)
 	if not menu_items[level] then return end
-    for _, items in ipairs(menu_items[level]) do
-		local info = MSA_DropDownMenu_CreateInfo()
+	for _, items in ipairs(menu_items[level]) do
+		local info = UIDropDownMenu_CreateInfo()
 		for prop, value in pairs(items) do
-			info[prop] = value ~= "" and value or MSA_DROPDOWNMENU_MENU_VALUE ~= "" and MSA_DropDownMenu_MENU_VALUE or "[ 2 UI ]"
+			info[prop] = value ~= "" and value or UIDROPDOWNMENU_MENU_VALUE ~= "" and UIDROPDOWNMENU_MENU_VALUE or "[ 2 UI ]"
 		end
 		info.arg1 = k
-		info.arg2 = MSA_DROPDOWNMENU_MENU_VALUE
-		MSA_DropDownMenu_AddButton(info, level)
+		info.arg2 = UIDROPDOWNMENU_MENU_VALUE
+		UIDropDownMenu_AddButton(info, level)
 	end
 end]]
 
 local frame = CreateFrame("Frame")
 frame:RegisterEvent("PLAYER_LOGIN")
-
 frame:SetScript("OnEvent", function(self, event, ...)
     --if not MaoRUISettingDB["Misc"]["FriendGroups"] then self:UnregisterAllEvents() return end
     if event == "PLAYER_LOGIN" then

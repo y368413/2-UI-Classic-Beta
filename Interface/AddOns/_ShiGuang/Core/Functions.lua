@@ -499,19 +499,19 @@ function M:InspectItemTextures(clean, grabTextures)
 	for i = 1, 5 do
 		local tex = _G[tip:GetName().."Texture"..i]
 		local texture = tex and tex:GetTexture()
-		if texture then
-			if grabTextures then
-				if texture == essenceTextureID then
-					local selected = (texturesDB[i-1] ~= essenceTextureID and texturesDB[i-1]) or nil
-					essencesDB[i] = {selected, tex:GetAtlas(), texture}
-					if selected then texturesDB[i-1] = nil end
-				else
-					texturesDB[i] = texture
-				end
-			end
+		if not texture then break end
 
-			if clean then tex:SetTexture() end
+		if grabTextures then
+			if texture == essenceTextureID then
+				local selected = (texturesDB[i-1] ~= essenceTextureID and texturesDB[i-1]) or nil
+				essencesDB[i] = {selected, tex:GetAtlas(), texture}
+				if selected then texturesDB[i-1] = nil end
+			else
+				texturesDB[i] = texture
+			end
 		end
+
+		if clean then tex:SetTexture() end
 	end
 
 	return texturesDB, essencesDB
@@ -536,9 +536,12 @@ function M.GetItemLevel(link, arg1, arg2, fullScan)
 		gems, essences = M:InspectItemTextures(nil, true)
 
 		for i = 1, tip:NumLines() do
-			local text = _G[tip:GetName().."TextLeft"..i]:GetText() or ""
-			iLvl, enchantText = M:InspectItemInfo(text, iLvl, enchantText)
-			if enchantText then break end
+			local line = _G[tip:GetName().."TextLeft"..i]
+			if line then
+				local text = line:GetText() or ""
+				iLvl, enchantText = M:InspectItemInfo(text, iLvl, enchantText)
+				if enchantText then break end
+			end
 		end
 
 		return iLvl, enchantText, gems, essences
@@ -555,12 +558,15 @@ function M.GetItemLevel(link, arg1, arg2, fullScan)
 		end
 
 		for i = 2, 5 do
-			local text = _G[tip:GetName().."TextLeft"..i]:GetText() or ""
-			local found = strfind(text, itemLevelString)
-			if found then
-				local level = strmatch(text, "(%d+)%)?$")
-				iLvlDB[link] = tonumber(level)
-				break
+			local line = _G[tip:GetName().."TextLeft"..i]
+			if line then
+				local text = line:GetText() or ""
+				local found = strfind(text, itemLevelString)
+				if found then
+					local level = strmatch(text, "(%d+)%)?$")
+					iLvlDB[link] = tonumber(level)
+					break
+				end
 			end
 		end
 

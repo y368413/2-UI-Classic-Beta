@@ -22,6 +22,7 @@ local localSlots = {
 		[10] = {17, SECONDARYHANDSLOT, 1000}
 }
 
+local lastClick = 0
 local inform = CreateFrame("Frame", nil, nil, "MicroButtonAlertTemplate")
 inform:SetPoint("BOTTOM", info, "TOP", 0, 23)
 inform.Text:SetText(U["Low Durability"])
@@ -29,21 +30,21 @@ inform:Hide()
 
 local function sortSlots(a, b)
 	if a and b then
-		return a[3] < b[3]
+		return (a[3] == b[3] and a[1] < b[1]) or (a[3] < b[3])
 	end
 end
 
 local function getItemDurability()
 	local numSlots = 0
 	for i = 1, 10 do
-		if GetInventoryItemLink("player", localSlots[i][1]) then
-			local current, max = GetInventoryItemDurability(localSlots[i][1])
+		localSlots[i][3] = 1000
+		local index = localSlots[i][1]
+		if GetInventoryItemLink("player", index) then
+			local current, max = GetInventoryItemDurability(index)
 			if current then
 				localSlots[i][3] = current/max
 				numSlots = numSlots + 1
 			end
-		else
-			localSlots[i][3] = 1000
 		end
 	end
 	sort(localSlots, sortSlots)
@@ -75,12 +76,7 @@ info.onEvent = function(self, event)
 	if event == "PLAYER_ENTERING_WORLD" then
 		self:UnregisterEvent("PLAYER_ENTERING_WORLD")
 	end
-	if event == "PLAYER_REGEN_ENABLED" then
-		self:UnregisterEvent(event)
-		self:RegisterEvent("UPDATE_INVENTORY_DURABILITY")
-		getItemDurability()
-		if isLowDurability() then inform:Show() end
-	else
+
 		local numSlots = getItemDurability()
 		if numSlots > 0 then
 			self.text:SetText(format(gsub("[color]%d|r%%" , "%[color%]", (gradientColor(floor(localSlots[1][3]*100)/100))), floor(localSlots[1][3]*100)))
@@ -88,15 +84,19 @@ info.onEvent = function(self, event)
 			self.text:SetText(I.MyColor..NONE)
 		end
 
-		if isLowDurability() then inform:Show() else inform:Hide() end
+	if isLowDurability() and ((lastClick == 0) or (GetTime() - lastClick > 60*30)) then -- only half an hour
+		inform:Show()
+	else
+		inform:Hide()
 	end
 end
 
 inform.CloseButton:HookScript("OnClick", function()
-	if InCombatLockdown() then
+	--[[if InCombatLockdown() then
 		info:UnregisterEvent("UPDATE_INVENTORY_DURABILITY")
 		info:RegisterEvent("PLAYER_REGEN_ENABLED")
-	end
+	end]]
+	lastClick = GetTime()
 end)
 
 info.onMouseUp = function(self, btn)
