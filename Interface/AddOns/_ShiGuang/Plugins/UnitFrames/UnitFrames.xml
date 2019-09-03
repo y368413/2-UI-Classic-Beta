@@ -660,6 +660,7 @@
 	<Script file="UnitFramesStyle.lua"/>
 	<Script file="WhoaThickFrames.lua"/>
 	<Script file="AlternatePowerBar.lua"/>
+	<Script file="ClassicCastbars.lua"/>
 	<Script file="ClassicAuraDurations.lua"/>
 	<Script file="ClassicSpellActivations.lua"/>
 	<Script file="ColorFrames.lua"/>
