@@ -1,5 +1,6 @@
 QuestieLocale.locale['zhTW'] = {
     -- Config Windows
+    ['QUESTIE_TITLE'] = "|cff0080ff[任务]|r地图标注",
     ['OPTIONS_TAB'] = "選項",
     ['QUESTIE_HEADER'] = "Questie選項",
     ['ENABLE_QUESTIE'] = "啟用Questie",

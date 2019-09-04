@@ -54,6 +54,7 @@ DialogKey_TITLE = '|cff0080ff[任务]|r快捷对话'
 Farmer_TITLE = '|cff8080ff[拾取]|r拾取提示'
 HardYards_TITLE = '|cFFD2691E [菜单]|r距离显示:'
 MTG_TITLE = "|cff69ccf0[购买]|r鱼人助手"
+NameplateSCT_TITLE = "|cff8080ff[血条]|r伤害数字"
 ----------------Charms----------------------
 CHARMS_BUY_STACK="你确定购买|cffff0000一组|r下列物品吗？";
 CHARMS_NAKEDIZE="脱光光" ;

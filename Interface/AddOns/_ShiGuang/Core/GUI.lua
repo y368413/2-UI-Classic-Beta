@@ -122,6 +122,8 @@ local defaultSettings = {
     BommIcon = true,
     HighlightTarget = true,
     HighlightFocus = true,
+    ClassicCastbars = true,
+    TargetClassicCastbars = true,
 	},
 	Skins = {
 		DBM = true,
@@ -378,6 +380,8 @@ local optionList = {		-- type, key, value, name, horizon, horizon2, doubleline
 		--{1, "Nameplate", "QuestIcon", U["Nameplate QuestIcon"]},
 		{1, "Nameplate", "HighlightTarget", "血条高亮鼠标指向", true},
 		{1, "Nameplate", "HighlightTarget", "血条高亮焦点指向", true, true},
+		{1, "Nameplate", "ClassicCastbars", "|cff00cc4c血条施法条"},
+		{1, "Nameplate", "TargetClassicCastbars", "|cff00cc4c目标头像下方施法条", true},
 		--{1, "Nameplate", "FullHealth", U["Show FullHealth"], true},
 		--{1, "Nameplate", "ExplosivesScale", U["ExplosivesScale"]},
 		--{1, "Nameplate", "AKSProgress", U["AngryKeystones Progress"], true},

@@ -1,5 +1,6 @@
 QuestieLocale.locale['enUS'] = {
     -- Config Windows
+    ['QUESTIE_TITLE'] = "|cff0080ff[Quest]|rQuestie",
     ['OPTIONS_TAB'] = "Options",
     ['QUESTIE_HEADER'] = "Questie Options",
     ['ENABLE_QUESTIE'] = "Enable Icons",

@@ -1106,7 +1106,7 @@ function Questie:OnInitialize()
     Questie:RegisterChatCommand("questie", "QuestieSlash")
 
     LibStub("AceConfig-3.0"):RegisterOptionsTable("Questie", options)
-    self.configFrame = LibStub("AceConfigDialog-3.0"):AddToBlizOptions("Questie", "Questie");
+    self.configFrame = LibStub("AceConfigDialog-3.0"):AddToBlizOptions("Questie", QuestieLocale:GetUIString('QUESTIE_TITLE'));
 
     --Initialize the DB settings.
     Questie:debug(DEBUG_DEVELOP, QuestieLocale:GetUIString('DEBUG_CLUSTER', Questie.db.global.clusterLevel))

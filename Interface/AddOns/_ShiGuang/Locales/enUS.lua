@@ -37,6 +37,7 @@ DialogKey_TITLE = '|cff0080ff[Quest]|rDialogKey'
 Farmer_TITLE = '|cff8080ff[Loot]|rFarmer'
 HardYards_TITLE = '|cFFD2691E [Range]|rHardYards:'
 MTG_TITLE = "|cff69ccf0[Buy]|rMrrl'sTradeGame"
+NameplateSCT_TITLE = "|cff8080ff[SCT]|rNameplateSCT"
 ----------------Charms----------------------
 CHARMS_BUY_STACK="You sure buy|cffff0000 a stack |rthis item？"  ;
 CHARMS_NAKEDIZE="Nakedize";

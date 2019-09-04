@@ -1595,21 +1595,21 @@ ClassicCastbars.defaultConfig = {
 
     nameplate = {
         enabled = true,
-        width = 106,
-        height = 11,
-        iconSize = 13,
+        width = 102,
+        height = 6,
+        iconSize = 16,
         showCastInfoOnly = false,
-        showTimer = false,
+        showTimer = true,
         autoPosition = true,
         castFont = _G.STANDARD_TEXT_FONT,
         castFontSize = 8,
-        castStatusBar = "Interface\\TargetingFrame\\UI-StatusBar",
-        castBorder = "Interface\\CastingBar\\UI-CastingBar-Border-Small",
+        castStatusBar = "Interface\\Addons\\_ShiGuang\\Media\\normTex",  --"Interface\\TargetingFrame\\UI-StatusBar",
+        castBorder = "Interface\\Tooltips\\ChatBubble-Backdrop",  --"Interface\\CastingBar\\UI-CastingBar-Border-Small"
         hideIconBorder = false,
-        position = { "CENTER", 7.3, -23.1 },
+        position = { "CENTER", -1, -12 },
         iconPositionX = -3,
         iconPositionY = 0,
-        borderColor = { 1, 0.796078431372549, 0, 1 },
+        borderColor = { 1, 0.8, 0, 1 },
         statusColor = { 1, 0.7, 0, 1 },
         statusColorChannel = { 0, 1, 0, 1 },
         textColor = { 1, 1, 1, 1 },
@@ -1849,7 +1849,7 @@ function addon:CastPushback(unitGUID)
 end
 
 function addon:ToggleUnitEvents(shouldReset)
-    if self.db.target.enabled then
+    if MaoRUISettingDB["Nameplate"]["TargetClassicCastbars"] then
         self:RegisterEvent("PLAYER_TARGET_CHANGED")
         if self.db.target.autoPosition then
             self:RegisterUnitEvent("UNIT_AURA", "target")
@@ -1861,7 +1861,7 @@ function addon:ToggleUnitEvents(shouldReset)
         self:UnregisterEvent("UNIT_TARGET")
     end
 
-    if self.db.nameplate.enabled then
+    if MaoRUISettingDB["Nameplate"]["ClassicCastbars"] then
         self:RegisterEvent("NAME_PLATE_UNIT_ADDED")
         self:RegisterEvent("NAME_PLATE_UNIT_REMOVED")
     else
@@ -2187,7 +2187,7 @@ function addon:SetCastbarStyle(castbar, cast, db)
     end
 
     castbar.Icon:SetSize(db.iconSize, db.iconSize)
-    castbar.Icon:SetPoint("LEFT", castbar, db.iconPositionX - db.iconSize, db.iconPositionY)
+    castbar.Icon:SetPoint("BOTTOMLEFT", castbar, db.iconPositionX - db.iconSize, db.iconPositionY)
     castbar.Border:SetVertexColor(unpack(db.borderColor))
 
     if db.castBorder == "Interface\\CastingBar\\UI-CastingBar-Border-Small" then -- default border

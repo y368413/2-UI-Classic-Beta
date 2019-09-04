@@ -1822,5 +1822,5 @@ end
 
 function NameplateSCT:RegisterMenu()
     LibStub("AceConfigRegistry-3.0"):RegisterOptionsTable("NameplateSCT", menu);
-    self.menu = LibStub("AceConfigDialog-3.0"):AddToBlizOptions("NameplateSCT", "NameplateSCT");
+    self.menu = LibStub("AceConfigDialog-3.0"):AddToBlizOptions("NameplateSCT", NameplateSCT_TITLE);
 end

@@ -264,34 +264,6 @@ local function UpdateHealthColor(unitFrame)
 	end
 end
 
-local function UpdateCastBar(unitFrame)
-	local cb = unitFrame.castBar
-	if not cb.colored then
-		cb.startCastColor = CreateColor(0.8, 0.6, 0.1)  --.37, .71, 1
-		cb.startChannelColor = CreateColor(0.1, 0.6, 0.8)  --.37, .71, 1
-		cb.finishedCastColor = CreateColor(0.2, 0.6, 0.8)  --.1, .8, 0
-		cb.failedCastColor = CreateColor(0.1, 0.6, 0.9)  --1, .1, 0
-		cb.nonInterruptibleColor = CreateColor(1, 0, 0)  --.78, .25, .25
-		CastingBarFrame_AddWidgetForFade(cb, cb.BorderShield)
-		cb.colored = true
-	end
-
-	-- Disable Castbar on PlayerPlate
-	local unit = unitFrame.displayedUnit
-	if UnitIsUnit(unit, "player") then
-		unit = nil
-	end
-	CastingBarFrame_SetUnit(cb, unit, false, true)
-end
-
-local function UpdateCastbarTimer(cb, curValue)
-	local _, maxValue = cb:GetMinMaxValues()
-	local last = cb.last and cb.last or 0
-	local finish = (curValue > last) and (maxValue - curValue) or curValue
-	cb.timer:SetFormattedText("%.1f ", finish)
-	cb.last = curValue
-end
-
 local function UpdateSelectionHighlight(unitFrame)
 	local unit = unitFrame.displayedUnit
 	local redarrowleft, redarrowright, glow, line = unitFrame.redarrowleft, unitFrame.redarrowright, unitFrame.glowBorder, unitFrame.underLine
@@ -362,7 +334,6 @@ local function UpdateAll(unitFrame)
 	local unit = unitFrame.displayedUnit
 
 	if UnitExists(unit) then
-		UpdateCastBar(unitFrame)
 		UpdateSelectionHighlight(unitFrame)
 		UpdateName(unitFrame)
 		UpdateHealthColor(unitFrame)
@@ -521,43 +492,6 @@ local function OnNamePlateCreated(namePlate)
 	Boomicon:SetSize(66, 66)
 	unitFrame.creatureBoomIcon = Boomicon
 
-	local cb = CreateFrame("StatusBar", nil, unitFrame)
-	--cb:Hide()
-	cb.iconWhenNoninterruptible = false
-	cb:SetHeight(6)
-	cb:SetPoint("TOPLEFT", hp, "BOTTOMLEFT", 0, -2)
-	cb:SetPoint("TOPRIGHT", hp, "BOTTOMRIGHT", 0, -2)
-	M.CreateSB(cb, true)
-	cb:SetStatusBarColor(.5, .5, .5)
-	cb.Text = M.CreateFS(cb, 9, "", false, "CENTER", 0, -5)
-	cb.timer = M.CreateFS(cb, 9, "", false, "BOTTOMRIGHT", 0, -7)
-	unitFrame.castBar = cb
-
-	local cbicon = cb:CreateTexture(nil, "OVERLAY", 1)
-	cbicon:SetPoint("BOTTOMRIGHT", cb, "BOTTOMLEFT", -2, 0)
-	cbicon:SetTexCoord(unpack(I.TexCoord))
-	cbicon:SetSize(20, 20)
-	M.CreateSD(cbicon, 3, 3)
-	cb.Icon = cbicon
-
-	local cbshield = cb:CreateTexture(nil, "OVERLAY", 1)
-	cbshield:SetAtlas("nameplates-InterruptShield")
-	cbshield:SetSize(15, 15)
-	cbshield:SetPoint("LEFT", cb, "LEFT", 3, -3)
-	cb.BorderShield = cbshield
-
-	local flash = cb:CreateTexture(nil, "OVERLAY")
-	flash:SetAllPoints()
-	flash:SetTexture(I.normTex)
-	flash:SetBlendMode("ADD")
-	cb.Flash = flash
-
-	CastingBarFrame_OnLoad(cb, nil, false, true)
-	cb:SetScript("OnEvent", CastingBarFrame_OnEvent)
-	cb:SetScript("OnUpdate", CastingBarFrame_OnUpdate)
-	cb:SetScript("OnShow", CastingBarFrame_OnShow)
-	cb:HookScript("OnValueChanged", UpdateCastbarTimer)
-
 	local rtf = CreateFrame("Frame", nil, unitFrame)
 	rtf:SetSize(30, 30)
 	rtf:SetPoint("TOP", unitFrame.name, "LEFT", -15, 15)
@@ -613,7 +547,6 @@ local function OnNamePlateRemoved(unit)
 	local namePlate = C_NamePlate.GetNamePlateForUnit(unit)
 	local unitFrame = namePlate.UnitFrame
 	SetUnit(unitFrame, nil)
-	CastingBarFrame_SetUnit(unitFrame.castBar, nil, false, true)
 end
 
 local function NamePlates_OnEvent(self, event, ...)
