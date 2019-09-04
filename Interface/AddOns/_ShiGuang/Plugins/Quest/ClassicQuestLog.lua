@@ -492,11 +492,11 @@ function cql:ListEntryOnEnter()
 
    -- description
    if isComplete and isComplete>0 then
-      if ( IsBreadcrumbQuest(self.questID) ) then
-         GameTooltip:AddLine(GetQuestLogCompletionText(self.index), 1, 1, 1, true);
-      else
+      --if ( IsBreadcrumbQuest(self.questID) ) then
+         --GameTooltip:AddLine(GetQuestLogCompletionText(self.index), 1, 1, 1, true);
+      --else
          GameTooltip:AddLine(QUEST_WATCH_QUEST_READY, 1, 1, 1, true);
-      end
+      --end
    else
       local _, objectiveText = GetQuestLogQuestText(index)
       GameTooltip:AddLine(objectiveText,.85,.85,.85,true)
@@ -592,7 +592,7 @@ function cql:ShowMap()
       if not WorldMapFrame:IsVisible() then
          ToggleWorldMap()
       end
-      QuestMapFrame_ShowQuestDetails(questID)
+      --QuestMapFrame_ShowQuestDetails(questID)
    end
 end
 

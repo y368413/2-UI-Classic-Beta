@@ -1,5 +1,5 @@
 --## Author: d87
-local  ClassicAuraDurations = {}
+local ClassicAuraDurations = {}
 local LibClassicDurations
 local LibAuraTypes
 local LibSpellLocks

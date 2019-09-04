@@ -32,6 +32,7 @@ hooksecurefunc("UnitFrameHealthBar_Update", whoaUnitReaction)
 hooksecurefunc("HealthBar_OnValueChanged", function(self) whoaUnitReaction(self, self.unit) end)
 
 ---------------------------------------------------------------------------------	Aura positioning constants.
+local rmh = IsAddOnLoaded("RealMobHealth")
 local LARGE_AURA_SIZE, SMALL_AURA_SIZE, AURA_OFFSET_Y, AURA_ROW_WIDTH, NUM_TOT_AURA_ROWS = 21, 16, 1, 128, 2   -- Set aura size.
 hooksecurefunc("TargetFrame_UpdateAuraPositions", function(self, auraName, numAuras, numOppositeAuras, largeAuraList, updateFunc, maxRowWidth, offsetX, mirrorAurasVertically)
 	local offsetY = AURA_OFFSET_Y;
@@ -83,6 +84,12 @@ hooksecurefunc("PlayerFrame_ToPlayerArt", function(self)
 		self.manabar.RightText:ClearAllPoints();
 		self.manabar.RightText:SetPoint("RIGHT",self.manabar,"RIGHT",-5,0);
 		self.manabar.TextString:SetPoint("CENTER",self.manabar,"CENTER",0,0);
+		self.healthbar.LeftText:SetFontObject(SystemFont_Outline_Small);
+		self.healthbar.RightText:SetFontObject(SystemFont_Outline_Small);
+		self.manabar.LeftText:SetFontObject(SystemFont_Outline_Small);
+		self.manabar.RightText:SetFontObject(SystemFont_Outline_Small);
+		-- self.healthbar.TextString:SetFontObject(SystemFont_Outline_Small);
+		-- self.manabar.TextString:SetFontObject(SystemFont_Outline_Small);
 		--PlayerFrameGroupIndicatorText:ClearAllPoints();
 		--PlayerFrameGroupIndicatorText:SetPoint("BOTTOMLEFT", PlayerFrame,"TOP",0,-20);
 		PlayerFrameGroupIndicatorLeft:Hide();
@@ -111,56 +118,66 @@ hooksecurefunc("PlayerFrame_ToVehicleArt", function(self, vehicleType)
 	PlayerName:SetPoint("CENTER",50,23);
 	PlayerFrameBackground:SetWidth(114);
 end)
---[[	Player frame dead text.
+--[[	Player frame dead / ghost text.
 hooksecurefunc("TextStatusBar_UpdateTextStringWithValues",function(self)
 	local deadText = DEAD;
 	local ghostText = "Ghost";
 	
 	if UnitIsDead("player") or UnitIsGhost("player") then
-		PlayerFrameHealthBarText:SetFontObject(GameFontNormalSmall);
-		for i, v in pairs({	PlayerFrameHealthBar.LeftText, PlayerFrameHealthBar.RightText, PlayerFrameManaBar.LeftText, PlayerFrameManaBar.RightText, PlayerFrameTextureFrameManaBarText, PlayerFrameManaBar }) do v:SetAlpha(0); end
+		PlayerFrameHealthBar.TextString:SetFontObject(GameFontNormalSmall);
+		PlayerFrameHealthBar.TextString:SetTextColor(1.0,0.82,0,1);
+		for i, v in pairs({	PlayerFrameHealthBar.LeftText, PlayerFrameHealthBar.RightText, PlayerFrameManaBar.LeftText, PlayerFrameManaBar.RightText, PlayerFrameManaBar.TextString, PlayerFrameManaBar }) do v:SetAlpha(0); end
 		if GetCVar("statusTextDisplay")=="BOTH" then
-			PlayerFrameHealthBarText:Show();
+			PlayerFrameHealthBar.TextString:Show();
 		end
 		if UnitIsDead("player") then
-			PlayerFrameHealthBarText:SetText(deadText);
+			PlayerFrameHealthBar.TextString:SetText(deadText);
 		elseif UnitIsGhost("player") then
-			PlayerFrameHealthBarText:SetText(ghostText);
+			PlayerFrameHealthBar.TextString:SetText(ghostText);
 		end
 	elseif not UnitIsDead("player") and not UnitIsGhost("player") then
-		PlayerFrameHealthBarText:SetFontObject(TextStatusBarText);
-		for i, v in pairs({	PlayerFrameHealthBar.LeftText, PlayerFrameHealthBar.RightText, PlayerFrameManaBar.LeftText, PlayerFrameManaBar.RightText, PlayerFrameTextureFrameManaBarText, PlayerFrameManaBar }) do v:SetAlpha(1); end
+		PlayerFrameHealthBar.TextString:SetFontObject(SystemFont_Outline_Small);
+		PlayerFrameHealthBar.TextString:SetTextColor(1,1,1,1);
+		for i, v in pairs({	PlayerFrameHealthBar.LeftText, PlayerFrameHealthBar.RightText, PlayerFrameManaBar.LeftText, PlayerFrameManaBar.RightText, PlayerFrameManaBar.TextString, PlayerFrameManaBar }) do v:SetAlpha(1); end
 	end
 	
---	Target frame ghost text.
-	if UnitExists("target") and UnitIsDead("target") or UnitIsGhost("target") then
-		TargetFrameTextureFrameHealthBarText:SetFontObject(GameFontNormalSmall);
-		if GetCVar("statusTextDisplay")=="BOTH" then
-			TargetFrameTextureFrameHealthBarText:Show();
+	--Target frame dead / ghost text.
+	if rmh then 
+		if UnitExists("target") and UnitIsDead("target") or UnitIsGhost("target") then
+			TargetFrameHealthBar.TextString:SetFontObject(GameFontNormalSmall);
+			TargetFrameHealthBar.TextString:SetTextColor(1.0,0.82,0,1);
+			if GetCVar("statusTextDisplay")=="BOTH" then
+				TargetFrameHealthBar.TextString:Show();
+			end
+			for i, v in pairs({	TargetFrameHealthBar.LeftText, TargetFrameHealthBar.RightText, TargetFrameManaBar.LeftText, TargetFrameManaBar.RightText, TargetFrameManaBar.TextString, TargetFrameManaBar }) do v:SetAlpha(0); end
+			if UnitIsGhost("target") and not UnitIsDead("target") then
+				TargetFrameHealthBar.TextString:SetText(ghostText);
+			end
+		elseif rmh and UnitExists("target") and not UnitIsDead("target") and not UnitIsGhost("target") then
+			TargetFrameHealthBar.TextString:SetFontObject(SystemFont_Outline_Small);
+			TargetFrameHealthBar.TextString:SetTextColor(1,1,1,1);
+			for i, v in pairs({	TargetFrameHealthBar.LeftText, TargetFrameHealthBar.RightText, TargetFrameManaBar.LeftText, TargetFrameManaBar.RightText, TargetFrameManaBar.TextString, TargetFrameManaBar }) do v:SetAlpha(1); end
 		end
-		for i, v in pairs({	TargetFrameHealthBar.LeftText, TargetFrameHealthBar.RightText, TargetFrameManaBar.LeftText, TargetFrameManaBar.RightText, TargetFrameTextureFrameManaBarText, TargetFrameManaBar }) do v:SetAlpha(0); end
-		if UnitIsGhost("target") then
-			TargetFrameTextureFrameHealthBarText:SetText(ghostText);
-		end
-	elseif not UnitIsDead("target") and not UnitIsGhost("target") then
-		TargetFrameTextureFrameHealthBarText:SetFontObject(TextStatusBarText);
-		for i, v in pairs({	TargetFrameHealthBar.LeftText, TargetFrameHealthBar.RightText, TargetFrameManaBar.LeftText, TargetFrameManaBar.RightText, TargetFrameTextureFrameManaBarText, TargetFrameManaBar }) do v:SetAlpha(1); end
 	end
 	
---	Focus frame ghost text.
-	if UnitExists("focus") and UnitIsDead("focus") or UnitIsGhost("focus") then
-		FocusFrameTextureFrameHealthBarText:SetFontObject(GameFontNormalSmall);
-		if GetCVar("statusTextDisplay")=="BOTH" then
-			FocusFrameTextureFrameHealthBarText:Show();
-		end
-		for i, v in pairs({	FocusFrameHealthBar.LeftText, FocusFrameHealthBar.RightText, FocusFrameManaBar.LeftText, FocusFrameManaBar.RightText, FocusFrameTextureFrameManaBarText, FocusFrameManaBar }) do v:SetAlpha(0); end
-		if UnitIsGhost("focus") then
-			FocusFrameTextureFrameHealthBarText:SetText(ghostText);
-		end
-	elseif not UnitIsDead("focus") and not UnitIsGhost("focus") then
-		FocusFrameTextureFrameHealthBarText:SetFontObject(TextStatusBarText);
-		for i, v in pairs({	FocusFrameHealthBar.LeftText, FocusFrameHealthBar.RightText, FocusFrameManaBar.LeftText, FocusFrameManaBar.RightText, FocusFrameTextureFrameManaBarText, FocusFrameManaBar }) do v:SetAlpha(1); end
-	end
+	--Focus frame dead / ghost text.
+	-- if rmh then 
+		-- if UnitExists("focus") and UnitIsDead("focus") or UnitIsGhost("focus") then
+			-- FocusFrameHealthBar.TextString:SetFontObject(GameFontNormalSmall);
+			-- FocusFrameHealthBar.TextString:SetTextColor(1.0,0.82,0,1);
+			-- if GetCVar("statusTextDisplay")=="BOTH" then
+				-- FocusFrameHealthBar.TextString:Show();
+			-- end
+			-- for i, v in pairs({	FocusFrameHealthBar.LeftText, FocusFrameHealthBar.RightText, FocusFrameManaBar.LeftText, FocusFrameManaBar.RightText, FocusFrameManaBar.TextString, FocusFrameManaBar }) do v:SetAlpha(0); end
+			-- if UnitIsGhost("focus") and not UnitIsDead("focus") then
+				-- FocusFrameHealthBar.TextString:SetText(ghostText);
+			-- end
+		-- elseif rmh and UnitExists("focus") and not UnitIsDead("focus") and not UnitIsGhost("focus") then
+			-- FocusFrameHealthBar.TextString:SetFontObject(SystemFont_Outline_Small);
+			-- FocusFrameHealthBar.TextString:SetTextColor(1,1,1,1);
+			-- for i, v in pairs({	FocusFrameHealthBar.LeftText, FocusFrameHealthBar.RightText, FocusFrameManaBar.LeftText, FocusFrameManaBar.RightText, FocusFrameManaBar.TextString, FocusFrameManaBar }) do v:SetAlpha(1); end
+		-- end
+	-- end
 end)]]
 
 --	Target frame
@@ -174,9 +191,21 @@ hooksecurefunc("TargetFrame_CheckClassification", function(self, forceNormalText
 	self.name:SetPoint("LEFT", self, 15, 36);
 	self.healthbar:SetSize(119, 28);
 	self.healthbar:SetPoint("TOPLEFT", 5, -24);
-	-- self.healthbar.LeftText:SetPoint("LEFT", self.healthbar, "LEFT", 5, 0);
-	-- self.healthbar.RightText:SetPoint("RIGHT", self.healthbar, "RIGHT", -3, 0);
-	-- self.healthbar.TextString:SetPoint("CENTER", self.healthbar, "CENTER", 0, 0);
+	if rmh then
+		self.healthbar.LeftText:SetPoint("LEFT", self.healthbar, "LEFT", 5, 0);
+		self.healthbar.RightText:SetPoint("RIGHT", self.healthbar, "RIGHT", -3, 0);
+		self.healthbar.TextString:SetPoint("CENTER", self.healthbar, "CENTER", 0, 0);
+		-- self.manabar.LeftText:SetPoint("LEFT", self.manabar, "LEFT", 5, 0);	
+		self.manabar.RightText:ClearAllPoints();
+		self.manabar.RightText:SetPoint("RIGHT", self.manabar, "RIGHT", -3, 0);
+		self.manabar.TextString:SetPoint("CENTER", self.manabar, "CENTER", 0, 0);
+		self.healthbar.LeftText:SetFontObject(SystemFont_Outline_Small);
+		self.healthbar.RightText:SetFontObject(SystemFont_Outline_Small);
+		self.manabar.LeftText:SetFontObject(SystemFont_Outline_Small);
+		self.manabar.RightText:SetFontObject(SystemFont_Outline_Small);
+		self.healthbar.TextString:SetFontObject(SystemFont_Outline_Small);
+		self.manabar.TextString:SetFontObject(SystemFont_Outline_Small);
+	end
 	-- TargetFrame.threatNumericIndicator:SetPoint("BOTTOM", PlayerFrame, "TOP", 72, -21);
 	-- FocusFrame.threatNumericIndicator:SetAlpha(0);
 	if ( forceNormalTexture ) then

@@ -66,12 +66,19 @@ local spellNamesByID = {
     [14269] = "MongooseBite",
     [14270] = "MongooseBite",
     [14271] = "MongooseBite",
+
+    [879] = "Exorcism",
+    [5614] = "Exorcism",
+    [5615] = "Exorcism",
+    [10312] = "Exorcism",
+    [10313] = "Exorcism",
+    [10314] = "Exorcism",
 }
 
 f:RegisterEvent("PLAYER_LOGIN")
 function f:PLAYER_LOGIN()
 
-    if class == "WARRIOR" or class == "ROGUE" or class == "HUNTER" or class == "WARLOCK" then
+    if class == "WARRIOR" or class == "ROGUE" or class == "HUNTER" or class == "WARLOCK" or class == "PALADIN" then
         self:RegisterEvent("SPELLS_CHANGED")
         self:SPELLS_CHANGED()
 
@@ -157,6 +164,14 @@ function f:SPELLS_CHANGED()
             self:UnregisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
             self:SetScript("OnUpdate", nil)
         end
+
+    elseif class == "PALADIN" then
+        if ClassicSpellActivations.findHighestRank("Exorcism") then
+            self:RegisterEvent("PLAYER_TARGET_CHANGED")
+            self.PLAYER_TARGET_CHANGED = ClassicSpellActivations.PaladinExorcismCheck
+            self:SetScript("OnUpdate", self.timerOnUpdate)
+        end
+
     elseif class == "HUNTER" then
         self:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
         self:SetScript("OnUpdate", self.timerOnUpdate)
@@ -254,6 +269,7 @@ local reverseSpellRanks = {
     Execute = { 20662, 20661, 20660, 20658, 5308 },
     ShadowBolt = { 25307, 11661, 11660, 11659, 7641, 1106, 1088, 705, 695, 686 },
     MongooseBite = { 14271, 14270, 14269, 1495 },
+    Exorcism = { 10314, 10313, 10312, 5615, 5614, 879 },
 }
 function ClassicSpellActivations.findHighestRank(spellName)
     for _, spellID in ipairs(reverseSpellRanks[spellName]) do
@@ -288,7 +304,19 @@ function f:Deactivate(spellName)
         self:FanoutEvent("SPELL_ACTIVATION_OVERLAY_GLOW_HIDE", highestRankSpellID)
     end
 end
+
+local _OnUpdateCounter = 0
+local periodicCheck = nil
 function f.timerOnUpdate(self, elapsed)
+    _OnUpdateCounter = _OnUpdateCounter + elapsed
+    if _OnUpdateCounter < 0.2 then return end
+    _OnUpdateCounter = 0
+
+
+    if periodicCheck then
+        periodicCheck()
+    end
+
     local now = GetTime()
     for spellName, state in pairs(activations) do
         if state.expirationTime and now >= state.expirationTime then
@@ -454,6 +482,67 @@ function ClassicSpellActivations.CheckMongooseBite(eventType, isSrcPlayer, isDst
         local spellName = select(2, ...)
         if spellName == LocalizedMongooseBite then
             f:Deactivate("MongooseBite", 5)
+        end
+    end
+end
+
+-----------------
+-- PALADIN
+-----------------
+
+do
+    local LocalDemonTypes = { "Demon", "Dämon", "Demonio", "Demonio", "Démon", "Demone", "Demônio", "Демон", "악마", "恶魔", "惡魔" }
+    local LocalUndeadTypes = { "Undead", "Untoter", "No-muerto", "No-muerto", "Mort-vivant", "Non Morto", "Renegado", "Нежить", "언데드", "亡灵", "不死族" }
+    local LocIDs = {
+        ["enUS"] = 1,
+        ["deDE"] = 2,
+        ["esES"] = 3,
+        ["esMX"] = 4,
+        ["frFR"] = 5,
+        ["itIT"] = 6,
+        ["ptBR"] = 7,
+        ["ruRU"] = 8,
+        ["koKR"] = 9,
+        ["zhCN"] = 10,
+        ["zhTW"] = 11,
+    }
+    local UndeadType
+    local DemonType
+    local locID = LocIDs[GetLocale()]
+    if locID then
+        UndeadType = LocalUndeadTypes[locID]
+        DemonType = LocalDemonTypes[locID]
+    end
+
+    local exorcismTicker
+    local exorcismCooldownState
+    local exorcismTickerFunc = function()
+        local startTime, duration, enabled = GetSpellCooldown(8092) -- fistt Rank
+        local newState
+        if duration <= 1.5 then
+            newState = false
+        else
+            newState = true
+        end
+
+        if newState ~= exorcismCooldownState then
+            if newState == false then
+                f:Activate("Exorcism", 5)
+            else
+                f:Deactivate("Exorcism")
+            end
+        end
+        exorcismCooldownState = newState
+    end
+
+    function ClassicSpellActivations.PaladinExorcismCheck(self, event)
+        if UnitExists("target") and (UnitCreatureType("target") == UndeadType or UnitCreatureType("target") == DemonType) then
+            exorcismCooldownState = not exorcismCooldownState
+            exorcismTickerFunc()
+            periodicCheck = exorcismTickerFunc
+        else
+            f:Deactivate("Exorcism")
+            periodicCheck = nil
         end
     end
 end

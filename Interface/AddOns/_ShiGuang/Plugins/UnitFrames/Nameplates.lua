@@ -1,6 +1,7 @@
 ﻿local _, ns = ...
 local M, R, U, I = unpack(ns)
 ------------------------------- Nameplate, by paopao001-- NDui MOD-----------------------------
+local LCD = I.LibClassicDurations
 -- Auras
 local function CreateAuraIcon(parent)
 	local button = CreateFrame("Frame", nil, parent)
@@ -20,7 +21,8 @@ local function CreateAuraIcon(parent)
 end
 
 local function UpdateAuraIcon(button, unit, index, filter, customIcon)
-	local name, icon, count, debuffType, duration, expirationTime, _, _, _, spellID = UnitAura(unit, index, filter)
+	local name, icon, count, debuffType, _, _, caster, _, _, spellID = LCD:UnitAura(unit, index, filter)
+	duration, expirationTime = LCD:GetAuraDurationByUnit(unit, spellID, caster, name)
 
 	button.expirationTime = expirationTime
 	button.duration = duration
@@ -104,7 +106,7 @@ local function UpdateBuffs(unitFrame)
 	local i = 1
 	for index = 1, 15 do
 		if i <= MaoRUISettingDB["Nameplate"]["maxAuras"] then
-			local name, _, _, _, _, _, caster, _, _, spellID = UnitAura(unit, index, "HELPFUL")
+			local name, _, _, _, _, _, caster, _, _, spellID = LCD:UnitAura(unit, index, "HELPFUL")
 			local matchbuff, customIcon = AuraFilter(caster, spellID, unit)
 			if name and matchbuff then
 				if not unitFrame.icons[i] then
@@ -125,7 +127,7 @@ local function UpdateBuffs(unitFrame)
 
 	for index = 1, 20 do
 		if i <= MaoRUISettingDB["Nameplate"]["maxAuras"] then
-			local name, _, _, _, _, _, caster, _, _, spellID = UnitAura(unit, index, "HARMFUL")
+			local name, _, _, _, _, _, caster, _, _, spellID = LCD:UnitAura(unit, index, "HARMFUL")
 			local matchdebuff, customIcon = AuraFilter(caster, spellID, unit)
 			if name and matchdebuff then
 				if not unitFrame.icons[i] then
@@ -266,7 +268,7 @@ local function UpdateCastBar(unitFrame)
 	local cb = unitFrame.castBar
 	if not cb.colored then
 		cb.startCastColor = CreateColor(0.8, 0.6, 0.1)  --.37, .71, 1
-		cb.startChannelColor = CreateColor(0.1, 0.6, 0.8)
+		cb.startChannelColor = CreateColor(0.1, 0.6, 0.8)  --.37, .71, 1
 		cb.finishedCastColor = CreateColor(0.2, 0.6, 0.8)  --.1, .8, 0
 		cb.failedCastColor = CreateColor(0.1, 0.6, 0.9)  --1, .1, 0
 		cb.nonInterruptibleColor = CreateColor(1, 0, 0)  --.78, .25, .25
@@ -520,7 +522,7 @@ local function OnNamePlateCreated(namePlate)
 	unitFrame.creatureBoomIcon = Boomicon
 
 	local cb = CreateFrame("StatusBar", nil, unitFrame)
-	cb:Hide()
+	--cb:Hide()
 	cb.iconWhenNoninterruptible = false
 	cb:SetHeight(6)
 	cb:SetPoint("TOPLEFT", hp, "BOTTOMLEFT", 0, -2)

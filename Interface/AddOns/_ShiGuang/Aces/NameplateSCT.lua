@@ -1,4 +1,4 @@
----------------## Author: mpstark, Justwait
+---------------## Author: mpstark, Justwait ## Version: 1.2
 -- LIBEASING --
 ---------------
 
@@ -10,35 +10,6 @@ if (not LibEasing) then
 end
 
 LibEasing.frame = LibEasing.frame or CreateFrame("Frame");
-
---
--- Original Lua implementations
--- from 'EmmanuelOga'
--- https://github.com/EmmanuelOga/easing/
---
--- Adapted from
--- Tweener's easing functions (Penner's Easing Equations)
--- and http://code.google.com/p/tweener/ (jstweener javascript version)
---
-
---[[
-Disclaimer for Robert Penner's Easing Equations license:
-
-TERMS OF USE - EASING EQUATIONS
-
-Open source under the BSD License.
-
-Copyright ? 2001 Robert Penner
-All rights reserved.
-
-Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
-
-    * Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
-    * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
-    * Neither the name of the author nor the names of contributors may be used to endorse or promote products derived from this software without specific prior written permission.
-
-THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-]]
 
 -- For all easing functions:
 -- t = elapsed time
@@ -1405,17 +1376,18 @@ local menu = {
 
         disableBlizzardFCT = {
             type = 'toggle',
-            name = "Disable Blizzard FCT",
-            desc = "",
-            get = function(_, newValue) return GetCVar("floatingCombatTextCombatDamage") == "0" end,
+            name = "Blizzard FCT (Game > Combat > Show Target Damage)",
+            get = function(_, newValue) return GetCVar("floatingCombatTextCombatDamage") == "1" end,
             set = function(_, newValue)
                 if (newValue) then
-                    SetCVar("floatingCombatTextCombatDamage", "0");
+                    SetCVar("floatingCombatTextCombatDamage", 1);
                 else
-                    SetCVar("floatingCombatTextCombatDamage", "1");
+                    SetCVar("floatingCombatTextCombatDamage", 0);
                 end
             end,
-            order = 2,
+            order = 3,
+			disabled = true,
+            width = "double",
         },
 
         personalNameplate = {
@@ -1424,7 +1396,8 @@ local menu = {
             desc = "Also show numbers when you take damage on your personal nameplate or center screen",
 			get = function() return NameplateSCT.db.global.personal; end,
 			set = function(_, newValue) NameplateSCT.db.global.personal = newValue; end,
-            order = 3,
+            order = 2,
+            disabled = function() return not NameplateSCT.db.global.enabled; end;
         },
 
         animations = {
@@ -1671,15 +1644,15 @@ local menu = {
                     order = 3,
                 },
 
-                icon = {
-                    type = 'select',
-                    name = "Icon",
-                    desc = "",
-                    get = function() return NameplateSCT.db.global.formatting.icon; end,
-                    set = function(_, newValue) NameplateSCT.db.global.formatting.icon = newValue; end,
-                    values = iconValues,
-                    order = 51,
-                },
+                -- icon = {
+                    -- type = 'select',
+                    -- name = "Icon",
+                    -- desc = "",
+                    -- get = function() return NameplateSCT.db.global.formatting.icon; end,
+                    -- set = function(_, newValue) NameplateSCT.db.global.formatting.icon = newValue; end,
+                    -- values = iconValues,
+                    -- order = 51,
+                -- },
                 size = {
                     type = 'range',
                     name = "Size",
@@ -1719,15 +1692,15 @@ local menu = {
                     order = 101,
                     inline = true,
                     args = {
-                        icon = {
-                            type = 'select',
-                            name = "Icon",
-                            desc = "",
-                            get = function() return NameplateSCT.db.global.offTargetFormatting.icon; end,
-                            set = function(_, newValue) NameplateSCT.db.global.offTargetFormatting.icon = newValue; end,
-                            values = iconValues,
-                            order = 1,
-                        },
+                        -- icon = {
+                            -- type = 'select',
+                            -- name = "Icon",
+                            -- desc = "",
+                            -- get = function() return NameplateSCT.db.global.offTargetFormatting.icon; end,
+                            -- set = function(_, newValue) NameplateSCT.db.global.offTargetFormatting.icon = newValue; end,
+                            -- values = iconValues,
+                            -- order = 1,
+                        -- },
                         size = {
                             type = 'range',
                             name = "Size",
@@ -1810,7 +1783,7 @@ local menu = {
                     type = 'toggle',
                     name = "Scale Down Small Hits",
                     desc = "Scale down hits that are below a running average of your recent damage output",
-                    disabled = function() return NameplateSCT.db.global.sizing.smallHitsHide; end,
+                    disabled = function() return not NameplateSCT.db.global.enabled or NameplateSCT.db.global.sizing.smallHitsHide; end,
                     get = function() return NameplateSCT.db.global.sizing.smallHits; end,
                     set = function(_, newValue) NameplateSCT.db.global.sizing.smallHits = newValue; end,
                     order = 20,

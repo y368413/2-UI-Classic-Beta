@@ -7,12 +7,14 @@ local list = {
 	["Player Aura"] = {		-- 玩家光环组
 		{AuraID = 1850, UnitID = "player"},		-- 急奔
 		{AuraID = 774, UnitID = "player", Caster = "player"},		-- 回春术
+		{AuraID = 1058, UnitID = "player", Caster = "player"},		-- 回春术
 		{AuraID = 8936, UnitID = "player", Caster = "player"},		-- 愈合
 	},
 	["Target Aura"] = {		-- 目标光环组
 		{AuraID = 99, UnitID = "target", Caster = "player"},		-- 夺魂咆哮
 		{AuraID = 339, UnitID = "target", Caster = "player"},		-- 纠缠根须
 		{AuraID = 774, UnitID = "target", Caster = "player"},		-- 回春术
+		{AuraID = 1058, UnitID = "target", Caster = "player"},		-- 回春术
 		{AuraID = 1079, UnitID = "target", Caster = "player"},		-- 割裂
 		{AuraID = 5211, UnitID = "target", Caster = "player"},		-- 蛮力猛击
 		{AuraID = 6795, UnitID = "target", Caster = "player"},		-- 低吼

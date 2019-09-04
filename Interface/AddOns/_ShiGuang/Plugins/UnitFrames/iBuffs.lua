@@ -68,7 +68,7 @@ hooksecurefunc("RefreshDebuffs", function(frame, unit, numDebuffs, suffix, check
 	end
 end)
 
-hooksecurefunc("TargetFrame_UpdateAuras", function(self)
+--[[hooksecurefunc("TargetFrame_UpdateAuras", function(self)
 	for i = 1, MAX_TARGET_BUFFS do
 		frameName = self:GetName().."Buff"..(i)
 		caster = select(7, UnitBuff(self.unit, i, nil))
@@ -93,4 +93,4 @@ hooksecurefunc("TargetFrame_UpdateAuras", function(self)
 			end
 		end
 	end
-end)
+end)]]
