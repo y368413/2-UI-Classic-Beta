@@ -1301,7 +1301,7 @@ function Castbars:OnInitialize()
             },
             TargetCastingBarFrame =
             {
-                Show = true,
+                Show = false,
                 ShowIcon = true,
                 IconAlignment = "LEFT",
                 ShowTotalCastTime = false,
@@ -1314,7 +1314,7 @@ function Castbars:OnInitialize()
             },
             FocusCastingBarFrame =
             {
-                Show = true,
+                Show = false,
                 ShowIcon = true,
                 IconAlignment = "LEFT",
                 ShowTotalCastTime = false,
