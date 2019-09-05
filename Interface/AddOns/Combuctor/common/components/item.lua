@@ -315,7 +315,6 @@ function ItemSlot:UpdateUpgradeIcon()
 	end
 end
 
-
 function ItemSlot:SetLocked(locked)
 	SetItemButtonDesaturated(self, locked)
 end

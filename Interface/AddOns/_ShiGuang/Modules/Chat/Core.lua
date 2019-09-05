@@ -291,10 +291,8 @@ function module:OnLogin()
 	self:ChatWhisperSticky()
 	self:ChatFilter()
 	self:Chatbar()
-	--self:ChatCopy()
 	self:UrlCopy()
 	self:WhipserInvite()
-	--self:ResizeChatFrame()
 
 	-- ProfanityFilter
 	if not BNFeaturesEnabledAndConnected() then return end

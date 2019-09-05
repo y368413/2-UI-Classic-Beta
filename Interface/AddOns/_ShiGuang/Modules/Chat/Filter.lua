@@ -2,11 +2,13 @@ local _, ns = ...
 local M, R, U, I = unpack(ns)
 local module = M:GetModule("Chat")
 
-local strfind, gsub = string.find, string.gsub
+local strfind, strmatch, gsub = string.find, string.match, string.gsub
 local pairs, ipairs, tonumber = pairs, ipairs, tonumber
 local min, max, tremove = math.min, math.max, table.remove
 local IsGuildMember, C_FriendList_IsFriend, IsGUIDInGroup, C_Timer_After = IsGuildMember, C_FriendList.IsFriend, IsGUIDInGroup, C_Timer.After
 local Ambiguate, UnitIsUnit, BNGetGameAccountInfoByGUID, GetTime, SetCVar = Ambiguate, UnitIsUnit, BNGetGameAccountInfoByGUID, GetTime, SetCVar
+local GetItemInfo, GetItemStats = GetItemInfo, GetItemStats
+local LE_ITEM_CLASS_WEAPON, LE_ITEM_CLASS_ARMOR = LE_ITEM_CLASS_WEAPON, LE_ITEM_CLASS_ARMOR
 local BN_TOAST_TYPE_CLUB_INVITATION = BN_TOAST_TYPE_CLUB_INVITATION or 6
 
 -- Filter Chat symbols
@@ -135,21 +137,44 @@ function module:UpdateAddOnBlocker(event, msg, author)
 	end
 end
 
--- Block trash clubs
-local trashClubs = {"站桩", "致敬我们"}
-function module:BlockTrashClub()
-	if self.toastType == BN_TOAST_TYPE_CLUB_INVITATION then
-		local text = self.DoubleLine:GetText() or ""
-		for _, name in pairs(trashClubs) do
-			if strfind(text, name) then
-				self:Hide()
-				return
-			end
-		end
+-- Show itemlevel on chat hyperlinks
+local function isItemHasLevel(link)
+	local name, _, rarity, level, _, _, _, _, _, _, _, classID = GetItemInfo(link)
+	if name and level and rarity > 1 and (classID == LE_ITEM_CLASS_WEAPON or classID == LE_ITEM_CLASS_ARMOR) then
+		local itemLevel = M.GetItemLevel(link)
+		return name, itemLevel
 	end
 end
 
+local function isItemHasGem(link)
+	local stats = GetItemStats(link)
+	for index in pairs(stats) do
+		if strfind(index, "EMPTY_SOCKET_") then
+			return "|TInterface\\ItemSocketingFrame\\UI-EmptySocket-Prismatic:0|t"
+		end
+	end
+	return ""
+end
 
+local itemCache = {}
+local function convertItemLevel(link)
+	if itemCache[link] then return itemCache[link] end
+
+	local itemLink = strmatch(link, "|Hitem:.-|h")
+	if itemLink then
+		local name, itemLevel = isItemHasLevel(itemLink)
+		if name and itemLevel then
+			link = gsub(link, "|h%[(.-)%]|h", "|h["..name.."("..itemLevel..isItemHasGem(itemLink)..")]|h")
+			itemCache[link] = link
+		end
+	end
+	return link
+end
+
+function module:UpdateChatItemLevel(_, msg, ...)
+	msg = gsub(msg, "(|Hitem:%d+:.-|h.-|h)", convertItemLevel)
+	return false, msg, ...
+end
 
 function module:ChatFilter()
 	if MaoRUISettingDB["Chat"]["EnableFilter"] then
@@ -177,7 +202,23 @@ function module:ChatFilter()
 		ChatFrame_AddMessageEventFilter("CHAT_MSG_CHANNEL", self.UpdateAddOnBlocker)
 	end
 
-	hooksecurefunc(BNToastFrame, "ShowToast", self.BlockTrashClub)
+	if MaoRUISettingDB["Chat"]["ChatItemLevel"] then
+		ChatFrame_AddMessageEventFilter("CHAT_MSG_LOOT", self.UpdateChatItemLevel)
+		ChatFrame_AddMessageEventFilter("CHAT_MSG_CHANNEL", self.UpdateChatItemLevel)
+		ChatFrame_AddMessageEventFilter("CHAT_MSG_SAY", self.UpdateChatItemLevel)
+		ChatFrame_AddMessageEventFilter("CHAT_MSG_YELL", self.UpdateChatItemLevel)
+		ChatFrame_AddMessageEventFilter("CHAT_MSG_WHISPER", self.UpdateChatItemLevel)
+		ChatFrame_AddMessageEventFilter("CHAT_MSG_WHISPER_INFORM", self.UpdateChatItemLevel)
+		ChatFrame_AddMessageEventFilter("CHAT_MSG_BN_WHISPER", self.UpdateChatItemLevel)
+		ChatFrame_AddMessageEventFilter("CHAT_MSG_RAID", self.UpdateChatItemLevel)
+		ChatFrame_AddMessageEventFilter("CHAT_MSG_RAID_LEADER", self.UpdateChatItemLevel)
+		ChatFrame_AddMessageEventFilter("CHAT_MSG_PARTY", self.UpdateChatItemLevel)
+		ChatFrame_AddMessageEventFilter("CHAT_MSG_PARTY_LEADER", self.UpdateChatItemLevel)
+		ChatFrame_AddMessageEventFilter("CHAT_MSG_GUILD", self.UpdateChatItemLevel)
+		ChatFrame_AddMessageEventFilter("CHAT_MSG_BATTLEGROUND", self.UpdateChatItemLevel)
+		ChatFrame_AddMessageEventFilter("CHAT_MSG_INSTANCE_CHAT", self.UpdateChatItemLevel)
+		ChatFrame_AddMessageEventFilter("CHAT_MSG_INSTANCE_CHAT_LEADER", self.UpdateChatItemLevel)
+	end
 end
 
 --MonsterSayFilter
@@ -231,43 +272,3 @@ local function SendMessage(event, msg)
 		end
 	end
 end
-
-
---AchievementFilter
-local achievements = {}
-local function achievementReady(id)
-	local area, guild = achievements[id].CHAT_MSG_ACHIEVEMENT, achievements[id].CHAT_MSG_GUILD_ACHIEVEMENT
-	if area and guild then -- merge area to guild
-		for name,class in pairs(area) do
-			if guild[name] == class then area[name] = nil end
-		end
-	end
-	for event,players in pairs(achievements[id]) do
-		if next(players) ~= nil then -- skip empty
-			local list = {}
-			for name,class in pairs(players) do
-				list[#list+1] = format("|c%s|Hplayer:%s|h%s|h|r", RAID_CLASS_COLORS[class].colorStr, name, name)
-			end
-			SendMessage(event, format("[%s]获得了成就%s！", table.concat(list, "、"), GetAchievementLink(id)))
-		end
-	end
-	achievements[id] = nil
-end
-
-local function achievementFilter(self, event, msg, _, _, _, _, _, _, _, _, _, _, guid)
-	if not guid or not guid:find("Player") then return end
-	local id = tonumber(msg:match("|Hachievement:(%d+)"))
-	if not id then return end
-	local _,class,_,_,_,name,server = GetPlayerInfoByGUID(guid)
-	if not name then return end -- check nil
-	if server ~= "" and server ~= playerServer then name = name.."-"..server end
-	if not achievements[id] then
-		achievements[id] = {}
-		C_Timer_After(0.5, function() achievementReady(id) end)
-	end
-	achievements[id][event] = achievements[id][event] or {}
-	achievements[id][event][name] = class
-	return true
-end
-ChatFrame_AddMessageEventFilter("CHAT_MSG_ACHIEVEMENT", achievementFilter)
-ChatFrame_AddMessageEventFilter("CHAT_MSG_GUILD_ACHIEVEMENT", achievementFilter)

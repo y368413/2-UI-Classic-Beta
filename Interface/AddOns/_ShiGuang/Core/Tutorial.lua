@@ -39,6 +39,7 @@ local function ForceDefaultSettings()
 	SetCVar("nameplateShowAll", 1)
 	SetCVar("nameplateMotion", 1)
 	SetCVar("nameplateShowFriendlyNPCs", 0)
+	SetCVar("ActionButtonUseKeyDown", 1)
 	SetCVar("alwaysShowActionBars", 1)
 	SetCVar("lockActionBars", 1)
 	SetActionBarToggles(1, 1, 0, 0)
@@ -214,8 +215,7 @@ local function ForceSkadaOptions()
 		["profiles"] = {
 			["Default"] = {
 				["windows"] = {
-					{
-						["barheight"] = 16,
+					{	["barheight"] = 16,
 						["classicons"] = true,
 						["barslocked"] = true,
 						["y"] = 21,
@@ -368,7 +368,7 @@ local function YesTutor()
 	  MaoRUIDB["SkadaRequest"] = true
 	  MaoRUIDB["BWRequest"] = true
 	  ForceAddonSkins()
-	    --MaoRUIDB["ResetDetails"] = true 
+			MaoRUIDB["ResetDetails"] = true
 end
 
 local welcome

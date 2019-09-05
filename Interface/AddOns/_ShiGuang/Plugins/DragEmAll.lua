@@ -48,6 +48,7 @@ local BlzFrames = {
 	["VideoOptionsFrame"] = false,
 	-- Other AddOns
 	["BaudErrorFrame"] = false,
+	["ClassicQuestLog"] = false,
 }
 
 -- Frame Existing Check

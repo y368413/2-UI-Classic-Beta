@@ -2,13 +2,13 @@
 ## Title:-|cFFFFFF00 2|r|cFFFF0000 UI |r Classic -
 ## Author: ShiGuang、TuTu、Siweia
 ## Notes: Time Flies...
-## Version: 0.2.1
+## Version: 0.2.2
 ## SavedVariables: MaoRUIDB,ShiGuangDB,CastbarsDB,NameplateSCTDB,DialogKeyDB,TinyRosterDB
 ## SavedVariablesPerCharacter: MaoRUISettingDB,ShiGuangPerDB
 
 ## X-Support: Classic
 ## X-Repple: 2 UI
-## X-StatsVersion: 20190904
+## X-StatsVersion: 20190905
 ## X-LoadOn-Always: Delayed
 ## X-Website: https://git.coding.net/MaoRUI/MaoR-UI.git
 ## X-Credits: abin, ape47, Coolkid, Elv, Freebaser, Haleth, Haste, Loshine, Monolit, Neal, Neavo, p3lim, Qulight, Ray, superk, Tukz, Tuller, Warbaby, yleaf, Zork, EK, Rubgrsch, siweia & "PaoPao"...
