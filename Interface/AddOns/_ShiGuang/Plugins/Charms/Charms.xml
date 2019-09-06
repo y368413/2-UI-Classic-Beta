@@ -1,5 +1,4 @@
 ﻿<Ui xmlns="http://www.blizzard.com/wow/ui/">
-	<!--Script file="iLevel.lua"/-->
 	<Script file="Charms.lua"/>
 	<Script file="rlTools.lua"/>
 	<Script file="kAutoOpen.lua"/>

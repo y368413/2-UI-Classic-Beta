@@ -192,7 +192,8 @@ function module:OnLogin()
 	local bankWidth = MaoRUISettingDB["Bags"]["BankWidth"]
 	local iconSize = MaoRUISettingDB["Bags"]["IconSize"]
 	local artifaceMark = MaoRUISettingDB["Bags"]["Artifact"]
-	local showItemLevel = MaoRUISettingDB["Bags"]["BagsiLvl"]
+	--local showItemLevel = MaoRUISettingDB["Bags"]["BagsiLvl"]
+	local showItemLevel = false
 	local deleteButton = MaoRUISettingDB["Bags"]["DeleteButton"]
 	local itemSetFilter = MaoRUISettingDB["Bags"]["ItemSetFilter"]
 

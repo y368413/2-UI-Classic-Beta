@@ -226,6 +226,7 @@ end
  --------------------------------------- 聊天表情-- Author:M  end -------------------------------------
  
 function module:Chatbar()
+	if not MaoRUISettingDB["Chat"]["Chatbar"] then return end
 	local width, height, padding, buttonList = 16, 18, 6, {}
 	local Chatbar = CreateFrame("Frame", nil, UIParent)
 	Chatbar:SetSize(width, height)

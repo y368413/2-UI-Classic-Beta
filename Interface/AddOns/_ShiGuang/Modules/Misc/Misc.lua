@@ -77,6 +77,9 @@ function MISC:OnLogin()
 	hooksecurefunc(StaticPopupDialogs["DELETE_GOOD_ITEM"], "OnShow", function(self)
 		self.editBox:SetText(DELETE_ITEM_CONFIRM_STRING)
 	end)
+
+	-- Fix blizz error
+	MAIN_MENU_MICRO_ALERT_PRIORITY = MAIN_MENU_MICRO_ALERT_PRIORITY or {}
 end
 
 -- Extend Instance

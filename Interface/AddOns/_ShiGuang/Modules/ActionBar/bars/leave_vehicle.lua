@@ -9,7 +9,7 @@ function Bar:CreateLeaveVehicle()
 	local buttonList = {}
 
 	--create the frame to hold the buttons
-	local frame = CreateFrame("Frame", "NDui_LeaveVehicleBar", UIParent, "SecureHandlerStateTemplate")
+	local frame = CreateFrame("Frame", "NDui_LeaveVehicleBar", UIParent)
 	frame:SetWidth(num*cfg.size + (num-1)*margin + 2*padding)
 	frame:SetHeight(cfg.size + 2*padding)
 	if MaoRUISettingDB["Actionbar"]["Style"] == 3 then
@@ -20,32 +20,33 @@ function Bar:CreateLeaveVehicle()
 	frame:SetScale(MaoRUISettingDB["Actionbar"]["Scale"])
 
 	--the button
-	local button = CreateFrame("CheckButton", "LeaveVehicleButton", frame, "ActionButtonTemplate, SecureHandlerClickTemplate")
+	local button = CreateFrame("Button", "NDui_LeaveVehicleButton", frame)
 	table.insert(buttonList, button) --add the button object to the list
 	button:SetSize(cfg.size, cfg.size)
 	button:SetPoint("BOTTOMLEFT", frame, padding, padding)
 	button:RegisterForClicks("AnyUp")
-	button.icon:SetTexture("INTERFACE\\PLAYERACTIONBARALT\\NATURAL")
-	button.icon:SetTexCoord(.086, .168, .360, .441)
-	button:SetNormalTexture(nil)
-	button:GetHighlightTexture():SetColorTexture(1, 1, 1, .25)
-	button:GetPushedTexture():SetTexture(I.textures.pushed)
-	M.CreateSD(button, 3, 3)
+	M.PixelIcon(button, "INTERFACE\\PLAYERACTIONBARALT\\NATURAL", true)
+	button.Icon:SetTexCoord(.086, .168, .360, .441)
+	M.CreateSD(button)
+
+	local function updateVisibility()
+		if UnitOnTaxi("player") then
+			button:Show()
+		else
+			button:Hide()
+			button:UnlockHighlight()
+		end
+	end
+	hooksecurefunc("MainMenuBarVehicleLeaveButton_Update", updateVisibility)
 
 	local function onClick(self)
-		if UnitOnTaxi("player") then TaxiRequestEarlyLanding() else VehicleExit() end
-		self:SetChecked(false)
+		if not UnitOnTaxi("player") then return end
+		TaxiRequestEarlyLanding()
+		self:LockHighlight()
 	end
 	button:SetScript("OnClick", onClick)
 	button:SetScript("OnEnter", MainMenuBarVehicleLeaveButton_OnEnter)
 	button:SetScript("OnLeave", M.HideTooltip)
-
-	--frame visibility
-	frame.frameVisibility = "[canexitvehicle]c;[mounted]m;n"
-	RegisterStateDriver(frame, "exit", frame.frameVisibility)
-
-	frame:SetAttribute("_onstate-exit", [[ if CanExitVehicle() then self:Show() else self:Hide() end ]])
-	if not CanExitVehicle() then frame:Hide() end
 
 	--create drag frame and drag functionality
 	if R.bars.userplaced then

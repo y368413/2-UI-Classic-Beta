@@ -87,6 +87,7 @@ local defaultSettings = {
 		ChatMenu = true,
 		WhisperColor = true,
 		ChatItemLevel = false,
+		Chatbar = true,
 	},
 	Map = {
 		Coord = true,

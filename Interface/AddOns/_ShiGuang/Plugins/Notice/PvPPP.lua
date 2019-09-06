@@ -1,22 +1,4 @@
-﻿--------------------------------	Announce enemy drinking in arena(by Duffed)----------------------------------
-local drinkSpell = {
-	[GetSpellInfo(118358)] = true,	-- Drink
-	[GetSpellInfo(167152)] = true,	-- Refreshment
-	[GetSpellInfo(167268)] = true,	-- Ba'ruun's Bountiful Bloom
-}
-
-local frame = CreateFrame("Frame")
-frame:RegisterEvent("UNIT_SPELLCAST_SUCCEEDED")
-frame:SetScript("OnEvent", function(self, event, ...)
-	if not (event == "UNIT_SPELLCAST_SUCCEEDED" and GetZonePVPInfo() == "arena") then return end
-
-	local unit, _, spellID = ...
-	if UnitIsEnemy("player", unit) and drinkSpell[GetSpellInfo(spellID)] then
-		SendChatMessage(UnitClass(unit).." "..UnitName(unit)..TUTORIAL_TITLE11, CheckChat(true))
-	end
-end)
-
---------------------------------	Kill count ----------------------------------
+﻿--------------------------------	Kill count ----------------------------------
 local NextLimit = { 100, 500, 1000, 5000, 10000, 25000, 50000, 100000,250000,500000,1000000 }
 local GetNextLimit = function(kills)
 	for i =1, #NextLimit do

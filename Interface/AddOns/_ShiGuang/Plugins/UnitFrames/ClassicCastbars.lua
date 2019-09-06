@@ -1,4 +1,4 @@
---## Author: Wardz ## Version: v1.0.3
+--## Author: Wardz ## Version: v1.0.4
 local ClassicCastbars = {}
 local PoolManager = {}
 ClassicCastbars.PoolManager = PoolManager
@@ -1191,6 +1191,7 @@ local castSpellIDs = {
     28738, -- Summon Speedy
     3657, -- Summon Spell Guard
     11548, -- Summon Spider God
+    3652, -- Summon Spirit of Old
     10712, -- Summon Spotted Rabbit
     15067, -- Summon Sprite Darter Hatchling
     712, -- Summon Succubus
@@ -1486,32 +1487,28 @@ ClassicCastbars.castTimeIncreases = {
 }
 
 -- Spells that have cast time reduced by talents.
--- Value here is not the actual cast time, but instead how
--- many seconds a talent reduces the cast time. We reduct
--- the cast time in the CLEU event for player guids so we don't
--- reduce cast time for a NPC spell with the exact same name.
 ClassicCastbars.castTimeTalentDecreases = {
-    [GetSpellInfo(403)] = 1,        -- Lightning Bolt
-    [GetSpellInfo(421)] = 1,        -- Chain Lightning
-    [GetSpellInfo(6353)] = 2,       -- Soul Fire
-    [GetSpellInfo(116)] = 0.5,      -- Frostbolt
-    [GetSpellInfo(133)] = 0.5,      -- Fireball
-    [GetSpellInfo(686)] = 0.5,      -- Shadow Bolt
-    [GetSpellInfo(348)] = 0.5,      -- Immolate
-    [GetSpellInfo(331)] = 0.5,      -- Healing Wave
-    [GetSpellInfo(585)] = 0.5,      -- Smite
-    [GetSpellInfo(14914)] = 0.5,    -- Holy Fire
-    [GetSpellInfo(2054)] = 0.5,     -- Heal
-    [GetSpellInfo(25314)] = 0.5,    -- Greater Heal
-    [GetSpellInfo(8129)] = 0.5,     -- Mana Burn
-    [GetSpellInfo(5176)] = 0.5,     -- Wrath
-    [GetSpellInfo(2912)] = 0.5,     -- Starfire
-    [GetSpellInfo(5185)] = 0.5,     -- Healing Touch
-    [GetSpellInfo(2645)] = 2,       -- Ghost Wolf
-    [GetSpellInfo(691)] = 4,        -- Summon Felhunter
-    [GetSpellInfo(688)] = 4,        -- Summon Imp
-    [GetSpellInfo(697)] = 4,        -- Summon Voidwalker
-    [GetSpellInfo(712)] = 4,        -- Summon Succubus
+    [GetSpellInfo(403)] = 2000,      -- Lightning Bolt
+    [GetSpellInfo(421)] = 1500,      -- Chain Lightning
+    [GetSpellInfo(6353)] = 4000,     -- Soul Fire
+    [GetSpellInfo(116)] = 2500,      -- Frostbolt
+    [GetSpellInfo(133)] = 3000,      -- Fireball
+    [GetSpellInfo(686)] = 2500,      -- Shadow Bolt
+    [GetSpellInfo(348)] = 1500,      -- Immolate
+    [GetSpellInfo(331)] = 2500,      -- Healing Wave
+    [GetSpellInfo(585)] = 2000,      -- Smite
+    [GetSpellInfo(14914)] = 3000,    -- Holy Fire
+    [GetSpellInfo(2054)] = 2500,     -- Heal
+    [GetSpellInfo(25314)] = 2500,    -- Greater Heal
+    [GetSpellInfo(8129)] = 2500,     -- Mana Burn
+    [GetSpellInfo(5176)] = 1500,     -- Wrath
+    [GetSpellInfo(2912)] = 3000,     -- Starfire
+    [GetSpellInfo(5185)] = 3000,     -- Healing Touch
+    [GetSpellInfo(2645)] = 1000,     -- Ghost Wolf
+    [GetSpellInfo(691)] = 6000,      -- Summon Felhunter
+    [GetSpellInfo(688)] = 6000,      -- Summon Imp
+    [GetSpellInfo(697)] = 6000,      -- Summon Voidwalker
+    [GetSpellInfo(712)] = 6000,      -- Summon Succubus
 }
 
 -- List of crowd controls.
@@ -1589,7 +1586,7 @@ ClassicCastbars.crowdControls = {
 
 -- Addon Savedvariables
 ClassicCastbars.defaultConfig = {
-    version = "8", -- settings version
+    version = "9", -- settings version
     pushbackDetect = true,
     locale = GetLocale(),
 
@@ -1613,6 +1610,8 @@ ClassicCastbars.defaultConfig = {
         statusColor = { 1, 0.7, 0, 1 },
         statusColorChannel = { 0, 1, 0, 1 },
         textColor = { 1, 1, 1, 1 },
+        textPositionX = 6,
+        textPositionY = -1,
     },
 
     target = {
@@ -1635,6 +1634,8 @@ ClassicCastbars.defaultConfig = {
         statusColor = { 1, 0.7, 0, 1 },
         statusColorChannel = { 0, 1, 0, 1 },
         textColor = { 1, 1, 1, 1 },
+        textPositionX = 6,
+        textPositionY = -1,
     },
 }
 
@@ -1731,7 +1732,7 @@ function addon:StopAllCasts(unitGUID)
     end
 end
 
-function addon:StoreCast(unitGUID, spellName, iconTexturePath, castTime, isChanneled)
+function addon:StoreCast(unitGUID, spellName, iconTexturePath, castTime, isPlayer, isChanneled)
     local currTime = GetTime()
 
     if not activeTimers[unitGUID] then
@@ -1746,6 +1747,7 @@ function addon:StoreCast(unitGUID, spellName, iconTexturePath, castTime, isChann
     cast.isChanneled = isChanneled
     cast.unitGUID = unitGUID
     cast.timeStart = currTime
+    cast.isPlayer = isPlayer
     cast.prevCurrTimeModValue = nil
     cast.currTimeModValue = nil
     cast.pushbackValue = nil
@@ -1840,7 +1842,7 @@ function addon:CastPushback(unitGUID)
         cast.pushbackValue = cast.pushbackValue or 1.0
         cast.maxValue = cast.maxValue + cast.pushbackValue
         cast.endTime = cast.endTime + cast.pushbackValue
-        cast.pushbackValue = max(cast.pushbackValue - 0.2, 0.2)
+        cast.pushbackValue = max(cast.pushbackValue - 0.5, 0.2)
     else
         -- channels are reduced by 25% per hit afaik
         cast.maxValue = cast.maxValue - (cast.maxValue * 25) / 100
@@ -1996,22 +1998,23 @@ function addon:COMBAT_LOG_EVENT_UNFILTERED()
         local _, _, icon, castTime = GetSpellInfo(spellID)
         if not castTime or castTime == 0 then return end
 
-        -- Reduce cast time for certain spells
+        local isPlayer = bit_band(srcFlags, COMBATLOG_OBJECT_TYPE_PLAYER) > 0
+
+        -- Use talent reduced cast time for certain player spells
         local reducedTime = castTimeTalentDecreases[spellName]
-        if reducedTime then
-            if bit_band(srcFlags, COMBATLOG_OBJECT_TYPE_PLAYER) > 0 then -- only reduce cast time for player casted ability
-                castTime = castTime - (reducedTime * 1000)
-            end
+        if reducedTime and isPlayer then
+            castTime = reducedTime
         end
 
         -- using return here will make the next function (StoreCast) reuse the current stack frame which is slightly more performant
-        return self:StoreCast(srcGUID, spellName, icon, castTime)
+        return self:StoreCast(srcGUID, spellName, icon, castTime, isPlayer)
     elseif eventType == "SPELL_CAST_SUCCESS" then -- spell finished
         -- Channeled spells are started on SPELL_CAST_SUCCESS instead of stopped
         -- Also there's no castTime returned from GetSpellInfo for channeled spells so we need to get it from our own list
         local channelData = channeledSpells[spellName]
         if channelData then
-            return self:StoreCast(srcGUID, spellName, GetSpellTexture(channelData[2]), channelData[1] * 1000, true)
+            local isPlayer = bit_band(srcFlags, COMBATLOG_OBJECT_TYPE_PLAYER) > 0
+            return self:StoreCast(srcGUID, spellName, GetSpellTexture(channelData[2]), channelData[1] * 1000, isPlayer, true)
         end
 
         -- non-channeled spell, finish it.
@@ -2031,7 +2034,7 @@ function addon:COMBAT_LOG_EVENT_UNFILTERED()
     elseif eventType == "SPELL_AURA_REMOVED" then
         -- Channeled spells has no SPELL_CAST_* event for channel stop,
         -- so check if aura is gone instead since most (all?) channels has an aura effect.
-        if channeledSpells[spellName] then
+        if channeledSpells[spellName] and srcGUID == dstGUID then
             return self:DeleteCast(srcGUID)
         elseif castTimeIncreases[spellName] then
             -- Aura that slows casting speed was removed.
@@ -2068,7 +2071,7 @@ addon:SetScript("OnUpdate", function(self, elapsed)
         if next(activeGUIDs) then
             for unitID, unitGUID in pairs(activeGUIDs) do
                 local cast = activeTimers[unitGUID]
-                if cast and currTime - cast.timeStart > 0.2 then
+                if cast and cast.isPlayer and currTime - cast.timeStart > 0.25 then
                     if GetUnitSpeed(unitID) ~= 0 then
                         self:DeleteCast(unitGUID)
                     end
@@ -2122,6 +2125,7 @@ local activeFrames = addon.activeFrames
 local gsub = _G.string.gsub
 local unpack = _G.unpack
 local min = _G.math.min
+local max = _G.math.max
 local UnitExists = _G.UnitExists
 
 function addon:GetCastbarFrame(unitID)
@@ -2142,11 +2146,11 @@ function addon:SetTargetCastbarPosition(castbar, parentFrame)
         if parentFrame.buffsOnTop or auraRows <= 1 then
             castbar:SetPoint("CENTER", parentFrame, -18, -75)
         else
-            castbar:SetPoint("CENTER", parentFrame, -18, min(-75, -50 * (auraRows - 0.4)))
+            castbar:SetPoint("CENTER", parentFrame, -18, max(min(-75, -37.5 * auraRows), -150))
         end
     else
         if not parentFrame.buffsOnTop and auraRows > 0 then
-            castbar:SetPoint("CENTER", parentFrame, -18, min(-75, -50 * (auraRows - 0.4)))
+            castbar:SetPoint("CENTER", parentFrame, -18, max(min(-75, -37.5 * auraRows), -150))
         else
             castbar:SetPoint("CENTER", parentFrame, -18, -50)
         end
@@ -2186,6 +2190,7 @@ function addon:SetCastbarStyle(castbar, cast, db)
         castbar.Icon:SetTexCoord(0, 1, 0, 1)
     end
 
+    castbar.Spark:SetHeight(db.height * 2.1)
     castbar.Icon:SetSize(db.iconSize, db.iconSize)
     castbar.Icon:SetPoint("BOTTOMLEFT", castbar, db.iconPositionX - db.iconSize, db.iconPositionY)
     castbar.Border:SetVertexColor(unpack(db.borderColor))
@@ -2251,6 +2256,7 @@ function addon:SetCastbarFonts(castbar, cast, db)
     local c = db.textColor
     castbar.Text:SetTextColor(c[1], c[2], c[3], c[4])
     castbar.Timer:SetTextColor(c[1], c[2], c[3], c[4])
+    castbar.Text:SetPoint("LEFT", db.textPositionX, db.textPositionY)
 end
 
 function addon:DisplayCastbar(castbar, unitID)

@@ -1122,10 +1122,10 @@ end
 function DEX_Set_WOWDamage()
 	if (DEX_Get("DEX_ShowDamageWoW") == 0) then
 		SetCVar("floatingCombatTextCombatDamage", 0);
-		SetCVar("floatingCombatTextCombatHealing", 0);
+		--SetCVar("floatingCombatTextCombatHealing", 0);
 	else
 		SetCVar("floatingCombatTextCombatDamage", 1);
-		SetCVar("floatingCombatTextCombatHealing", 1);
+		--SetCVar("floatingCombatTextCombatHealing", 1);
 	end
 end
 
