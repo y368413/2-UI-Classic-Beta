@@ -4,7 +4,7 @@
 ## Notes: Time Flies...
 ## Version: 0.2.4
 ## SavedVariables: MaoRUIDB,ShiGuangDB,CastbarsDB,NameplateSCTDB,DialogKeyDB,TinyRosterDB
-## SavedVariablesPerCharacter: MaoRUISettingDB,ShiGuangPerDB
+## SavedVariablesPerCharacter: MaoRUISettingDB,ShiGuangPerDB,DEX_SAVE
 
 ## X-Support: Classic
 ## X-Repple: 2 UI
