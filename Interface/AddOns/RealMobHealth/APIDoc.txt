@@ -3,6 +3,14 @@ by SDPhantom
 https://www.wowinterface.com/forums/member.php?u=34145
 ===============================================================================
 
+API Version:
+	RealMobHealth.APIVersion	Full API version string
+	RealMobHealth.APIVersionMajor	Numerical version major
+	RealMobHealth.APIVersionMinor	Numerical version minor
+		Note: APIVersion is set by X-APIVersion in the TOC
+			Major version only increments when a change can break previous addons
+			Minor version starts at zero for every major and increments on additions, tweaks, and bugfixes
+
 Event System:
 	RealMobHealth.RegisterAddOnEvent(event,func)
 	RealMobHealth.UnregisterAddOnEvent(event,func)
@@ -18,7 +26,7 @@ Event System:
 
 		HEALTH_UPDATE(event,creatureKey,maxHealth) - Health data for creature has changed
 			Note: creatureKey and maxHealth are nil if more than one creature was affected
-			If maxHealth is nil and creatureKey present, creature data was removed
+				If maxHealth is nil and creatureKey present, creature data was removed
 		HEALTHCACHE_UPDATE(event,cacheSize) - Cache size changed
 		PEERCACHE_UPDATE(event,cacheSize) - Cache size changed
 
@@ -64,3 +72,13 @@ Health Data:
 	RealMobHealth.DeleteUnitHealthData(unit)
 	RealMobHealth.WipeHealthData()
 		Deletes unit/all health data
+
+Options:
+	RealMobHealth.OverrideOption(option,value)
+		Overrides option, setting it to value
+		Note: Fails silently if option doesn't exist or value doesn't match the same value type
+			(Example: Boolean options only accept boolean values)
+
+	RealMobHealth.UITweaksSetEnabled(show)
+		Shortcut to disable/restore all UITweaks options
+		True restores, False disables

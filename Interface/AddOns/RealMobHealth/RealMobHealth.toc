@@ -1,7 +1,8 @@
 ## Interface: 11302
-## Title: RealMobHealth v2.3
+## Title: RealMobHealth v2.5
 ## Notes: Mob Health for Classic
-## Version: 2.3
+## Version: 2.5
+## X-APIVersion: 3.2
 ## Author: SDPhantom
 ## SavedVariables: RealMobHealth_Options,RealMobHealth_CreatureHealthCache, RealMobHealth_PeerHealthCache
 

@@ -34,6 +34,8 @@ QuestieLocale.locale['zhTW'] = {
 
     ['MINIMAP_TAB'] = "小地圖選項",
     ['MINIMAP_HEADER'] = "小地圖標記選項",
+    ['MINIMAP_GLOBAL_SCALE'] = "小地圖標記的全局大小",
+    ['MINIMAP_GLOBAL_SCALE_DESC'] = "調整小度圖標記圖示的縮放比例（預設：%s）",
     ['MINIMAP_OBJECTIVE_SCALE'] = "縮放靶心圖表標",
     ['MINIMAP_OBJECTIVE_SCALE_DESC'] = "調整小地圖上的靶心圖表標大小（默認：%s）",
     ['MINIMAP_AVAILABLE_SCALE'] = "縮放可接受與可完成標記的圖示大小",

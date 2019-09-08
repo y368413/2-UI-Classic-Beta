@@ -114,28 +114,3 @@ function S:LoadWithAddOn(addonName, value, func)
 	M:RegisterEvent("PLAYER_ENTERING_WORLD", loadFunc)
 	M:RegisterEvent("ADDON_LOADED", loadFunc)
 end
-
---[[local _, _, Icon = select(1, GetSpellInfo(32379)) 
-local Frame = CreateFrame("Frame") 
-Frame:SetWidth(64) 
-Frame:SetHeight(64)   
-Frame:SetPoint("CENTER", UIParent, "CENTER", 0, 0) 
-Frame.Icon = Frame:CreateTexture(nil, "ARTWORK") 
-Frame.Icon:SetTexture(Icon) 
-Frame.Icon:SetTexCoord(0.08, 0.92, 0.08, 0.92) 
-Frame.Icon:SetPoint("CENTER", Frame, "CENTER", 0, 0) 
-
-function MakeShadow(Parent, Size) 
-local Shadow = CreateFrame("Frame", nil, Parent) 
-Shadow:SetFrameLevel(0) 
-Shadow:SetPoint("TOPLEFT", -Size, Size) 
-Shadow:SetPoint("BOTTOMRIGHT", Size, -Size) 
-Shadow:SetPoint("TOPRIGHT", Size, Size) 
-Shadow:SetPoint("BOTTOMLEFT", -Size, -Size) 
-Shadow:SetBackdrop({edgeFile = "Interface\\Addons\\_ShiGuang\\Media\\glowTex", edgeSize = Size}) 
-Shadow:SetBackdropColor( .05, .05, .05, .9) 
-Shadow:SetBackdropBorderColor(0, 0, 0, 1) 
-return Shadow 
-end 
-
-MakeShadow(Frame, 6)]]

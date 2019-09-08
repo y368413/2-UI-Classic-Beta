@@ -13,13 +13,15 @@ select(2,...).Localization=setmetatable({
 --		Options Panel
 		Options_DynamicList={--	Buttom Text, Tooltip Title, Description
 --					Tooltip Title = false to use Button Text
-			ShowTooltipText={"Show Tooltip Info",false,"Displays if a mob's health is present in Health Cache."};
 			ShowStatusBarTextAdditions={"Show TargetFrame Text",false,"Creates text for TargetFrame's bars."};
 			ModifyHealthBarText={"Modify UnitFrame Health",false,"Shows real health values for mobs in default UnitFrames."};
+			ShowTooltipText={"Show Tooltip Feedback",false,"Displays if a mob's health is present in Health Cache."};
+			ShowTooltipHealthText={"Show Tooltip Health",false,"Shows health on the GameTooltip's StatusBar"};
 			ShowNamePlateHealthText={"Show NamePlate Health",false,"Shows health on the left side of NamePlates."};
 
 			EnablePeerCache={"Enable","Enable Peer Cache","Toggles receiving health data from others.\n|cffffff00Note: This addon will still answer queries and broadcast health updates.|r"};
 		};
+		Options_SetByAddOn="|cffff0000This option has been overridden by another addon.|r";
 
 --		Options Cache Panels
 		Options_HealthCachePanel={"Health Cache","Stores health data from mobs encountered."};

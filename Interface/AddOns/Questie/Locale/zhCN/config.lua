@@ -34,6 +34,8 @@ QuestieLocale.locale['zhCN'] = {
 
     ['MINIMAP_TAB'] = "小地图选项",
     ['MINIMAP_HEADER'] = "小地图标记选项",
+    ['MINIMAP_GLOBAL_SCALE'] = "小地图标记的全局大小",
+    ['MINIMAP_GLOBAL_SCALE_DESC'] = "调整小度图标记图标的缩放比例（预设：%s）",
     ['MINIMAP_OBJECTIVE_SCALE'] = "缩放目标图标",
     ['MINIMAP_OBJECTIVE_SCALE_DESC'] = "调整小地图上的目标图标大小（默认：%s）",
     ['MINIMAP_AVAILABLE_SCALE'] = "缩放可接受与可完成标记的图标大小",

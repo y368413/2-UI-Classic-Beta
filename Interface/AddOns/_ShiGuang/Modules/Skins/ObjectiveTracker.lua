@@ -24,6 +24,17 @@ function S:QuestTracker()
 		end
 	end)
 
+	local timerMover = CreateFrame("Frame", "NDuiQuestTimerMover", UIParent)
+	timerMover:SetSize(150, 30)
+	M.Mover(timerMover, QUEST_TIMERS, "QuestTimer", {"TOPRIGHT", frame, "TOPLEFT", -10, 0})
+
+	hooksecurefunc(QuestTimerFrame, "SetPoint", function(self, _, parent)
+		if parent ~= timerMover then
+			self:ClearAllPoints()
+			self:SetPoint("TOP", timerMover)
+		end
+	end)
+
 	-- Show quest color and level
 	local function Showlevel(self)
 		local numEntries = GetNumQuestLogEntries()
@@ -84,6 +95,9 @@ function S:QuestTracker()
 				QuestLogEx:Maximize()
 			elseif ClassicQuestLog then -- https://www.wowinterface.com/downloads/info24937-ClassicQuestLogforClassic.html
 				ShowUIPanel(ClassicQuestLog)
+				QuestLog_SetSelection(self.questIndex)
+			elseif QuestGuru then -- https://www.curseforge.com/wow/addons/questguru_classic
+				ShowUIPanel(QuestGuru)
 				QuestLog_SetSelection(self.questIndex)
 			else
 				ShowUIPanel(QuestLogFrame)
