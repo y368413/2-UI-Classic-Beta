@@ -46,8 +46,8 @@ local function ClassColourCode(class,table)
 	if table then
 		return RAID_CLASS_COLORS[class]
 	else
-		--local colour = RAID_CLASS_COLORS[class]
-		--return string.format("|cFF%02x%02x%02x", colour.r*255, colour.g*255, colour.b*255)
+		local colour = RAID_CLASS_COLORS[class]
+		return string.format("|cFF%02x%02x%02x", colour.r*255, colour.g*255, colour.b*255)
 	end
 end
 
