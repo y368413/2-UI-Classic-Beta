@@ -258,6 +258,20 @@ function MISC:TradeTargetInfo()
 end
 
 -- Show BID and highlight price
+-- AH Gold Icon
+local function formats(value)
+	local str = ''
+	if value > 9999 then
+		str = str .. format('|c00ffd700%d●|r', floor(value / 10000))
+	end
+	if value > 99 and floor(value/100)%100 ~= 0 then
+		str = str .. format('|c00c7c7cf%d●|r', (floor(value / 100) % 100))
+	end
+	if floor(value)%100 ~= 0 then
+		str = str .. format('|c00eda55f%d●|r', (floor(value) % 100))
+	end
+	return str
+end
 do
 	local function setupMisc(event, addon)
 		if addon == "Blizzard_AuctionUI" then
