@@ -1,5 +1,5 @@
 <Ui xmlns="http://www.blizzard.com/wow/ui/">
-	<Script file="Merchant.lua"/>
+	<!--Script file="Merchant.lua"/-->
 	<Script file="Molinari.lua"/>
 	<Script file="AHhelper.lua"/>
 	<Script file="AutoFollow.lua"/>

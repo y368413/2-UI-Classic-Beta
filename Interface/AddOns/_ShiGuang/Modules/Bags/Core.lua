@@ -3,10 +3,11 @@ local M, R, U, I = unpack(ns)
 
 local module = M:RegisterModule("Bags")
 local cargBags = ns.cargBags
+
 local ipairs, strmatch, unpack = ipairs, string.match, unpack
 local BAG_ITEM_QUALITY_COLORS = BAG_ITEM_QUALITY_COLORS
 local LE_ITEM_QUALITY_POOR, LE_ITEM_QUALITY_RARE, LE_ITEM_QUALITY_ARTIFACT, LE_ITEM_QUALITY_HEIRLOOM = LE_ITEM_QUALITY_POOR, LE_ITEM_QUALITY_RARE, LE_ITEM_QUALITY_ARTIFACT, LE_ITEM_QUALITY_HEIRLOOM
-local LE_ITEM_CLASS_WEAPON, LE_ITEM_CLASS_ARMOR, EJ_LOOT_SLOT_FILTER_ARTIFACT_RELIC = LE_ITEM_CLASS_WEAPON, LE_ITEM_CLASS_ARMOR, EJ_LOOT_SLOT_FILTER_ARTIFACT_RELIC
+local LE_ITEM_CLASS_WEAPON, LE_ITEM_CLASS_ARMOR, LE_ITEM_CLASS_QUIVER = LE_ITEM_CLASS_WEAPON, LE_ITEM_CLASS_ARMOR, LE_ITEM_CLASS_QUIVER
 local GetContainerNumSlots, GetContainerItemInfo, PickupContainerItem = GetContainerNumSlots, GetContainerItemInfo, PickupContainerItem
 local C_NewItems_IsNewItem, C_Timer_After = C_NewItems.IsNewItem, C_Timer.After
 local IsControlKeyDown, IsAltKeyDown, DeleteCursorItem = IsControlKeyDown, IsAltKeyDown, DeleteCursorItem
@@ -130,18 +131,19 @@ end
 function module:CreateSortButton(name)
 	local bu = M.CreateButton(self, 24, 24, true, "Interface\\Icons\\ABILITY_SEAL")
 	bu:SetScript("OnClick", function()
+		if InCombatLockdown() then
+			UIErrorsFrame:AddMessage(I.InfoColor..ERR_NOT_IN_COMBAT)
+			return
+		end
+
 		if name == "Bank" then
 			SortBankBags()
 		else
 			if MaoRUISettingDB["Bags"]["ReverseSort"] then
-				if InCombatLockdown() then
-					UIErrorsFrame:AddMessage(I.InfoColor..ERR_NOT_IN_COMBAT)
-				else
-					SortBags()
-					wipe(sortCache)
-					NDui_Backpack.isSorting = true
-					C_Timer_After(.5, module.ReverseSort)
-				end
+				SortBags()
+				wipe(sortCache)
+				NDui_Backpack.isSorting = true
+				C_Timer_After(.5, module.ReverseSort)
 			else
 				SortBags()
 			end
@@ -192,8 +194,7 @@ function module:OnLogin()
 	local bankWidth = MaoRUISettingDB["Bags"]["BankWidth"]
 	local iconSize = MaoRUISettingDB["Bags"]["IconSize"]
 	local artifaceMark = MaoRUISettingDB["Bags"]["Artifact"]
-	--local showItemLevel = MaoRUISettingDB["Bags"]["BagsiLvl"]
-	local showItemLevel = false
+	local showItemLevel = MaoRUISettingDB["Bags"]["BagsiLvl"]
 	local deleteButton = MaoRUISettingDB["Bags"]["DeleteButton"]
 	local itemSetFilter = MaoRUISettingDB["Bags"]["ItemSetFilter"]
 
@@ -205,6 +206,7 @@ function module:OnLogin()
 	Backpack:HookScript("OnHide", function() PlaySound(SOUNDKIT.IG_BACKPACK_CLOSE) end)
 
 	local f = {}
+	module.AmmoBags = {}
 	local onlyBags, bagAmmo, bagEquipment, bagConsumble, bagsJunk, onlyBank, bankAmmo, bankLegendary, bankEquipment, bankConsumble, onlyReagent, bagMountPet, bankMountPet = self:GetFilters()
 
 	function Backpack:OnInit()
@@ -212,7 +214,7 @@ function module:OnLogin()
 
 		f.main = MyContainer:New("Main", {Columns = bagsWidth, Bags = "bags"})
 		f.main:SetFilter(onlyBags, true)
-		f.main:SetPoint("BOTTOMRIGHT", -50, 50)
+		f.main:SetPoint("BOTTOMRIGHT", -50, 320)
 
 		f.junk = MyContainer:New("Junk", {Columns = bagsWidth, Parent = f.main})
 		f.junk:SetFilter(bagsJunk, true)
@@ -330,8 +332,9 @@ function module:OnLogin()
 		end
 
 		if showItemLevel then
-			if item.link and item.level and item.rarity > 1 and (item.subType == EJ_LOOT_SLOT_FILTER_ARTIFACT_RELIC or item.classID == LE_ITEM_CLASS_WEAPON or item.classID == LE_ITEM_CLASS_ARMOR) then
-				local level = M.GetItemLevel(item.link, item.bagID, item.slotID) or item.level
+			if item.link and item.level and item.rarity > 1 and (item.classID == LE_ITEM_CLASS_WEAPON or item.classID == LE_ITEM_CLASS_ARMOR) then
+				--local level = M.GetItemLevel(item.link, item.bagID, item.slotID) or item.level
+				local level = item.level
 				local color = BAG_ITEM_QUALITY_COLORS[item.rarity]
 				self.iLvl:SetText(level)
 				if MaoRUISettingDB["Bags"]["BagsiLvlcolor"] then
@@ -453,7 +456,9 @@ function module:OnLogin()
 
 	function BagButton:OnUpdate()
 		local id = GetInventoryItemID("player", (self.GetInventorySlot and self:GetInventorySlot()) or self.invID)
-		local quality = id and select(3, GetItemInfo(id)) or 0
+		if not id then return end
+		local _, _, quality, _, _, _, _, _, _, _, _, classID = GetItemInfo(id)
+		quality = quality or 0
 		if quality == 1 then quality = 0 end
 		local color = BAG_ITEM_QUALITY_COLORS[quality]
 		if not self.hidden and not self.notBought then
@@ -461,6 +466,8 @@ function module:OnLogin()
 		else
 			self.BG:SetBackdropBorderColor(0, 0, 0)
 		end
+
+		module.AmmoBags[self.bagID] = (classID == LE_ITEM_CLASS_QUIVER)
 	end
 
 	-- Fixes

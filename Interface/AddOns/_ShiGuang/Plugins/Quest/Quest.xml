@@ -1,4 +1,5 @@
 ﻿<Ui xmlns="http://www.blizzard.com/wow/ui/">
 	<Script file="Mingy.lua"/>
 	<Script file="WideQuestLog.lua"/>
+	<Script file="BetterQuestFrame.lua"/>
 </Ui>

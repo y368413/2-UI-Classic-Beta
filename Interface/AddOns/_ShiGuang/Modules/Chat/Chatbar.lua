@@ -385,6 +385,38 @@ function module:Chatbar()
 			buttonList[i]:SetPoint("LEFT", buttonList[i-1], "RIGHT", padding, 0)
 		end
 	end
+
+--Voice
+	-- Custom ChatMenu
+	Voice = CreateFrame("Button", nil, Chatbar)
+	Voice:SetSize(18, 18)
+	if GetCVar("portal") == "CN" then
+	Voice:SetPoint("LEFT", buttonList[11], "RIGHT", 3, 0)
+	else
+	Voice:SetPoint("LEFT", buttonList[10], "RIGHT", 3, 0)
+	end
+	Voice:SetNormalTexture("Interface\\AddOns\\_ShiGuang\\media\\Emotes\\zhuan_push_frame")
+	Voice:RegisterForClicks("AnyUp")
+	Voice:SetScript("OnClick",function(self) if VoiceFrame:IsShown() then VoiceFrame:Hide() else VoiceFrame:Show() end end)
+	
+	VoiceFrame = CreateFrame("Frame", nil, Chatbar)
+	VoiceFrame:SetSize(25, 100)
+	VoiceFrame:Hide()
+	VoiceFrame:SetPoint("TOPRIGHT", _G.ChatFrame1, 22, 0)
+	
+	_G.ChatFrameMenuButton:ClearAllPoints()
+	_G.ChatFrameMenuButton:SetPoint("TOP", VoiceFrame)	
+	_G.ChatFrameMenuButton:SetParent(VoiceFrame)
+	_G.ChatFrameChannelButton:ClearAllPoints()
+	_G.ChatFrameChannelButton:SetPoint("TOP", _G.ChatFrameMenuButton, "BOTTOM", 0, -2)
+	_G.ChatFrameChannelButton:SetParent(VoiceFrame)
+	--_G.ChatFrameToggleVoiceDeafenButton:SetParent(VoiceFrame)
+	--_G.ChatFrameToggleVoiceMuteButton:SetParent(VoiceFrame)
+	--_G.QuickJoinToastButton:SetParent(VoiceFrame)
+	_G.ChatAlertFrame:ClearAllPoints()
+	_G.ChatAlertFrame:SetPoint("BOTTOMLEFT", _G.ChatFrame1Tab, "TOPLEFT", 6, 6)
+--end
+
 -------------------------- 處理聊天氣泡------------------------
     if (GetCVarBool("chatBubbles")) then
     local frame = CreateFrame("Frame", nil, UIParent)

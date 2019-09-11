@@ -137,18 +137,22 @@ function module:UpdateAddOnBlocker(event, msg, author)
 	end
 end
 
--- Show itemlevel on chat hyperlinks
-local function isItemHasLevel(link)
-	local name, _, rarity, level, _, _, _, _, _, _, _, classID = GetItemInfo(link)
-	if name and level and rarity > 1 and (classID == LE_ITEM_CLASS_WEAPON or classID == LE_ITEM_CLASS_ARMOR) then
-		local itemLevel = M.GetItemLevel(link)
-		return name, itemLevel
-	end
+-- Show icon on chat hyperlinks
+local function GetHyperlink(link, texture)
+    if (not texture) then return link else return "|T"..texture..":0|t" .. link end
+end
+local function SetChatLinkIcon(link)
+    local schema, id = string.match(link, "|H(%w+):(%d+):")
+    local texture
+    if (schema == "item") then texture = select(10, GetItemInfo(tonumber(id)))
+    elseif (schema == "spell") then texture = select(3, GetSpellInfo(tonumber(id)))
+    elseif (schema == "achievement") then texture = select(10, GetAchievementInfo(tonumber(id)))
+    end
+    return GetHyperlink(link, texture)
 end
 
 local function isItemHasGem(link)
-	local stats = GetItemStats(link)
-	for index in pairs(stats) do
+	for index in pairs(GetItemStats(link)) do
 		if strfind(index, "EMPTY_SOCKET_") then
 			return "|TInterface\\ItemSocketingFrame\\UI-EmptySocket-Prismatic:0|t"
 		end
@@ -160,18 +164,27 @@ local itemCache = {}
 local function convertItemLevel(link)
 	if itemCache[link] then return itemCache[link] end
 
-	local itemLink = strmatch(link, "|Hitem:.-|h")
-	if itemLink then
-		local name, itemLevel = isItemHasLevel(itemLink)
-		if name and itemLevel then
-			link = gsub(link, "|h%[(.-)%]|h", "|h["..name.."("..itemLevel..isItemHasGem(itemLink)..")]|h")
-			itemCache[link] = link
-		end
-	end
+	  local itemLink = strmatch(link, "|H(.-)|h")
+	  local itemLinkGem = strmatch(link, "|Hitem:.-|h")
+    local name, _, _, _, _, class, subclass, _, equipSlot = GetItemInfo(itemLink)
+    local level = GetDetailedItemLevelInfo(itemLink)
+    if (level) then
+        if (equipSlot and strfind(equipSlot, "INVTYPE_")) then level = format("%s(%s)", level, _G[equipSlot] or equipSlot)
+        elseif (class == ARMOR) then level = format("%s(%s)", level, class)
+        elseif (subclass and strfind(subclass, RELICSLOT)) then level = format("%s(%s)", level, RELICSLOT)
+        end
+        if itemLinkGem then
+        link = gsub(link, "|h%[(.-)%]|h", "|h["..level..isItemHasGem(itemLinkGem)..":"..name.."]|h")
+        else
+        link = gsub(link, "|h%[(.-)%]|h", "|h["..level..":"..name.."]|h")
+        end
+        itemCache[link] = link
+    end
 	return link
 end
 
 function module:UpdateChatItemLevel(_, msg, ...)
+	msg = gsub(msg, "(|H%w+:%d+:.-|h.-|h)", SetChatLinkIcon)
 	msg = gsub(msg, "(|Hitem:%d+:.-|h.-|h)", convertItemLevel)
 	return false, msg, ...
 end
@@ -201,7 +214,6 @@ function module:ChatFilter()
 		ChatFrame_AddMessageEventFilter("CHAT_MSG_INSTANCE_CHAT_LEADER", self.UpdateAddOnBlocker)
 		ChatFrame_AddMessageEventFilter("CHAT_MSG_CHANNEL", self.UpdateAddOnBlocker)
 	end
---[[
 	if MaoRUISettingDB["Chat"]["ChatItemLevel"] then
 		ChatFrame_AddMessageEventFilter("CHAT_MSG_LOOT", self.UpdateChatItemLevel)
 		ChatFrame_AddMessageEventFilter("CHAT_MSG_CHANNEL", self.UpdateChatItemLevel)
@@ -218,7 +230,7 @@ function module:ChatFilter()
 		ChatFrame_AddMessageEventFilter("CHAT_MSG_BATTLEGROUND", self.UpdateChatItemLevel)
 		ChatFrame_AddMessageEventFilter("CHAT_MSG_INSTANCE_CHAT", self.UpdateChatItemLevel)
 		ChatFrame_AddMessageEventFilter("CHAT_MSG_INSTANCE_CHAT_LEADER", self.UpdateChatItemLevel)
-	end]]
+	end
 end
 
 --MonsterSayFilter

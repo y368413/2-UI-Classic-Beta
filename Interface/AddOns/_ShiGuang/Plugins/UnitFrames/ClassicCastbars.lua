@@ -1,4 +1,4 @@
---## Author: Wardz ## Version: v1.0.4
+--## Author: Wardz ## Version: v1.0.5
 local ClassicCastbars = {}
 local PoolManager = {}
 ClassicCastbars.PoolManager = PoolManager
@@ -1586,8 +1586,9 @@ ClassicCastbars.crowdControls = {
 
 -- Addon Savedvariables
 ClassicCastbars.defaultConfig = {
-    version = "9", -- settings version
+    version = "10", -- settings version
     pushbackDetect = true,
+    movementDetect = true,
     locale = GetLocale(),
 
     nameplate = {
@@ -1699,19 +1700,15 @@ function addon:StartCast(unitGUID, unitID)
     self:CheckCastModifier(unitID, unitGUID)
 end
 
-function addon:StopCast(unitID)
+function addon:StopCast(unitID, noFadeOut)
     local castbar = activeFrames[unitID]
     if not castbar then return end
 
-    castbar._data = nil
     if not castbar.isTesting then
-        --[[if not noFadeOut then
-            -- TODO: verify this doesn't cause side effects or performance issues
-            UIFrameFadeOut(castbar, 0.1, 1, 0)
-        else]]
-            castbar:Hide()
-        --end
+        self:HideCastbar(castbar, noFadeOut)
     end
+
+    castbar._data = nil
 end
 
 function addon:StartAllCasts(unitGUID)
@@ -1752,13 +1749,15 @@ function addon:StoreCast(unitGUID, spellName, iconTexturePath, castTime, isPlaye
     cast.currTimeModValue = nil
     cast.pushbackValue = nil
     cast.showCastInfoOnly = nil
+    cast.isInterrupted = nil
 
     self:StartAllCasts(unitGUID)
 end
 
 -- Delete cast data for unit, and stop any active castbars
-function addon:DeleteCast(unitGUID)
+function addon:DeleteCast(unitGUID, isInterrupted)
     if unitGUID and activeTimers[unitGUID] then
+        activeTimers[unitGUID].isInterrupted = isInterrupted -- just so we can avoid passing it as an arg for every function call
         self:StopAllCasts(unitGUID)
         activeTimers[unitGUID] = nil
     end
@@ -2050,7 +2049,7 @@ function addon:COMBAT_LOG_EVENT_UNFILTERED()
             return self:DeleteCast(srcGUID)
         end
     elseif eventType == "PARTY_KILL" or eventType == "UNIT_DIED" or eventType == "SPELL_INTERRUPT" then
-        return self:DeleteCast(dstGUID)
+        return self:DeleteCast(dstGUID, eventType == "SPELL_INTERRUPT")
     elseif eventType == "SWING_DAMAGE" or eventType == "ENVIRONMENTAL_DAMAGE" or eventType == "RANGE_DAMAGE" or eventType == "SPELL_DAMAGE" then
 
         if bit_band(dstFlags, COMBATLOG_OBJECT_TYPE_PLAYER) > 0 then -- is player
@@ -2062,26 +2061,27 @@ end
 local refresh = 0
 addon:SetScript("OnUpdate", function(self, elapsed)
     if not next(activeTimers) then return end
-
     local currTime = GetTime()
-    refresh = refresh - elapsed
+    local pushbackEnabled = self.db.pushbackDetect
 
-    -- Check if unit is moving to stop castbar, thanks to LibClassicCasterino for this idea
-    if refresh < 0 then
-        if next(activeGUIDs) then
-            for unitID, unitGUID in pairs(activeGUIDs) do
-                local cast = activeTimers[unitGUID]
-                if cast and cast.isPlayer and currTime - cast.timeStart > 0.25 then
-                    if GetUnitSpeed(unitID) ~= 0 then
-                        self:DeleteCast(unitGUID)
+    if self.db.movementDetect then
+        refresh = refresh - elapsed
+
+        -- Check if unit is moving to stop castbar, thanks to LibClassicCasterino for this idea
+        if refresh < 0 then
+            if next(activeGUIDs) then
+                for unitID, unitGUID in pairs(activeGUIDs) do
+                    local cast = activeTimers[unitGUID]
+                    if cast and cast.isPlayer and currTime - cast.timeStart > 0.25 then
+                        if GetUnitSpeed(unitID) ~= 0 then
+                            self:DeleteCast(unitGUID)
+                        end
                     end
                 end
             end
+            refresh = 0.1
         end
-        refresh = 0.1
     end
-
-    local pushbackEnabled = self.db.pushbackDetect
 
     -- Update all shown castbars in a single OnUpdate call
     for unit, castbar in pairs(activeFrames) do
@@ -2127,6 +2127,8 @@ local unpack = _G.unpack
 local min = _G.math.min
 local max = _G.math.max
 local UnitExists = _G.UnitExists
+local UIFrameFadeOut = _G.UIFrameFadeOut
+local UIFrameFadeRemoveFrame = _G.UIFrameFadeRemoveFrame
 
 function addon:GetCastbarFrame(unitID)
     -- PoolManager:DebugInfo()
@@ -2243,6 +2245,7 @@ function addon:SetLSMBorders(castbar, cast, db)
         })
         castbar.BorderFrame.currentTexture = db.castBorder
     end
+    castbar.BorderFrame:SetBackdropBorderColor(unpack(db.borderColor))
 end
 
 function addon:SetCastbarFonts(castbar, cast, db)
@@ -2266,6 +2269,12 @@ function addon:DisplayCastbar(castbar, unitID)
     local db = self.db[gsub(unitID, "%d", "")] -- nameplate1 -> nameplate
     if unitID == "nameplate-testmode" then
         db = self.db.nameplate
+    end
+
+    if castbar.fadeInfo then
+        -- need to remove frame if it's currently fading so alpha doesn't get changed after re-displaying castbar
+        UIFrameFadeRemoveFrame(castbar)
+        castbar.fadeInfo.finishedFunc = nil
     end
 
     local cast = castbar._data
@@ -2294,4 +2303,19 @@ function addon:DisplayCastbar(castbar, unitID)
     self:SetCastbarFonts(castbar, cast, db)
     self:SetCastbarIconAndText(castbar, cast, db)
     castbar:Show()
+end
+
+function addon:HideCastbar(castbar, noFadeOut)
+    local isInterrupted = castbar._data and castbar._data.isInterrupted
+
+    if not noFadeOut then
+        if isInterrupted then
+            castbar.Text:SetText(_G.INTERRUPTED)
+            castbar:SetStatusBarColor(castbar.failedCastColor:GetRGB())
+        end
+
+        UIFrameFadeOut(castbar, isInterrupted and 1.5 or 0.2, 1, 0)
+    else
+        castbar:Hide()
+    end
 end

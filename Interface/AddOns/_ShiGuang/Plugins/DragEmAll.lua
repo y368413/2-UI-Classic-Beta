@@ -17,7 +17,6 @@ local BlzFrames = {
 	["FriendsFrame"] = false,
 	["GameMenuFrame"] = false,
 	["GossipFrame"] = false,
-	["GuildInviteFrame"] = false,
 	["GuildRegistrarFrame"] = false,
 	["HelpFrame"] = false,
 	["InterfaceOptionsFrame"] = false,
@@ -29,8 +28,8 @@ local BlzFrames = {
 	["OpenMailFrame"] = false,
 	["PaperDollFrame"] = true,
 	["PetitionFrame"] = false,
+	["PetPaperDollFrame"] = true,
 	["PetStableFrame"] = false,
-	["PVEFrame"] = false,
 	["QuestLogFrame"] = false,
 	["RaidParentFrame"] = false,
 	["ReputationFrame"] = true,
@@ -38,17 +37,14 @@ local BlzFrames = {
 	["SendMailFrame"] = true,
 	["SkillFrame"] = true,
 	["SpellBookFrame"] = false,
-	["SplashFrame"] = false,
 	["StackSplitFrame"] = false,
 	["TabardFrame"] = false,
 	["TaxiFrame"] = false,
-	["TokenFrame"] = true,
 	["TradeFrame"] = false,
 	["TutorialFrame"] = false,
 	["VideoOptionsFrame"] = false,
 	-- Other AddOns
 	["BaudErrorFrame"] = false,
-	["ClassicQuestLog"] = false,
 }
 
 -- Frame Existing Check
@@ -94,9 +90,8 @@ local lodFrames = {
 	Blizzard_ObliterumUI		= { ["ObliterumForgeFrame"] = false },
 	Blizzard_OrderHallUI		= { ["OrderHallTalentFrame"] = false, },
 	Blizzard_ScrappingMachineUI = { ["ScrappingMachineFrame"] = false },
-	Blizzard_TalentUI			= { ["PlayerTalentFrame"] = false, ["PVPTalentPrestigeLevelDialog"] = false, },
+	Blizzard_TalentUI			= { ["TalentFrame"] = false },
 	Blizzard_TimeManager		= { ["TimeManagerFrame"] = false },
-	Blizzard_TokenUI			= { ["TokenFrame"] = true },
 	Blizzard_TradeSkillUI		= { ["TradeSkillFrame"] = false },
 	Blizzard_TrainerUI			= { ["ClassTrainerFrame"] = false },
 	Blizzard_VoidStorageUI		= { ["VoidStorageFrame"] = false, ["VoidStorageBorderFrameMouseBlockFrame"] = "VoidStorageFrame" },
@@ -181,7 +176,7 @@ end
 
 local function InitSetup()
 	HookFrames(BlzFrames)
-	--IsFrameExists()
+	IsFrameExists()
 end
 
 local function AddonLoaded(_, name)

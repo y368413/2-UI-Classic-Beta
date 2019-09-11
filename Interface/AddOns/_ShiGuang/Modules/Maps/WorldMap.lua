@@ -112,13 +112,18 @@ function module:WorldMapScale()
 	end
 
 	M.CreateMF(WorldMapFrame, nil, true)
+	self.UpdateMapScale(WorldMapFrame)
 	hooksecurefunc(WorldMapFrame, "HandleUserActionToggleSelf", self.UpdateMapAnchor)
 	WorldMapFrame.BlackoutFrame:Hide()
 end
 
+local function isMouseOverMap()
+	return not WorldMapFrame:IsMouseOver()
+end
+
 function module:MapFader()
 	if MaoRUISettingDB["Map"]["MapFader"] then
-		PlayerMovementFrameFader.AddDeferredFrame(WorldMapFrame, .5, 1, 1)
+		PlayerMovementFrameFader.AddDeferredFrame(WorldMapFrame, .5, 1, .5, isMouseOverMap)
 	else
 		PlayerMovementFrameFader.RemoveFrame(WorldMapFrame)
 	end

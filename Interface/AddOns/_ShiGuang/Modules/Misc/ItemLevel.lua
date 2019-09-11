@@ -15,7 +15,6 @@ local inspectSlots = {
 
 function MISC:GetSlotAnchor(index)
 	if not index then return end
-
 	if index <= 5 or index == 9 or index == 15 then
 		return "BOTTOMLEFT", 40, 20
 	elseif index == 16 then
@@ -52,10 +51,13 @@ function MISC:CreateItemString(frame, strType)
 	for index, slot in pairs(inspectSlots) do
 		if index ~= 4 then
 			local slotFrame = _G[strType..slot.."Slot"]
+			slotFrame.iLvlText = M.CreateFS(slotFrame, I.Font[2]+3)
+			slotFrame.iLvlText:ClearAllPoints()
+			slotFrame.iLvlText:SetPoint("BOTTOMRIGHT", slotFrame, x, y)
 			local relF, x, y = MISC:GetSlotAnchor(index)
-			slotFrame.enchantText = M.CreateFS(slotFrame, I.Font[2]+1)
+			slotFrame.enchantText = M.CreateFS(slotFrame, I.Font[2]-3)
 			slotFrame.enchantText:ClearAllPoints()
-			slotFrame.enchantText:SetPoint(relF, slotFrame, x, y)
+			slotFrame.enchantText:SetPoint(relF, slotFrame, x-1, y-16)
 			slotFrame.enchantText:SetTextColor(0, 1, 0)
 			for i = 1, 5 do
 				local offset = (i-1)*18 + 5
@@ -85,10 +87,14 @@ function MISC:RefreshButtonInfo()
 		for index, slotFrame in pairs(pending) do
 			local link = GetInventoryItemLink(InspectFrame.unit, index)
 			if link then
-				local quality = select(3, GetItemInfo(link))
+				local quality, level = select(3, GetItemInfo(link))
 				if quality then
 					local color = BAG_ITEM_QUALITY_COLORS[quality]
 					MISC:ItemBorderSetColor(slotFrame, color.r, color.g, color.b)
+					if level and level > 1 and quality > 1 then
+						slotFrame.iLvlText:SetText(level)
+						slotFrame.iLvlText:SetTextColor(1, 0.8, 0)  --color.r, color.g, color.b
+					end
 					pending[index] = nil
 				end
 			end
@@ -112,6 +118,7 @@ function MISC:ItemLevel_SetupLevel(frame, strType, unit)
 	for index, slot in pairs(inspectSlots) do
 		if index ~= 4 then
 			local slotFrame = _G[strType..slot.."Slot"]
+			slotFrame.iLvlText:SetText("")
 			slotFrame.enchantText:SetText("")
 			for i = 1, 5 do
 				local texture = slotFrame["textureIcon"..i]
@@ -124,10 +131,14 @@ function MISC:ItemLevel_SetupLevel(frame, strType, unit)
 			if itemTexture then
 				local link = GetInventoryItemLink(unit, index)
 				if link then
-					local quality = select(3, GetItemInfo(link))
+					local quality, level = select(3, GetItemInfo(link))
 					if quality then
 						local color = BAG_ITEM_QUALITY_COLORS[quality]
 						MISC:ItemBorderSetColor(slotFrame, color.r, color.g, color.b)
+						if level and level > 1 and quality > 1 then
+							slotFrame.iLvlText:SetText(level)
+					slotFrame.iLvlText:SetTextColor(1, 0.8, 0)  --color.r, color.g, color.b
+						end
 					else
 						pending[index] = slotFrame
 						MISC.QualityUpdater:Show()

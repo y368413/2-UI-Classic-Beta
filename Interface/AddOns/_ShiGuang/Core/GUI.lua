@@ -86,8 +86,10 @@ local defaultSettings = {
 		BlockAddonAlert = true,
 		ChatMenu = true,
 		WhisperColor = true,
-		ChatItemLevel = false,
+		ChatItemLevel = true,
 		Chatbar = true,
+		ChatWidth = 360,
+		ChatHeight = 121,
 	},
 	Map = {
 		Coord = true,
@@ -293,6 +295,10 @@ end
 
 local function updateFilterList()
 	M:GetModule("Chat"):UpdateFilterList()
+end
+
+local function updateInterruptAlert()
+	M:GetModule("Misc"):InterruptAlert()
 end
 
 local function updateMapFader()

@@ -19,6 +19,19 @@ function module:TabSetAlpha(alpha)
 	end
 end
 
+function module:UpdateChatSize()
+	if not MaoRUISettingDB["Chat"]["Lock"] then return end
+
+	ChatFrame1:ClearAllPoints()
+	ChatFrame1:SetPoint("BOTTOMLEFT", UIParent, "BOTTOMLEFT", 0, 21)
+	ChatFrame1:SetWidth(MaoRUISettingDB["Chat"]["ChatWidth"])
+	ChatFrame1:SetHeight(MaoRUISettingDB["Chat"]["ChatHeight"])
+	local bg = ChatFrame1.gradientBG
+	if bg then
+		bg:SetHeight(MaoRUISettingDB["Chat"]["ChatHeight"] + 30)
+	end
+end
+
 function module:SkinChat()
 	if not self or (self and self.styled) then return end
 
@@ -225,23 +238,6 @@ function module:UpdateTabColors(selected)
 	end
 end
 
--- Easy Resizing chatframe by dragging tab1
-function module:ResizeChatFrame()
-	ChatFrame1Tab:HookScript("OnMouseDown", function(_, btn)
-		if btn == "LeftButton" then
-			if select(8, GetChatWindowInfo(1)) then
-				ChatFrame1:StartSizing("TOP")
-			end
-		end
-	end)
-	ChatFrame1Tab:SetScript("OnMouseUp", function(_, btn)
-		if btn == "LeftButton" then
-			ChatFrame1:StopMovingOrSizing()
-			FCF_SavePositionAndDimensions(ChatFrame1)
-		end
-	end)
-end
-
 function module:UpdateChannelNames(text, ...)
 	if strfind(text, INTERFACE_ACTION_BLOCKED) then return end
 		text = gsub(text, "|h%[(%d+)%. 大脚世界频道%]|h", "|h%[%1%.世界%]|h")
@@ -293,6 +289,12 @@ function module:OnLogin()
 	self:Chatbar()
 	self:UrlCopy()
 	self:WhipserInvite()
+
+	-- Lock chatframe
+	if MaoRUISettingDB["Chat"]["Lock"] then
+		self:UpdateChatSize()
+		hooksecurefunc("FCF_SavePositionAndDimensions", self.UpdateChatSize)
+	end
 
 	-- ProfanityFilter
 	if not BNFeaturesEnabledAndConnected() then return end

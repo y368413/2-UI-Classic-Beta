@@ -305,21 +305,21 @@ function DEXOptionsFrameDropDownCats_Initialize()
 			text = DEXOptionsDropDown[i];
 			func = DEXOptionsFrameDropDownCats_OnClick;
 		};
-		MSA_DropDownMenu_AddButton(info);
+		UIDropDownMenu_AddButton(info);
 	end
 end
 
 
 function DEXOptionsFrameDropDownCats_OnShow()
-	MSA_DropDownMenu_Initialize(DEXOptionsDropDownCats, DEXOptionsFrameDropDownCats_Initialize)
-	MSA_DropDownMenu_SetSelectedID(DEXOptionsDropDownCats, DEX_Get("DEX_ColorMode"))
-	MSA_DropDownMenu_SetWidth(DEXOptionsDropDownCats,100)
+	UIDropDownMenu_Initialize(DEXOptionsDropDownCats, DEXOptionsFrameDropDownCats_Initialize)
+	UIDropDownMenu_SetSelectedID(DEXOptionsDropDownCats, DEX_Get("DEX_ColorMode"))
+	UIDropDownMenu_SetWidth(DEXOptionsDropDownCats,100)
 end
 
 
 function DEXOptionsFrameDropDownCats_OnClick(self)
 	local thisID = self:GetID()
-	MSA_DropDownMenu_SetSelectedID(DEXOptionsDropDownCats, thisID)
+	UIDropDownMenu_SetSelectedID(DEXOptionsDropDownCats, thisID)
 	DEX_Set("DEX_ColorMode",thisID)
 end
 

@@ -1,0 +1,50 @@
+## Interface: 11302
+## Title: AuctionLite
+## Title-zhCN: |cff69ccf0[拍卖]|r购售助手
+## Title-zhTW: |cff69ccf0[拍卖]|r购售助手
+## Notes: A lightweight addon that tracks auction house data and improves the auction house interface.
+## Notes-zhCN: 拍卖助手插件，是一款类似于Auctioneer的插件，让你更方便更容易的使用拍卖行
+## Author: merial.kilrogg@gmail.com
+## Version: 1.9.1
+## Dependencies: _ShiGuang
+## SavedVariables: AuctionLiteDB
+## X-Category: Interface Enhancements
+## X-Curse-Packaged-Version: r274
+## X-Curse-Project-Name: AuctionLite
+## X-Curse-Project-ID: auctionlite
+## X-Curse-Repository-ID: wow/auctionlite/mainline
+## DefaultState: disabled
+
+## X-Repple: 2 UI
+
+Locale\enUS.lua
+Locale\zhCN.lua
+Locale\zhTW.lua
+
+AuctionLite.lua
+AuctionFrame.lua
+
+Config.lua
+ListBox.lua
+
+Templates.xml
+
+BuyFrame.lua
+BuyFrame.xml
+
+SellFrame.lua
+SellFrame.xml
+
+CancelAuctions.lua
+CreateAuctions.lua
+QueryAuctions.lua
+
+Disenchant.lua
+External.lua
+History.lua
+Tooltip.lua
+
+Util.lua
+
+AdvSearch.xml
+AdvSearch.lua
