@@ -30,7 +30,7 @@ local function MerchantItemlevel()
 end
 hooksecurefunc("MerchantFrame_UpdateMerchantInfo", MerchantItemlevel)
 ----------------------------------------------------------------------------------------
--- Learn all available skills(TrainAll by SDPhantom)
+--[[ Learn all available skills(TrainAll by SDPhantom)
 ----------------------------------------------------------------------------------------
 local TrainAll = CreateFrame("Frame")
 TrainAll:RegisterEvent("ADDON_LOADED")
@@ -57,4 +57,4 @@ TrainAll:SetScript("OnEvent", function(self, event, addon)
 			button:Disable()
 		end)
 	end
-end)
+end)]]

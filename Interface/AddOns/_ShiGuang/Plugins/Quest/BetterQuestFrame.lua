@@ -1,11 +1,9 @@
-local _, ns = ...
+﻿local _, ns = ...
 local M, R, U, I = unpack(ns)
 --## Author: Cytoph ## Version: 0.9.2
-BetterQuestFrame = CreateFrame("Frame", nil, UIParent)
-local BQF = BetterQuestFrame
-local ClickFrames = {}
+local BetterQuestFrame = CreateFrame("Frame", nil, UIParent)
 
-function BQF:Initialize()
+function BetterQuestFrame:Initialize()
 	self:SetFrameStrata("BACKGROUND")
 	self:SetMovable(true)
 	self:SetClampedToScreen(true)
@@ -18,7 +16,7 @@ function BQF:Initialize()
 	self.fontStrings = {};
 end
 
-function BQF:LoadQuests()
+function BetterQuestFrame:LoadQuests()
 
 	if QuestWatchFrame:IsVisible() then QuestWatchFrame:Hide() end
 	QuestWatchFrame.Show = QuestWatchFrame.Hide
@@ -108,7 +106,7 @@ function BQF:LoadQuests()
 				objectivesCount = 1
 			end
 			
-			BQF:SetClickFrame(i, self.fontStrings[l - objectivesCount], objectives, isComplete)
+			BetterQuestFrame:SetClickFrame(i, self.fontStrings[l - objectivesCount], objectives, isComplete)
 		end
 	end
 	
@@ -193,7 +191,8 @@ local function OnLeave(self)
 	end
 end
 
-function BQF:SetClickFrame(questIndex, headerText, objectives, completed)
+function BetterQuestFrame:SetClickFrame(questIndex, headerText, objectives, completed)
+	local ClickFrames = {}
 	if not ClickFrames[questIndex] then
 		ClickFrames[questIndex] = CreateFrame("Frame")
 		ClickFrames[questIndex]:SetScript("OnMouseUp", OnMouseUp)
@@ -208,7 +207,7 @@ function BQF:SetClickFrame(questIndex, headerText, objectives, completed)
 	f.completed = completed
 end
 
-function BQF:ADDON_LOADED(addon)
+function BetterQuestFrame:ADDON_LOADED(addon)
 	if addon == "_ShiGuang" and MaoRUISettingDB["Misc"]["BetterQuest"] then
 		self:Initialize()
 		local AnchorFrame = CreateFrame("Frame", "QuestMover", UIParent)
@@ -227,18 +226,18 @@ function BQF:ADDON_LOADED(addon)
 	end
 end
 
-function BQF:QUEST_LOG_UPDATE(unitTarget)
+function BetterQuestFrame:QUEST_LOG_UPDATE(unitTarget)
 	if MaoRUISettingDB["Misc"]["BetterQuest"] then
 	self:LoadQuests()
 	end
 end
 
-function BQF:OnEvent(event, ...)
+function BetterQuestFrame:OnEvent(event, ...)
 	if MaoRUISettingDB["Misc"]["BetterQuest"] then
 		self[event](self, ...)
 	end		
 end
 
-BQF:RegisterEvent("ADDON_LOADED")
-BQF:RegisterEvent("QUEST_LOG_UPDATE")
-BQF:SetScript("OnEvent", BQF.OnEvent)
+BetterQuestFrame:RegisterEvent("ADDON_LOADED")
+BetterQuestFrame:RegisterEvent("QUEST_LOG_UPDATE")
+BetterQuestFrame:SetScript("OnEvent", BetterQuestFrame.OnEvent)

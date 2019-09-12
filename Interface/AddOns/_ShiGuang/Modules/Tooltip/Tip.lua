@@ -200,12 +200,12 @@ function TT:OnTooltipSetUnit()
 		if alive then
 			GameTooltipStatusBar:SetStatusBarColor(r, g, b)
 
-			if GameTooltipStatusBar.text then
-				if RealMobHealth and RealMobHealth.UnitHasHealthData(unit) then
-					local value, max = RealMobHealth.GetUnitHealth(unit)
-					GameTooltipStatusBar.text:SetText(M.Numb(value).." | "..M.Numb(max))
-				end
-			end
+			--if GameTooltipStatusBar.text then
+				--if RealMobHealth and RealMobHealth.UnitHasHealthData(unit) then
+					--local value, max = RealMobHealth.GetUnitHealth(unit)
+					--GameTooltipStatusBar.text:SetText(M.Numb(value).." | "..M.Numb(max))
+				--end
+			--end
 		else
 			GameTooltipStatusBar:Hide()
 		end
@@ -232,7 +232,7 @@ function TT:StatusBar_OnValueChanged(value)
 		if RealMobHealth and RealMobHealth.UnitHasHealthData(unit) then
 			value, max = RealMobHealth.GetUnitHealth(unit)
 		end
-		self.text:SetText(M.Numb(value).." | "..M.Numb(max))
+		--self.text:SetText(M.Numb(value).." | "..M.Numb(max))
 	end
 end
 

@@ -64,6 +64,127 @@ hooksecurefunc("TargetFrame_UpdateAuraPositions", function(self, auraName, numAu
 			updateFunc(self, auraName, i, numOppositeAuras, i - 1, size, offsetX, offsetY, mirrorAurasVertically);
 		end
 	end
+end)
+-- NOTE: Blizzards API will return targets current and max healh as a percentage instead of exact value (ex. 100/100).
+function whoaTextFormat(statusFrame, textString, value, valueMin, valueMax)
+	if ( ( tonumber(valueMax) ~= valueMax or valueMax > 0 ) and not ( statusFrame.pauseUpdates ) ) then
+		local valueDisplay = value;
+		local valueMaxDisplay = valueMax;
+		local k,m=1e3
+		local m=k*k
+		local textDisplay = GetCVar("statusTextDisplay");
+		if ( value and valueMax > 0 and ( (textDisplay ~= "NUMERIC" and textDisplay ~= "NONE") or statusFrame.showPercentage ) and not statusFrame.showNumeric) then
+			if ( value == 0 and statusFrame.zeroText ) then
+				textString:SetText(statusFrame.zeroText);
+				statusFrame.isZero = 1;
+				textString:Show();
+			elseif ( textDisplay == "BOTH" and not statusFrame.showPercentage) then
+				if( statusFrame.LeftText and statusFrame.RightText ) then
+					if(not statusFrame.powerToken or statusFrame.powerToken == "MANA") then
+						statusFrame.LeftText:SetText(math.ceil((value / valueMax) * 100) .. "%");
+						statusFrame.LeftText:Show();
+					end
+					if (value < 1e3) then
+						valueDisplay = format(valueDisplay);
+					elseif (value >= 1e3) and (value < 1e5) then
+						valueDisplay = format("%1.3f",value/k);
+					elseif (value >= 1e5) and (value < 1e6) then
+						valueDisplay = format("%1.0f K",value/k);
+					elseif (value >= 1e6) then
+						valueDisplay = format("%1.1f M",value/m);
+					end
+					if (value == 0) then
+						statusFrame.RightText:SetText("");
+					elseif (value ~= 0) then
+						statusFrame.RightText:SetText(valueDisplay);
+					end
+					statusFrame.RightText:Show();
+					textString:Hide();
+				else
+					valueDisplay = "(" .. math.ceil((value / valueMax) * 100) .. "%) " .. valueDisplay .. " / " .. valueMaxDisplay;
+				end
+				textString:SetText(valueDisplay);
+			else
+				if (value == 0) then
+					valueDisplay = ("");
+				elseif (value ~= 0) then
+					valueDisplay = math.ceil((value / valueMax) * 100) .. "%";
+				end
+				if ( statusFrame.prefix and (statusFrame.alwaysPrefix or not (statusFrame.cvar and GetCVar(statusFrame.cvar) == "1" and statusFrame.textLockable) ) ) then
+					textString:SetText(statusFrame.prefix .. " " .. valueDisplay);
+				else
+					textString:SetText(valueDisplay);
+				end
+			end
+		elseif ( value == 0 and statusFrame.zeroText ) then
+			textString:SetText(statusFrame.zeroText);
+			statusFrame.isZero = 1;
+			textString:Show();
+			return;
+		else
+			statusFrame.isZero = nil;
+			if ( statusFrame.prefix and (statusFrame.alwaysPrefix or not (statusFrame.cvar and GetCVar(statusFrame.cvar) == "1" and statusFrame.textLockable) ) ) then
+				if (value < 1e3) then
+					valueDisplay = format(valueDisplay);
+				elseif (value >= 1e3) and (value < 1e5) then
+					valueDisplay = format("%1.3f",value/k);
+				elseif (value >= 1e5) and (value < 1e6) then
+					valueDisplay = format("%1.0f K",value/k);
+				elseif (value >= 1e6) then
+					valueDisplay = format("%1.1f M",value/m);
+				end
+				if (valueMax < 1e3) then
+					valueMaxDisplay = format(valueMaxDisplay);
+				elseif (valueMax >= 1e3) and (valueMax < 1e5) then
+					valueMaxDisplay = format("%1.3f",valueMaxDisplay/k);
+				elseif (valueMax >= 1e5) and (valueMax < 1e6) then
+					valueMaxDisplay = format("%1.0f K",valueMaxDisplay/k);
+				elseif (valueMax >= 1e6) then
+					valueMaxDisplay = format("%1.1f M",valueMaxDisplay/m);
+				end
+				if (value == 0) then
+					textString:SetText("");
+				elseif (value ~= 0) then
+					textString:SetText(statusFrame.prefix.." "..valueDisplay.." / "..valueMaxDisplay);
+				end
+			else
+				if (value < 1e3) then
+					valueDisplay = format(valueDisplay);
+				elseif (value >= 1e3) and (value < 1e5) then
+					valueDisplay = format("%1.3f",value/k);
+				elseif (value >= 1e5) and (value < 1e6) then
+					valueDisplay = format("%1.0f K",value/k);
+				elseif (value >= 1e6) then
+					valueDisplay = format("%1.1f M",value/m);
+				end
+				if (valueMax < 1e3) then
+					valueMaxDisplay = format(valueMaxDisplay);
+				elseif (valueMax >= 1e3) and (valueMax < 1e5) then
+					valueMaxDisplay = format("%1.3f",valueMaxDisplay/k);
+				elseif (valueMax >= 1e5) and (valueMax < 1e6) then
+					valueMaxDisplay = format("%1.0f K",valueMaxDisplay/k);
+				elseif (valueMax >= 1e6) then
+					valueMaxDisplay = format("%1.1f M",valueMaxDisplay/m);
+				end
+				if (value == 0) then
+					textString:SetText("");
+				elseif (value ~= 0) then
+					textString:SetText(valueDisplay.." / "..valueMaxDisplay);
+				end
+			end
+		end
+	else
+		textString:Hide();
+		textString:SetText("");
+		if ( not statusFrame.alwaysShow ) then
+			statusFrame:Hide();
+		else
+			statusFrame:SetValue(0);
+		end
+	end
+end
+hooksecurefunc("TextStatusBar_UpdateTextStringWithValues",whoaTextFormat)
+
 --[[	Player frame dead / ghost text.
 hooksecurefunc("TextStatusBar_UpdateTextStringWithValues",function(self)
 	local deadText = DEAD;
@@ -73,59 +194,39 @@ hooksecurefunc("TextStatusBar_UpdateTextStringWithValues",function(self)
 		PlayerFrameHealthBar.TextString:SetFontObject(GameFontNormalSmall);
 		PlayerFrameHealthBar.TextString:SetTextColor(1.0,0.82,0,1);
 		for i, v in pairs({	PlayerFrameHealthBar.LeftText, PlayerFrameHealthBar.RightText, PlayerFrameManaBar.LeftText, PlayerFrameManaBar.RightText, PlayerFrameManaBar.TextString, PlayerFrameManaBar }) do v:SetAlpha(0); end
-		if GetCVar("statusTextDisplay")=="BOTH" then
-			PlayerFrameHealthBar.TextString:Show();
-		end
-		if UnitIsDead("player") then
-			PlayerFrameHealthBar.TextString:SetText(deadText);
-		elseif UnitIsGhost("player") then
-			PlayerFrameHealthBar.TextString:SetText(ghostText);
-		end
-	elseif not UnitIsDead("player") and not UnitIsGhost("player") then
+		PlayerFrameHealthBar.TextString:Show();
+	else
 		PlayerFrameHealthBar.TextString:SetFontObject(SystemFont_Outline_Small);
 		PlayerFrameHealthBar.TextString:SetTextColor(1,1,1,1);
 		for i, v in pairs({	PlayerFrameHealthBar.LeftText, PlayerFrameHealthBar.RightText, PlayerFrameManaBar.LeftText, PlayerFrameManaBar.RightText, PlayerFrameManaBar.TextString, PlayerFrameManaBar }) do v:SetAlpha(1); end
 	end
-	
-	--Target frame dead / ghost text.
-	if rmh then 
-		if UnitExists("target") and UnitIsDead("target") or UnitIsGhost("target") then
-			TargetFrameHealthBar.TextString:SetFontObject(GameFontNormalSmall);
-			TargetFrameHealthBar.TextString:SetTextColor(1.0,0.82,0,1);
-			if GetCVar("statusTextDisplay")=="BOTH" then
-				TargetFrameHealthBar.TextString:Show();
-			end
-			for i, v in pairs({	TargetFrameHealthBar.LeftText, TargetFrameHealthBar.RightText, TargetFrameManaBar.LeftText, TargetFrameManaBar.RightText, TargetFrameManaBar.TextString, TargetFrameManaBar }) do v:SetAlpha(0); end
-			if UnitIsGhost("target") and not UnitIsDead("target") then
-				TargetFrameHealthBar.TextString:SetText(ghostText);
-			end
-		elseif rmh and UnitExists("target") and not UnitIsDead("target") and not UnitIsGhost("target") then
-			TargetFrameHealthBar.TextString:SetFontObject(SystemFont_Outline_Small);
-			TargetFrameHealthBar.TextString:SetTextColor(1,1,1,1);
-			for i, v in pairs({	TargetFrameHealthBar.LeftText, TargetFrameHealthBar.RightText, TargetFrameManaBar.LeftText, TargetFrameManaBar.RightText, TargetFrameManaBar.TextString, TargetFrameManaBar }) do v:SetAlpha(1); end
-		end
+	if UnitIsDead("player") then
+		PlayerFrameHealthBar.TextString:SetText(deadText);
+	elseif UnitIsGhost("player") then
+		PlayerFrameHealthBar.TextString:SetText(ghostText);
+	-- end
+	elseif not UnitIsDead("player") and not UnitIsGhost("player") then
+		-- PlayerFrameHealthBar.TextString:SetFontObject(SystemFont_Outline_Small);
+		-- PlayerFrameHealthBar.TextString:SetTextColor(1,1,1,1);
+		-- for i, v in pairs({	PlayerFrameHealthBar.LeftText, PlayerFrameHealthBar.RightText, PlayerFrameManaBar.LeftText, PlayerFrameManaBar.RightText, PlayerFrameManaBar.TextString, PlayerFrameManaBar }) do v:SetAlpha(1); end
 	end
 	
-	--Focus frame dead / ghost text.
-	-- if rmh then 
-		-- if UnitExists("focus") and UnitIsDead("focus") or UnitIsGhost("focus") then
-			-- FocusFrameHealthBar.TextString:SetFontObject(GameFontNormalSmall);
-			-- FocusFrameHealthBar.TextString:SetTextColor(1.0,0.82,0,1);
-			-- if GetCVar("statusTextDisplay")=="BOTH" then
-				-- FocusFrameHealthBar.TextString:Show();
-			-- end
-			-- for i, v in pairs({	FocusFrameHealthBar.LeftText, FocusFrameHealthBar.RightText, FocusFrameManaBar.LeftText, FocusFrameManaBar.RightText, FocusFrameManaBar.TextString, FocusFrameManaBar }) do v:SetAlpha(0); end
-			-- if UnitIsGhost("focus") and not UnitIsDead("focus") then
-				-- FocusFrameHealthBar.TextString:SetText(ghostText);
-			-- end
-		-- elseif rmh and UnitExists("focus") and not UnitIsDead("focus") and not UnitIsGhost("focus") then
-			-- FocusFrameHealthBar.TextString:SetFontObject(SystemFont_Outline_Small);
-			-- FocusFrameHealthBar.TextString:SetTextColor(1,1,1,1);
-			-- for i, v in pairs({	FocusFrameHealthBar.LeftText, FocusFrameHealthBar.RightText, FocusFrameManaBar.LeftText, FocusFrameManaBar.RightText, FocusFrameManaBar.TextString, FocusFrameManaBar }) do v:SetAlpha(1); end
-		-- end
-	-- end
+	if UnitIsDead("target") or UnitIsGhost("target") then
+		for i, v in pairs({	TargetFrameHealthBar.LeftText, TargetFrameHealthBar.RightText, TargetFrameHealthBar.TextString, TargetFrameManaBar.LeftText, TargetFrameManaBar.RightText, TargetFrameManaBar.TextString, TargetFrameManaBar }) do v:SetAlpha(0); end
+	else
+		for i, v in pairs({	TargetFrameHealthBar.LeftText, TargetFrameHealthBar.RightText, TargetFrameHealthBar.TextString, TargetFrameManaBar.LeftText, TargetFrameManaBar.RightText, TargetFrameManaBar.TextString, TargetFrameManaBar }) do v:SetAlpha(1); end
+	end
+	if UnitIsDead("target") then
+		TargetFrame.deadText:SetText(deadText);
+	elseif UnitIsGhost("target") then
+		TargetFrame.deadText:Show();
+		TargetFrame.deadText:SetText(ghostText);
+	-- elseif not UnitIsDead("target") and not UnitIsGhost("target") then
+		-- PlayerFrameHealthBar.TextString:SetFontObject(SystemFont_Outline_Small);
+		-- PlayerFrameHealthBar.TextString:SetTextColor(1,1,1,1);
+		-- for i, v in pairs({	PlayerFrameHealthBar.LeftText, PlayerFrameHealthBar.RightText, PlayerFrameManaBar.LeftText, PlayerFrameManaBar.RightText, PlayerFrameManaBar.TextString, PlayerFrameManaBar }) do v:SetAlpha(1); end
+	end
 end)]]
-end)
 --	Player frame.
 hooksecurefunc("PlayerFrame_ToPlayerArt", function(self)
 		PlayerFrameTexture:SetTexture("Interface\\Addons\\_ShiGuang\\Media\\Modules\\UFs\\UI-TargetingFrame");
@@ -134,7 +235,7 @@ hooksecurefunc("PlayerFrame_ToPlayerArt", function(self)
 		self.name:Hide();
 		--self.name:ClearAllPoints();
 		--self.name:SetPoint("CENTER", PlayerFrame, "CENTER",50.5, 36);
-		self.healthbar:SetPoint("TOPLEFT",106,-24);
+		self.healthbar:SetPoint("TOPLEFT",108,-24);
 		self.healthbar:SetHeight(28);
 		self.healthbar.LeftText:ClearAllPoints();
 		self.healthbar.LeftText:SetPoint("LEFT",self.healthbar,"LEFT",5,0);	
@@ -210,7 +311,8 @@ whoaPetFrameBg();
 --	Target frame
 hooksecurefunc("TargetFrame_CheckClassification", function(self, forceNormalTexture)
 	local classification = UnitClassification(self.unit);
-	-- self.highLevelTexture:SetPoint("CENTER", self.levelText, "CENTER", 0,0);
+	--self.highLevelTexture:ClearAllPoints();
+	--self.highLevelTexture:SetPoint("CENTER", self.levelText, "CENTER", 1,0);
 	self.deadText:SetFont(STANDARD_TEXT_FONT,21,"OUTLINE")
 	self.deadText:SetPoint("TOPLEFT", self.healthbar, "TOPRIGHT", 12, -8)
 	self.nameBackground:Hide();
@@ -221,7 +323,7 @@ hooksecurefunc("TargetFrame_CheckClassification", function(self, forceNormalText
 	self.healthbar.LeftText:SetPoint("LEFT", self.healthbar, "LEFT", 5, 0);
 	self.healthbar.RightText:SetPoint("RIGHT", self.healthbar, "RIGHT", -3, 0);
 	self.healthbar.TextString:SetPoint("CENTER", self.healthbar, "CENTER", 0, 0);
-	-- self.manabar.LeftText:SetPoint("LEFT", self.manabar, "LEFT", 5, 0);	
+	self.manabar.LeftText:SetPoint("LEFT", self.manabar, "LEFT", 3, 0);	
 	self.manabar.RightText:ClearAllPoints();
 	self.manabar.RightText:SetPoint("RIGHT", self.manabar, "RIGHT", -3, 0);
 	self.manabar.TextString:SetPoint("CENTER", self.manabar, "CENTER", 0, 0);
@@ -301,8 +403,22 @@ hooksecurefunc("UnitFrameManaBar_UpdateType", function(manaBar)
 	end
 end)
 
+function CreateStatusBarText(name, parentName, parent, point, x, y)
+	local fontString = parent:CreateFontString(parentName..name, nil, "TextStatusBarText")
+	fontString:SetPoint(point, parent, point, x, y)
+	return fontString
+end
+function whoaStatustextFrame()
+	TargetFrameHealthBar.TextString = CreateStatusBarText("Text", "TargetFrameHealthBar", TargetFrameTextureFrame, "CENTER", 0, 0);
+	TargetFrameHealthBar.LeftText = CreateStatusBarText("TextLeft", "TargetFrameHealthBar", TargetFrameTextureFrame, "LEFT", 5, 0);
+	TargetFrameHealthBar.RightText = CreateStatusBarText("TextRight", "TargetFrameHealthBar", TargetFrameTextureFrame, "RIGHT", -3, 0);
+	TargetFrameManaBar.TextString = CreateStatusBarText("Text", "TargetFrameManaBar", TargetFrameTextureFrame, "CENTER", 0, 0);
+	TargetFrameManaBar.LeftText = CreateStatusBarText("TextLeft", "TargetFrameManaBar", TargetFrameTextureFrame, "LEFT", 5, 0);
+	TargetFrameManaBar.RightText = CreateStatusBarText("TextRight", "TargetFrameManaBar", TargetFrameTextureFrame, "RIGHT", -3, 0);
+end
+whoaStatustextFrame()
 --	ToT & ToF
-hooksecurefunc("TargetFrame_CheckClassification", function()
+function whoaFrameToTF()
 	TargetFrameToTTextureFrameDeadText:ClearAllPoints();
 	TargetFrameToTTextureFrameDeadText:SetPoint("CENTER", "TargetFrameToTHealthBar","CENTER",1, 0);
 	TargetFrameToTTextureFrameName:SetSize(65,10);
@@ -316,7 +432,9 @@ hooksecurefunc("TargetFrame_CheckClassification", function()
 	TargetFrameToTBackground:SetSize(50,14);
 	TargetFrameToTBackground:ClearAllPoints();
 	TargetFrameToTBackground:SetPoint("CENTER", "TargetFrameToT","CENTER",20, 0);
-end)
+end
+hooksecurefunc("TargetofTarget_Update", whoaFrameToTF)
+hooksecurefunc("TargetFrame_CheckClassification", whoaFrameToTF)
 
 --	Boss target frames.
 --[[function whoaBossFrames()

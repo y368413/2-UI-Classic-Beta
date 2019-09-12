@@ -300,17 +300,3 @@ Announces:SetScript("OnEvent", function(self, event, _, subEvent, _, _, srcName,
 		end
 	end
 end)
-
--- 提醒换装
-if E.ItemsPrompt == true then
-	local framenoss = CreateFrame("Frame")
-	framenoss:RegisterEvent("ZONE_CHANGED_NEW_AREA")
-	framenoss:SetScript("OnEvent", function(self, event)
-		if event ~= "ZONE_CHANGED_NEW_AREA" or not IsInInstance() then return end;
-		local spec = GetSpecialization();
-		if not spec then return NONE, NONE end;
-		local _, TalentName = GetSpecializationInfo(spec);
-		ElvUIAlertRun("你现在的天赋是 |cffEE3A8C(".. TalentName.. ")|r, 请检查|cff00FF00装备|r是否符合", 0, 1, 1);
-		DEFAULT_CHAT_FRAME:AddMessage(string.format("你现在的天赋是 |cffEE3A8C(".. TalentName.. ")|r, 请检查|cff00FF00装备|r是否符合."), 0, 1, 1);
-	end)
-end
