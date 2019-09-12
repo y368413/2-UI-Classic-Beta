@@ -33,11 +33,4 @@ function S:QuestTracker()
 		end
 	end
 	hooksecurefunc("QuestLog_Update", Showlevel)
-
-	
-	--M:RegisterEvent("QUEST_ACCEPTED", local function(_, questIndex)
-	--	if GetCVarBool("autoQuestWatch") and GetNumQuestLeaderBoards(questIndex) ~= 0 and GetNumQuestWatches() < MAX_WATCHABLE_QUESTS then
-	--		AutoQuestWatch_Insert(questIndex, QUEST_WATCH_NO_EXPIRE)
-	--	end
-	--end)
 end

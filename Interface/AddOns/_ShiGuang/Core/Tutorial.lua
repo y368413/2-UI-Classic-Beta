@@ -11,8 +11,7 @@ print("--------------- 有你们的魔兽,才是世界 -->>>")
 
 -- Tuitorial
 local function DefaultSettings()
-	SetCVar("scriptErrors", 1)     --0是屏蔽错误1是不屏蔽错误
-	SetCVar("autoQuestWatch", 1)  
+	SetCVar("scriptErrors", 1)     --0是屏蔽错误1是不屏蔽错误 
 	SetCVar("alwaysCompareItems", 1)
 	SetCVar("synchronizeSettings", 1)
   SetCVar("synchronizeMacros", 1)

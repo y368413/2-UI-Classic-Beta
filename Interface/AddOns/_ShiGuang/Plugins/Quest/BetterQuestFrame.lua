@@ -21,6 +21,7 @@ end
 function BQF:LoadQuests()
 
 	if QuestWatchFrame:IsVisible() then QuestWatchFrame:Hide() end
+	QuestWatchFrame.Show = QuestWatchFrame.Hide
 	
 	for i = 1, table.getn(self.fontStrings), 1 do
 		self.fontStrings[i]:Hide()
@@ -208,7 +209,7 @@ function BQF:SetClickFrame(questIndex, headerText, objectives, completed)
 end
 
 function BQF:ADDON_LOADED(addon)
-	if addon == "_ShiGuang" then
+	if addon == "_ShiGuang" and MaoRUISettingDB["Misc"]["BetterQuest"] then
 		self:Initialize()
 		local AnchorFrame = CreateFrame("Frame", "QuestMover", UIParent)
 	  AnchorFrame:SetSize(260, 43)
@@ -227,37 +228,17 @@ function BQF:ADDON_LOADED(addon)
 end
 
 function BQF:QUEST_LOG_UPDATE(unitTarget)
+	if MaoRUISettingDB["Misc"]["BetterQuest"] then
 	self:LoadQuests()
-end
-
--- only make the frame movable when mouseovering and pressing alt
-function BQF:MODIFIER_STATE_CHANGED()
-	if self:IsMouseOver() then
-		if IsAltKeyDown() then -- easier than checking for event payload imo
-			self:EnableMouse(true)
-			self:SetBackdropColor(0, 1, 0, .5)
-		else
-			self:EnableMouse(false)
-			self:SetBackdropColor(0, 0, 0, 0)
-			-- avoid getting stuck to the cursor when alt is released while dragging
-			self:StopMovingOrSizing()
-		end
-	else
-		if self:IsMouseEnabled() then
-			-- avoid leaving the backdrop enabled when alt is still pressed but not mouseovering
-			self:EnableMouse(false)
-			self:SetBackdropColor(0, 0, 0, 0)
-		end
 	end
 end
 
 function BQF:OnEvent(event, ...)
-	self[event](self, ...)
+	if MaoRUISettingDB["Misc"]["BetterQuest"] then
+		self[event](self, ...)
+	end		
 end
-
--- DEFAULT_CHAT_FRAME:AddMessage("Test")
 
 BQF:RegisterEvent("ADDON_LOADED")
 BQF:RegisterEvent("QUEST_LOG_UPDATE")
-BQF:RegisterEvent("MODIFIER_STATE_CHANGED")
 BQF:SetScript("OnEvent", BQF.OnEvent)

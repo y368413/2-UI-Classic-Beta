@@ -7,10 +7,12 @@ local strsplit, pairs = string.split, pairs
 local quest = {
    "更多设置请|cFF00DDFF右键小地图|r",
  	 "任何你不喜欢的，请你控制台关了它.|cff3399FF        自己去下载自己喜欢的",
- 	 "我不想要技能栏上的白圈.|cff3399FF                ESC-插件-别打勾[输出]MaxDps",
+ 	 "我不想要技能栏上的白圈.|cff3399FF                 ESC-插件-别打勾[输出]MaxDps",
 	 "我找不到在哪关闭自动交接任务. |cff3399FF            左上任务追踪栏上 框里的勾",
 	 "我缩放完了UI，系统头像位置变了.|cff3399FF          右键解锁挪回去",
 	 "我用的简易头像,右键解锁挪不动啊.|cff3399FF         /bht m",
+	 "任务追踪列表太长了，好烦。|cff3399FF            按L - 地区名称前的 “ - ” 按钮",
+	 "点击聊天框角色名称可实现:|cff3399FF     Shift-密语 Ctrl-邀请工会 Alt-组队邀请",
    "|cFF00DDFF如需改进和反馈，可以回帖或者在讨论组(n9PnFl0o)告诉我，谢谢。",
 }
 local story = {
