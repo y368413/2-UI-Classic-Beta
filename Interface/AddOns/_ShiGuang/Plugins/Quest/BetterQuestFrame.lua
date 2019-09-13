@@ -116,18 +116,18 @@ function BetterQuestFrame:LoadQuests()
 		end
 	end
 	
-	local frameHeight = 0
+	--local frameHeight = 0
 	
-	for _, text in pairs(self.fontStrings) do
-		frameHeight = frameHeight + text:GetHeight()
-	end
+	--for _, text in pairs(self.fontStrings) do
+		--frameHeight = frameHeight + text:GetHeight()
+	--end
 	
-	frameHeight = frameHeight + 10						-- Spacing between title and first quest
-	frameHeight = frameHeight + ((questCount - 1) * 5)	-- Spacing before all quest titles but the first
-	frameHeight = frameHeight + ((l - questCount) * 1)	-- Spacing before each quest objectives
-	frameHeight = frameHeight + l							-- General spacing between each FontString
+	--frameHeight = frameHeight + 10						-- Spacing between title and first quest
+	--frameHeight = frameHeight + ((questCount - 1) * 5)	-- Spacing before all quest titles but the first
+	--frameHeight = frameHeight + ((l - questCount) * 1)	-- Spacing before each quest objectives
+	--frameHeight = frameHeight + l							-- General spacing between each FontString
 	
-	self:SetSize(260, frameHeight)
+	self:SetSize(260, GetScreenHeight()*.65)
 	self.header:SetText(QUEST_LOG.." " .. questCount .. "/20")
 end
 

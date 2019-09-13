@@ -1,24 +1,30 @@
--- shirsig, https://github.com/shirsig/SortBags
+--## Version: 0.1.0 ## Author: shirsig
+local _G, _M = getfenv(0), {}
+setfenv(1, setmetatable(_M, {__index=_G}))
 
-local _G = getfenv(0)
-local select, pairs, ipairs, tonumber = select, pairs, ipairs, tonumber
-local min, abs, mod, ceil = min, abs, mod, ceil
-local gsub, strfind, tinsert, sort, format = gsub, strfind, tinsert, sort, format
-local GetContainerItemLink, GetContainerItemInfo, GetContainerNumSlots, GetBagName, GetItemInfo = GetContainerItemLink, GetContainerItemInfo, GetContainerNumSlots, GetBagName, GetItemInfo
-local ClearCursor, PickupContainerItem, BankButtonIDToInvSlotID = ClearCursor, PickupContainerItem, BankButtonIDToInvSlotID
+CreateFrame("GameTooltip", "SortBagsTooltip", nil, "GameTooltipTemplate")
 
-local Start, LT, Move, TooltipInfo, Sort, Stack, Initialize, ContainerClass, Item
 local CONTAINERS
 
-local sortTooltip = CreateFrame("GameTooltip", "SortBagsTooltip", nil, "GameTooltipTemplate")
+_G.BagSlotFlag, _G.BankBagSlotFlag = {}, {}
 
 function _G.SortBags()
 	CONTAINERS = {0, 1, 2, 3, 4}
+	for i = #CONTAINERS, 1, -1 do
+		if GetBagSlotFlag(CONTAINERS[i], LE_BAG_FILTER_FLAG_IGNORE_CLEANUP) then
+			tremove(CONTAINERS, i)
+		end
+	end
 	Start()
 end
 
 function _G.SortBankBags()
 	CONTAINERS = {-1, 5, 6, 7, 8, 9, 10}
+	for i = #CONTAINERS, 1, -1 do
+		if GetBankBagSlotFlag(CONTAINERS[i], LE_BAG_FILTER_FLAG_IGNORE_CLEANUP) then
+			tremove(CONTAINERS, i)
+		end
+	end
 	Start()
 end
 
@@ -27,7 +33,25 @@ function _G.GetSortBagsRightToLeft(enabled)
 end
 
 function _G.SetSortBagsRightToLeft(enabled)
-	SortBagsRightToLeft = enabled and 1 or nil
+	_G.SortBagsRightToLeft = enabled and 1 or nil
+end
+
+function _G.SetBagSlotFlag(index, flagIndex, checked)
+	BagSlotFlag[index] = BagSlotFlag[index] or {}
+	BagSlotFlag[index][flagIndex] = checked and true or false
+end
+
+function _G.SetBankBagSlotFlag(index, flagIndex, checked)
+	BankBagSlotFlag[index] = BankBagSlotFlag[index] or {}
+	BankBagSlotFlag[index][flagIndex] = checked and true or false
+end
+
+function _G.GetBagSlotFlag(index, flagIndex)
+	return (BagSlotFlag[index] or {})[flagIndex] and true or false
+end
+
+function _G.GetBankBagSlotFlag(index, flagIndex)
+	return (BankBagSlotFlag[index] or {})[flagIndex] and true or false
 end
 
 local function set(...)
@@ -198,18 +222,18 @@ function TooltipInfo(container, position)
 	-- local chargesPattern = "^" .. gsub(gsub(ITEM_SPELL_CHARGES_P1, "%%d", "(%%d+)"), "%%%d+%$d", "(%%d+)") .. "$" TODO retail
 	local chargesPattern = "^" .. gsub(gsub(ITEM_SPELL_CHARGES, "%%d", "(%%d+)"), "%%%d+%$d", "(%%d+)") .. "$"
 
-	sortTooltip:SetOwner(UIParent, "ANCHOR_NONE")
-	sortTooltip:ClearLines()
+	SortBagsTooltip:SetOwner(UIParent, "ANCHOR_NONE")
+	SortBagsTooltip:ClearLines()
 
 	if container == BANK_CONTAINER then
-		sortTooltip:SetInventoryItem("player", BankButtonIDToInvSlotID(position))
+		SortBagsTooltip:SetInventoryItem("player", BankButtonIDToInvSlotID(position))
 	else
-		sortTooltip:SetBagItem(container, position)
+		SortBagsTooltip:SetBagItem(container, position)
 	end
 
 	local charges, usable, soulbound, quest, conjured
-	for i = 1, sortTooltip:NumLines() do
-		local text = _G[sortTooltip:GetName().."TextLeft"..i]:GetText()
+	for i = 1, SortBagsTooltip:NumLines() do
+		local text = getglobal("SortBagsTooltipTextLeft" .. i):GetText()
 
 		local _, _, chargeString = strfind(text, chargesPattern)
 		if chargeString then

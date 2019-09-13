@@ -3,13 +3,19 @@ local M, R, U, I = unpack(ns)
 
   PlayerFrame:ClearAllPoints() PlayerFrame:SetPoint("RIGHT",UIParent,"CENTER", -150, -250) PlayerFrame:SetUserPlaced(true)  --PlayerFrame:SetScale(0.8) 
   TargetFrame:ClearAllPoints() TargetFrame:SetPoint("LEFT",UIParent,"CENTER", 150, -250) TargetFrame:SetUserPlaced(true)  --TargetFrame:SetScale(0.8) 
-  PartyMemberFrame1:ClearAllPoints() PartyMemberFrame1:SetPoint("TOPLEFT", 260, -143)
+  PartyMemberFrame1:ClearAllPoints() PartyMemberFrame1:SetPoint("TOPLEFT", 260, -143) PartyMemberFrame1:SetUserPlaced(true)
+  PartyMemberFrame1:SetScript("OnMouseDown", function() --按shift移动小队
+		if (IsShiftKeyDown()) then PartyMemberFrame1:ClearAllPoints() PartyMemberFrame1:StartMoving() end
+  end)
+  PartyMemberFrame1:SetScript("OnMouseUp", function()
+		PartyMemberFrame1:StopMovingOrSizing()
+  end)
   TargetFrameToT:ClearAllPoints() TargetFrameToT:SetPoint("LEFT",TargetFrame,"BOTTOMRIGHT", -43, 21)
   TargetFrameToTTextureFrameName:ClearAllPoints() TargetFrameToTTextureFrameName:SetPoint("LEFT",TargetFrameToT,"Top", -8, -43)
   PetFrameHealthBarText:SetPoint("BOTTOMRIGHT", PetFrame, "LEFT", 3,-6)  
   PetFrameManaBarText:SetPoint("TOPRIGHT", PetFrame, "LEFT", 3, -6)
   PetFrameManaBarText:SetTextColor(0, 1, 1)
-  
+
 ------------------------------------------Class icon---------------------------------------
 hooksecurefunc("UnitFramePortrait_Update",function(self) 
    if not MaoRUISettingDB["UFs"]["UFClassIcon"] then return end
