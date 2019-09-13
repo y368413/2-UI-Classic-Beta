@@ -387,24 +387,27 @@ local function HelloWorld()
 	})
 	welcome:SetBackdropColor(0.2, 0.2, 0.2, 1) 
 	welcome:SetBackdropBorderColor(0,0,0,0)
+
+	local TopBlack = CreateFrame("Frame", nil, welcome) 
+	TopBlack:SetPoint("BOTTOMLEFT",welcome,"TOPLEFT",0,-43)
+	TopBlack:SetPoint("TOPRIGHT",0,0)
+	M.CreateBD(TopBlack, 1)
+	TopBlackText1 = M:CreatStyleText(TopBlack, "Interface\\addons\\_ShiGuang\\Media\\Fonts\\RedCircl.TTF", 80, "OUTLINE", "|cFFFFFF00 2 |r", "TOP",TopBlack,"TOP",0, -3, 1, 0, 0)
+	TopBlackText2 = M:CreatStyleText(TopBlack, "Interface\\addons\\_ShiGuang\\Media\\Fonts\\RedCircl.TTF", 21, "OUTLINE", "|cFFFF0000 UI|r", "TOP",TopBlack,"TOP",12, -43, 1, 0, 0)
 	
 	local BottomBlack = CreateFrame("Frame", nil, welcome) 
 	BottomBlack:SetPoint("TOPLEFT",welcome,"BOTTOMLEFT",0,43)
 	BottomBlack:SetPoint("BOTTOMRIGHT",0,0)
 	M.CreateBD(BottomBlack, 1)
 	BottomBlackText = M:CreatStyleText(BottomBlack, STANDARD_TEXT_FONT, 16, "OUTLINE", "-----  开袋即食零设置 上手即用懒人包  -----", "BOTTOM",BottomBlack,"BOTTOM",0,16, 0.97,0.75,0) 
-	
-	local WelcomeTitle1 = M:CreatStyleButton(nil, welcome, 60, 60, "BOTTOM", welcome, "CENTER", 0, 12, 1, 1) 
-	WelcomeTitle1Text = M:CreatStyleText(WelcomeTitle1, "Interface\\addons\\_ShiGuang\\Media\\Fonts\\RedCircl.TTF", 120, "OUTLINE", "|cFFFFFF00 2 |r", "CENTER", WelcomeTitle1, "CENTER",0, 3, 1, 0, 0) 
-
-	local WelcomeTitle2 = M:CreatStyleButton(nil, welcome, 43, 43, "BOTTOMRIGHT", WelcomeTitle1, "BOTTOMRIGHT", 21, -8, 1, 1) 
-	WelcomeTitle2Text = M:CreatStyleText(WelcomeTitle2, "Interface\\addons\\_ShiGuang\\Media\\Fonts\\RedCircl.TTF", 23, "OUTLINE", "|cFFFF0000 UI|r", "CENTER", WelcomeTitle2, "CENTER", 0, 3, 1, 1, 0) 
 
 	local MadeBy = M:CreatStyleButton(nil, welcome, 210, 21, "BOTTOMRIGHT", BottomBlack, "BOTTOMRIGHT", -8, 31, 10, 1) 
 	MadeBy:SetScript("OnClick", function(self,Button) welcome:Hide() end)
 	--MadeByText = M:CreatStyleText(MadeBy, "Interface\\addons\\_ShiGuang\\Media\\Fonts\\Pixel.TTF", 12, "OUTLINE", "- www.maorui.net -", "CENTER", MadeBy, 0, 0, 0.66,0.66,0.66) --■ ■
-	MadeByText1 = M:CreatStyleText(MadeBy, "Interface\\addons\\_ShiGuang\\Media\\Fonts\\Edo.TTF", 52, "OUTLINE", "ALLIANCE OR HORDE ?", "TOP",Welcome,"TOP",0,-21, 1, 1, 1)
-	MadeByText2 = M:CreatStyleText(MadeBy, "Interface\\addons\\_ShiGuang\\Media\\Fonts\\Edo.TTF", 43, "OUTLINE", "MAKE DECISION !", "TOP",Welcome,"TOP",0,-99, 1, 1, 1)
+	--MadeByText1 = M:CreatStyleText(MadeBy, "Interface\\addons\\_ShiGuang\\Media\\Fonts\\Edo.TTF", 52, "OUTLINE", "ALLIANCE OR HORDE ?", "TOP",Welcome,"TOP",0,-21, 1, 1, 1)
+	--MadeByText2 = M:CreatStyleText(MadeBy, "Interface\\addons\\_ShiGuang\\Media\\Fonts\\Edo.TTF", 43, "OUTLINE", "MAKE DECISION !", "TOP",Welcome,"TOP",0,-99, 1, 1, 1)
+	MadeByText1 = M:CreatStyleText(MadeBy, STANDARD_TEXT_FONT, 160, "OUTLINE", "有任何问题先学会", "CENTER",Welcome,"CENTER",0,210, 1, 1, 1)
+	MadeByText2 = M:CreatStyleText(MadeBy, STANDARD_TEXT_FONT, 160, "OUTLINE", "！！！右键小地图！！！", "CENTER",Welcome,"CENTER",0,0, 1, 1, 1)
 
 	local LeftPic = M:CreatStyleButton(nil, welcome, 512, 210, "BOTTOMRIGHT", welcome, "BOTTOM", 1, 43, 2, 1)
 	LeftPic:SetNormalTexture("Interface\\AddOns\\_ShiGuang\\Media\\Modules\\BlinkHealthText\\LeftPic")
@@ -446,7 +449,7 @@ local function HelloWorld()
 	SmallText3 = M:CreatStyleText(LeftPic, STANDARD_TEXT_FONT, 16, "OUTLINE", "[ 鼠标右键点击小地图便捷插件设置 ]", "LEFT",RightPic,"RIGHT",-26,-20, I.r, I.g, I.b)
 	SmallText4 = M:CreatStyleText(LeftPic, STANDARD_TEXT_FONT, 16, "OUTLINE", "[ 系统自带功能，插件有针对性增强或者删减 ]", "LEFT",RightPic,"RIGHT",-26,-60, I.r, I.g, I.b)
 
-	local LeftBlue = CreateFrame("Frame", nil, welcome) 
+	--[[local LeftBlue = CreateFrame("Frame", nil, welcome) 
 	LeftBlue:SetPoint("TOPLEFT",welcome,"TOPLEFT",0,0)
 	LeftBlue:SetPoint("BOTTOMRIGHT",LeftPic,"TOPRIGHT",0,0)
 	LeftBlue:SetBackdrop({ 
@@ -498,7 +501,7 @@ local function HelloWorld()
 	PlayerModel:SetCamDistanceScale(1)
 	PlayerModel:SetPosition(-1.6,0,0)
 	PlayerModel:SetRotation(0)
-	PlayerModel.rotation = 0
+	PlayerModel.rotation = 0]]
 end
 SlashCmdList["ShiGuang"] = HelloWorld
 SLASH_ShiGuang1 = "/loadmr"

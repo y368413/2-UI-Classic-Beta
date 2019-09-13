@@ -1,4 +1,5 @@
 ﻿<Ui xmlns="http://www.blizzard.com/wow/ui/">
+	<Script file="TFTB.lua"/>
 	<Script file="PvPPP.lua"/>
 	<Script file="Reminder.lua"/>
 	<Script file="HardYards.lua"/>
