@@ -194,7 +194,7 @@ SlashCmdList.MOUSEOVERBIND = function()
 
 		function bind:Deactivate(save)
 			if save then
-				SaveBindings(MaoRUISettingDB["Actionbar"]["BindType"])
+				AttemptToSaveBindings(MaoRUISettingDB["Actionbar"]["BindType"])
 				print("|cffffff00"..KEY_BOUND.."|r")
 			else
 				LoadBindings(MaoRUISettingDB["Actionbar"]["BindType"])
