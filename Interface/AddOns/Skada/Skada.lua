@@ -2814,7 +2814,6 @@ do
 		if type(SkadaPerCharDB) ~= "table" then SkadaPerCharDB = {} end
 		self.char = SkadaPerCharDB
 		self.char.sets = self.char.sets or {}
-		self.char.cached_specs = self.char.cached_specs or {}
 		LibStub("AceConfigRegistry-3.0"):RegisterOptionsTable("Skada", self.options, true)
 
 		-- Profiles
