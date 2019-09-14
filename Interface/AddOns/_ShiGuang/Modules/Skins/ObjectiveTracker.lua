@@ -6,6 +6,35 @@ local pairs = pairs
 local LE_QUEST_FREQUENCY_DAILY = LE_QUEST_FREQUENCY_DAILY or 2
 
 function S:QuestTracker()
+	-- Mover for quest tracker
+	local frame = CreateFrame("Frame", "NDuiQuestMover", UIParent)
+	frame:SetSize(210, 43)
+	M.Mover(frame, "QuestTracker", "QuestTracker", {"TOPLEFT","UIParent","TOPLEFT",8,-43})
+
+	local tracker = QuestWatchFrame
+	tracker:SetHeight(GetScreenHeight()*.65)
+	tracker:SetClampedToScreen(false)
+	tracker:SetMovable(true)
+	if tracker:IsMovable() then tracker:SetUserPlaced(true) end
+
+	hooksecurefunc(tracker, "SetPoint", function(self, _, parent)
+		if parent == "MinimapCluster" or parent == _G.MinimapCluster then
+			self:ClearAllPoints()
+			self:SetPoint("TOPLEFT", frame, 5, -5)
+		end
+	end)
+
+	local timerMover = CreateFrame("Frame", "NDuiQuestTimerMover", UIParent)
+	timerMover:SetSize(150, 30)
+	M.Mover(timerMover, QUEST_TIMERS, "QuestTimer", {"TOPRIGHT", frame, "TOPLEFT", -10, 0})
+
+	hooksecurefunc(QuestTimerFrame, "SetPoint", function(self, _, parent)
+		if parent ~= timerMover then
+			self:ClearAllPoints()
+			self:SetPoint("TOP", timerMover)
+		end
+	end)
+
 	-- Show quest color and level
 	local function Showlevel(self)
 		local numEntries = GetNumQuestLogEntries()
@@ -34,6 +63,20 @@ function S:QuestTracker()
 	end
 	hooksecurefunc("QuestLog_Update", Showlevel)
 
+	--if not NDuiDB["Skins"]["QuestTracker"] then return end
+
+	local header = CreateFrame("Frame", nil, frame)
+	header:SetAllPoints(frame)
+	header:Hide()
+	M.CreateFS(header, 16, QUEST_LOG, true, "TOPLEFT", 30, 16)
+
+	local bg = header:CreateTexture(nil, "ARTWORK")
+	bg:SetTexture("Interface\\LFGFrame\\UI-LFG-SEPARATOR")
+	bg:SetTexCoord(0, .66, 0, .31)
+	bg:SetVertexColor(cr, cg, cb, .8)
+	bg:SetPoint("TOPLEFT", 0, 20)
+	bg:SetSize(250, 30)
+
 	-- ModernQuestWatch, Ketho
 	local function onMouseUp(self)
 		if IsShiftKeyDown() then -- untrack quest
@@ -52,6 +95,9 @@ function S:QuestTracker()
 				QuestLogEx:Maximize()
 			elseif ClassicQuestLog then -- https://www.wowinterface.com/downloads/info24937-ClassicQuestLogforClassic.html
 				ShowUIPanel(ClassicQuestLog)
+				QuestLog_SetSelection(self.questIndex)
+			elseif QuestGuru then -- https://www.curseforge.com/wow/addons/questguru_classic
+				ShowUIPanel(QuestGuru)
 				QuestLog_SetSelection(self.questIndex)
 			else
 				ShowUIPanel(QuestLogFrame)
@@ -97,6 +143,8 @@ function S:QuestTracker()
 	end
 
 	hooksecurefunc("QuestWatch_Update", function()
+		header:SetShown(tracker:IsShown())
+
 		local watchTextIndex = 1
 		for i = 1, GetNumQuestWatches() do
 			local questIndex = GetQuestIndexForWatch(i)

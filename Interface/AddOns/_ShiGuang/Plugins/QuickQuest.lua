@@ -1,6 +1,13 @@
 ﻿---------------------------- QuickQuest, by P3lim  -- NDui MOD  -- y368413 DIY --------------------------
 local _, ns = ...
 local M, R, U, I = unpack(ns)
+local QuickQuestCheckButton = CreateFrame("CheckButton", nil, QuestWatchFrame, "OptionsCheckButtonTemplate")
+QuickQuestCheckButton:SetPoint("TOPLEFT", QuestWatchFrame, 2, 26)
+QuickQuestCheckButton:SetSize(26, 26)
+QuickQuestCheckButton:SetHitRectInsets(0, -10, 0, 0)
+QuickQuestCheckButton:RegisterEvent("PLAYER_LOGIN")
+QuickQuestCheckButton:SetScript("OnEvent", function(self) self:SetChecked(MaoRUISettingDB["Misc"].AutoQuest) end)
+QuickQuestCheckButton:SetScript("OnClick", function(self) MaoRUISettingDB["Misc"].AutoQuest = self:GetChecked() end)
 
 -- Function
 local strmatch = string.match

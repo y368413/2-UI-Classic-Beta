@@ -193,7 +193,7 @@ local defaultSettings = {
 		PulseCD = false,
 		SorasThreat = true,
 		EnhancedMenu = false,
-		BetterQuest = true,
+		BetterQuest = false,
 	},
 	Tutorial = {
 		Complete = false,
@@ -485,7 +485,6 @@ local optionList = {		-- type, key, value, name, horizon, horizon2, doubleline
 		{1, "Tooltip", "TargetBy", U["Show TargetedBy"].."*", true, true},
 		{1, "Tooltip", "LFDRole", U["Group Roles"].."*"},
 		{1, "Bags", "Enable", U["Enable Bags"], true},
-		{1, "Misc", "BetterQuest", "任务追踪面板增强", true, true},
 		{},--blank
 		{1, "Map", "Coord", U["Map Coords"]},
 		{1, "Map", "Clock", U["Minimap Clock"], true},

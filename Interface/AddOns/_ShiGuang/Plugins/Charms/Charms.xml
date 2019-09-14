@@ -3,5 +3,4 @@
 	<Script file="rlTools.lua"/>
 	<Script file="kAutoOpen.lua"/>
 	<Script file="xMerchant.lua"/>
-	<Script file="StatPriority.lua"/>
 </Ui>

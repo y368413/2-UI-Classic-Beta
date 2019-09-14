@@ -19,7 +19,5 @@
 	<Script file="LibDBIcon-1.0.lua"/>
 	<Script file="LibSharedMedia-3.0.lua"/>
 	<Include file="AceGUI-3.0-SharedMediaWidgets\widget.xml"/>
-	<Script file="LibItemUpgradeInfo-1.0.lua"/>
-	<Include file="HereBeDragons\HereBeDragons.xml"/>
 	<Script file="SlashIn.lua"/>
 </Ui>
