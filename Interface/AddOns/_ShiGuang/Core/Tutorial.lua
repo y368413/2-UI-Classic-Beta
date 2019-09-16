@@ -124,10 +124,8 @@ local function SetupUIScale()
 end
 
 local function ForceChatSettings()
-	ChatFrame1:ClearAllPoints()
-	ChatFrame1:SetPoint("BOTTOMLEFT", UIParent, "BOTTOMLEFT", 0, 21)
-	ChatFrame1:SetWidth(360)
-	ChatFrame1:SetHeight(121)
+	M:GetModule("Chat"):UpdateChatSize()
+
 	for i = 1, NUM_CHAT_WINDOWS do
 		local cf = _G["ChatFrame"..i]
 		ChatFrame_RemoveMessageGroup(cf, "CHANNEL")
@@ -373,7 +371,7 @@ local welcome
 local function HelloWorld()
 	if welcome then welcome:Show() return end
 	local BackDropFile = "Interface\\Addons\\_ShiGuang\\Media\\Modules\\Raid\\solid"
-	welcome = CreateFrame("Frame", nil, UIParent)
+	welcome = CreateFrame("Frame", "UI_Tutorial", UIParent)
 	welcome:SetPoint("TOPLEFT",0,0)
 	welcome:SetPoint("BOTTOMRIGHT",0,0)
 	welcome:SetFrameStrata("HIGH")

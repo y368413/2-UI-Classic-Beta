@@ -143,6 +143,8 @@ local function TexturePool_ResetVertexColor(pool, texture)
 end
 
 function module:MapReveal()
+	if IsAddOnLoaded("Leatrix_Maps") then return end
+
 	local bu = CreateFrame("CheckButton", nil, WorldMapFrame, "OptionsCheckButtonTemplate")
 	bu:SetPoint("TOPLEFT", 3, 0)
 	bu:SetSize(26, 26)

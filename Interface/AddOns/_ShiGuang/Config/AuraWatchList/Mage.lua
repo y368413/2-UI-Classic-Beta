@@ -8,6 +8,7 @@ local list = {
 		{AuraID = 130, UnitID = "player"},		-- 缓落
 	},
 	["Target Aura"] = {		-- 目标光环组
+		{AuraID = 116, UnitID = "target", Caster = "player"},		-- 寒冰箭
 		{AuraID = 118, UnitID = "target", Caster = "player"},		-- 变形术
 		{AuraID = 122, UnitID = "target", Caster = "player"},		-- 冰霜新星
 		{AuraID = 12654, UnitID = "target", Caster = "player"},		-- 点燃
@@ -15,6 +16,9 @@ local list = {
 	},
 	["Special Aura"] = {	-- 玩家重要光环组
 		{AuraID = 66, UnitID = "player"},		-- 隐形术
+		{AuraID = 543, UnitID = "player"},		-- 防护火焰结界
+		{AuraID = 8462, UnitID = "player"},		-- 防护冰霜结界
+		{AuraID = 11958, UnitID = "player"},	-- 寒冰屏障
 		{AuraID = 12042, UnitID = "player"},	-- 奥术强化
 		{AuraID = 12472, UnitID = "player"},	-- 冰冷血脉
 	},
@@ -23,9 +27,6 @@ local list = {
 	["Spell Cooldown"] = {	-- 冷却计时组
 		{SlotID = 13},		-- 饰品1
 		{SlotID = 14},		-- 饰品2
-		{TotemID = 1},		-- 能量符文
-		{SpellID = 12472},	-- 冰冷血脉
-		{SpellID = 12042},	-- 奥术强化
 	},
 }
 

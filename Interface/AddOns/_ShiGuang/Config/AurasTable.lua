@@ -41,9 +41,9 @@ function module:AddNewAuraWatch(class, list)
 				local name = GetSpellInfo(spellID)
 				if not name then
 					wipe(v)
-					if I.isClassic then
+					--if I.isClassic then
 						print(format("|cffFF0000XXX:|r '%s' %s", class, spellID))
-					end
+					--end
 				end
 			end
 		end
@@ -67,24 +67,7 @@ function module:AddNewAuraWatch(class, list)
 	end
 end
 
-function module:AddDeprecatedGroup()
-	if I.isClassic then return end
-	if not MaoRUISettingDB["AuraWatch"]["DeprecatedAuras"] then return end
-
-	for name, value in pairs(R.DeprecatedAuras) do
-		for _, list in pairs(AuraWatchList["ALL"]) do
-			if list.Name == name then
-				local newTable = newAuraFormat(value)
-				for spellID, v in pairs(newTable) do
-					list.List[spellID] = v
-				end
-			end
-		end
-	end
-	wipe(R.DeprecatedAuras)
-end
 
 function module:OnLogin()
-	self:AddDeprecatedGroup()
 	R.AuraWatchList = AuraWatchList
 end

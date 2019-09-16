@@ -51,7 +51,6 @@ function S:OnLogin()
    end
 
 	-- Add Skins
-	self:CreateRM()
 	self:QuestTracker()
 	self:DBMSkin()
 	self:SkadaSkin()

@@ -278,14 +278,14 @@ local function UpdateSelectionHighlight(unitFrame)
 		if glow then glow:Hide() end
 	end
 
-	if not MaoRUISettingDB["Nameplate"]["Numberstyle"] then	
+	--if not MaoRUISettingDB["Nameplate"]["Numberstyle"] then	
 			unitFrame.redarrowleft:SetRotation(math.rad(90))
 			unitFrame.redarrowleft:SetPoint("RIGHT", unitFrame.healthBar, "LEFT", 1, 0)
 			unitFrame.redarrowright:SetRotation(math.rad(-90))
 			unitFrame.redarrowright:SetPoint("LEFT", unitFrame.healthBar, "RIGHT", -1, 0)
-	else
-			unitFrame.redarrowleft:SetPoint("BOTTOM", unitFrame.name, "TOP", 0, 0)
-	end
+	--else
+			--unitFrame.redarrowleft:SetPoint("BOTTOM", unitFrame.name, "TOP", 0, 0)
+	--end
 end
 
 local function UpdateRaidTarget(unitFrame)

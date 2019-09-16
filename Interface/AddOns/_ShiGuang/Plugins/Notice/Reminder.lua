@@ -9,7 +9,14 @@ local thanksspells = {
 	[2006] = true,		-- Resurrection
 	[7328] = true,		-- Redemption
 	[2008] = true,		-- Ancestral Spirit
-	[115178] = true,	-- Resuscitate
+	[5231] = true,	-- Resuscitate
+	[467] = true,	-- 
+	[1459] = true,	-- 
+	[19740] = true,	-- 
+	[20217] = true,	-- 
+	[56521] = true,	-- 
+	[1255] = true,	--
+	[5697] = true,	-- 
 }
 local Saythanks = CreateFrame("Frame")
 Saythanks:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
@@ -19,6 +26,7 @@ Saythanks:SetScript("OnEvent", function()
 		if spell == key and value == true and player == UnitName("player") and buffer ~= UnitName("player") and subEvent == "SPELL_CAST_SUCCESS" then
 			--SendChatMessage("Thanks:"....GetSpellLink(spell)..", "..buffer:gsub("%-[^|]+", ""), "WHISPER", nil, buffer)
 			print(GetSpellLink(spell)..SHIGUANG_Gets..buffer)
+			DoEmote("cheer", buffer)
 		end
 	end
 end)

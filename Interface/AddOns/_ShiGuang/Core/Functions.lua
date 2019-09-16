@@ -108,14 +108,19 @@ end
 local function tooltipOnEnter(self)
 	GameTooltip:SetOwner(self, self.anchor)
 	GameTooltip:ClearLines()
+	if self.title then
+		GameTooltip:AddLine(self.title)
+	end
 	if tonumber(self.text) then
 		GameTooltip:SetSpellByID(self.text)
-	else
+	elseif self.text then
 		local r, g, b = 1, 1, 1
 		if self.color == "class" then
 			r, g, b = cr, cg, cb
 		elseif self.color == "system" then
 			r, g, b = 1, .8, 0
+		elseif self.color == "info" then
+			r, g, b = .6, .8, 1
 		end
 		GameTooltip:AddLine(self.text, r, g, b, 1)
 	end
@@ -705,6 +710,50 @@ function M:CreateColorSwatch()
 
 	return swatch
 end
+
+local function updateSliderEditBox(self)
+	local slider = self.__owner
+	local minValue, maxValue = slider:GetMinMaxValues()
+	local text = tonumber(self:GetText())
+	if not text then return end
+	text = min(maxValue, text)
+	text = max(minValue, text)
+	slider:SetValue(text)
+	self:SetText(text)
+	self:ClearFocus()
+end
+
+function M:CreateSlider(name, minValue, maxValue, x, y, width)
+	local slider = CreateFrame("Slider", nil, self, "OptionsSliderTemplate")
+	slider:SetPoint("TOPLEFT", x, y)
+	slider:SetWidth(width or 200)
+	slider:SetMinMaxValues(minValue, maxValue)
+	slider:SetHitRectInsets(0, 0, 0, 0)
+
+	slider.Low:SetText(minValue)
+	slider.Low:SetPoint("TOPLEFT", slider, "BOTTOMLEFT", 10, -2)
+	slider.High:SetText(maxValue)
+	slider.High:SetPoint("TOPRIGHT", slider, "BOTTOMRIGHT", -10, -2)
+	slider.Text:ClearAllPoints()
+	slider.Text:SetPoint("CENTER", 0, 25)
+	slider.Text:SetText(name)
+	slider.Text:SetTextColor(1, .8, 0)
+	slider:SetBackdrop(nil)
+	slider.Thumb:SetTexture(I.sparkTex)
+	slider.Thumb:SetBlendMode("ADD")
+	local bg = M.CreateBG(slider)
+	bg:SetPoint("TOPLEFT", 14, -2)
+	bg:SetPoint("BOTTOMRIGHT", -15, 3)
+	M.CreateBD(bg, .3)
+	slider.value = M.CreateEditBox(slider, 50, 20)
+	slider.value:SetPoint("TOP", slider, "BOTTOM")
+	slider.value:SetJustifyH("CENTER")
+	slider.value.__owner = slider
+	slider.value:SetScript("OnEnterPressed", updateSliderEditBox)
+
+	return slider
+end
+
 
 	-- Function --
 function M:CreatStyleButton(id, parent, w, h, ap, frame, rp, x, y, l, alpha, bgF, r, g, b)

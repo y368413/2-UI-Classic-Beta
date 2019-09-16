@@ -6,5 +6,5 @@
 	<Script file="GUI.lua"/>
 	<Script file="AWConfig.lua"/>
 	<Script file="Tutorial.lua"/>
-	<Script file="Helplist.lua"/>
+	<Script file="Changelog.lua"/>
 </Ui>

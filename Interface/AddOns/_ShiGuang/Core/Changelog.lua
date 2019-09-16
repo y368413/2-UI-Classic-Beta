@@ -7,12 +7,12 @@ local strsplit, pairs = string.split, pairs
 local quest = {
    "更多设置请|cFF00DDFF右键小地图|r",
  	 "任何你不喜欢的，请你控制台关了它.|cff3399FF        自己去下载自己喜欢的",
- 	 "我不想要技能栏上的白圈.|cff3399FF                 ESC-插件-别打勾[输出]MaxDps",
-	 "我找不到在哪关闭自动交接任务. |cff3399FF            左上任务追踪栏上 框里的勾",
+ 	 "聊天框怎样回到最新消息而不是一直滚轮.|cff3399FF        Shift+鼠标滚轮下",
+ 	 "我不想要技能栏上的白圈.|cff3399FF               ESC-插件-别打勾[输出]MaxDps",
+	 "我找不到在哪关闭自动交接任务. |cff3399FF          左上任务追踪栏上 框里的勾",
 	 "我缩放完了UI，系统头像位置变了.|cff3399FF          右键解锁挪回去",
 	 "我用的简易头像,右键解锁挪不动啊.|cff3399FF         /bht m",
 	 "5人小队的框架位置很不习惯.|cff3399FF        按着Shift拖小队的第一个队友框",
-	 "聊天框有什么办法到最新发言吗。|cff3399FF            Shift + 鼠标下滚轮",
 	 "点击聊天框角色名称可实现:|cff3399FF     Shift-密语 Ctrl-邀请工会 Alt-组队邀请",
    "|cFF00DDFF如需改进和反馈，可以回帖或者在讨论组(n9PnFl0o)告诉我，谢谢。",
 }
@@ -44,6 +44,7 @@ local story = {
   "#至少，你拥有的关于这个世界的记忆，那是在别的地方任何方法也无法获得的。",
 }
 local function Helplist()
+	if f then f:Show() return end
 	local f = CreateFrame("Frame", "Helplist", UIParent)
 	local bgTexture = f:CreateTexture("name", "BACKGROUND")
     bgTexture:SetTexture("Interface\\PETBATTLES\\Weather-StaticField");
@@ -94,3 +95,17 @@ SlashCmdList["HELPLIST"] = Helplist
 SLASH_HELPLIST1 = '/MrHelp'
 SlashCmdList["WELOVEWOW"] = lovewow
 SLASH_WELOVEWOW1 = '/welovewow'
+
+local function compareToShow(event)
+	if UI_Tutorial then return end
+
+	local old1, old2 = strsplit(".", MaoRUIDB["Changelog"].Version or "")
+	local cur1, cur2 = strsplit(".", I.Version)
+	if old1 ~= cur1 or old2 ~= cur2 then
+		Helplist()
+		MaoRUIDB["Changelog"].Version = I.Version
+	end
+
+	M:UnregisterEvent(event, compareToShow)
+end
+M:RegisterEvent("PLAYER_ENTERING_WORLD", compareToShow)

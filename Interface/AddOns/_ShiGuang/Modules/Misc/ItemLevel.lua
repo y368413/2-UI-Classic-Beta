@@ -53,7 +53,7 @@ function MISC:CreateItemString(frame, strType)
 			local slotFrame = _G[strType..slot.."Slot"]
 			slotFrame.iLvlText = M.CreateFS(slotFrame, I.Font[2]+3)
 			slotFrame.iLvlText:ClearAllPoints()
-			slotFrame.iLvlText:SetPoint("BOTTOMRIGHT", slotFrame, x, y)
+			slotFrame.iLvlText:SetPoint("TOPLEFT", slotFrame, x, y)
 			local relF, x, y = MISC:GetSlotAnchor(index)
 			slotFrame.enchantText = M.CreateFS(slotFrame, I.Font[2]-3)
 			slotFrame.enchantText:ClearAllPoints()
@@ -91,7 +91,7 @@ function MISC:RefreshButtonInfo()
 				if quality then
 					local color = BAG_ITEM_QUALITY_COLORS[quality]
 					MISC:ItemBorderSetColor(slotFrame, color.r, color.g, color.b)
-					if level and level > 1 and quality > 1 then
+					if MaoRUISettingDB["Misc"]["ShowItemLevel"] and level and level > 1 and quality > 1 then
 						slotFrame.iLvlText:SetText(level)
 						slotFrame.iLvlText:SetTextColor(1, 0.8, 0)  --color.r, color.g, color.b
 					end
@@ -135,7 +135,7 @@ function MISC:ItemLevel_SetupLevel(frame, strType, unit)
 					if quality then
 						local color = BAG_ITEM_QUALITY_COLORS[quality]
 						MISC:ItemBorderSetColor(slotFrame, color.r, color.g, color.b)
-						if level and level > 1 and quality > 1 then
+						if MaoRUISettingDB["Misc"]["ShowItemLevel"] and level and level > 1 and quality > 1 then
 							slotFrame.iLvlText:SetText(level)
 					slotFrame.iLvlText:SetTextColor(1, 0.8, 0)  --color.r, color.g, color.b
 						end
@@ -144,19 +144,21 @@ function MISC:ItemLevel_SetupLevel(frame, strType, unit)
 						MISC.QualityUpdater:Show()
 					end
 
-					local _, enchant, gems = M.GetItemLevel(link, unit, index, MaoRUISettingDB["Misc"]["GemNEnchant"])
-					if enchant then
-						slotFrame.enchantText:SetText(enchant)
-					end
+					if MaoRUISettingDB["Misc"]["GemNEnchant"] then
+						local _, enchant, gems = M.GetItemLevel(link, unit, index, true)
+						if enchant then
+							slotFrame.enchantText:SetText(enchant)
+						end
 
-					for i = 1, 5 do
-						local texture = slotFrame["textureIcon"..i]
-						if gems and next(gems) then
-							local index, gem = next(gems)
-							texture:SetTexture(gem)
-							texture.bg:Show()
+						for i = 1, 5 do
+							local texture = slotFrame["textureIcon"..i]
+							if gems and next(gems) then
+								local index, gem = next(gems)
+								texture:SetTexture(gem)
+								texture.bg:Show()
 
-							gems[index] = nil
+								gems[index] = nil
+							end
 						end
 					end
 				else

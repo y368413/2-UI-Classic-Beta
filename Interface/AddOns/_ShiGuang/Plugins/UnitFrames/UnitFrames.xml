@@ -3,7 +3,7 @@
 	<Script file="iFrame.lua"/>
 	<Script file="iBuffs.lua"/>
 	<Script file="PartyTarget.lua"/>
-	<!--Script file="Castbar.lua"/-->
+	<Script file="PowerSpark.lua"/>
 	<!--Script file="PartyCastbar.lua"/-->
 	<Script file="PetTarget.lua"/>
 	<Script file="UnitFramesStyle.lua"/>
