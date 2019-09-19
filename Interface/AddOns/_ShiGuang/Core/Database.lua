@@ -50,7 +50,7 @@ I.bgTex = Media.."bgTex"
 I.EnergyTex = Media.."Skullflower3"
 I.arrowTex = Media.."Modules\\Raid\\textureArrowAbove"
 I.mailTex = "Interface\\Minimap\\Tracking\\Mailbox"
-I.gearTex = Media.."Modules\\Raid\\ArrowLarge"  --"Interface\\WorldMap\\Gear_64"
+I.gearTex = Media.."arrow-down-active"  --Media.."Modules\\Raid\\ArrowLarge"
 I.eyeTex = "Interface\\Minimap\\Raid_Icon"		-- blue: \\Dungeon_Icon
 I.garrTex = "Interface\\HelpFrame\\HelpIcon-ReportLag"
 I.copyTex = "Interface\\Buttons\\UI-GuildButton-PublicNote-Up"
@@ -137,6 +137,7 @@ I.ReminderBuffs = {
 	MAGE = {
 		{	spells = {	-- 奥术智慧
 				[1459] = true,
+				[23028] = true,
 			},
 			depend = 1459,
 			combat = true,
@@ -147,6 +148,7 @@ I.ReminderBuffs = {
 	PRIEST = {
 		{	spells = {	-- 真言术耐
 				[1243] = true,
+				[21562] = true,
 			},
 			depend = 1243,
 			combat = true,

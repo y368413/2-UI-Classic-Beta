@@ -11,7 +11,7 @@ local LE_ITEM_CLASS_WEAPON, LE_ITEM_CLASS_ARMOR, LE_ITEM_CLASS_QUIVER = LE_ITEM_
 local GetContainerNumSlots, GetContainerItemInfo, PickupContainerItem = GetContainerNumSlots, GetContainerItemInfo, PickupContainerItem
 local C_NewItems_IsNewItem, C_Timer_After = C_NewItems.IsNewItem, C_Timer.After
 local IsControlKeyDown, IsAltKeyDown, DeleteCursorItem = IsControlKeyDown, IsAltKeyDown, DeleteCursorItem
-local SortBankBags, SortBags, InCombatLockdown = SortBankBags, SortBags, InCombatLockdown
+local SortBankBags, SortBags, InCombatLockdown, ClearCursor = SortBankBags, SortBags, InCombatLockdown, ClearCursor
 
 local sortCache = {}
 function module:ReverseSort()
@@ -20,6 +20,7 @@ function module:ReverseSort()
 		for slot = 1, numSlots do
 			local texture, _, locked = GetContainerItemInfo(bag, slot)
 			if (slot <= numSlots/2) and texture and not locked and not sortCache["b"..bag.."s"..slot] then
+				ClearCursor()
 				PickupContainerItem(bag, slot)
 				PickupContainerItem(bag, numSlots+1 - slot)
 				sortCache["b"..bag.."s"..slot] = true
@@ -56,7 +57,7 @@ end
 function module:CreateInfoFrame()
 	local infoFrame = CreateFrame("Button", nil, self)
 	infoFrame:SetPoint("TOPLEFT", 10, 0)
-	infoFrame:SetSize(220, 32)
+	infoFrame:SetSize(200, 32)
 	M.CreateFS(infoFrame, 14, SEARCH, true, "LEFT", -5, 0)
 
 	local search = self:SpawnPlugin("SearchBar", infoFrame)
@@ -163,6 +164,8 @@ function module:CreateDeleteButton()
 	local enabledText = I.InfoColor..U["DeleteMode Enabled"]
 
 	local bu = M.CreateButton(self, 24, 24, true, "Interface\\Buttons\\UI-GroupLoot-Pass-Up")
+	bu.Icon:SetPoint("TOPLEFT", 3, -2)
+	bu.Icon:SetPoint("BOTTOMRIGHT", -1, 2)
 	bu:SetScript("OnClick", function(self)
 		deleteEnable = not deleteEnable
 		if deleteEnable then
@@ -170,7 +173,7 @@ function module:CreateDeleteButton()
 			self.text = enabledText
 		else
 			self:SetBackdropBorderColor(0, 0, 0)
-			self.text = ""
+			self.text = nil
 		end
 		self:GetScript("OnEnter")(self)
 	end)
@@ -203,7 +206,7 @@ function module:CreateFavouriteButton()
 			self.text = enabledText
 		else
 			self:SetBackdropBorderColor(0, 0, 0)
-			self.text = ""
+			self.text = nil
 		end
 		self:GetScript("OnEnter")(self)
 	end)
@@ -228,7 +231,8 @@ local function favouriteOnClick(self)
 	end
 end
 
-local function buttonOnClick(self)
+local function buttonOnClick(self, btn)
+	if btn ~= "LeftButton" then return end
 	deleteButtonOnClick(self)
 	favouriteOnClick(self)
 end
@@ -332,10 +336,10 @@ function module:OnLogin()
 
 		self.Quest = M.CreateFS(self, 26, "!", "system", "LEFT", 2, 0)
 
-		self.Favourite = self:CreateTexture(nil, "ARTWORK")
+		self.Favourite = self:CreateTexture(nil, "ARTWORK", nil, 2)
 		self.Favourite:SetAtlas("collections-icon-favorites")
-		self.Favourite:SetSize(35, 35)
-		self.Favourite:SetPoint("TOPLEFT", -12, 10)
+		self.Favourite:SetSize(30, 30)
+		self.Favourite:SetPoint("TOPLEFT", -12, 9)
 
 		if showItemLevel then
 			self.iLvl = M.CreateFS(self, 12, "", false, "BOTTOMLEFT", 1, 1)
@@ -344,9 +348,7 @@ function module:OnLogin()
 		self.glowFrame = M.CreateBG(self, 4)
 		self.glowFrame:SetSize(iconSize+8, iconSize+8)
 
-		if deleteButton then
-			self:HookScript("OnClick", buttonOnClick)
-		end
+		self:HookScript("OnClick", buttonOnClick)
 	end
 
 	function MyButton:ItemOnEnter()

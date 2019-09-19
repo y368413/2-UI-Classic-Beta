@@ -6,9 +6,27 @@ local pairs = pairs
 local LE_QUEST_FREQUENCY_DAILY = LE_QUEST_FREQUENCY_DAILY or 2
 
 function S:QuestTracker()
+	-- Mover for quest tracker
+	local frame = CreateFrame("Frame", "NDuiQuestMover", UIParent)
+	frame:SetSize(210, 43)
+	M.Mover(frame, U["QuestTracker"], "QuestTracker", {"TOPLEFT","UIParent","TOPLEFT",8,-43})
+
+	local tracker = QuestWatchFrame
+	tracker:SetHeight(GetScreenHeight()*.65)
+	tracker:SetClampedToScreen(false)
+	tracker:SetMovable(true)
+	if tracker:IsMovable() then tracker:SetUserPlaced(true) end
+
+	hooksecurefunc(tracker, "SetPoint", function(self, _, parent)
+		if parent == "MinimapCluster" or parent == _G.MinimapCluster then
+			self:ClearAllPoints()
+			self:SetPoint("TOPLEFT", frame, 5, -5)
+		end
+	end)
+
 	local timerMover = CreateFrame("Frame", "NDuiQuestTimerMover", UIParent)
 	timerMover:SetSize(150, 30)
-	M.Mover(timerMover, QUEST_TIMERS, "QuestTimer", {"TOPLEFT", "UIParent", "TOPLEFT", 60, -43})
+	M.Mover(timerMover, QUEST_TIMERS, "QuestTimer", {"TOPRIGHT", frame, "TOPLEFT", -10, 0})
 
 	hooksecurefunc(QuestTimerFrame, "SetPoint", function(self, _, parent)
 		if parent ~= timerMover then
@@ -44,6 +62,23 @@ function S:QuestTracker()
 		end
 	end
 	hooksecurefunc("QuestLog_Update", Showlevel)
+
+	if not MaoRUISettingDB["Skins"]["QuestTracker"] then return end
+
+	local headerString = QUEST_LOG.." %s/%s"
+	local MAX_QUESTLOG_QUESTS = MAX_QUESTLOG_QUESTS or 20
+
+	local header = CreateFrame("Frame", nil, frame)
+	header:SetAllPoints(frame)
+	header:Hide()
+	header.Text = M.CreateFS(header, 16, QUEST_LOG, true, "TOPLEFT", 0, 15)
+
+	local bg = header:CreateTexture(nil, "ARTWORK")
+	bg:SetTexture("Interface\\LFGFrame\\UI-LFG-SEPARATOR")
+	bg:SetTexCoord(0, .66, 0, .31)
+	bg:SetVertexColor(cr, cg, cb, .8)
+	bg:SetPoint("TOPLEFT", 0, 20)
+	bg:SetSize(250, 30)
 
 	-- ModernQuestWatch, Ketho
 	local function onMouseUp(self)
@@ -85,9 +120,9 @@ function S:QuestTracker()
 				text:SetTextColor(.8, .8, .8)
 			end
 		else
-			self.headerText:SetTextColor(NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b) -- 1, .82, 0
+			self.headerText:SetTextColor(1, .8, 0)
 			for _, text in ipairs(self.objectiveTexts) do
-				text:SetTextColor(HIGHLIGHT_FONT_COLOR.r, HIGHLIGHT_FONT_COLOR.g, HIGHLIGHT_FONT_COLOR.b) -- 1, 1, 1
+				text:SetTextColor(1, 1, 1)
 			end
 		end
 	end
@@ -109,6 +144,43 @@ function S:QuestTracker()
 		f.objectiveTexts = objectiveTexts
 		f.completed = completed
 	end
+
+	hooksecurefunc("QuestWatch_Update", function()
+		header:SetShown(tracker:IsShown())
+		local numQuests = select(2, GetNumQuestLogEntries())
+		header.Text:SetFormattedText(headerString, numQuests, MAX_QUESTLOG_QUESTS)
+
+		local watchTextIndex = 1
+		for i = 1, GetNumQuestWatches() do
+			local questIndex = GetQuestIndexForWatch(i)
+			if questIndex then
+				local numObjectives = GetNumQuestLeaderBoards(questIndex)
+				if numObjectives > 0 then
+					local headerText = _G["QuestWatchLine"..watchTextIndex]
+					if watchTextIndex > 1 then
+						headerText:SetPoint("TOPLEFT", "QuestWatchLine"..(watchTextIndex - 1), "BOTTOMLEFT", 0, -10)
+					end
+					watchTextIndex = watchTextIndex + 1
+					local objectivesGroup = {}
+					local objectivesCompleted = 0
+					for j = 1, numObjectives do
+						local finished = select(3, GetQuestLogLeaderBoard(j, questIndex))
+						if finished then
+							objectivesCompleted = objectivesCompleted + 1
+						end
+						_G["QuestWatchLine"..watchTextIndex]:SetPoint("TOPLEFT", "QuestWatchLine"..(watchTextIndex - 1), "BOTTOMLEFT", 0, -5)
+						tinsert(objectivesGroup, _G["QuestWatchLine"..watchTextIndex])
+						watchTextIndex = watchTextIndex + 1
+					end
+					SetClickFrame(i, questIndex, headerText, objectivesGroup, objectivesCompleted == numObjectives)
+				end
+			end
+		end
+		-- hide/show frames so it doesnt eat clicks, since we cant parent to a FontString
+		for _, frame in pairs(ClickFrames) do
+			frame[GetQuestIndexForWatch(frame.watchIndex) and "Show" or "Hide"](frame)
+		end
+	end)
 
 	local function autoQuestWatch(_, questIndex)
 		-- tracking otherwise untrackable quests (without any objectives) would still count against the watch limit

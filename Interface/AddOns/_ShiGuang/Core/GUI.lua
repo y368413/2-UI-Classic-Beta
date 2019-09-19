@@ -190,7 +190,6 @@ local defaultSettings = {
 		PulseCD = false,
 		SorasThreat = true,
 		EnhancedMenu = false,
-		BetterQuest = true,
 	},
 	Tutorial = {
 		Complete = false,
@@ -404,6 +403,8 @@ local optionList = {		-- type, key, value, name, horizon, horizon2, doubleline
 		{1, "Misc", "InterruptSound", U["Interrupt Alarm"], true, false},
 		--{1, "Misc", "DispellSound", U["Dispell Alarm"], true, true},
 		{},--blank
+		{1, "Misc", "AutoQuest", "|cff00cc4c"..U["Auto Quest"]},
+		{},--blank
 	  {1, "Misc", "ItemLevel", "|cff00cc4c"..U["Show ItemLevel"]},
 		{1, "Misc", "GemNEnchant", U["Show GemNEnchant"].."*", true},
 		{1, "Misc", "ShowItemLevel", U["Show ItemLevel"].."*", true, true},
@@ -445,7 +446,7 @@ local optionList = {		-- type, key, value, name, horizon, horizon2, doubleline
 		{1, "Tooltip", "SpecLevelByShift", U["Show SpecLevelByShift"].."*", true, true},
 		{1, "Tooltip", "TargetBy", U["Show TargetedBy"].."*"},
 		{1, "Bags", "Enable", U["Enable Bags"], true},
-		{1, "Misc", "BetterQuest", U["QuestTracker"], true, true},
+		{1, "Skins", "QuestTracker", U["QuestTracker"], true, true},
 		{},--blank
 		{1, "Map", "Coord", U["Map Coords"]},
 		{1, "Map", "MapFader", U["MapFader"].."*", true, nil, updateMapFader},
@@ -814,7 +815,7 @@ local function importData()
 		elseif value == "FavouriteItems" then
 			local items = {select(3, strsplit(":", option))}
 			for _, itemID in next, items do
-				MaoRUISettingDB[key][value][itemID] = true
+				MaoRUISettingDB[key][value][tonumber(itemID)] = true
 			end
 		elseif key == "Mover" then
 			local relFrom, parent, relTo, x, y = select(3, strsplit(":", option))

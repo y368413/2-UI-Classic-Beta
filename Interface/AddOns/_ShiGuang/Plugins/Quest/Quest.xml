@@ -2,5 +2,4 @@
 	<Script file="Mingy.lua"/>
   <!--Script file="ClassicQuestLog.lua"/-->
 	<Script file="WideQuestLog.lua"/>
-	<Script file="BetterQuestFrame.lua"/>
 </Ui>
