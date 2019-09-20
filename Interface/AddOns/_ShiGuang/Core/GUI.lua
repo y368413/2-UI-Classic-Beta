@@ -45,6 +45,7 @@ local defaultSettings = {
 		ItemSetFilter = false,
 		DeleteButton = true,
 		FavouriteItems = {},
+		GatherEmpty = false,
 	},
 	Auras = {
 		Reminder = true,

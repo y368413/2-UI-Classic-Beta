@@ -12,5 +12,4 @@
 	<Script file="ClassicCastbars.lua"/>
 	<Script file="ClassicAuraDurations.lua"/>
 	<Script file="ClassicSpellActivations.lua"/>
-	<Script file="ColorFrames.lua"/>
 </Ui>
