@@ -212,17 +212,35 @@ local emotes = {
     { key = "rt8",    zhTW="rt8",        zhCN="rt8",    texture = "Interface\\TargetingFrame\\UI-RaidTargetingIcon_8" },
 }
 
--- 直接加入
-for _, v in ipairs(emotes) do
-    ICON_TAG_LIST[v.key] = v.key
-    if (v[GetLocale()]) then ICON_TAG_LIST[v[GetLocale()]] = v.key end
-    --末尾可設字體大小 格式為(數字.) 如(16.)
-    if (v.texture) then
-        ICON_LIST[v.key] = "|T".. v.texture ..":" .. "16."
-    else
-        ICON_LIST[v.key] = "|TInterface\\AddOns\\_ShiGuang\\Media\\Emotes\\".. v.key ..":" .. "16."
+
+local function ReplaceEmote(value)
+    local emote = value:gsub("[%{%}]", "")
+    for _, v in ipairs(emotes) do
+        if (emote == v.key or emote == v.zhCN or emote == v.zhTW) then
+            return "|T".. (v.texture or "Interface\\AddOns\\_ShiGuang\\Media\\Emotes\\".. v.key) ..":16|t"
+        end
     end
+    return value
 end
+
+local function filter(self, event, msg, ...)
+    msg = msg:gsub("%{.-%}", ReplaceEmote)
+    return false, msg, ...
+end
+
+ChatFrame_AddMessageEventFilter("CHAT_MSG_CHANNEL", filter)
+ChatFrame_AddMessageEventFilter("CHAT_MSG_SAY", filter)
+ChatFrame_AddMessageEventFilter("CHAT_MSG_YELL", filter)
+ChatFrame_AddMessageEventFilter("CHAT_MSG_WHISPER", filter)
+ChatFrame_AddMessageEventFilter("CHAT_MSG_WHISPER_INFORM", filter)
+ChatFrame_AddMessageEventFilter("CHAT_MSG_RAID", filter)
+ChatFrame_AddMessageEventFilter("CHAT_MSG_RAID_LEADER", filter)
+ChatFrame_AddMessageEventFilter("CHAT_MSG_PARTY", filter)
+ChatFrame_AddMessageEventFilter("CHAT_MSG_PARTY_LEADER", filter)
+ChatFrame_AddMessageEventFilter("CHAT_MSG_GUILD", filter)
+ChatFrame_AddMessageEventFilter("CHAT_MSG_BATTLEGROUND", filter)
+ChatFrame_AddMessageEventFilter("CHAT_MSG_EMOTE", filter)
+
  --------------------------------------- 聊天表情-- Author:M  end -------------------------------------
  
 function module:Chatbar()
@@ -410,9 +428,6 @@ function module:Chatbar()
 	_G.ChatFrameChannelButton:ClearAllPoints()
 	_G.ChatFrameChannelButton:SetPoint("TOP", _G.ChatFrameMenuButton, "BOTTOM", 0, -2)
 	_G.ChatFrameChannelButton:SetParent(VoiceFrame)
-	--_G.ChatFrameToggleVoiceDeafenButton:SetParent(VoiceFrame)
-	--_G.ChatFrameToggleVoiceMuteButton:SetParent(VoiceFrame)
-	--_G.QuickJoinToastButton:SetParent(VoiceFrame)
 	_G.ChatAlertFrame:ClearAllPoints()
 	_G.ChatAlertFrame:SetPoint("BOTTOMLEFT", _G.ChatFrame1Tab, "TOPLEFT", 6, 6)
 --end
@@ -420,42 +435,29 @@ function module:Chatbar()
 -------------------------- 處理聊天氣泡------------------------
     if (GetCVarBool("chatBubbles")) then
     local frame = CreateFrame("Frame", nil, UIParent)
+    --替換文字為表情
     local function TextToEmote(text)
-        for tag in gmatch(text, "%b{}") do
-            local term = strlower(gsub(tag, "[{}]", ""))
-            if (ICON_TAG_LIST[term] and ICON_LIST[ICON_TAG_LIST[term]]) then
-                text = text:gsub(tag, ICON_LIST[ICON_TAG_LIST[term]] .. "0|t")
-            end
-        end
+        text = text:gsub("%{.-%}", ReplaceEmote)
         return text
     end
-    local function isBubbleFrame(frame)
-        if (frame:IsForbidden()) then return end
-		if (frame:GetName()) then return end
-        local region = frame:GetRegions()
-		if (region and region:IsObjectType("Texture")) then
-			return region:GetTexture() == "Interface\\Tooltips\\ChatBubble-Background"
-		end
-    end
-    local function replaceBubble(frame)
-        local f
-        for i = 1, frame:GetNumRegions() do
-            f = select(i, frame:GetRegions())
-            if (f:GetObjectType() == "FontString") then
-                local text = f:GetText() or ""
-                local after = TextToEmote(text)
-                if (after ~= text) then
-                    f:SetText(after)
-                end
-            end
-        end
-    end
-    local function FindAndReplaceBubble()
-        local frame
+    --找出氣泡框
+    local function FindAndReplaceBubble(self)
+        local b, v, f
         for i = 2, WorldFrame:GetNumChildren() do
-            frame = select(i, WorldFrame:GetChildren())
-            if (isBubbleFrame(frame)) then
-                replaceBubble(frame)
+            v = select(i, WorldFrame:GetChildren())
+            if (v:IsForbidden()) then return end
+            b = v:GetBackdrop()
+            if (v:IsShown() and b and b.bgFile == "Interface\\Tooltips\\ChatBubble-Background") then
+                for j = 1, v:GetNumRegions() do
+                    f = select(j, v:GetRegions())
+                    if f:GetObjectType() == "FontString" then
+                        local text = f:GetText() or ""
+                        local after = TextToEmote(text)
+                        if (after ~= text) then
+                            f:SetText(after)
+                        end
+                    end
+                end
             end
         end
     end
@@ -463,23 +465,8 @@ function module:Chatbar()
         self.timer = (self.timer or 0) + elapsed
         if (not self.paused and self.timer > 0.16) then
             self.timer = 0
-            FindAndReplaceBubble()
+            FindAndReplaceBubble(self)
         end
     end)
     end
-
--------------------------- 處理聊天界面------------------------
-    local function myChatFilter(self, event, msg, ...)
-        for emotes in gmatch(msg, "%b{}") do
-          local term = strlower(gsub(emotes, "[{}]", ""))
-            if (ICON_TAG_LIST[term] and ICON_LIST[ICON_TAG_LIST[term]]) then
-			       msg = gsub(msg, emotes, ICON_LIST[ICON_TAG_LIST[term]] .. "0|t")
-		        end
-		    end
-	      return false, msg, ...
-    end
-   
-    local CHAT_TYPES = { "AFK", "BATTLEGROUND_LEADER", "BATTLEGROUND", "BN_WHISPER", "BN_WHISPER_INFORM", "CHANNEL", "DND", "EMOTE", "GUILD", "OFFICER", "PARTY_LEADER", "PARTY", "RAID_LEADER", "RAID_WARNING", "RAID", "SAY", "WHISPER", "WHISPER_INFORM", "YELL", }
-
-    for _, type in pairs(CHAT_TYPES) do ChatFrame_AddMessageEventFilter("CHAT_MSG_" .. type, myChatFilter) end
 end

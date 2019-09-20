@@ -11,7 +11,6 @@ function TT:SetupTooltipIcon(icon)
 	if title then
 		title:SetFormattedText("|T%s:16:16:"..newString..":%d|t %s", icon, 16, title:GetText())
 	end
-
 	for i = 2, self:NumLines() do
 		local line = _G[self:GetName().."TextLeft"..i]
 		if not line then break end
@@ -32,7 +31,6 @@ function TT:HookTooltipSetItem()
 		if link then
 			TT.SetupTooltipIcon(self, GetItemIcon(link))
 		end
-
 		self.tipModified = true
 	end
 end
@@ -43,7 +41,6 @@ function TT:HookTooltipSetSpell()
 		if id then
 			TT.SetupTooltipIcon(self, GetSpellTexture(id))
 		end
-
 		self.tipModified = true
 	end
 end
@@ -66,7 +63,6 @@ function TT:ReskinRewardIcon()
 	self.Icon:SetTexCoord(unpack(I.TexCoord))
 	self.bg = M.CreateBG(self.Icon)
 	M.CreateBD(self.bg)
-
 	local iconBorder = self.IconBorder
 	iconBorder:SetAlpha(0)
 	hooksecurefunc(iconBorder, "SetVertexColor", updateBackdropColor)
@@ -79,7 +75,6 @@ function TT:ReskinTooltipIcons()
 	hooksecurefunc(GameTooltip, "SetUnitAura", function(self)
 		TT.SetupTooltipIcon(self)
 	end)
-
 	-- Tooltip rewards icon
 	TT.ReskinRewardIcon(EmbeddedItemTooltip.ItemTooltip)
 end

@@ -1,5 +1,27 @@
 ﻿<Ui xmlns="http://www.blizzard.com/wow/ui/">
-	<Script file="Misc.lua"/>
+  <Button name="ClassicLFGListSearchAutoCompleteButtonTemplate" useParentLevel="true" virtual="true">
+    <Size x="275" y="22"/>
+    <Layers>
+      <Layer level="OVERLAY">
+        <Texture parentKey="Selected" atlas="search-select" hidden="true" setAllPoints="true"/>
+      </Layer>
+    </Layers>
+    <NormalTexture atlas="_search-rowbg"/>
+    <PushedTexture atlas="_search-rowbg"/>
+    <HighlightTexture atlas="search-highlight"/>
+    <ButtonText parentKey="Label" setAllPoints="true" justifyH="LEFT" wordwrap="false">
+      <Anchors>
+        <Anchor point="TOPLEFT" relativeKey="$parent" relativePoint="TOPLEFT" x="5" y="0"/>
+        <Anchor point="BOTTOMRIGHT" relativeKey="$parent" relativePoint="BOTTOMRIGHT" x="0" y="0"/>
+      </Anchors>
+    </ButtonText>
+    <NormalFont style="GameFontHighlightSmall"/>
+    <HighlightFont style="GameFontHighlightSmall"/>
+    <DisabledFont style="GameFontDisableSmall"/>
+    <Scripts>
+    </Scripts>
+  </Button>
+  <Script file="Misc.lua"/>
 	<Script file="Alerts.lua"/>
 	<Script file="ItemLevel.lua"/>
 	<Script file="ExpRep.lua"/>
