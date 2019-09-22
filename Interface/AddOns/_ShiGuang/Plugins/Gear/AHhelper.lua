@@ -130,7 +130,7 @@ daftAuction:SetScript("OnEvent", function(self, event)
 				local stackSize = AuctionsStackSizeEntry:GetNumber();
 				if myStartPrice ~= nil then				
 					if stackSize > 1 then -- this is a stack of items				
-						if MSA_DropDownMenu_GetSelectedValue(PriceDropDown) == 1 then -- input price per item
+						if UIDropDownMenu_GetSelectedValue(PriceDropDown) == 1 then -- input price per item  MSA_DropDownMenu_GetSelectedValue
 							MoneyInputFrame_SetCopper(StartPrice, myStartPrice);
 							MoneyInputFrame_SetCopper(BuyoutPrice, myBuyoutPrice);
 						else -- input price for entire stack
@@ -142,10 +142,10 @@ daftAuction:SetScript("OnEvent", function(self, event)
 						MoneyInputFrame_SetCopper(StartPrice, myStartPrice);
 						MoneyInputFrame_SetCopper(BuyoutPrice, myBuyoutPrice);
 					end;
-					if MSA_DropDownMenu_GetSelectedValue(DurationDropDown) ~= 3 then 
-						MSA_DropDownMenu_SetSelectedValue(DurationDropDown, 3); -- set duration to 3 (48h)
-						DurationDropDownText:SetText("48 H"); -- set duration text since it keeps bugging to "Custom"  48 Hours
-					end;
+					--if UIDropDownMenu_GetSelectedValue(DurationDropDown) ~= 3 then 
+						--UIDropDownMenu_GetSelectedValue(DurationDropDown, 3); -- set duration to 3 (48h)
+						--DurationDropDownText:SetText("48 H"); -- set duration text since it keeps bugging to "Custom"  48 Hours
+					--end;
 				end;
 					
 				myBuyoutPrice = nil;

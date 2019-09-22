@@ -9,7 +9,7 @@
 
 	<Include file="cargBags\cargBags.xml"/>
 
-  <Script file="MSA-DropDownMenu-1.0.lua"/>
+  <!--Script file="MSA-DropDownMenu-1.0.lua"/-->
 	<Script file="LibButtonGlow.lua"/>
 	<Script file="LibBase64.lua"/>
 </Ui>

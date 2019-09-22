@@ -69,8 +69,8 @@ end
 
 ----------------------------------------------------------------------------	右键菜单--------------------------------------------------------------------------
 --动作条样式
---local SetMrbarMenuFrame = CreateFrame("Frame", "ClickMenu", UIParent, "UIDropDownMenuTemplate")
-local SetMrbarMenuFrame = MSA_DropDownMenu_Create("ClickMenu", UIParent)
+local SetMrbarMenuFrame = CreateFrame("Frame", "ClickMenu", UIParent, "UIDropDownMenuTemplate")
+--local SetMrbarMenuFrame = MSA_DropDownMenu_Create("ClickMenu", UIParent)
 local SetMrbarMicromenu = {  
     { text = "|cffff8800 ------------------------|r", notCheckable = true },
     { text = "           "..MAINMENU_BUTTON.."", isTitle = true, notCheckable = true},
@@ -227,7 +227,7 @@ function module:SetupMinimap()
 	Minimap:SetFrameLevel(10)
 	Minimap:SetMaskTexture("Interface\\Buttons\\WHITE8X8")
 	--MinimapCluster:SetScale(scale)
-	MSA_DropDownList1:SetClampedToScreen(true)
+	--UIDropDownList1:SetClampedToScreen(true)
 
 	local mover = M.Mover(Minimap, U["Minimap"], "Minimap", R.Minimap.Pos, Minimap:GetWidth(), Minimap:GetHeight())
 	Minimap:ClearAllPoints()
