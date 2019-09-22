@@ -1,10 +1,19 @@
---## Version: 0.1.2 ## Author: shirsig
-local _G, _M = getfenv(0), {}
-setfenv(1, setmetatable(_M, {__index=_G}))
+-----------------------------------------
+-- SortBags 0.1.2, shirsig
+-- https://github.com/shirsig/SortBags
+-----------------------------------------
 
-CreateFrame("GameTooltip", "SortBagsTooltip", nil, "GameTooltipTemplate")
+local _G = getfenv(0)
+local select, pairs, ipairs, tonumber = select, pairs, ipairs, tonumber
+local min, abs, mod, ceil = min, abs, mod, ceil
+local gsub, strfind, tinsert, sort, format = gsub, strfind, tinsert, sort, format
+local GetContainerItemLink, GetContainerItemInfo, GetContainerNumSlots, GetBagName, GetItemInfo = GetContainerItemLink, GetContainerItemInfo, GetContainerNumSlots, GetBagName, GetItemInfo
+local ClearCursor, PickupContainerItem, BankButtonIDToInvSlotID = ClearCursor, PickupContainerItem, BankButtonIDToInvSlotID
 
+local Start, LT, Move, TooltipInfo, Sort, Stack, Initialize, ContainerClass, Item
 local CONTAINERS
+
+local sortTooltip = CreateFrame("GameTooltip", "SortBagsTooltip", nil, "GameTooltipTemplate")
 
 function _G.SortBags()
 	CONTAINERS = {0, 1, 2, 3, 4}
@@ -31,7 +40,7 @@ function _G.GetSortBagsRightToLeft(enabled)
 end
 
 function _G.SetSortBagsRightToLeft(enabled)
-	_G.SortBagsRightToLeft = enabled and 1 or nil
+	SortBagsRightToLeft = enabled and 1 or nil
 end
 
 local function set(...)
@@ -205,18 +214,18 @@ function TooltipInfo(container, position)
 	-- local chargesPattern = "^" .. gsub(gsub(ITEM_SPELL_CHARGES_P1, "%%d", "(%%d+)"), "%%%d+%$d", "(%%d+)") .. "$" TODO retail
 	local chargesPattern = "^" .. gsub(gsub(ITEM_SPELL_CHARGES, "%%d", "(%%d+)"), "%%%d+%$d", "(%%d+)") .. "$"
 
-	SortBagsTooltip:SetOwner(UIParent, "ANCHOR_NONE")
-	SortBagsTooltip:ClearLines()
+	sortTooltip:SetOwner(UIParent, "ANCHOR_NONE")
+	sortTooltip:ClearLines()
 
 	if container == BANK_CONTAINER then
-		SortBagsTooltip:SetInventoryItem("player", BankButtonIDToInvSlotID(position))
+		sortTooltip:SetInventoryItem("player", BankButtonIDToInvSlotID(position))
 	else
-		SortBagsTooltip:SetBagItem(container, position)
+		sortTooltip:SetBagItem(container, position)
 	end
 
 	local charges, usable, soulbound, quest, conjured
-	for i = 1, SortBagsTooltip:NumLines() do
-		local text = getglobal("SortBagsTooltipTextLeft" .. i):GetText()
+	for i = 1, sortTooltip:NumLines() do
+		local text = _G[sortTooltip:GetName().."TextLeft"..i]:GetText()
 
 		local _, _, chargeString = strfind(text, chargesPattern)
 		if chargeString then

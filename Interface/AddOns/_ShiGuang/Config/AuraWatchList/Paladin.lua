@@ -5,6 +5,7 @@ local module = M:GetModule("AurasTable")
 -- 圣骑士的法术监控
 local list = {
 	["Player Aura"] = {		-- 玩家光环组
+	{AuraID = 20154, UnitID = "player", Caster = "player"},		-- 正义圣印
 	},
 	["Target Aura"] = {		-- 目标光环组
 		{AuraID = 853, UnitID = "target", Caster = "player"},		-- 制裁之锤

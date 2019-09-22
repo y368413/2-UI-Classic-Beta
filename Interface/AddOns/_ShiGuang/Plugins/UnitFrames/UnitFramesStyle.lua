@@ -76,6 +76,14 @@ hooksecurefunc("TargetFrame_Update", function(self)
 end)
 	
 ------------------------------------------------------------------------------- TargetClassButton by 狂飙@cwdg(networm@qq.com) 20120119 DIY by y368413 
+-- Binding Variables
+BINDING_NAME_INSPECT = "    "..INSPECT
+BINDING_NAME_TRADE = "    "..TRADE
+BINDING_NAME_WHISPER = "    "..WHISPER
+BINDING_NAME_FOLLOW = "    "..FOLLOW
+--BINDING_NAME_COMPARE_ACHIEVEMENTS = COMPARE_ACHIEVEMENTS
+BINDING_NAME_Invite = "    "..CALENDAR_INVITE_PLAYER 
+
 local targeticon = CreateFrame("Button", "TargetClass", TargetFrame)
 targeticon:Hide()
 targeticon:SetWidth(28)

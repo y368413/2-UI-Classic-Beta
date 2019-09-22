@@ -53,7 +53,7 @@ DialogKey_TITLE = '|cff0080ff[任務]|r快捷對話'
 Farmer_TITLE = '|cff8080ff[拾取]|r拾取提示'
 HardYards_TITLE = '|cFFD2691E [菜单]|r距离显示:'
 MTG_TITLE = "|cff69ccf0[購買]|r魚人助手"
-NameplateSCT_TITLE = "|cff8080ff[血条]|r伤害数字"
+BINDING_HEADER_TARGETCLASSBUTTON = "目标交互"
 ----------------Charms----------------------
 CHARMS_BUY_STACK="你確定購買|cffff0000一組|r下列物品嗎？";
 CHARMS_NAKEDIZE="脫光光" ;
@@ -120,7 +120,7 @@ MINIMAP_MENU_COMPAREITEMS = "對比裝備";
 MINIMAP_MENU_SWITCHUF = "頭像切換";
 MINIMAP_MENU_AFKSCREEN = "屏保(AFK)";
 MINIMAP_MENU_CHECKFOODSSS = "吃喝檢查";
-MINIMAP_MENU_QUSETIONANSWER = "常見問題";
+MINIMAP_MENU_QUSETIONANSWER = "常見問題+插件改动";
 MINIMAP_MENU_UISETTING = "設置";
 MINIMAP_MENU_MORE = "    更多設置...";
   -- Paku_Totems
@@ -1394,3 +1394,5 @@ U["FavouriteMode Enabled"] = "\n你現在可以點擊標記物品。\n若啓用�
 U["DisableInfobars"] = "關閉所有信息條模塊"
 U["FreeSlots"] = "空閑背包欄位"
 U["Bags GatherEmpty"] = "合并背包空閑欄位"
+U["AutoDismount"] = "自動下馬及站立"
+U["StupidShiftKey"] = "你的Shift鍵可能卡住了。"

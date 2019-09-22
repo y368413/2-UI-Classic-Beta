@@ -620,4 +620,27 @@ function module:OnLogin()
 
 	SetSortBagsRightToLeft(not MaoRUISettingDB["Bags"]["ReverseSort"])
 	SetInsertItemsLeftToRight(false)
+
+	--[[ SHIFT KEY DETECT
+	local function onUpdate(self, elapsed)
+		if IsShiftKeyDown() then
+			self.elapsed = self.elapsed + elapsed
+			if self.elapsed > 3 then
+				UIErrorsFrame:AddMessage(I.InfoColor..U["StupidShiftKey"])
+				self:Hide()
+			end
+		end
+	end
+	local shiftUpdater = CreateFrame("Frame")
+	shiftUpdater:SetScript("OnUpdate", onUpdate)
+	shiftUpdater:Hide()
+
+	f.main:HookScript("OnShow", function()
+		shiftUpdater.elapsed = 0
+		shiftUpdater:Show()
+	end)
+
+	f.main:HookScript("OnHide", function()
+		shiftUpdater:Hide()
+	end)]]
 end

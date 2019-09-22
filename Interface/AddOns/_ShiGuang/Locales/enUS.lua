@@ -37,7 +37,7 @@ DialogKey_TITLE = '|cff0080ff[Quest]|rDialogKey'
 Farmer_TITLE = '|cff8080ff[Loot]|rFarmer'
 HardYards_TITLE = '|cFFD2691E [Range]|rHardYards:'
 MTG_TITLE = "|cff69ccf0[Buy]|rMrrl'sTradeGame"
-NameplateSCT_TITLE = "|cff8080ff[SCT]|rNameplateSCT"
+BINDING_HEADER_TARGETCLASSBUTTON = "Target Class Button"
 ----------------Charms----------------------
 CHARMS_BUY_STACK="You sure buy|cffff0000 a stack |rthis item？"  ;
 CHARMS_NAKEDIZE="Nakedize";
@@ -104,7 +104,7 @@ MINIMAP_MENU_COMPAREITEMS = "Compare Items";
 MINIMAP_MENU_SWITCHUF = "Switch UF";
 MINIMAP_MENU_AFKSCREEN = "AFK Screen";
 MINIMAP_MENU_CHECKFOODSSS = "Check food/drink";
-MINIMAP_MENU_QUSETIONANSWER = "Question/Answer";
+MINIMAP_MENU_QUSETIONANSWER = "Question/Answer/UI changelog";
 MINIMAP_MENU_UISETTING = " Setting";
 MINIMAP_MENU_MORE = "      More...";
   -- Paku_Totems
@@ -1399,3 +1399,5 @@ U["FavouriteMode Enabled"] = "\nYou can now star items.\nIf \'Bags ItemFilter\' 
 U["DisableInfobars"] = "Disable All Infobars"
 U["FreeSlots"] = "Total free slots"
 U["Bags GatherEmpty"] = "Collect empty slots"
+U["AutoDismount"] = "AutoDismount&AutoStand"
+U["StupidShiftKey"] = "Your SHIFT key may be stuck."

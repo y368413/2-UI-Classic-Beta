@@ -155,7 +155,7 @@ end
 		end
 	end
 	local function sendMsg(text)
-			SendChatMessage(text, IsPartyLFG() and "INSTANCE_CHAT" or IsInRaid() and "RAID" or "PARTY")
+			SendChatMessage(text, IsInRaid() and "RAID" or "PARTY")
 	end
 
 	local function sendResult(i)
@@ -220,14 +220,14 @@ end
 	end
 
 	FF = CreatMarkerButton("FLASKFOOD", MAF, "Interface\\GossipFrame\\TaxiGossipIcon", 21, 21, "TOP", RP, "BOTTOM", 0, -3, 0.43)
-    FF:SetScript("OnEnter", function(self) GameTooltip:SetOwner(FF, "ANCHOR_TOP") GameTooltip:AddLine("检查食物", 1,2,0) GameTooltip:Show() end)
-    FF:SetScript("OnLeave", function(self) GameTooltip:Hide() end)
+  FF:SetScript("OnEnter", function(self) GameTooltip:SetOwner(FF, "ANCHOR_TOP") GameTooltip:AddLine("检查食物", 1,2,0) GameTooltip:Show() end)
+  FF:SetScript("OnLeave", function(self) GameTooltip:Hide() end)
 	FF:SetScript("OnMouseDown", function(self) scanBuff() end)
   
 ---------------------------------------------------- PullTimer
 	PT = CreatMarkerButton("FLASKFOOD", MAF, "Interface\\Addons\\_ShiGuang\\Media\\Modules\\Role\\bubbleTex", 21, 21, "TOP", FF, "BOTTOM", 0, -3, 0.43)
-    PT:SetScript("OnEnter", function(self) GameTooltip:SetOwner(PT, "ANCHOR_TOP") GameTooltip:AddLine("DBM倒数", 1,2,0) GameTooltip:Show() end)
-    PT:SetScript("OnLeave", function(self) GameTooltip:Hide() end)
+  PT:SetScript("OnEnter", function(self) GameTooltip:SetOwner(PT, "ANCHOR_TOP") GameTooltip:AddLine("DBM倒数", 1,2,0) GameTooltip:Show() end)
+  PT:SetScript("OnLeave", function(self) GameTooltip:Hide() end)
 	PT:RegisterForClicks("LeftButtonUp")
 	PT:SetAttribute("type","macro")
 	PT:SetAttribute("macrotext",'/dbm pull 8')

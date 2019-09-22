@@ -46,7 +46,7 @@ function MISC:OnLogin()
 	self:UpdateErrorBlocker()
 	self:TradeTargetInfo()
 	self:MenuButton_Add()
-	--self:FreeMountCD()
+	self:AutoDismount()
 	self:WallpaperKit()
 	
 
@@ -80,6 +80,14 @@ function MISC:OnLogin()
 
 	-- Fix blizz error
 	MAIN_MENU_MICRO_ALERT_PRIORITY = MAIN_MENU_MICRO_ALERT_PRIORITY or {}
+
+	-- RealMobHealth override
+	--if RealMobHealth then
+		--RealMobHealth.OverrideOption("ModifyHealthBarText", false)
+		--RealMobHealth.OverrideOption("ShowTooltipHealthText", false)
+		--RealMobHealth.OverrideOption("ShowNamePlateHealthText", false)
+		--RealMobHealth.OverrideOption("ShowStatusBarTextAdditions", false)
+	--end
 end
 
 -- Extend Instance
@@ -313,7 +321,6 @@ do
 	M:RegisterEvent("ADDON_LOADED", setupMisc)
 end
 
-
 -- ALT+RightClick to buy a stack
 do
 	local cache = {}
@@ -446,4 +453,31 @@ function MISC:MenuButton_Add()
 		["guild"] = gsub(CHAT_GUILD_INVITE_SEND, HEADER_COLON, ""),
 	}
 	hooksecurefunc("UnitPopup_ShowMenu", MISC.MenuButton_Show)
+end
+
+-- Auto dismount and auto stand
+function MISC:AutoDismount()
+	if not MaoRUISettingDB["Misc"]["AutoDismount"] then return end
+
+	local standString = {
+		[ERR_LOOT_NOTSTANDING] = true,
+		[SPELL_FAILED_NOT_STANDING] = true,
+	}
+
+	local dismountString = {
+		[ERR_ATTACK_MOUNTED] = true,
+		[ERR_NOT_WHILE_MOUNTED] = true,
+		[ERR_TAXIPLAYERALREADYMOUNTED] = true,
+		[SPELL_FAILED_NOT_MOUNTED] = true,
+	}
+
+	local function updateEvent(event, ...)
+		local _, msg = ...
+		if standString[msg] then
+			DoEmote("STAND")
+		elseif dismountString[msg] then
+			Dismount()
+		end
+	end
+	M:RegisterEvent("UI_ERROR_MESSAGE", updateEvent)
 end

@@ -122,7 +122,8 @@ local function AddOwners(tooltip, link)
 		end
 
 		if count > 0 then
-			tooltip:AddDoubleLine(Addon:GetOwnerIconString(info, 12,0,0) .. ' ' .. color:format(info.name), text)
+			tooltip:AddDoubleLine(color:format(info.name), text)
+			--tooltip:AddDoubleLine(Addon:GetOwnerIconString(info, 12,0,0) .. ' ' .. color:format(info.name), text)
 			total = total + count
 			players = players + 1
 		end

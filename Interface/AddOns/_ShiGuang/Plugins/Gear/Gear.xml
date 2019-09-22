@@ -1,5 +1,6 @@
 <Ui xmlns="http://www.blizzard.com/wow/ui/">
-	<Script file="LetMeCast.lua"/>
 	<Script file="Molinari.lua"/>
 	<Script file="AHhelper.lua"/>
+	<Script file="AutoFollow.lua"/>
+	<Script file="solQuickShifter.lua"/>
 </Ui>

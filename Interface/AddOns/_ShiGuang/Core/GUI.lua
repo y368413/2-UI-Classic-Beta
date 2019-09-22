@@ -191,6 +191,7 @@ local defaultSettings = {
 		PulseCD = false,
 		SorasThreat = true,
 		EnhancedMenu = false,
+		AutoDismount = true,
 	},
 	Tutorial = {
 		Complete = false,
@@ -406,15 +407,15 @@ local optionList = {		-- type, key, value, name, horizon, horizon2, doubleline
 		{},--blank
 		{1, "Misc", "AutoQuest", "|cff00cc4c"..U["Auto Quest"]},
 		{},--blank
-	  {1, "Misc", "ItemLevel", "|cff00cc4c"..U["Show ItemLevel"]},
+	  {1, "Misc", "ShowItemLevel", "|cff00cc4c"..U["Show ItemLevel"]},
 		{1, "Misc", "GemNEnchant", U["Show GemNEnchant"].."*", true},
-		{1, "Misc", "ShowItemLevel", U["Show ItemLevel"].."*", true, true},
+		--{1, "Misc", "ShowItemLevel", U["Show ItemLevel"].."*", true, true},
+		{1, "Misc", "FreeMountCD", "CD君(CN only)", true, true},
 	  {1, "Skins", "InfobarLine", U["Bottom Line"]},
 	  {1, "Misc", "xMerchant", U["xMerchant"], true},
 	  {1, "Misc", "WallpaperKit", U["WallpaperKit"], true, true},
 	  {1, "Misc", "CrazyCatLady", U["Death Alarm"]},
 	  {1, "Misc", "PlacedItemAlert", U["Placed Item Alert"], true},
-	  {1, "Misc", "FreeMountCD", "CD君(CN only)", true, true},
 	},
 	[5] = {
 		{1, "Chat", "Oldname", U["Default Channel"]},
@@ -447,7 +448,7 @@ local optionList = {		-- type, key, value, name, horizon, horizon2, doubleline
 		{1, "Tooltip", "SpecLevelByShift", U["Show SpecLevelByShift"].."*", true, true},
 		{1, "Tooltip", "TargetBy", U["Show TargetedBy"].."*"},
 		{1, "Bags", "Enable", U["Enable Bags"], true},
-		{1, "Skins", "QuestTracker", U["QuestTracker"], true, true},
+		{1, "Misc", "AutoDismount", U["AutoDismount"], true, true},
 		{},--blank
 		{1, "Map", "Coord", U["Map Coords"]},
 		{1, "Map", "MapFader", U["MapFader"].."*", true, nil, updateMapFader},

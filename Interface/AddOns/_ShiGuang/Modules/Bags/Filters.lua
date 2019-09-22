@@ -37,6 +37,7 @@ end
 
 local function isItemAmmo(item)
 	if not MaoRUISettingDB["Bags"]["ItemFilter"] then return end
+	if I.MyClass ~= "HUNTER" then return end
 	return item.equipLoc == "INVTYPE_AMMO" or module.AmmoBags[item.bagID]
 end
 
