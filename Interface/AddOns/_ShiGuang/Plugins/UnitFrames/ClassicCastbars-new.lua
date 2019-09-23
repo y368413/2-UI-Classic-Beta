@@ -1,7 +1,6 @@
---## Author: Wardz ## Version: v1.0.7
-local ClassicCastbars = {}
+local _, namespace = ...
 local PoolManager = {}
-ClassicCastbars.PoolManager = PoolManager
+namespace.PoolManager = PoolManager
 
 local framePool = CreateFramePool("Statusbar", UIParent, "SmallCastingBarFrameTemplate", PoolManager.ResetterFunc)
 local framesCreated = 0
@@ -79,8 +78,10 @@ if date("%d.%m") == "01.04" then -- April Fools :)
     end)
 end
 
+
+local _, namespace = ...
 local AnchorManager = {}
-ClassicCastbars.AnchorManager = AnchorManager
+namespace.AnchorManager = AnchorManager
 
 local anchors = {
     target = {
@@ -197,6 +198,8 @@ function AnchorManager:GetAnchor(unitID)
     return frame
 end
 
+
+local _, namespace = ...
 local GetSpellInfo = _G.GetSpellInfo
 
 local castSpellIDs = {
@@ -1440,7 +1443,7 @@ local castSpellIDs = {
 
 local counter, cursor = 0, 1
 local castedSpells = {}
-ClassicCastbars.castedSpells = castedSpells
+namespace.castedSpells = castedSpells
 
 -- temporary, ill clean up this later
 local function BuildSpellNameToSpellIDTable()
@@ -1473,7 +1476,7 @@ C_Timer.After(0.1, BuildSpellNameToSpellIDTable) -- run asap once the current ca
 -- value[1] is the cast time in seconds, value[2] is the spell ID used to retrive
 -- spell icon later on.
 -- TODO: merge with main spell table and just store the cast time here as table value
-ClassicCastbars.channeledSpells = {
+namespace.channeledSpells = {
     -- MISC
     [GetSpellInfo(746)] = { 8, 746 },         -- First Aid
     [GetSpellInfo(13278)] = { 4, 13278 },     -- Gnomish Death Ray
@@ -1514,7 +1517,7 @@ ClassicCastbars.channeledSpells = {
 -- List of abilities that increases cast time (reduces speed)
 -- Value here is the slow percentage, from highest spell rank.
 -- TODO: check if these also affect Aimed Shot/Volley + bosses
-ClassicCastbars.castTimeIncreases = {
+namespace.castTimeIncreases = {
     -- WARLOCK
     [GetSpellInfo(1714)] = 60,    -- Curse of Tongues
     [GetSpellInfo(1098)] = 30,    -- Enslave Demon
@@ -1544,7 +1547,7 @@ ClassicCastbars.castTimeIncreases = {
 }
 
 -- Spells that have cast time reduced by talents.
-ClassicCastbars.castTimeTalentDecreases = {
+namespace.castTimeTalentDecreases = {
     [GetSpellInfo(403)] = 2000,      -- Lightning Bolt
     [GetSpellInfo(421)] = 1500,      -- Chain Lightning
     [GetSpellInfo(6353)] = 4000,     -- Soul Fire
@@ -1572,7 +1575,7 @@ ClassicCastbars.castTimeTalentDecreases = {
 -- List of crowd controls.
 -- We want to stop the castbar when these auras are detected
 -- as SPELL_CAST_FAILED is not triggered when an unit gets CC'ed.
-ClassicCastbars.crowdControls = {
+namespace.crowdControls = {
     [GetSpellInfo(5211)] = 1,       -- Bash
     [GetSpellInfo(24394)] = 1,      -- Intimidation
     [GetSpellInfo(853)] = 1,        -- Hammer of Justice
@@ -1643,7 +1646,7 @@ ClassicCastbars.crowdControls = {
 }
 
 -- Addon Savedvariables
-ClassicCastbars.defaultConfig = {
+namespace.defaultConfig = {
     version = "11", -- settings version
     pushbackDetect = true,
     movementDetect = true,
@@ -1651,26 +1654,26 @@ ClassicCastbars.defaultConfig = {
 
     nameplate = {
         enabled = true,
-        width = 102,
-        height = 6,
-        iconSize = 16,
+        width = 106,
+        height = 11,
+        iconSize = 13,
         showCastInfoOnly = false,
-        showTimer = true,
+        showTimer = false,
         autoPosition = true,
         castFont = _G.STANDARD_TEXT_FONT,
         castFontSize = 8,
-        castStatusBar = "Interface\\Addons\\_ShiGuang\\Media\\normTex",  --"Interface\\TargetingFrame\\UI-StatusBar",
-        castBorder = "Interface\\Tooltips\\ChatBubble-Backdrop",  --"Interface\\CastingBar\\UI-CastingBar-Border-Small"
+        castStatusBar = "Interface\\TargetingFrame\\UI-StatusBar",
+        castBorder = "Interface\\CastingBar\\UI-CastingBar-Border-Small",
         hideIconBorder = false,
-        position = { "CENTER", -1, -12 },
+        position = { "CENTER", 7.3, -23.1 },
         iconPositionX = -3,
         iconPositionY = 0,
-        borderColor = { 1, 0.8, 0, 1 },
+        borderColor = { 1, 0.796078431372549, 0, 1 },
         statusColor = { 1, 0.7, 0, 1 },
         statusColorChannel = { 0, 1, 0, 1 },
         textColor = { 1, 1, 1, 1 },
-        textPositionX = 6,
-        textPositionY = -1,
+        textPositionX = 0,
+        textPositionY = 0,
         frameLevel = 10,
     },
 
@@ -1694,13 +1697,13 @@ ClassicCastbars.defaultConfig = {
         statusColor = { 1, 0.7, 0, 1 },
         statusColorChannel = { 0, 1, 0, 1 },
         textColor = { 1, 1, 1, 1 },
-        textPositionX = 6,
-        textPositionY = -1,
+        textPositionX = 0,
+        textPositionY = 0,
         frameLevel = 10,
     },
 
     party = {
-        enabled = true,
+        enabled = false,
         width = 120,
         height = 12,
         iconSize = 16,
@@ -1709,8 +1712,8 @@ ClassicCastbars.defaultConfig = {
         autoPosition = false,
         castFont = _G.STANDARD_TEXT_FONT,
         castFontSize = 9,
-        castStatusBar = "Interface\\Addons\\_ShiGuang\\Media\\normTex",
-        castBorder = "Interface\\Tooltips\\ChatBubble-Backdrop",
+        castStatusBar = "Interface\\TargetingFrame\\UI-StatusBar",
+        castBorder = "Interface\\CastingBar\\UI-CastingBar-Border",
         hideIconBorder = false,
         position = { "CENTER", -143.5, -5 },
         iconPositionX = -5,
@@ -1750,7 +1753,9 @@ ClassicCastbars.defaultConfig = {
     },
 }
 
-local PoolManager = ClassicCastbars.PoolManager
+
+local _, namespace = ...
+local PoolManager = namespace.PoolManager
 
 local addon = CreateFrame("Frame")
 addon:RegisterEvent("PLAYER_LOGIN")
@@ -1765,11 +1770,11 @@ local activeFrames = {}
 local npcCastTimeCacheStart = {}
 local npcCastTimeCache = {}
 
-addon.AnchorManager = ClassicCastbars.AnchorManager
-addon.defaultConfig = ClassicCastbars.defaultConfig
+addon.AnchorManager = namespace.AnchorManager
+addon.defaultConfig = namespace.defaultConfig
 addon.activeFrames = activeFrames
---ClassicCastbars.addon = addon
---ClassicCastbars = addon -- global ref for ClassicCastbars_Options
+namespace.addon = addon
+ClassicCastbars = addon -- global ref for ClassicCastbars_Options
 
 -- upvalues for speed
 local pairs = _G.pairs
@@ -1786,10 +1791,11 @@ local GetUnitSpeed = _G.GetUnitSpeed
 local CastingInfo = _G.CastingInfo
 local bit_band = _G.bit.band
 local COMBATLOG_OBJECT_TYPE_PLAYER_OR_PET = _G.COMBATLOG_OBJECT_TYPE_PLAYER + _G.COMBATLOG_OBJECT_TYPE_PET
-local castTimeIncreases = ClassicCastbars.castTimeIncreases
+local castTimeIncreases = namespace.castTimeIncreases
 
 function addon:CheckCastModifier(unitID, unitGUID)
     if not self.db.pushbackDetect then return end
+
     for i = 1, 16 do
         local name = UnitAura(unitID, i, "HARMFUL")
         if not name then return end -- no more debuffs
@@ -1976,7 +1982,7 @@ function addon:CastPushback(unitGUID)
 end
 
 function addon:ToggleUnitEvents(shouldReset)
-    if MaoRUISettingDB["Nameplate"]["TargetClassicCastbars"] then
+    if self.db.target.enabled then
         self:RegisterEvent("PLAYER_TARGET_CHANGED")
         if self.db.target.autoPosition then
             self:RegisterUnitEvent("UNIT_AURA", "target")
@@ -1988,7 +1994,7 @@ function addon:ToggleUnitEvents(shouldReset)
         self:UnregisterEvent("UNIT_TARGET")
     end
 
-    if MaoRUISettingDB["Nameplate"]["ClassicCastbars"] then
+    if self.db.nameplate.enabled then
         self:RegisterEvent("NAME_PLATE_UNIT_ADDED")
         self:RegisterEvent("NAME_PLATE_UNIT_REMOVED")
     else
@@ -2050,8 +2056,8 @@ function addon:PLAYER_LOGIN()
     ClassicCastbarsDB = ClassicCastbarsDB or {}
 
     -- Copy any settings from defaults if they don't exist in current profile
-    self.db = CopyDefaults(ClassicCastbars.defaultConfig, ClassicCastbarsDB)
-    self.db.version = ClassicCastbars.defaultConfig.version
+    self.db = CopyDefaults(namespace.defaultConfig, ClassicCastbarsDB)
+    self.db.version = namespace.defaultConfig.version
 
     -- Reset fonts on game locale switched (fonts only works for certain locales)
     if self.db.locale ~= GetLocale() then
@@ -2063,7 +2069,7 @@ function addon:PLAYER_LOGIN()
     -- config is not needed anymore if options are not loaded
     if not IsAddOnLoaded("ClassicCastbars_Options") then
         self.defaultConfig = nil
-        ClassicCastbars.defaultConfig = nil
+        namespace.defaultConfig = nil
     end
 
     if self.db.player.enabled then
@@ -2152,10 +2158,10 @@ end
 addon.GROUP_LEFT = addon.GROUP_ROSTER_UPDATE
 addon.GROUP_JOINED = addon.GROUP_ROSTER_UPDATE
 
-local channeledSpells = ClassicCastbars.channeledSpells
-local castTimeTalentDecreases = ClassicCastbars.castTimeTalentDecreases
-local crowdControls = ClassicCastbars.crowdControls
-local castedSpells = ClassicCastbars.castedSpells
+local channeledSpells = namespace.channeledSpells
+local castTimeTalentDecreases = namespace.castTimeTalentDecreases
+local crowdControls = namespace.crowdControls
+local castedSpells = namespace.castedSpells
 local ARCANE_MISSILES = GetSpellInfo(5143)
 
 function addon:COMBAT_LOG_EVENT_UNFILTERED()
@@ -2237,7 +2243,7 @@ function addon:COMBAT_LOG_EVENT_UNFILTERED()
     elseif eventType == "SPELL_AURA_APPLIED" then
         if castTimeIncreases[spellName] then
             -- Aura that slows casting speed was applied
-            return self:SetCastDelay(dstGUID, ClassicCastbars.castTimeIncreases[spellName])
+            return self:SetCastDelay(dstGUID, namespace.castTimeIncreases[spellName])
         elseif crowdControls[spellName] then
             -- Aura that interrupts cast was applied
             return self:DeleteCast(dstGUID)
@@ -2330,10 +2336,12 @@ addon:SetScript("OnUpdate", function(self, elapsed)
 end)
 
 
-local AnchorManager = ClassicCastbars.AnchorManager
-local PoolManager = ClassicCastbars.PoolManager
 
---local addon = ClassicCastbars.addon
+local _, namespace = ...
+local AnchorManager = namespace.AnchorManager
+local PoolManager = namespace.PoolManager
+
+local addon = namespace.addon
 local activeFrames = addon.activeFrames
 local gsub = _G.string.gsub
 local unpack = _G.unpack
@@ -2410,7 +2418,7 @@ function addon:SetCastbarStyle(castbar, cast, db)
 
     castbar.Spark:SetHeight(db.height * 2.1)
     castbar.Icon:SetSize(db.iconSize, db.iconSize)
-    castbar.Icon:SetPoint("BOTTOMLEFT", castbar, db.iconPositionX - db.iconSize, db.iconPositionY)
+    castbar.Icon:SetPoint("LEFT", castbar, db.iconPositionX - db.iconSize, db.iconPositionY)
     castbar.Border:SetVertexColor(unpack(db.borderColor))
 
     if db.castBorder == "Interface\\CastingBar\\UI-CastingBar-Border-Small" or db.castBorder == "Interface\\CastingBar\\UI-CastingBar-Border" then -- default border
@@ -2475,7 +2483,7 @@ function addon:SetCastbarFonts(castbar, cast, db)
     local c = db.textColor
     castbar.Text:SetTextColor(c[1], c[2], c[3], c[4])
     castbar.Timer:SetTextColor(c[1], c[2], c[3], c[4])
-    castbar.Text:SetPoint("LEFT", db.textPositionX, db.textPositionY)
+    castbar.Text:SetPoint("CENTER", db.textPositionX, db.textPositionY)
 end
 
 function addon:DisplayCastbar(castbar, unitID)
