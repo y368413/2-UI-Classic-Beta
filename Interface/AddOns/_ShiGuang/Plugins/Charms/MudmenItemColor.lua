@@ -3,7 +3,7 @@ local addon = CreateFrame('Button', 'MudmenItemColor');
 local defaultSlotWidth, defaultSlotHeight = 68, 68;
 
 -- here we add on new color for quest items in the quality color ref array
-LE_ITEM_QUALITY_QUEST = #BAG_ITEM_QUALITY_COLORS + 1;
+LE_ITEM_QUALITY_QUEST = #BAG_ITEM_QUALITY_COLORS + 0;
 LE_ITEM_QUALITY_POOR = 0;
 LE_ITEM_QUALITY_ARROW = #BAG_ITEM_QUALITY_COLORS + 2;
 LE_ITEM_QUALITY_RECIPE = #BAG_ITEM_QUALITY_COLORS + 3;
@@ -12,17 +12,18 @@ LE_ITEM_QUALITY_CONSUMABLE = #BAG_ITEM_QUALITY_COLORS + 5;
 LE_ITEM_QUALITY_CRAFT = #BAG_ITEM_QUALITY_COLORS + 6;
 LE_ITEM_QUALITY_HEARTH = #BAG_ITEM_QUALITY_COLORS + 7;
 LE_ITEM_QUALITY_BAG = #BAG_ITEM_QUALITY_COLORS + 8;
-
+LE_ITEM_QUALITY_CONJURED = #BAG_ITEM_QUALITY_COLORS + 9;
 
 BAG_ITEM_QUALITY_COLORS[LE_ITEM_QUALITY_POOR] = {r=10, g=10, b=10}
 BAG_ITEM_QUALITY_COLORS[LE_ITEM_QUALITY_QUEST] = {r=150, g=.153, b=152}
 BAG_ITEM_QUALITY_COLORS[LE_ITEM_QUALITY_ARROW] = {r=.100, g=.300, b=100}
-BAG_ITEM_QUALITY_COLORS[LE_ITEM_QUALITY_RECIPE] = {r=200, g=.50, b=.500}
+BAG_ITEM_QUALITY_COLORS[LE_ITEM_QUALITY_RECIPE] = {r=0.752, g=0.541, b=0.086}
 BAG_ITEM_QUALITY_COLORS[LE_ITEM_QUALITY_TRASH] = {r=153, g=51, b=0}
 BAG_ITEM_QUALITY_COLORS[LE_ITEM_QUALITY_CONSUMABLE] = {r=5, g=.40, b=.20}
 BAG_ITEM_QUALITY_COLORS[LE_ITEM_QUALITY_CRAFT] = {r=.125, g=700, b=150}
 BAG_ITEM_QUALITY_COLORS[LE_ITEM_QUALITY_HEARTH] = {r=500, g=.10, b=.10}
-BAG_ITEM_QUALITY_COLORS[LE_ITEM_QUALITY_BAG] = {r=300, g=.500, b=.700}
+BAG_ITEM_QUALITY_COLORS[LE_ITEM_QUALITY_BAG] = {r=0.988, g=0.011, b=0.419}
+BAG_ITEM_QUALITY_COLORS[LE_ITEM_QUALITY_CONJURED] = {r=0.78, g=.61, b=0.43}
 
 mmDefaultConfig = {
     ['bags'] = 1,
@@ -427,6 +428,39 @@ function GetItemQuality(itemId)
 	if (itemId == 4471) then quality = LE_ITEM_QUALITY_HEARTH;end
 	if (itemId == 17056) then quality = LE_ITEM_QUALITY_CRAFT;end
 	if (itemId == 7286) then quality = LE_ITEM_QUALITY_CRAFT;end
+    if (itemId == 2296) then quality = LE_ITEM_QUALITY_TRASH;end
+    if (itemId == 3172) then quality = LE_ITEM_QUALITY_TRASH;end
+	if (itemId == 2288) then quality = LE_ITEM_QUALITY_CONJURED;end
+    if (itemId == 1113) then quality = LE_ITEM_QUALITY_CONJURED;end
+	if (itemId == 5350) then quality = LE_ITEM_QUALITY_CONJURED;end
+    if (itemId == 5349) then quality = LE_ITEM_QUALITY_CONJURED;end
+	if (itemId == 22895) then quality = LE_ITEM_QUALITY_CONJURED;end
+    if (itemId == 8079) then quality = LE_ITEM_QUALITY_CONJURED;end
+	if (itemId == 8077) then quality = LE_ITEM_QUALITY_CONJURED;end
+    if (itemId == 1487) then quality = LE_ITEM_QUALITY_CONJURED;end
+	if (itemId == 2136) then quality = LE_ITEM_QUALITY_CONJURED;end
+    if (itemId == 1114) then quality = LE_ITEM_QUALITY_CONJURED;end
+	if (itemId == 8075) then quality = LE_ITEM_QUALITY_CONJURED;end
+	if (itemId == 8078) then quality = LE_ITEM_QUALITY_CONJURED;end
+    if (itemId == 3772) then quality = LE_ITEM_QUALITY_CONJURED;end
+	if (itemId == 8076) then quality = LE_ITEM_QUALITY_CONJURED;end
+	if (itemId == 5522) then quality = LE_ITEM_QUALITY_CONJURED;end
+    if (itemId == 13603) then quality = LE_ITEM_QUALITY_CONJURED;end
+	if (itemId == 13602) then quality = LE_ITEM_QUALITY_CONJURED;end
+	if (itemId == 13701) then quality = LE_ITEM_QUALITY_CONJURED;end
+	if (itemId == 1254) then quality = LE_ITEM_QUALITY_CONJURED;end
+    if (itemId == 13700) then quality = LE_ITEM_QUALITY_CONJURED;end
+	if (itemId == 13699) then quality = LE_ITEM_QUALITY_CONJURED;end
+	if (itemId == 16893) then quality = LE_ITEM_QUALITY_CONJURED;end
+	if (itemId == 5232) then quality = LE_ITEM_QUALITY_CONJURED;end
+	if (itemId == 16896) then quality = LE_ITEM_QUALITY_CONJURED;end
+    if (itemId == 16892) then quality = LE_ITEM_QUALITY_CONJURED;end
+	if (itemId == 16895) then quality = LE_ITEM_QUALITY_CONJURED;end
+	if (itemId == 5512) then quality = LE_ITEM_QUALITY_CONJURED;end
+	if (itemId == 5511) then quality = LE_ITEM_QUALITY_CONJURED;end
+	if (itemId == 5512) then quality = LE_ITEM_QUALITY_CONJURED;end
+    if (itemId == 5510) then quality = LE_ITEM_QUALITY_CONJURED;end
+	if (itemId == 9421) then quality = LE_ITEM_QUALITY_CONJURED;end
     return quality;
 end
 
