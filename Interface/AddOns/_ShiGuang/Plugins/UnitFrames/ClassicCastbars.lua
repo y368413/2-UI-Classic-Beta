@@ -1,4 +1,4 @@
---## Author: Wardz ## Version: v1.0.7
+--## Author: Wardz ## Version: v1.0.8
 local ClassicCastbars = {}
 local PoolManager = {}
 ClassicCastbars.PoolManager = PoolManager
@@ -125,6 +125,8 @@ local anchors = {
 local cache = {}
 local _G = _G
 local strmatch = _G.strmatch
+local strfind = _G.string.find
+local UnitGUID = _G.UnitGUID
 local GetNamePlateForUnit = _G.C_NamePlate.GetNamePlateForUnit
 
 local function GetUnitFrameForUnit(unitType, unitID, hasNumberIndex)
@@ -157,7 +159,7 @@ local function GetPartyFrameForUnit(unitID)
         local frame, frameName = GetUnitFrameForUnit("party", "party"..i, true)
         if frame and frame.unit and UnitGUID(frame.unit) == guid then
             if compact then
-                if not strfind(frameName, "PartyMemberFrame") then
+                if strfind(frameName, "PartyMemberFrame") == nil then
                     return frame
                 end
             else
@@ -628,7 +630,7 @@ local castSpellIDs = {
     3595, -- Frost Oil
     17460, -- Frost Ram
     25178, -- Frost Weakness
-    10180, -- Frostbolt
+    10181, -- Frostbolt
     8398, -- Frostbolt Volley
     16992, -- Frostguard
     6957, -- Frostmane Strength
@@ -1644,7 +1646,7 @@ ClassicCastbars.crowdControls = {
 
 -- Addon Savedvariables
 ClassicCastbars.defaultConfig = {
-    version = "11", -- settings version
+    version = "12", -- settings version
     pushbackDetect = true,
     movementDetect = true,
     locale = GetLocale(),
@@ -1672,6 +1674,7 @@ ClassicCastbars.defaultConfig = {
         textPositionX = 6,
         textPositionY = -1,
         frameLevel = 10,
+        statusBackgroundColor = { 0, 0, 0, 0.535 },
     },
 
     target = {
@@ -1697,6 +1700,7 @@ ClassicCastbars.defaultConfig = {
         textPositionX = 6,
         textPositionY = -1,
         frameLevel = 10,
+        statusBackgroundColor = { 0, 0, 0, 0.535 },
     },
 
     party = {
@@ -1722,6 +1726,7 @@ ClassicCastbars.defaultConfig = {
         textPositionX = 0,
         textPositionY = 0,
         frameLevel = 10,
+        statusBackgroundColor = { 0, 0, 0, 0.535 },
     },
 
     player = {
@@ -1747,6 +1752,7 @@ ClassicCastbars.defaultConfig = {
         textPositionX = 0,
         textPositionY = 0,
         frameLevel = 10,
+        statusBackgroundColor = { 0, 0, 0, 0.535 },
     },
 }
 
@@ -2497,9 +2503,18 @@ function addon:DisplayCastbar(castbar, unitID)
 
     local cast = castbar._data
     cast.showCastInfoOnly = db.showCastInfoOnly
-    castbar:SetMinMaxValues(0, cast.maxValue)
     castbar:SetParent(parentFrame)
     castbar.Text:SetWidth(db.width - 10) -- ensure text gets truncated
+
+    if not castbar.Background then
+        for k, v in pairs({ castbar:GetRegions() }) do
+            if v.GetTexture and v:GetTexture() and strfind(v:GetTexture(), "Color-") then
+                castbar.Background = v
+                break
+            end
+        end
+    end
+    castbar.Background:SetColorTexture(unpack(db.statusBackgroundColor))
 
     if cast.isChanneled then
         castbar:SetStatusBarColor(unpack(db.statusColorChannel))
@@ -2520,8 +2535,12 @@ function addon:DisplayCastbar(castbar, unitID)
     self:SetCastbarFonts(castbar, cast, db)
     self:SetCastbarIconAndText(castbar, cast, db)
 
-    castbar:SetValue(0)
-    castbar.Spark:SetPoint("CENTER", castbar, "LEFT", 0, 0)
+    if not castbar.isTesting then
+        castbar:SetMinMaxValues(0, cast.maxValue)
+        castbar:SetValue(0)
+        castbar.Spark:SetPoint("CENTER", castbar, "LEFT", 0, 0)
+    end
+
     castbar:SetAlpha(1)
     castbar:Show()
 end
