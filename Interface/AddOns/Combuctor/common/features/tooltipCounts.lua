@@ -93,6 +93,8 @@ local function AddOwners(tooltip, link)
 					if REAGENTBANK_CONTAINER then
 						bank = bank + FindItemCount(owner, REAGENTBANK_CONTAINER, itemID)
 					end
+
+					bank = bank + FindItemCount(owner, BANK_CONTAINER, itemID)
 				else
 					local owned = GetItemCount(itemID, true)
 					local carrying = GetItemCount(itemID)
@@ -122,7 +124,7 @@ local function AddOwners(tooltip, link)
 		end
 
 		if count > 0 then
-			tooltip:AddDoubleLine(color:format(info.name), text)
+			tooltip:AddDoubleLine(format('|T%s:12:12|t ', Addon:GetOwnerIcon(info)) .. color:format(info.name), text)
 			--tooltip:AddDoubleLine(Addon:GetOwnerIconString(info, 12,0,0) .. ' ' .. color:format(info.name), text)
 			total = total + count
 			players = players + 1

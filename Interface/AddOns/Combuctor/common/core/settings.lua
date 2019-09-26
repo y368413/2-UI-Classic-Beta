@@ -35,8 +35,8 @@ local FrameDefaults = {
 	money = true, broker = true,
 	bagToggle = true, sort = true, search = true, options = true,
 
-	strata = 'HIGH',
-	scale = 1, alpha = 1,
+	strata = 'HIGH', alpha = 1,
+	scale = Addon.FrameScale or 1,
 	color = {0, 0, 0, 0.5},
 	x = 0, y = 0,
 
@@ -48,15 +48,12 @@ local FrameDefaults = {
 	hiddenBags = {},
 
 	rules = AsArray({
-		'all', 'all/all', 'all/normal', 'all/reagent',
-		'equip', 'equip/all', 'equip/armor', 'equip/weapon', 'equip/trinket',
+		'all', 'all/normal', 'all/trade', 'all/reagent', 'all/keys', 'all/quiver',
+		'equip', 'equip/armor', 'equip/weapon', 'equip/trinket',
 		'binding', 'binding/account', 'binding/equip', 'binding/use', 'binding/all', "binding/soulbound",
-		'use', 'use/all', 'use/consume', 'use/enhance',
-		'trade', 'trade/all', 'trade/goods', 'trade/gem', 'trade/glyph', 'trade/recipe',
-		'quest', 'quest/all',
-		'misc', 'misc/all', 
-		--'contain', 'contain/all',
-		--'Cool', 'Cool/All', 'Cool/Artifact', 'Cool/Open', 'Cool/Garrison', 'Cool/Fish',
+		'use', 'use/consume', 'use/enhance',
+		'trade', 'trade/goods', 'trade/gem', 'trade/glyph', 'trade/recipe',
+		'quest', 'misc',
 	}),
 }
 

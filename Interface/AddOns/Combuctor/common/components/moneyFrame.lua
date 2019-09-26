@@ -80,7 +80,7 @@ function MoneyFrame:OnEnter()
 	for name in Cache:IterateOwners() do
 		local owner = Cache:GetOwnerInfo(name)
 		if not owner.isguild and owner.money then
-			local icon = Addon:GetOwnerIconString(owner, 12,0,0)
+			local icon = format('|T%s:12:12|t ', Addon:GetOwnerIcon(owner))  --Addon:GetOwnerIconString(owner, 12,0,0)
 			local coins = GetMoneyString(owner.money, true)
 			local color = Addon:GetOwnerColor(owner)
 

@@ -245,7 +245,10 @@ ChatFrame_AddMessageEventFilter("CHAT_MSG_EMOTE", filter)
  
 function module:Chatbar()
 	if not MaoRUISettingDB["Chat"]["Chatbar"] then return end
+	local chatFrame = SELECTED_DOCK_FRAME
+	local editBox = chatFrame.editBox
 	local width, height, padding, buttonList = 16, 18, 6, {}
+	local tinsert, pairs = table.insert, pairs
 	local Chatbar = CreateFrame("Frame", nil, UIParent)
 	Chatbar:SetSize(width, height)
 	Chatbar:SetPoint("TOPLEFT", _G.ChatFrame1, "BOTTOMLEFT", 0, 0)

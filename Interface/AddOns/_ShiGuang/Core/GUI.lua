@@ -136,7 +136,7 @@ local defaultSettings = {
 		TMW = true,
 		CastBarstyle = true,
 		WeakAuras = true,
-		InfobarLine = true,
+		InfobarLine = false,
 		Details = true,
 		PGFSkin = true,
 		Rematch = true,
@@ -200,6 +200,7 @@ local defaultSettings = {
 
 local accountSettings = {
 	ChatFilterList = "%*",
+	ChatFilterWhiteList = "",
 	Timestamp = false,
 	NameplateFilter = {[1]={}, [2]={}},
 	Changelog = {},
@@ -221,6 +222,7 @@ local accountSettings = {
 	KeystoneInfo = {},
 	AutoBubbles = false,
 	SystemInfoType = 1,
+	DisableInfobars = false,
 }
 
 -- Initial settings
@@ -295,6 +297,10 @@ end
 
 local function updateFilterList()
 	M:GetModule("Chat"):UpdateFilterList()
+end
+
+local function updateFilterWhiteList()
+	M:GetModule("Chat"):UpdateFilterWhiteList()
 end
 
 local function updateChatSize()
@@ -411,7 +417,7 @@ local optionList = {		-- type, key, value, name, horizon, horizon2, doubleline
 		{1, "Misc", "GemNEnchant", U["Show GemNEnchant"].."*", true},
 		--{1, "Misc", "ShowItemLevel", U["Show ItemLevel"].."*", true, true},
 		{1, "Misc", "FreeMountCD", "CD君(CN only)", true, true},
-	  {1, "Skins", "InfobarLine", U["Bottom Line"]},
+	  {1, "Skins", "InfobarLine", U["Bar Line"]},
 	  {1, "Misc", "xMerchant", U["xMerchant"], true},
 	  {1, "Misc", "WallpaperKit", U["WallpaperKit"], true, true},
 	  {1, "Misc", "CrazyCatLady", U["Death Alarm"]},
@@ -422,17 +428,18 @@ local optionList = {		-- type, key, value, name, horizon, horizon2, doubleline
 		{1, "ACCOUNT", "Timestamp", U["Timestamp"], true, false, updateTimestamp},
 		{1, "Chat", "Sticky", U["Chat Sticky"].."*", true, true, updateChatSticky},
 		--{1, "Chat", "WhisperColor", U["Differ WhipserColor"].."*"},
-		{1, "Chat", "Freedom", U["Language Filter"]},
+		{1, "Chat", "Lock", "|cff00cc4c"..U["Lock Chat"]},
 		{1, "Chat", "EnableFilter", "|cff00cc4c"..U["Enable Chatfilter"], true},
 		{1, "Chat", "BlockAddonAlert", U["Block Addon Alert"], true, true},
 		{1, "Chat", "Invite", "|cff00cc4c"..U["Whisper Invite"]},
 		{1, "Chat", "GuildInvite", U["Guild Invite Only"].."*", true},
+		{1, "Chat", "Freedom", U["Language Filter"], true, true},
 		{},--blank
-		{1, "Chat", "Lock", "|cff00cc4c"..U["Lock Chat"]},
+		{3, "Chat", "Matches", U["Keyword Match"].."*", false, false, {1, 3, 0}},
 		{3, "Chat", "ChatWidth", U["LockChatWidth"].."*", true, false, {200, 600, 0}, updateChatSize},
 		{3, "Chat", "ChatHeight", U["LockChatHeight"].."*", true, true, {100, 500, 0}, updateChatSize},
 		{},--blank				
-		{3, "Chat", "Matches", U["Keyword Match"].."*", false, false, {1, 3, 0}},
+		{2, "ACCOUNT", "ChatFilterWhiteList", U["ChatFilterWhiteList"].."*", false, false, nil, updateFilterWhiteList, U["ChatFilterWhiteListTip"]},
 		{2, "ACCOUNT", "ChatFilterList", U["Filter List"].."*", true, false, updateFilterList},
 		{2, "Chat", "Keyword", U["Whisper Keyword"].."*", true, true, updateWhisperList},
 	},
@@ -465,12 +472,12 @@ local optionList = {		-- type, key, value, name, horizon, horizon2, doubleline
 		{1, "Misc", "FasterLoot", U["Faster Loot"], false, false, updateFasterLoot},
 		{1, "Misc", "HideErrors", U["Hide Error"], true, false, updateErrorBlocker},
 		{1, "ACCOUNT", "AutoBubbles", U["AutoBubbles"], true, true},
-		{1, "Skins", "DBM", U["DBM Skin"]},
+		--{1, "Skins", "DBM", U["DBM Skin"]},
 		--{1, "Skins", "Skada", U["Skada Skin"], true},
 		--{1, "Skins", "Bigwigs", U["Bigwigs Skin"]},
-		{1, "Skins", "TMW", U["TMW Skin"], true},
+		{1, "Skins", "TMW", U["TMW Skin"]},
+		{1, "Skins", "Details", U["Details Skin"], true},
 		{1, "Skins", "WeakAuras", U["WeakAuras Skin"], true, true},
-		--{1, "Skins", "Details", U["Details Skin"], true},
 		{4, "ACCOUNT", "TexStyle", U["Texture Style"], false, false, {U["Highlight"], U["Gradient"], U["Flat"]}},
 		{4, "ACCOUNT", "NumberFormat", U["Numberize"], true, false, {U["Number Type1"], U["Number Type2"], U["Number Type3"]}},
 		{2, "Skins", "DBMCount", U["Countdown Sec"].."*", true, true},
@@ -596,7 +603,9 @@ local function CreateOption(i)
 				if callback then callback() end
 			end)
 			eb.title = U["Tips"]
-			M.AddTooltip(eb, "ANCHOR_RIGHT", U["EdieBox Tip"], "info")
+			local tip = U["EdieBox Tip"]
+			if tooltip then tip = tooltip.."|n"..tip end
+			M.AddTooltip(eb, "ANCHOR_RIGHT", tip, "info")
 
 			M.CreateFS(eb, 14, name, "system", "CENTER", 0, 25)
 		-- Slider

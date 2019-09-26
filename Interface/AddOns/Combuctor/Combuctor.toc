@@ -1,14 +1,14 @@
-## Interface: 11302
+## Interface: 80205
 ## Title: |cff5FC412Combuctor|r
 ## Title-zhCN: |cff00ff00[背包]|r背包整合
 ## Title-zhTW: |cff00ff00[背包]|r背包整合
 ## Author: Tuller & Jaliborc (João Cardoso)
-## Notes: Pants are a dangerous foe
+## Notes: Single window displays for your inventory and bank
 ## Notes-zhCN: 可以按照类型过滤的背包&银行整合插件，标签风格。可按任务物品，装备，消耗品、物品品质等分类查看，让你查询物品更直观方便。
 ## Notes-zhTW: 可以按照类型过滤的背包&银行整合插件，标签风格。可按任务物品，装备，消耗品、物品品质等分类查看，让你查询物品更直观方便。
-## SavedVariables: SortBagsRightToLeft, Combuctor_Sets, BrotherBags
+## SavedVariables: Combuctor_Sets, BrotherBags, CaerdonWardrobeConfig
 ## Dependencies: _ShiGuang
-## Version: 8.2.6
+## Version: 8.2.8
 
 ## X-Repple: 2 UI
 

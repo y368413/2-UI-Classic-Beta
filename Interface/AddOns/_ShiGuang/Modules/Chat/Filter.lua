@@ -19,6 +19,11 @@ function module:UpdateFilterList()
 	M.SplitList(FilterList, MaoRUIDB["ChatFilterList"], true)
 end
 
+local WhiteFilterList = {}
+function module:UpdateFilterWhiteList()
+	M.SplitList(WhiteFilterList, MaoRUIDB["ChatFilterWhiteList"], true)
+end
+
 -- ECF strings compare
 local last, this = {}, {}
 function module:CompareStrDiff(sA, sB) -- arrays of bytes
@@ -56,6 +61,23 @@ function module:GetFilterResult(event, msg, name, flag, guid)
 	-- Trash Filter
 	for _, symbol in ipairs(msgSymbols) do
 		filterMsg = gsub(filterMsg, symbol, "")
+	end
+
+	if event == "CHAT_MSG_CHANNEL" then
+		local matches = 0
+		local found
+		for keyword in pairs(WhiteFilterList) do
+			if keyword ~= "" then
+				found = true
+				local _, count = gsub(filterMsg, keyword, "")
+				if count > 0 then
+					matches = matches + 1
+				end
+			end
+		end
+		if matches == 0 and found then
+			return 0
+		end
 	end
 
 	local matches = 0
@@ -96,7 +118,10 @@ function module:UpdateChatFilter(event, msg, author, _, _, _, flag, _, _, _, _, 
 
 		local name = Ambiguate(author, "none")
 		filterResult = module:GetFilterResult(event, msg, name, flag, guid)
-		if filterResult then R.BadBoys[name] = (R.BadBoys[name] or 0) + 1 end
+		if filterResult and filterResult ~= 0 then
+			R.BadBoys[name] = (R.BadBoys[name] or 0) + 1
+		end
+		if filterResult == 0 then filterResult = true end
 	end
 
 	return filterResult
@@ -192,14 +217,13 @@ end
 function module:ChatFilter()
 	if MaoRUISettingDB["Chat"]["EnableFilter"] then
 		self:UpdateFilterList()
+		self:UpdateFilterWhiteList()
 		ChatFrame_AddMessageEventFilter("CHAT_MSG_CHANNEL", self.UpdateChatFilter)
 		ChatFrame_AddMessageEventFilter("CHAT_MSG_SAY", self.UpdateChatFilter)
 		ChatFrame_AddMessageEventFilter("CHAT_MSG_YELL", self.UpdateChatFilter)
 		ChatFrame_AddMessageEventFilter("CHAT_MSG_WHISPER", self.UpdateChatFilter)
 		ChatFrame_AddMessageEventFilter("CHAT_MSG_EMOTE", self.UpdateChatFilter)
 		ChatFrame_AddMessageEventFilter("CHAT_MSG_TEXT_EMOTE", self.UpdateChatFilter)
-		ChatFrame_AddMessageEventFilter("CHAT_MSG_RAID", self.UpdateChatFilter)
-		ChatFrame_AddMessageEventFilter("CHAT_MSG_RAID_LEADER", self.UpdateChatFilter)
 	end
 
 	if MaoRUISettingDB["Chat"]["BlockAddonAlert"] then

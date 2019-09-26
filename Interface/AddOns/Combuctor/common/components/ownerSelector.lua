@@ -43,8 +43,8 @@ function OwnerSelector:OnEnter()
 	end
 
 	GameTooltip:SetText(CHARACTER)
-	GameTooltip:AddLine(L.TipChangePlayer, 1, 1, 1)
-	GameTooltip:AddLine(L.TipResetPlayer, 1, 1, 1)
+	GameTooltip:AddLine(L.TipChangePlayer:format(L.LeftClick), 1, 1, 1)
+	GameTooltip:AddLine(L.TipResetPlayer:format(L.RightClick), 1, 1, 1)
 	GameTooltip:Show()
 end
 
@@ -59,15 +59,15 @@ end
 
 function OwnerSelector:Update()
   local info = self:GetOwnerInfo()
-  if info.cached then
-  	local icon, coords = Addon:GetOwnerIcon(info)
-    local a, b, c, d = unpack(coords)
-    local s = (b - a) * 0.06
+  --if info.cached then
+  	--local icon, coords = Addon:GetOwnerIcon(info)
+    --local a, b, c, d = unpack(coords)
+    --local s = (b - a) * 0.06
 
-  	self.Icon:SetTexCoord(a+s, b-s, c+s, d-s)
-    self.Icon:SetTexture(icon)
-  else
+  	--self.Icon:SetTexCoord(a+s, b-s, c+s, d-s)
+    --self.Icon:SetTexture(icon)
+  --else
 		SetPortraitTexture(self.Icon, 'player')
 		self.Icon:SetTexCoord(.05,.95,.05,.95)
-  end
+  --end
 end

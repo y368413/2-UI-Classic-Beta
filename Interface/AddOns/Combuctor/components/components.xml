@@ -3,7 +3,6 @@
 
 	<Script file="qualityButton.lua"/>
 	<Script file="qualityFilter.lua"/>
-
 	<Script file="sideTab.lua"/>
 	<Script file="bottomTab.lua"/>
 	<Script file="ruleFilter.lua"/>
