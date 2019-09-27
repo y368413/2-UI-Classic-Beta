@@ -110,7 +110,8 @@ function Bar:OnLogin()
 
 	--create drag frame and drag functionality
 	if R.bars.userplaced then
-		M.Mover(frame, U["Main Actionbar"], "Bar1", frame.Pos)
+		local mover = M.Mover(frame, U["Main Actionbar"], "Bar1", frame.Pos)
+		mover:SetScale(MaoRUISettingDB["Actionbar"]["Scale"])
 	end
 
 	--create the mouseover functionality

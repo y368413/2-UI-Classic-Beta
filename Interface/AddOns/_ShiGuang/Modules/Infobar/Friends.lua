@@ -55,9 +55,9 @@ local function buildBNetTable(num)
 		local bnetID, accountName, battleTag, isBattleTagPresence, charName, gameID, client, isOnline, _, isAFK, isDND = BNGetFriendInfo(i)
 
 		if isOnline then
-			local _, _, _, realmName, _, _, _, class, _, zoneName, _, gameText, _, _, _, _, _, isGameAFK, isGameBusy = BNGetGameAccountInfo(gameID)
+			local _, _, _, realmName, _, _, _, class, _, zoneName, levels, gameText, _, _, _, _, _, isGameAFK, isGameBusy = BNGetGameAccountInfo(gameID)
 
-			charName = BNet_GetValidatedCharacterName(charName, battleTag, client)
+			charName = levels.." "..BNet_GetValidatedCharacterName(charName, battleTag, client)
 			class = I.ClassList[class]
 			accountName = isBattleTagPresence and battleTag or accountName
 

@@ -52,7 +52,8 @@ function Bar:CreateStancebar()
 
 	--create drag frame and drag functionality
 	if R.bars.userplaced then
-		M.Mover(frame, U["StanceBar"], "StanceBar", frame.Pos)
+		local mover = M.Mover(frame, U["StanceBar"], "StanceBar", frame.Pos)
+		mover:SetScale(MaoRUISettingDB["Actionbar"]["Scale"])
 	end
 
 	--create the mouseover functionality

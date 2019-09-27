@@ -45,7 +45,8 @@ function Bar:CreateBar2()
 
 	--create drag frame and drag functionality
 	if R.bars.userplaced then
-		M.Mover(frame, SHOW_MULTIBAR1_TEXT, "Bar2", frame.Pos)
+		local mover = M.Mover(frame, SHOW_MULTIBAR1_TEXT, "Bar2", frame.Pos)
+		mover:SetScale(MaoRUISettingDB["Actionbar"]["Scale"])
 	end
 
 	--create the mouseover functionality

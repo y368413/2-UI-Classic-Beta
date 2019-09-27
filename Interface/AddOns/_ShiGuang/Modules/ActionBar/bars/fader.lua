@@ -4,8 +4,6 @@ local Bar = M:GetModule("Actionbar")
 ----------------------------
 -- rLib: framefader, zork
 ----------------------------
-local SpellFlyout = SpellFlyout
-
 local function FaderOnFinished(self)
 	self.__owner:SetAlpha(self.finAlpha)
 end

@@ -120,9 +120,9 @@ local function friendsFrame()
 			elseif button.buttonType == FRIENDS_BUTTON_TYPE_BNET then
 				local _, presenceName, _, _, _, gameID, client, isOnline = BNGetFriendInfo(button.id)
 				if isOnline and client == BNET_CLIENT_WOW then
-					local _, charName, _, _, _, faction, _, class, _, zoneName = BNGetGameAccountInfo(gameID)
+					local _, charName, _, _, _, faction, _, class, _, zoneName, level = BNGetGameAccountInfo(gameID)
 					if presenceName and charName and class and faction == UnitFactionGroup("player") then
-						nameText = presenceName.." "..FRIENDS_WOW_NAME_COLOR_CODE.."("..classColor(class)..charName..FRIENDS_WOW_NAME_COLOR_CODE..")"
+						nameText = presenceName.." "..FRIENDS_WOW_NAME_COLOR_CODE.."("..classColor(class)..level.." "..charName..FRIENDS_WOW_NAME_COLOR_CODE..")"
 						if zoneName == playerArea then
 							infoText = format("|cff00ff00%s|r", zoneName)
 						end
