@@ -1,10 +1,13 @@
---## Version: 1.0.1  ## Author: LODWise
+--## Version: 1.0.4  ## Author: LODWise
 local addon = CreateFrame('Button', 'MudmenItemColor');
 local defaultSlotWidth, defaultSlotHeight = 68, 68;
 
 -- here we add on new color for quest items in the quality color ref array
-LE_ITEM_QUALITY_QUEST = #BAG_ITEM_QUALITY_COLORS + 0;
+LE_ITEM_QUALITY_QUEST = #BAG_ITEM_QUALITY_COLORS + 12;
 LE_ITEM_QUALITY_POOR = 0;
+LE_ITEM_QUALITY_COMMON = 1;
+LE_ITEM_QUALITY_EPIC = #BAG_ITEM_QUALITY_COLORS + 14;
+LE_ITEM_QUALITY_LEGENDARY = #BAG_ITEM_QUALITY_COLORS + 13;
 LE_ITEM_QUALITY_ARROW = #BAG_ITEM_QUALITY_COLORS + 2;
 LE_ITEM_QUALITY_RECIPE = #BAG_ITEM_QUALITY_COLORS + 3;
 LE_ITEM_QUALITY_TRASH = #BAG_ITEM_QUALITY_COLORS + 4;
@@ -16,15 +19,18 @@ LE_ITEM_QUALITY_CONJURED = #BAG_ITEM_QUALITY_COLORS + 9;
 LE_ITEM_QUALITY_CONSUMABLE2 = #BAG_ITEM_QUALITY_COLORS + 10;
 LE_ITEM_QUALITY_TOOL = #BAG_ITEM_QUALITY_COLORS + 11;
 
-BAG_ITEM_QUALITY_COLORS[LE_ITEM_QUALITY_POOR] = {r=10, g=10, b=10}
-BAG_ITEM_QUALITY_COLORS[LE_ITEM_QUALITY_QUEST] = {r=0.517, g=0.054, b=0.847}
+BAG_ITEM_QUALITY_COLORS[LE_ITEM_QUALITY_POOR] = {r=0.505, g=0.509, b=0.533}
+BAG_ITEM_QUALITY_COLORS[LE_ITEM_QUALITY_COMMON] = {r=1, g=1, b=1}
+BAG_ITEM_QUALITY_COLORS[LE_ITEM_QUALITY_EPIC] = {r=0.607, g=0.188, b=0.992}
+BAG_ITEM_QUALITY_COLORS[LE_ITEM_QUALITY_LEGENDARY] = {r=1, g=0.584, b=0.058}
+BAG_ITEM_QUALITY_COLORS[LE_ITEM_QUALITY_QUEST] = {r=0.933, g=0.066, b=0.525}
 BAG_ITEM_QUALITY_COLORS[LE_ITEM_QUALITY_ARROW] = {r=.011, g=0, b=0.980}
 BAG_ITEM_QUALITY_COLORS[LE_ITEM_QUALITY_RECIPE] = {r=0.752, g=0.541, b=0.086}
 BAG_ITEM_QUALITY_COLORS[LE_ITEM_QUALITY_TRASH] = {r=153, g=51, b=0}
 BAG_ITEM_QUALITY_COLORS[LE_ITEM_QUALITY_CONSUMABLE] = {r=5, g=.40, b=.20}
-BAG_ITEM_QUALITY_COLORS[LE_ITEM_QUALITY_CRAFT] = {r=0.415, g=0.905, b=0.658}
+BAG_ITEM_QUALITY_COLORS[LE_ITEM_QUALITY_CRAFT] = {r=0.278, g=1, b=0.905}
 BAG_ITEM_QUALITY_COLORS[LE_ITEM_QUALITY_HEARTH] = {r=500, g=.10, b=.10}
-BAG_ITEM_QUALITY_COLORS[LE_ITEM_QUALITY_BAG] = {r=0.988, g=0.011, b=0.419}
+BAG_ITEM_QUALITY_COLORS[LE_ITEM_QUALITY_BAG] = {r=0.360, g=1, b=0.482}
 BAG_ITEM_QUALITY_COLORS[LE_ITEM_QUALITY_CONJURED] = {r=0.78, g=.61, b=0.43}
 BAG_ITEM_QUALITY_COLORS[LE_ITEM_QUALITY_CONSUMABLE2] = {r=0.125, g=0.411, b=0.309}
 BAG_ITEM_QUALITY_COLORS[LE_ITEM_QUALITY_TOOL] = {r=0.713, g=0.262, b=0.372}
@@ -35,7 +41,7 @@ mmDefaultConfig = {
     ['char'] = 1,
     ['inspect'] = 1,
     ['merchant'] = 1,
-    ['intensity'] = 10,
+    ['intensity'] = 1,
 }
 
 addon:RegisterEvent('ADDON_LOADED');
@@ -177,7 +183,7 @@ function addon:updateContainerSlot(containerId, slotId, slotFrameName, show)
         local quality = GetItemQuality(itemId);
 
         -- green or better item, or quest item
-        if (quality and quality > LE_ITEM_QUALITY_POOR) then 
+        if (LE_ITEM_QUALITY_POOR) then 
             local r, g, b = GetQualityColor(quality);
             item.qborder:SetVertexColor(r, g, b);
             item.qborder:SetAlpha(1);
@@ -290,7 +296,7 @@ function addon:merchantItems_Update(itemLinkFunc)
         local link = itemLinkFunc(slotId);
 
         if (link)  then
-            addon:updateSlotBorderColor(itemFrame, link, LE_ITEM_QUALITY_POOR);
+            addon:updateSlotBorderColor(itemFrame, link, LE_ITEM_QUALITY_COMMON);
         else
             itemFrame.qborder:Hide();
         end
@@ -310,14 +316,13 @@ function addon:merchantMainBuyBack_Update()
     local lastLink = FindLastBuybackItem();
 
     if (lastLink) then
-        addon:updateSlotBorderColor(item, lastLink, LE_ITEM_QUALITY_POOR);
+        addon:updateSlotBorderColor(item, lastLink, LE_ITEM_QUALITY_COMMON);
     else
         item.qborder:Hide();
     end
 end
 
 function addon:updateSlotBorderColor(item, itemId, minQuality)
-    local minQuality = minQuality or LE_ITEM_QUALITY_POOR;
     local itemQuality = GetItemQuality(itemId);
 
     if (itemQuality and itemQuality > minQuality) then
@@ -363,7 +368,7 @@ function addon:updateTradeSkillItem(id)
     local link = GetTradeSkillItemLink(id);
 
     if (link) then
-        addon:updateSlotBorderColor(item, link, LE_ITEM_QUALITY_POOR);
+        addon:updateSlotBorderColor(item, link, LE_ITEM_QUALITY_COMMON);
     else
         item.qborder:Hide();
     end
@@ -382,7 +387,7 @@ function addon:updateTradeSkillReageant(id)
         local link = GetTradeSkillReagentItemLink(id, index)
 
         if (link) then
-            addon:updateSlotBorderColor(item, link, LE_ITEM_QUALITY_POOR);
+            addon:updateSlotBorderColor(item, link, LE_ITEM_QUALITY_COMMON);
         else
             item.qborder:Hide();
         end
@@ -433,7 +438,6 @@ function GetItemQuality(itemId)
 	if (itemId == 17056) then quality = LE_ITEM_QUALITY_CRAFT;end
 	if (itemId == 7286) then quality = LE_ITEM_QUALITY_CRAFT;end
     if (itemId == 2296) then quality = LE_ITEM_QUALITY_TRASH;end
-    if (itemId == 3172) then quality = LE_ITEM_QUALITY_TRASH;end
 	if (itemId == 2288) then quality = LE_ITEM_QUALITY_CONJURED;end
     if (itemId == 1113) then quality = LE_ITEM_QUALITY_CONJURED;end
 	if (itemId == 5350) then quality = LE_ITEM_QUALITY_CONJURED;end
@@ -551,6 +555,13 @@ function GetItemQuality(itemId)
 	if (itemId == 2947) then quality = LE_ITEM_QUALITY_ARROW;end
     if (itemId == 3131) then quality = LE_ITEM_QUALITY_ARROW;end
 	if (itemId == 15327) then quality = LE_ITEM_QUALITY_ARROW;end	
+    if (itemId == 878) then quality = LE_ITEM_QUALITY_TRASH;end
+	if (itemId == 6529) then quality = LE_ITEM_QUALITY_CONSUMABLE2;end
+	if (itemId == 6530) then quality = LE_ITEM_QUALITY_CONSUMABLE2;end	
+	if (itemId == 6811) then quality = LE_ITEM_QUALITY_CONSUMABLE2;end
+    if (itemId == 6532) then quality = LE_ITEM_QUALITY_CONSUMABLE2;end
+	if (itemId == 7307) then quality = LE_ITEM_QUALITY_CONSUMABLE2;end
+	if (itemId == 6533) then quality = LE_ITEM_QUALITY_CONSUMABLE2;end
     return quality;
 end
 

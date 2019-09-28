@@ -50,9 +50,11 @@ function MISC:OnLogin()
 	
 
 	-- Max camera distancee
-	if tonumber(GetCVar("cameraDistanceMaxZoomFactor")) ~= 2.6 then
-		SetCVar("cameraDistanceMaxZoomFactor", 2.6)
+	C_Timer.After(1, function()
+	if tonumber(GetCVar("cameraDistanceMaxZoomFactor")) ~= 4 then
+		SetCVar("cameraDistanceMaxZoomFactor", 4)
 	end
+	end)
 
 	-- Auto chatBubbles
 	if MaoRUIDB["AutoBubbles"] then
