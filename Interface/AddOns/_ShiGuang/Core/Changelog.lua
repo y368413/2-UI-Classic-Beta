@@ -7,6 +7,7 @@ local strsplit, pairs = string.split, pairs
 local quest = {
    "更多设置请|cFF00DDFF右键小地图|r",
  	 "任何你不喜欢的，请你控制台关了它.|cff3399FF        自己去下载自己喜欢的",
+ 	 "|cff3399FF头像样式一就仅只有你看到这些.    无任何施法条、连击点和更多其它",
  	 "聊天框怎样回到最新消息而不是一直滚轮.|cff3399FF        Shift+鼠标滚轮下",
  	 "我不想要技能栏上的白圈.|cff3399FF               ESC-插件-别打勾[输出]MaxDps",
 	 "我缩放完了UI，系统头像位置变了.|cff3399FF          右键解锁挪回去",
