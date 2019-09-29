@@ -4,5 +4,6 @@
 	<Script file="kAutoOpen.lua"/>
 	<Script file="xMerchant.lua"/>
 	<Script file="MudmenItemColor.lua"/>
+	<Script file="CharacterDurability.lua"/>
 	<Script file="CharacterStatsClass.lua"/>
 </Ui>

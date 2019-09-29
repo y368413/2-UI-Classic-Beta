@@ -5,7 +5,7 @@ if not R.Infobar.Guild then return end
 local module = M:GetModule("Infobar")
 local info = module:RegisterInfobar("Guild", R.Infobar.GuildPos)
 
-local wipe, sort, format, select = table.wipe, table.sort, format, select
+local wipe, sort, format, select, strfind = table.wipe, table.sort, format, select, strfind
 local CLASS_ICON_TCOORDS, SELECTED_DOCK_FRAME = CLASS_ICON_TCOORDS, SELECTED_DOCK_FRAME
 local LEVEL_ABBR, CLASS_ABBR, NAME, ZONE, RANK, GUILDINFOTAB_APPLICANTS, REMOTE_CHAT = LEVEL_ABBR, CLASS_ABBR, NAME, ZONE, RANK, GUILDINFOTAB_APPLICANTS, REMOTE_CHAT
 local IsAltKeyDown, IsShiftKeyDown, InviteToGroup, C_Timer_After, GetTime, Ambiguate, MouseIsOver = IsAltKeyDown, IsShiftKeyDown, InviteToGroup, C_Timer.After, GetTime, Ambiguate, MouseIsOver
@@ -174,10 +174,7 @@ local function setPosition()
 end
 
 local function refreshData()
-	if not prevTime or (GetTime()-prevTime > 5) then
-		GuildRoster()
-		prevTime = GetTime()
-	end
+	GuildRoster()
 
 	wipe(guildTable)
 	local count = 0
@@ -283,10 +280,7 @@ info.onEvent = function(self, event, ...)
 	end
 
 	if event == "GUILD_ROSTER_UPDATE" then
-		local canRequestRosterUpdate = ...
-		if canRequestRosterUpdate then
-			GuildRoster()
-		end
+		if arg1 then GuildRoster() end
 	end
 
 	local online = select(3, GetNumGuildMembers())

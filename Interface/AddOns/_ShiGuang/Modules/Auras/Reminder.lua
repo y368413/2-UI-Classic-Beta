@@ -10,11 +10,15 @@ local IsInInstance, IsPlayerSpell, UnitBuff, GetSpellTexture = IsInInstance, IsP
 local pairs, tinsert, next = pairs, table.insert, next
 
 function A:Reminder_ConvertToName(cfg)
+	local cache = {}
 	for spellID in pairs(cfg.spells) do
 		local name = GetSpellInfo(spellID)
 		if name then
-			cfg.spells[name] = true
+			cache[name] = true
 		end
+	end
+	for name in pairs(cache) do
+		cfg.spells[name] = true
 	end
 end
 
@@ -30,7 +34,7 @@ function A:Reminder_Update(cfg)
 	if depend and not IsPlayerSpell(depend) then isPlayerSpell = false end
 	if combat and InCombatLockdown() then isInCombat = true end
 	if instance and inInst and (instType == "scenario" or instType == "party" or instType == "raid") then isInInst = true end
-	if pvp and (instType == "arena" or instType == "pvp" or GetZonePVPInfo() == "combat") then isInPVP = true end
+	if pvp and (instType == "pvp" or GetZonePVPInfo() == "combat") then isInPVP = true end
 	if not combat and not instance and not pvp then isInCombat, isInInst, isInPVP = true, true, true end
 
 	frame:Hide()

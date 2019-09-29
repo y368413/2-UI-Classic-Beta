@@ -231,6 +231,7 @@ function module:SetupMinimap()
 	local mover = M.Mover(Minimap, U["Minimap"], "Minimap", R.Minimap.Pos, Minimap:GetWidth(), Minimap:GetHeight())
 	Minimap:ClearAllPoints()
 	Minimap:SetPoint("TOPRIGHT", mover)
+	Minimap.mover = mover
 
 	--self:UpdateMinimapScale()
 	self:ShowMinimapClock()
@@ -269,7 +270,8 @@ function module:SetupMinimap()
 		"MinimapZoomIn",
 		"MiniMapWorldMapButton",
 		"MiniMapMailBorder",
-		--"MiniMapTracking",
+		"MinimapToggleButton",
+		"GameTimeFrame",
 	}
 
 	for _, v in pairs(frames) do
@@ -280,4 +282,9 @@ function module:SetupMinimap()
 	-- Add Elements
 	self:ReskinRegions()
 	self:WhoPingsMyMap()
+
+	if LibDBIcon10_TownsfolkTracker then
+		LibDBIcon10_TownsfolkTracker:DisableDrawLayer("OVERLAY")
+		LibDBIcon10_TownsfolkTracker:DisableDrawLayer("BACKGROUND")
+	end
 end
