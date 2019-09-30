@@ -73,6 +73,10 @@ local spellNamesByID = {
     [10312] = "Exorcism",
     [10313] = "Exorcism",
     [10314] = "Exorcism",
+
+    [24275] = "HammerOfWrath",
+    [24274] = "HammerOfWrath",
+    [24239] = "HammerOfWrath",
 }
 
 f:RegisterEvent("PLAYER_LOGIN")
@@ -128,6 +132,7 @@ local function FindAura(unit, spellID, filter)
     end
 end
 
+local hadShadowTrance
 function f:SPELLS_CHANGED()
     if class == "WARRIOR" then
         self:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
@@ -151,6 +156,8 @@ function f:SPELLS_CHANGED()
         if ClassicSpellActivations.findHighestRank("Execute") then
             self:RegisterEvent("PLAYER_TARGET_CHANGED")
             self:RegisterUnitEvent("UNIT_HEALTH", "target")
+            self.PLAYER_TARGET_CHANGED = ClassicSpellActivations.ExecuteCheck
+            self.UNIT_HEALTH = ClassicSpellActivations.ExecuteCheck
         else
             self:UnregisterEvent("PLAYER_TARGET_CHANGED")
             self:UnregisterEvent("UNIT_HEALTH")
@@ -170,6 +177,15 @@ function f:SPELLS_CHANGED()
             self:RegisterEvent("PLAYER_TARGET_CHANGED")
             self.PLAYER_TARGET_CHANGED = ClassicSpellActivations.PaladinExorcismCheck
             self:SetScript("OnUpdate", self.timerOnUpdate)
+
+            if ClassicSpellActivations.findHighestRank("HammerOfWrath") then
+                self:RegisterUnitEvent("UNIT_HEALTH", "target")
+                self.PLAYER_TARGET_CHANGED = function(...)
+                    ClassicSpellActivations.PaladinExorcismCheck(...)
+                    ClassicSpellActivations.HOWCheck(...)
+                end
+                self.UNIT_HEALTH = ClassicSpellActivations.HOWCheck
+            end
         end
 
     elseif class == "HUNTER" then
@@ -191,7 +207,6 @@ function f:SPELLS_CHANGED()
     elseif class == "WARLOCK" then
         if IsPlayerSpell(18094) or IsPlayerSpell(18095) then
             self:RegisterUnitEvent("UNIT_AURA", "player")
-            local hadShadowTrance
             self.UNIT_AURA = function(self, event, unit)
                 local name, _, _, _, duration, expirationTime = FindAura(unit, 17941, "HELPFUL") -- Shadow Trance
                 local haveShadowTrance = name ~= nil
@@ -270,6 +285,7 @@ local reverseSpellRanks = {
     ShadowBolt = { 25307, 11661, 11660, 11659, 7641, 1106, 1088, 705, 695, 686 },
     MongooseBite = { 14271, 14270, 14269, 1495 },
     Exorcism = { 10314, 10313, 10312, 5615, 5614, 879 },
+    HammerOfWrath = { 24239, 24274, 24275 },
 }
 function ClassicSpellActivations.findHighestRank(spellName)
     for _, spellID in ipairs(reverseSpellRanks[spellName]) do
@@ -325,7 +341,7 @@ function f.timerOnUpdate(self, elapsed)
     end
 end
 
-function f:COMBAT_LOG_EVENT_UNFILTERED(self, event)
+function f:COMBAT_LOG_EVENT_UNFILTERED(event)
     local timestamp, eventType, hideCaster,
     srcGUID, srcName, srcFlags, srcFlags2,
     dstGUID, dstName, dstFlags, dstFlags2,
@@ -341,7 +357,7 @@ end
 -- WARRIOR
 -----------------
 
-function f:UNIT_HEALTH(event, unit)
+function ClassicSpellActivations.ExecuteCheck(self, event, unit)
     if UnitExists("target") and not UnitIsFriend("player", "target") then
         local h = UnitHealth("target")
         local hm = UnitHealthMax("target")
@@ -354,7 +370,6 @@ function f:UNIT_HEALTH(event, unit)
         f:Deactivate("Execute")
     end
 end
-f.PLAYER_TARGET_CHANGED = f.UNIT_HEALTH
 
 function ClassicSpellActivations.CheckOverpower(eventType, isSrcPlayer, isDstPlayer, ...)
     if isSrcPlayer then
@@ -544,5 +559,19 @@ do
             f:Deactivate("Exorcism")
             periodicCheck = nil
         end
+    end
+end
+
+function ClassicSpellActivations.HOWCheck(self, event, unit)
+    if UnitExists("target") and not UnitIsFriend("player", "target") then
+        local h = UnitHealth("target")
+        local hm = UnitHealthMax("target")
+        if h > 0 and h/hm <= 0.2 then
+            f:Activate("HammerOfWrath", 10)
+        else
+            f:Deactivate("HammerOfWrath")
+        end
+    else
+        f:Deactivate("HammerOfWrath")
     end
 end
