@@ -1,23 +1,5 @@
 -- ////// ## Author: solariz.de  ## Version: 2.0
 
-function SQS_GetLocalization()
-  local L = {}
-  local Lmeta = {}
-  Lmeta.__newindex = function(t, k, v)
-    if v == true then -- allow for the shorter L["Foo bar"] = true
-      v = k
-    end
-    rawset(t, k, v)
-  end
-  Lmeta.__index = function(t, k)
-    self:Debug(1, "Localization not found for %", k)
-    rawset(t, k, k) -- cache it
-    return k
-  end
-  setmetatable(L, Lmeta)
-  return L
-end
-
 function SQS_UpdateButtonDisplay()
 	-- called to update the buttons if skill is castable / available or not
 	-- local forms = GetNumShapeshiftForms(); --nope, only give me amount not the real IDs
@@ -32,14 +14,59 @@ function SQS_UpdateButtonDisplay()
 			elseif i == 5 then SQS_BTN_5:Hide(); 
 			end;
 		else
-			if i == 1 then SQS_BTN_1:Show(); 
-			elseif i == 2 then SQS_BTN_2:Show(); 
-			elseif i == 3 then SQS_BTN_3:Show();
-			elseif i == 4 then SQS_BTN_4:Show(); 
-			elseif i == 5 then SQS_BTN_5:Show(); 
+			if i == 1 then 
+				SQS_BTN_1:Show();
+				SQS_BTN_1.Texture:SetDesaturated(SQS_CheckNoMana(i))
+			elseif i == 2 then 
+				SQS_BTN_2:Show();
+				SQS_BTN_2.Texture:SetDesaturated(SQS_CheckNoMana(i));
+			elseif i == 3 then 
+				SQS_BTN_3:Show();
+				SQS_BTN_3.Texture:SetDesaturated(SQS_CheckNoMana(i));
+			elseif i == 4 then 
+				SQS_BTN_4:Show(); 
+				SQS_BTN_4.Texture:SetDesaturated(SQS_CheckNoMana(i));
+			elseif i == 5 then 
+				SQS_BTN_5:Show(); 
+				SQS_BTN_5.Texture:SetDesaturated(SQS_CheckNoMana(i));
 			end;
 		end
 	end
+end
+
+function SQS_CheckNoMana(FormNum)
+	-- checking if the spell is actually castable atm
+	-- we return true if NOT and false if. sounds weird
+	-- but I use that for the desaturate function, see in calling 
+	-- function SQS_UpdateButtonDisplay
+	local SpellName, usable, nomana;
+	if FormNum == 1 then 
+		-- exception here because we have bear and dire bear
+		usable, nomana = IsUsableSpell(L["SQS_1_BEAR"]);
+		if nomana == true then 
+			return true
+		end
+		usable, nomana = IsUsableSpell(L["SQS_1_DIREBEAR"]);
+		if nomana == true then 
+			return true
+		end
+	end
+		
+	-- now the others
+	if FormNum == 2 then SpellName = L["SQS_2_AQUATIC"]
+	elseif FormNum == 3 then SpellName = L["SQS_3_CAT"]
+	elseif FormNum == 4 then SpellName = L["SQS_4_TRAVEL"]
+	elseif FormNum == 5 then SpellName = L["SQS_5_MOONKIN"]
+	end
+
+	-- check
+	usable, nomana = IsUsableSpell(SpellName);
+	if nomana == true then 
+		return true
+	end
+
+	-- no break? we assume is usable
+	return false
 end
 
 function SQS_CreateButton(FormNum)
@@ -129,15 +156,15 @@ function SQS_GetMacro(FormNum)
 	-- retun the Macro to cast for each form
 	-- TODO: Language Handling
 	if FormNum == 1 then
-		return "/use [noform:"..FormNum.."] !"..L["SQS_1_BEAR"]
+		return "/dismount [mounted]\n/cancelform [noform:"..FormNum.."]\n/use [noform:"..FormNum.."] !"..L["SQS_1_DIREBEAR"].."\n/use [noform:"..FormNum.."]"..L["SQS_1_BEAR"]
 	elseif FormNum == 2 then
-		return "/use [noform:"..FormNum..",swimming] !"..L["SQS_2_AQUATIC"]
+		return "/dismount [mounted]\n/cancelform [noform:"..FormNum.."]\n/use [noform:"..FormNum..",swimming] !"..L["SQS_2_AQUATIC"]
 	elseif FormNum == 3 then
-		return "/use [noform:"..FormNum.."] !"..L["SQS_3_CAT"]
+		return "/dismount [mounted]\n/cancelform [noform:"..FormNum.."]\n/use [noform:"..FormNum.."] !"..L["SQS_3_CAT"]
 	elseif FormNum == 4 then
-		return "/use [noform:"..FormNum.."] !"..L["SQS_4_TRAVEL"]
+		return "/dismount [mounted]\n/cancelform [noform:"..FormNum.."]\n/use [noform:"..FormNum.."] !"..L["SQS_4_TRAVEL"]
 	elseif FormNum == 5 then
-		return "/use [noform:"..FormNum.."] !"..L["SQS_5_MOONKIN"]
+		return "/dismount [mounted]\n/cancelform [noform:"..FormNum.."]\n/use [noform:"..FormNum.."] !"..L["SQS_5_MOONKIN"]
 	else
 		return "/cancelform"
 	end
@@ -149,20 +176,21 @@ _G["BINDING_NAME_CLICK solQuickShifter:LeftButton"] = "    Show Shift Selection 
 
 -- ////// MAIN
 L = {}
-if (GetLocale() == 'deDE') then
-	L["SQS_1_BEAR"] = "Bärengestalt"
-	L["SQS_2_AQUATIC"] = "Wassergestalt"
-	L["SQS_3_CAT"] = "Katzengestalt"
-	L["SQS_4_TRAVEL"] = "Reisegestalt"
-	L["SQS_5_MOONKIN"] = "Moonkingestalt"
+if (GetLocale() == 'zhCN') then
+	L["SQS_1_BEAR"] = "熊形态"
+	L["SQS_1_DIREBEAR"] = "巨熊形态"
+	L["SQS_2_AQUATIC"] = "水栖形态"
+	L["SQS_3_CAT"] = "猎豹形态"
+	L["SQS_4_TRAVEL"] = "旅行形态"
+	L["SQS_5_MOONKIN"] = "枭兽形态"
 else
 	L["SQS_1_BEAR"] = "Bear Form"
+	L["SQS_1_DIREBEAR"] = "Dire Bear Form"
 	L["SQS_2_AQUATIC"] = "Aquatic Form"
 	L["SQS_3_CAT"] = "Cat Form"
 	L["SQS_4_TRAVEL"] = "Travel Form"
 	L["SQS_5_MOONKIN"] = "Moonkin Form"
 end
-
 
 -- Creating the Fram where our Buttons live in
 local 	solQuickShifterFrame=CreateFrame("Frame","solQuickShifterFrame",UIParent)
@@ -175,6 +203,7 @@ local 	solQuickShifterFrame=CreateFrame("Frame","solQuickShifterFrame",UIParent)
 
 -- register events
 	solQuickShifterFrame:RegisterEvent("PORTRAITS_UPDATED")
+	solQuickShifterFrame:RegisterEvent("UNIT_POWER_UPDATE")
 	solQuickShifterFrame:SetScript("OnEvent", function(self, event, ...)
  		SQS_UpdateButtonDisplay()
 	end)
@@ -190,7 +219,7 @@ SQS_CreateButton(3); -- Cat Form
 SQS_CreateButton(4); -- Travel Form
 SQS_CreateButton(5); -- Moonkin Form
 SQS_CreateButton(9); -- cancel form
-SQS_UpdateButtonDisplay()
+--SQS_UpdateButtonDisplay()
 
 -- activation when pressing hotkey
 local	toggleframe = CreateFrame("Button","solQuickShifter",UIParent,"SecureHandlerClickTemplate")
