@@ -208,12 +208,16 @@ local function UpdateHealth(unitFrame)
 	local p = minHealth/maxHealth * 100
 	unitFrame.healthBar:SetValue(p/100)
 
-	if minHealth == maxHealth or UnitIsUnit(unit, "player") then
-		unitFrame.healthBar.value:SetText("")
+	if MaoRUISettingDB["Nameplate"]["Figure"] and RealMobHealth and RealMobHealth.UnitHasHealthData(unit) then
+		local value, max = RealMobHealth.GetUnitHealth(unit)
+		unitFrame.healthBar.value:SetText(M.Numb(value))  --.." | "..M.Numb(max)
 	else
-		unitFrame.healthBar.value:SetText(string.format("%d", p))
+		if minHealth == maxHealth or UnitIsUnit(unit, "player") then
+		  unitFrame.healthBar.value:SetText("")
+	  else
+			unitFrame.healthBar.value:SetText(string.format("%d", p))
+		end
 	end
-
 	if p <= 50 and p >= 35 then
 		unitFrame.healthBar.value:SetTextColor(253/255, 238/255, 80/255)
 	elseif p < 35 and p >= 20 then
@@ -475,7 +479,11 @@ local function OnNamePlateCreated(namePlate)
 	hp:SetMinMaxValues(0, 1)
 	M.CreateSB(hp)
 	M.SmoothBar(hp)
-	hp.value = M.CreateFS(hp, 12, "", false, "TOPRIGHT", 0, 8)
+	if MaoRUISettingDB["Nameplate"]["Figure"] then
+	  hp.value = M.CreateFS(hp, 9, "", false, "TOPRIGHT", 2, 6)
+	else
+	  hp.value = M.CreateFS(hp, 12, "", false, "TOPRIGHT", 0, 8)
+	end
 	unitFrame.healthBar = hp
 
 	unitFrame.power = M.CreateFS(hp, 15, "", false, "LEFT", 0, 0)

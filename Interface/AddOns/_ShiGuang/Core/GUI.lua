@@ -124,6 +124,7 @@ local defaultSettings = {
     HighlightFocus = true,
     ClassicCastbars = true,
     TargetClassicCastbars = true,
+    Figure = false,
 	},
 	Skins = {
 		DBM = true,
@@ -363,7 +364,7 @@ local optionList = {		-- type, key, value, name, horizon, horizon2, doubleline
 	},
 	[2] = {
 		{1, "Nameplate", "Enable", "|cff00cc4c"..U["Enable Nameplate"], false, false},
-		{1, "Nameplate", "InsideView", U["Nameplate InsideView"], true, false},
+		{1, "Nameplate", "Figure", "显示具体血量数字", true, false},
 		{1, "Nameplate", "Arrow", U["RightArrow"], true, true},
 		{1, "Nameplate", "TankMode", "|cff00cc4c"..U["Tank Mode"].."*"},
 		{1, "Nameplate", "FriendlyCC", U["Friendly CC"].."*", true},
