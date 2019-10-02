@@ -3,142 +3,6 @@ local M, R, U, I = unpack(ns)
 local module = M:GetModule("Chat")
 local gsub, gmatch, tinsert, pairs = string.gsub, string.gmatch, table.insert, pairs
 
-------------------------------------------------------------------------------------- 属性通报 ----------------------------------------
-local function Talent()  -- 本地化专精
-	local SpecName = GetSpecialization() and select(2, GetSpecializationInfo(GetSpecialization())) or "无" return SpecName
-end
-
-local function HealText()  -- 格式化血量
-	if UnitHealthMax("player") > 1e4 then return format('%.2f万',UnitHealthMax("player")/1e4) else return UnitHealthMax("player") end
-end
-
--- 神器等级
-local function ArtifactLevel()
-    local currentLevel = " "
-    local azeriteItemLocation = C_AzeriteItem.FindActiveAzeriteItem()
-    if azeriteItemLocation then
-        currentLevel = C_AzeriteItem.GetPowerLevel(azeriteItemLocation)
-    end
-    return currentLevel
-end
-
-local slotNames = {
-    "HeadSlot",
-    "NeckSlot",
-    "ShoulderSlot",
-    "BackSlot",
-    "ChestSlot",
-    "ShirtSlot",
-    "TabardSlot",
-    "WristSlot",
-    "HandsSlot",
-    "WaistSlot",
-    "LegsSlot",
-    "FeetSlot",
-    "Finger0Slot",
-    "Finger1Slot",
-    "Trinket0Slot",
-    "Trinket1Slot",
-    "MainHandSlot",
-    "SecondaryHandSlot",
-    "AmmoSlot"
-}
-
--- 特质装等级
-local function AzeriteItemLevel(slotNum)
-    local currentLevel = "0"
-    local slotId = GetInventorySlotInfo(slotNames[slotNum])
-    local itemLink = GetInventoryItemLink("player", slotId)
-    if itemLink then
-        local itemLoc
-        if ItemLocation then
-            itemLoc = ItemLocation:CreateFromEquipmentSlot(slotId)
-        end
-        if C_AzeriteEmpoweredItem.IsAzeriteEmpoweredItem(itemLoc) then
-            return select(4, GetItemInfo(itemLink))
-        end
-    end
-    return currentLevel
-end
-
-local function BaseInfo()  -- 基础属性
-	local BaseStat = ""	
-		BaseStat = BaseStat..("[%s] "):format(Talent())
-		--BaseStat = BaseStat..("%s "):format(UnitClass("player"))
-		BaseStat = BaseStat..("< %.1f/%.1f > "):format(GetAverageItemLevel())
-		BaseStat = BaseStat..("血量:%s "):format(HealText())
-		BaseStat = BaseStat .. ("项链:%s "):format(ArtifactLevel())-- 项链等级
-    BaseStat = BaseStat .. ("头部:%s "):format(AzeriteItemLevel(1))-- 头部特质装等级
-    BaseStat = BaseStat .. ("肩部:%s "):format(AzeriteItemLevel(3))-- 肩部特质装等级
-    BaseStat = BaseStat .. ("胸部:%s "):format(AzeriteItemLevel(5))-- 胸部特质装等级
-	return BaseStat
-end
-
-local function DpsInfo()  -- 输出属性 by 图图  (9 = 暴击 12 = 溅射 17 = 吸血 18 = 急速 21 = 闪避 26 = 精通 29 = 装备+自身全能 31 = 装备全能)
-    local DpsStat={"", "", ""}
-    local specAttr={
-        --纯力敏智属性职业
-        WARRIOR={1,1,1},
-        DEATHKNIGHT={1,1,1},
-        ROGUE={2,2,2},
-        HUNTER={2,2,2},
-        MAGE={3,3,3},
-        WARLOCK={3,3,3},
-        PRIEST={3,3,3},
-        --混合力敏智属性职业
-        SHAMAN={3,2,3},
-        MONK={2,3,2},
-        DRUID={3,2,2,3},
-        PALADIN={3,1,1},
-        DEMONHUNTER={2,1}
-    }
-	local classCN,classEnName = UnitClass("player")
-    	DpsStat[1] = (STAT_STRENGTH..":%s "):format(UnitStat("player", 1))
-    	DpsStat[2] = (STAT_AGILITY..":%s "):format(UnitStat("player", 2))
-    	DpsStat[3] = (STAT_INTELLECT..":%s "):format(UnitStat("player", 4))
-	return DpsStat[specAttr[classEnName][GetSpecialization()]]
-end
-
-local function TankInfo() -- 坦克属性
-	local TankStat = ""
-		TankStat = TankStat..(STAT_STAMINA..":%s "):format(UnitStat("player", 3))
-		TankStat = TankStat..(STAT_ARMOR..":%s "):format(UnitArmor("player"))
-		TankStat = TankStat..("闪避:%.2f%% "):format(GetDodgeChance())
-		TankStat = TankStat..("招架:%.2f%% "):format(GetParryChance())
-		TankStat = TankStat..("格挡:%.2f%% "):format(GetBlockChance())
-	return TankStat
-end
-
-local function HealInfo()  -- 治疗属性
-	local HealStat = ""
-		--HealStat = HealStat..("精神:%s "):format(UnitStat("player", 5))
-		HealStat = HealStat..("法力回复:%d "):format(GetManaRegen()*5)
-	return HealStat
-end
-
-local function MoreInfo()  -- 增强属性
-	local MoreStat = ""
-		MoreStat = MoreStat..(STAT_HASTE..":%.2f%% "):format(GetHaste())  --GetMeleeHaste
-		MoreStat = MoreStat..(STAT_CRITICALSTRIKE..":%.2f%% "):format(GetCritChance())
-		MoreStat = MoreStat..(STAT_MASTERY..":%.2f%% "):format(GetMasteryEffect())
-		--MoreStat = MoreStat..("溅射:%.2f%% "):format(GetMultistrike()) -- GetCombatRating(12)
-		--MoreStat = MoreStat..(STAT_LIFESTEAL..":%.2f%% "):format(GetLifesteal())
-		-- MoreStat = MoreStat .. ("吸血:%.0f%% "):format(GetCombatRating(17) / 230)
-		MoreStat = MoreStat..(STAT_VERSATILITY..":%.2f%% "):format(GetCombatRatingBonus(CR_VERSATILITY_DAMAGE_DONE) + GetVersatilityBonus(CR_VERSATILITY_DAMAGE_DONE))  --GetVersatility()
-	return MoreStat
-end
-
-function StatReport()  -- 属性收集
-	if UnitLevel("player") < 10 then return BaseInfo() end
-	local StatInfo = ""
-	local Role = GetSpecializationRole(GetSpecialization())
-	if Role == "HEALER" then StatInfo = StatInfo..BaseInfo()..DpsInfo()..HealInfo()..MoreInfo()
-	elseif Role == "TANK" then StatInfo = StatInfo..BaseInfo()..DpsInfo()..TankInfo()..MoreInfo()
-	else StatInfo = StatInfo..BaseInfo()..DpsInfo()..MoreInfo()
-	end
-	return StatInfo
-end
-------------------------------------------------------------------------------------- 属性通报 End ----------------------------------------
  --------------------------------------- 聊天表情-- Author:M-------------------------------------
 -- key為圖片名
 local emotes = {
@@ -324,6 +188,24 @@ function module:Chatbar()
 		if func then bu:SetScript("OnClick", func) end
 		tinsert(buttonList, bu)
 		return bu
+	end
+
+	local function StatReport()  -- 属性收集
+		local StatInfo = ""
+			StatInfo = StatInfo..("血量:%s "):format(UnitHealthMax("player"))
+			StatInfo = StatInfo..(STAT_STRENGTH..":%s "):format(UnitStat("player", 1))
+   	 StatInfo = StatInfo..(STAT_AGILITY..":%s "):format(UnitStat("player", 2))
+   	 StatInfo = StatInfo..(STAT_INTELLECT..":%s "):format(UnitStat("player", 4))
+   	 StatInfo = StatInfo..(STAT_STAMINA..":%s "):format(UnitStat("player", 3))
+			StatInfo = StatInfo..(STAT_ARMOR..":%s "):format(UnitArmor("player"))
+			StatInfo = StatInfo..("精神:%s "):format(UnitStat("player", 5))
+			StatInfo = StatInfo..("法力回复:%d "):format(GetManaRegen()*5)
+			StatInfo = StatInfo..("闪避:%.2f%% "):format(GetDodgeChance())
+			StatInfo = StatInfo..("招架:%.2f%% "):format(GetParryChance())
+			StatInfo = StatInfo..("格挡:%.2f%% "):format(GetBlockChance())
+			StatInfo = StatInfo..(STAT_HASTE..":%.2f%% "):format(GetHaste())  --GetMeleeHaste
+			StatInfo = StatInfo..(STAT_CRITICALSTRIKE..":%.2f%% "):format(GetCritChance())
+		return StatInfo
 	end
 
 	-- Create Chatbars

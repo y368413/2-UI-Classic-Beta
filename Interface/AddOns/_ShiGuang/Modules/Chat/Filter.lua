@@ -48,7 +48,7 @@ local chatLines, prevLineID, filterResult = {}, 0, false
 function module:GetFilterResult(event, msg, name, flag, guid)
 	if name == I.MyName or (event == "CHAT_MSG_WHISPER" and flag == "GM") or flag == "DEV" then
 		return
-	elseif guid and (IsGuildMember(guid) or BNGetGameAccountInfoByGUID(guid) or C_FriendList_IsFriend(guid) or (IsInInstance() and IsGUIDInGroup(guid))) then
+	elseif guid and (IsGuildMember(guid) or BNGetGameAccountInfoByGUID(guid) or C_FriendList_IsFriend(guid) or IsGUIDInGroup(guid)) then
 		return
 	end
 
@@ -238,6 +238,7 @@ function module:ChatFilter()
 		ChatFrame_AddMessageEventFilter("CHAT_MSG_INSTANCE_CHAT_LEADER", self.UpdateAddOnBlocker)
 		ChatFrame_AddMessageEventFilter("CHAT_MSG_CHANNEL", self.UpdateAddOnBlocker)
 	end
+
 	if MaoRUISettingDB["Chat"]["ChatItemLevel"] then
 		ChatFrame_AddMessageEventFilter("CHAT_MSG_LOOT", self.UpdateChatItemLevel)
 		ChatFrame_AddMessageEventFilter("CHAT_MSG_CHANNEL", self.UpdateChatItemLevel)
@@ -254,57 +255,5 @@ function module:ChatFilter()
 		ChatFrame_AddMessageEventFilter("CHAT_MSG_BATTLEGROUND", self.UpdateChatItemLevel)
 		ChatFrame_AddMessageEventFilter("CHAT_MSG_INSTANCE_CHAT", self.UpdateChatItemLevel)
 		ChatFrame_AddMessageEventFilter("CHAT_MSG_INSTANCE_CHAT_LEADER", self.UpdateChatItemLevel)
-	end
-end
-
---MonsterSayFilter
---Turn off MSF in certain quests. Chat msg are repeated but important in these quests.
-local MSFOffQuestT = {[42880] = true, [54090]=true,} -- 42880: Meeting their Quota; 54090: Toys For Destruction
-local MSFOffQuestFlag = false
-
---TODO: If player uses hearthstone to leave questzone, QUEST_REMOVED is not fired.
-local Questf = CreateFrame("Frame")
-Questf:RegisterEvent("QUEST_ACCEPTED")
-Questf:RegisterEvent("QUEST_REMOVED")
-Questf:SetScript("OnEvent", function(self,event,arg1,arg2)
-	if event == "QUEST_ACCEPTED" and MSFOffQuestT[arg2] then MSFOffQuestFlag = true end
-	if event == "QUEST_REMOVED" and MSFOffQuestT[arg1] then MSFOffQuestFlag = false end
-end)
-
-local MSL, MSLPos = {}, 1
-local function monsterFilter(self,_,msg)
-	if MSFOffQuestFlag then return end
-	for _, v in ipairs(MSL) do if v == msg then return true end end
-	MSL[MSLPos] = msg
-	MSLPos = MSLPos + 1
-	if MSLPos > 7 then MSLPos = MSLPos - 7 end
-end
-ChatFrame_AddMessageEventFilter("CHAT_MSG_MONSTER_SAY", monsterFilter)
-ChatFrame_AddMessageEventFilter("CHAT_MSG_MONSTER_EMOTE", monsterFilter)
-
---SystemMessage
-local SystemFilterTag = {
-	-- !!! Always add parentheses since gsub() has two return values !!!
-	(ERR_LEARN_ABILITY_S:gsub("%%s","(.*)")),
-	(ERR_LEARN_SPELL_S:gsub("%%s","(.*)")),
-	(ERR_SPELL_UNLEARNED_S:gsub("%%s","(.*)")),
-	(ERR_LEARN_PASSIVE_S:gsub("%%s","(.*)")),
-	(ERR_PET_SPELL_UNLEARNED_S:gsub("%%s","(.*)")),
-	(ERR_PET_LEARN_ABILITY_S:gsub("%%s","(.*)")),
-	(ERR_PET_LEARN_SPELL_S:gsub("%%s","(.*)")),
-}
-local function systemMsgFilter(self,_,msg)
-	for _, s in ipairs(SystemFilterTag) do if msg:find(s) then return true end end
-end
-if UnitLevel("player") == GetMaxPlayerLevel() then ChatFrame_AddMessageEventFilter("CHAT_MSG_SYSTEM", systemMsgFilter) end
-
-
-local function SendMessage(event, msg)
-	local info = ChatTypeInfo[event:sub(10)]
-	for i = 1, NUM_CHAT_WINDOWS do
-		local ChatFrames = _G["ChatFrame"..i]
-		if ChatFrames and ChatFrames:IsEventRegistered(event) then
-			ChatFrames:AddMessage(msg, info.r, info.g, info.b)
-		end
 	end
 end

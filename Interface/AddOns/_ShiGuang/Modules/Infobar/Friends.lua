@@ -184,5 +184,5 @@ end
 info.onMouseUp = function(_, btn)
 	if btn ~= "LeftButton" then return end
 	GameTooltip:Hide()
-	ToggleFriendsFrame()
+	ToggleFrame(FriendsFrame)
 end

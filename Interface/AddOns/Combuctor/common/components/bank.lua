@@ -19,7 +19,7 @@ end
 
 function Frame:SortItems()
 	if SortReagentBankBags then
-		self:After(.3, 'SortReagents')
+		self:After(.1, 'SortReagents')
 	end
 
 	return (SortBankBags or self.__super.SortItems)(self)

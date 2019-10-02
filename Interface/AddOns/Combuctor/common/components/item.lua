@@ -141,6 +141,7 @@ function ItemSlot:OnDragStart()
 end
 
 function ItemSlot:OnPreClick(button)
+	if IsAddOnLoaded("AuctionsMaster") then return end
 	if IsModifiedClick() or button ~= 'RightButton' then
 		return
 	end

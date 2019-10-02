@@ -1,5 +1,3 @@
 ﻿<Ui xmlns="http://www.blizzard.com/wow/ui/">
 	<Script file="Mingy.lua"/>
-  <!--Script file="ClassicQuestLog.lua"/-->
-	<Script file="WideQuestLog.lua"/>
 </Ui>
