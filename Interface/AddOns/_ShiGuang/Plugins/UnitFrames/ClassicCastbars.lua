@@ -139,7 +139,10 @@ local function GetUnitFrameForUnit(unitType, unitID, hasNumberIndex)
             name = format(name, strmatch(unitID, "%d+")) -- add unit index to unitframe name
         end
 
-        if _G[name] then return _G[name], name end
+        local frame = _G[name]
+        if frame and frame:IsVisible() then
+            return _G[name], name
+        end
     end
 end
 
@@ -157,7 +160,7 @@ local function GetPartyFrameForUnit(unitID)
     -- to loop through them all and check if the unit matches
     for i = 1, 40 do
         local frame, frameName = GetUnitFrameForUnit("party", "party"..i, true)
-        if frame and frame.unit and UnitGUID(frame.unit) == guid then
+        if frame and frame.unit and UnitGUID(frame.unit) == guid and frame:IsVisible() then
             if compact then
                 if strfind(frameName, "PartyMemberFrame") == nil then
                     return frame
@@ -630,7 +633,6 @@ local castSpellIDs = {
     3595, -- Frost Oil
     17460, -- Frost Ram
     25178, -- Frost Weakness
-    10181, -- Frostbolt
     8398, -- Frostbolt Volley
     16992, -- Frostguard
     6957, -- Frostmane Strength
@@ -1438,13 +1440,14 @@ local castSpellIDs = {
     24422, -- Zandalar Signet of Might
     24421, -- Zandalar Signet of Mojo
     24420, -- Zandalar Signet of Serenity
+    10181, -- Frostbolt (needs to be last for chinese clients, see issue #16)
 }
 
 local counter, cursor = 0, 1
 local castedSpells = {}
 ClassicCastbars.castedSpells = castedSpells
 
--- temporary, ill clean up this later
+-- TODO: cleanup
 local function BuildSpellNameToSpellIDTable()
     counter = 0
 
@@ -1646,7 +1649,7 @@ ClassicCastbars.crowdControls = {
 
 -- Addon Savedvariables
 ClassicCastbars.defaultConfig = {
-    version = "12", -- settings version
+    version = "13", -- settings version
     pushbackDetect = true,
     movementDetect = true,
     locale = GetLocale(),
@@ -1761,7 +1764,6 @@ local PoolManager = ClassicCastbars.PoolManager
 local addon = CreateFrame("Frame")
 addon:RegisterEvent("PLAYER_LOGIN")
 addon:SetScript("OnEvent", function(self, event, ...)
-    -- this will basically trigger addon:EVENT_NAME(arguments) on any event happening
     return self[event](self, ...)
 end)
 
@@ -1847,6 +1849,7 @@ function addon:StopAllCasts(unitGUID, noFadeOut)
     end
 end
 
+-- Store new cast data for unit, and start castbar(s)
 function addon:StoreCast(unitGUID, spellName, iconTexturePath, castTime, isPlayer, isChanneled)
     local currTime = GetTime()
 
@@ -2009,7 +2012,7 @@ function addon:ToggleUnitEvents(shouldReset)
     else
         self:UnregisterEvent("GROUP_ROSTER_UPDATE")
         self:UnregisterEvent("GROUP_JOINED")
-        self:UnregisterEvent("GROUP_LEFT")
+        self:UnregisterEvent("GROUP_LEFT") -- TODO: check if needed
     end
 
     if shouldReset then
@@ -2171,12 +2174,12 @@ function addon:COMBAT_LOG_EVENT_UNFILTERED()
         local spellID = castedSpells[spellName]
         if not spellID then return end
         local _, _, icon, castTime = GetSpellInfo(spellID)
-        if not castTime or castTime == 0 then return end
+        if not castTime or castTime < 300 then return end
 
         local isPlayer = bit_band(srcFlags, COMBATLOG_OBJECT_TYPE_PLAYER_OR_PET) > 0
 
         if isPlayer then
-            -- Use talent reduced cast time for certain player spells if available
+            -- Use talent reduced cast time for certain player spells
             local reducedTime = castTimeTalentDecreases[spellName]
             if reducedTime then
                 castTime = reducedTime
@@ -2217,7 +2220,6 @@ function addon:COMBAT_LOG_EVENT_UNFILTERED()
 
                     local castTimeDiff = abs(castTime - origCastTime)
                     if castTimeDiff <= 4000 and castTimeDiff > 250 then -- heavy lag might affect this so only store time if the diff isn't too big
-                        --print("Caching: ", srcName, spellName, castTime, origCastTime)
                         npcCastTimeCache[srcName .. spellName] = castTime
                     end
                 end
@@ -2228,7 +2230,6 @@ function addon:COMBAT_LOG_EVENT_UNFILTERED()
         -- Also there's no castTime returned from GetSpellInfo for channeled spells so we need to get it from our own list
         if channelData then
             -- Arcane Missiles triggers this event for every tick so ignore after first tick has been detected
-            -- TODO: might be similar channels that do the same
             if spellName == ARCANE_MISSILES and activeTimers[srcGUID] and activeTimers[srcGUID].spellName == ARCANE_MISSILES then return end
 
             return self:StoreCast(srcGUID, spellName, GetSpellTexture(channelData[2]), channelData[1] * 1000, isPlayer, true)
@@ -2236,9 +2237,6 @@ function addon:COMBAT_LOG_EVENT_UNFILTERED()
 
         -- non-channeled spell, finish it.
         -- We also check the expiration timer in OnUpdate script just incase this event doesn't trigger when i.e unit is no longer in range.
-        -- Note: It's still possible to get a memory leak here since OnUpdate is only ran for active/shown frames, but adding extra
-        -- timer checks just to save a few kb extra memory in extremly rare situations is not really worth the performance hit.
-        -- All data is cleared on loading screens anyways.
         return self:DeleteCast(srcGUID, nil, nil, true)
     elseif eventType == "SPELL_AURA_APPLIED" then
         if castTimeIncreases[spellName] then
@@ -2275,6 +2273,12 @@ function addon:COMBAT_LOG_EVENT_UNFILTERED()
     end
 end
 
+local castStopBlacklist = {
+    [GetSpellInfo(4068)] = 1,       -- Iron Grenade
+    [GetSpellInfo(19769)] = 1,      -- Thorium Grenade
+    [GetSpellInfo(13808)] = 1,      -- M73 Frag Grenade
+}
+
 local refresh = 0
 addon:SetScript("OnUpdate", function(self, elapsed)
     if not next(activeTimers) then return end
@@ -2284,7 +2288,7 @@ addon:SetScript("OnUpdate", function(self, elapsed)
     if self.db.movementDetect then
         refresh = refresh - elapsed
 
-        -- Check if unit is moving to stop castbar, thanks to LibClassicCasterino for this idea
+        -- Check if unit is moving to stop castbar, thanks to Cordankos for this idea
         if refresh < 0 then
             if next(activeGUIDs) then
                 for unitID, unitGUID in pairs(activeGUIDs) do
@@ -2292,7 +2296,7 @@ addon:SetScript("OnUpdate", function(self, elapsed)
                     -- Only stop cast for players since some mobs runs while casting, also because
                     -- of lag we have to only stop it if the cast has been active for atleast 0.25 sec
                     if cast and cast.isPlayer and currTime - cast.timeStart > 0.25 then
-                        if GetUnitSpeed(unitID) ~= 0 then
+                        if not castStopBlacklist[cast.spellName] and GetUnitSpeed(unitID) ~= 0 then
                             self:DeleteCast(unitGUID)
                         end
                     end
@@ -2566,38 +2570,66 @@ function addon:HideCastbar(castbar, noFadeOut)
     UIFrameFadeOut(castbar, cast and cast.isInterrupted and 1.5 or 0.2, 1, 0)
 end
 
--- TODO: gotta be able to reset aswell
+-- TODO: reset to default skin on mode disabled without having to reloadui
 function addon:SkinPlayerCastbar()
     local db = self.db.player
 
     if not CastingBarFrame.Timer then
-        -- TODO: implement me
         CastingBarFrame.Timer = CastingBarFrame:CreateFontString(nil, "OVERLAY")
         CastingBarFrame.Timer:SetTextColor(1, 1, 1)
         CastingBarFrame.Timer:SetFontObject("SystemFont_Shadow_Small")
         CastingBarFrame.Timer:SetPoint("RIGHT", CastingBarFrame, -6, 0)
+        CastingBarFrame:HookScript("OnUpdate", function(frame)
+            if db.enabled and db.showTimer then
+                if not frame.channeling then
+                    frame.Timer:SetFormattedText("%.1f", frame.casting and (frame.maxValue - frame.value) or 0)
+                else
+                    frame.Timer:SetFormattedText("%.1f", frame.fadeOut and 0 or frame.value)
+                end
+            end
+        end)
+    end
+    CastingBarFrame.Timer:SetShown(db.showTimer)
+
+    if db.castBorder == "Interface\\CastingBar\\UI-CastingBar-Border" or db.castBorder == "Interface\\CastingBar\\UI-CastingBar-Border-Small" then
+        CastingBarFrame.Flash:SetSize(db.width + 61, db.height + 51)
+        CastingBarFrame.Flash:SetPoint("TOP", 0, 26)
+    else
+        CastingBarFrame.Flash:SetSize(0.01, 0.01) -- hide it using size, SetAlpha() or Hide() wont work without messing with blizz code
     end
 
     CastingBarFrame_SetStartCastColor(CastingBarFrame, unpack(db.statusColor))
 	CastingBarFrame_SetStartChannelColor(CastingBarFrame, unpack(db.statusColorChannel))
-	--[[CastingBarFrame_SetFinishedCastColor(CastingBarFrame, 0.0, 1.0, 0.0)
-	CastingBarFrame_SetNonInterruptibleCastColor(CastingBarFrame, 0.7, 0.7, 0.7)
-	CastingBarFrame_SetFailedCastColor(CastingBarFrame, 1.0, 0.0, 0.0)]]
+	--CastingBarFrame_SetFinishedCastColor(CastingBarFrame, unpack(db.statusColor))
+	--CastingBarFrame_SetNonInterruptibleCastColor(CastingBarFrame, 0.7, 0.7, 0.7)
+	--CastingBarFrame_SetFailedCastColor(CastingBarFrame, 1.0, 0.0, 0.0)
 
     CastingBarFrame.Text:ClearAllPoints()
     CastingBarFrame.Text:SetPoint("CENTER")
     CastingBarFrame.Icon:ClearAllPoints()
-    CastingBarFrame.Icon:Show()
+    CastingBarFrame.Icon:SetShown(db.enabled)
 
+    if not CastingBarFrame.Background then
+        for k, v in pairs({ CastingBarFrame:GetRegions() }) do
+            if v.GetTexture and v:GetTexture() and strfind(v:GetTexture(), "Color-") then
+                CastingBarFrame.Background = v
+                break
+            end
+        end
+    end
+    CastingBarFrame.Background:SetColorTexture(unpack(db.statusBackgroundColor))
+
+    CastingBarFrame:ClearAllPoints()
     if not db.autoPosition then
         local pos = db.position
         CastingBarFrame:SetPoint(pos[1], UIParent, pos[2], pos[3])
         CastingBarFrame.OldSetPoint = CastingBarFrame.SetPoint
-        CastingBarFrame.SetPoint = function() end
+        CastingBarFrame.SetPoint = function() end -- just incase any Blizzard code modifies it again
     else
         if CastingBarFrame.OldSetPoint then
             CastingBarFrame.SetPoint = CastingBarFrame.OldSetPoint
         end
+        CastingBarFrame:SetPoint("BOTTOM", UIParent, 0, 150)
     end
 
     self:SetCastbarStyle(CastingBarFrame, nil, db)

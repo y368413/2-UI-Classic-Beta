@@ -1,4 +1,4 @@
--- ////// ## Author: solariz.de  ## Version: 2.0
+-- ////// ## Author: solariz.de  ## Version: 2.03
 
 function SQS_UpdateButtonDisplay()
 	-- called to update the buttons if skill is castable / available or not
@@ -112,7 +112,7 @@ function SQS_CreateButton(FormNum)
 	-- using macro workaround, thanks bliz classic != classic, old function CastShapeshiftForm() is forbidden now :(
 	-- this is specially shitty because all the stance/form names are translated to the client language
 	-- so you cant just use a /cast cat form. Each language this "cat form" is different. In German it would be:
-	-- /wirken Katengestalt; luckily you can use /use and only need to translate the form name :(
+	-- /wirken Katzengestalt; luckily you can use /use and only need to translate the form name :(
 	Button:SetAttribute("type","macro")
 	Button:SetAttribute("macrotext",SQS_GetMacro(FormNum))
 end
@@ -204,21 +204,25 @@ local 	solQuickShifterFrame=CreateFrame("Frame","solQuickShifterFrame",UIParent)
 -- register events
 	solQuickShifterFrame:RegisterEvent("PORTRAITS_UPDATED")
 	solQuickShifterFrame:RegisterEvent("UNIT_POWER_UPDATE")
-	solQuickShifterFrame:SetScript("OnEvent", function(self, event, ...)
- 		SQS_UpdateButtonDisplay()
+	solQuickShifterFrame:RegisterEvent("ADDON_LOADED")
+	solQuickShifterFrame:SetScript("OnEvent", function(self, event, arg1, ...)
+		if event == "ADDON_LOADED" and arg1 == "_ShiGuang" then
+			SQS_CreateButton(1); -- Bear/Dire Bear Form
+			SQS_CreateButton(2); -- Aquatic Form
+			SQS_CreateButton(3); -- Cat Form
+			SQS_CreateButton(4); -- Travel Form
+			SQS_CreateButton(5); -- Moonkin Form
+			SQS_CreateButton(9); -- cancel form
+		else
+				SQS_UpdateButtonDisplay()
+		end
 	end)
-
 
 local 	t=solQuickShifterFrame:CreateTexture(nil,"ARTWORK")
 		t:SetAllPoints(solQuickShifterFrame)
 
 
-SQS_CreateButton(1); -- Bear/Dire Bear Form
-SQS_CreateButton(2); -- Aquatic Form
-SQS_CreateButton(3); -- Cat Form
-SQS_CreateButton(4); -- Travel Form
-SQS_CreateButton(5); -- Moonkin Form
-SQS_CreateButton(9); -- cancel form
+
 --SQS_UpdateButtonDisplay()
 
 -- activation when pressing hotkey
