@@ -362,16 +362,6 @@ TinyRosterDB = {
     SendMailNameEditBox = {},                                                   --發郵件
     BankItemSearchBox = {},                                                     --銀行查找
     BagItemSearchBox = {},                                                      --背包查找
-    BrowseName = { depands = "Blizzard_AuctionUI" },                            --拍賣場
-    MountJournalSearchBox = { depands = "Blizzard_Collections" },               --坐騎
-    HeirloomsJournalSearchBox = { depands = "Blizzard_Collections" },           --傳家寶
-    PetJournalSearchBox = { depands = "Blizzard_Collections" },                 --寵物
-    GuildItemSearchBox = { depands = "Blizzard_GuildBankUI" },                  --公會銀行
-    WardrobeCollectionFrameSearchBox = { depands = "Blizzard_Collections" },    --衣櫃
-    ["TradeSkillFrame.SearchBox"] = { depands = "Blizzard_TradeSkillUI" },      --專業技能
-    ["ToyBox.searchBox"] = { depands = "Blizzard_Collections" },                --玩具
-    ["AchievementFrame.searchBox"] = { depands="Blizzard_AchievementUI" },      --成就
-    EncounterJournalSearchBox = { depands = "Blizzard_EncounterJournal" },      --指南
 }
 
 --按鈕數量和高度
@@ -551,21 +541,20 @@ end
 
 --創建框架
 do
-    local function OnEvent(self, event, ...)
-        local arg1 = ...
-        if (event == "VARIABLES_LOADED") then
+    local function OnEvent(self, event)
+        --[[if (event == "VARIABLES_LOADED") then
             self:UnregisterEvent("VARIABLES_LOADED")
             for editboxName, v in pairs(TinyRosterDB) do
                 if (not v.depands or (v.depands and IsAddOnLoaded(v.depands))) then
                     fn(editboxName, v)
                 end
             end
-        end
+        end]]
         if (event == "ADDON_LOADED") then
             for editboxName, v in pairs(TinyRosterDB) do
-                if (v.depands and v.depands == arg1 and not getEditBox(editboxName).rosterMark) then
+                --if (v.depands and v.depands == arg1 and not getEditBox(editboxName).rosterMark) then
                     fn(editboxName, v)
-                end
+                --end
             end
         end
     end

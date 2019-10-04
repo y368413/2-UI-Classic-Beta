@@ -6,4 +6,5 @@
   <Script file="DialogKey.lua"/>
   <Script file="CombatNotification.lua"/>
   <Include file="DaisyCosp\DaisyCosp.xml"/>
+  <Include file="InboxMailBag\InboxMailBag.xml"/>
 </Ui>
