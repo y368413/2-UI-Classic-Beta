@@ -71,11 +71,6 @@ info.onMouseUp = function(self, btn)
 	end
 end
 
-local function getGoldString(number)
-	local money = format("%.0f", number/1e4)
-	return GetMoneyString(money*1e4)
-end
-
 info.onEnter = function(self)
 	GameTooltip:SetOwner(self, "ANCHOR_TOP", 0, 6)
 	GameTooltip:ClearLines()

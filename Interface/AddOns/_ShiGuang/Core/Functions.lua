@@ -6,6 +6,8 @@ local type, pairs, tonumber, wipe = type, pairs, tonumber, table.wipe
 local strmatch, gmatch, strfind, format, gsub = string.match, string.gmatch, string.find, string.format, string.gsub
 local min, max, abs, floor = math.min, math.max, math.abs, math.floor
 
+function sendCmd(cmd) ChatFrame1EditBox:SetText(""); ChatFrame1EditBox:Insert(cmd); ChatEdit_SendText(ChatFrame1EditBox); end
+
 -- Gradient Frame
 function M:CreateGF(w, h, o, r, g, b, a1, a2)
 	self:SetSize(w, h)

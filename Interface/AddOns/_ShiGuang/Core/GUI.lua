@@ -42,10 +42,11 @@ local defaultSettings = {
 		BagsiLvlcolor = false,
 		ReverseSort = true,
 		ItemFilter = true,
-		ItemSetFilter = false,
+		--ItemSetFilter = false,
 		DeleteButton = true,
 		FavouriteItems = {},
 		GatherEmpty = false,
+		SpecialBagsColor = true,
 	},
 	Auras = {
 		Reminder = true,
@@ -156,6 +157,7 @@ local defaultSettings = {
 		HideRealm = false,
 		HideTitle = false,
 		HideJunkGuild = true,
+		HideAllID = false,
 	},
 	Misc = {
 		Mail = true,
@@ -224,6 +226,7 @@ local accountSettings = {
 	AutoBubbles = false,
 	SystemInfoType = 1,
 	DisableInfobars = false,
+	ClassColorChat = true,
 }
 
 -- Initial settings
@@ -288,6 +291,10 @@ local function updateChatSticky()
 	M:GetModule("Chat"):ChatWhisperSticky()
 end
 
+local function updateClassColorName()
+	M:GetModule("Chat"):UpdateClassColorName()
+end
+
 local function updateTimestamp()
 	M:GetModule("Chat"):UpdateTimestamp()
 end
@@ -310,6 +317,10 @@ end
 
 local function updateMapFader()
 	M:GetModule("Maps"):MapFader()
+end
+
+local function updateMinimapScale()
+	M:GetModule("Maps"):UpdateMinimapScale()
 end
 
 local function showMinimapClock()
@@ -336,6 +347,9 @@ local function updateReminder()
 	M:GetModule("Auras"):InitReminder()
 end
 
+local function resetDetails()
+	MaoRUIDB["ResetDetails"] = true
+end
 -- Config
 local tabList = {
 	U["Actionbar"],
@@ -363,8 +377,8 @@ local optionList = {		-- type, key, value, name, horizon, horizon2, doubleline
 		{1, "Actionbar", "OverrideWA", U["HideCooldownOnWA"], true, true},
 	},
 	[2] = {
-		{1, "Nameplate", "Enable", "|cff00cc4c"..U["Enable Nameplate"], false, false},
-		{1, "Nameplate", "Figure", "显示具体血量数字", true, false},
+		{1, "Nameplate", "Enable", "|cff00cc4c"..U["Enable Nameplate"]},
+		{1, "Nameplate", "Figure", "显示具体血量数字", true},
 		{1, "Nameplate", "Arrow", U["RightArrow"], true, true},
 		{1, "Nameplate", "TankMode", "|cff00cc4c"..U["Tank Mode"].."*"},
 		{1, "Nameplate", "FriendlyCC", U["Friendly CC"].."*", true},
@@ -402,14 +416,14 @@ local optionList = {		-- type, key, value, name, horizon, horizon2, doubleline
 		{3, "AuraWatch", "IconScale", U["AuraWatch IconScale"], true, true, {.8, 2, 1}},
 	},
 	[4] = {
-		{1, "Misc", "QuestNotifier", "|cff00cc4c"..U["QuestNotifier"].."*", false, false, updateQuestNotifier},
+		{1, "Misc", "QuestNotifier", "|cff00cc4c"..U["QuestNotifier"].."*", false, false, nil, updateQuestNotifier},
 		{1, "Misc", "QuestProgress", U["QuestProgress"].."*", true},
 		{1, "Misc", "OnlyCompleteRing", U["OnlyCompleteRing"].."*", true, true},
-		{1, "Misc", "Interrupt", "|cff00cc4c"..U["Interrupt Alert"].."*", false, false, updateInterruptAlert}, 
+		{1, "Misc", "Interrupt", "|cff00cc4c"..U["Interrupt Alert"].."*", false, false, nil, updateInterruptAlert}, 
 		{1, "Misc", "AlertInInstance", U["Alert In Instance"].."*", true},
 		{1, "Misc", "OwnInterrupt", U["Own Interrupt"].."*", true, true},
 		{1, "Misc", "BrokenSpell", U["Broken Spell"].."*"},
-		{1, "Misc", "InterruptSound", U["Interrupt Alarm"], true, false},
+		{1, "Misc", "InterruptSound", U["Interrupt Alarm"], true},
 		--{1, "Misc", "DispellSound", U["Dispell Alarm"], true, true},
 		{},--blank
 		{1, "Misc", "AutoQuest", "|cff00cc4c"..U["Auto Quest"]},
@@ -426,8 +440,8 @@ local optionList = {		-- type, key, value, name, horizon, horizon2, doubleline
 	},
 	[5] = {
 		{1, "Chat", "Oldname", U["Default Channel"]},
-		{1, "ACCOUNT", "Timestamp", U["Timestamp"], true, false, updateTimestamp},
-		{1, "Chat", "Sticky", U["Chat Sticky"].."*", true, true, updateChatSticky},
+		{1, "ACCOUNT", "Timestamp", U["Timestamp"], true, false, nil, updateTimestamp},
+		{1, "Chat", "Sticky", U["Chat Sticky"].."*", true, true, nil, updateChatSticky},
 		--{1, "Chat", "WhisperColor", U["Differ WhipserColor"].."*"},
 		{1, "Chat", "Lock", "|cff00cc4c"..U["Lock Chat"]},
 		{1, "Chat", "EnableFilter", "|cff00cc4c"..U["Enable Chatfilter"], true},
@@ -441,8 +455,8 @@ local optionList = {		-- type, key, value, name, horizon, horizon2, doubleline
 		{3, "Chat", "ChatHeight", U["LockChatHeight"].."*", true, true, {100, 500, 0}, updateChatSize},
 		{},--blank				
 		{2, "ACCOUNT", "ChatFilterWhiteList", U["ChatFilterWhiteList"].."*", false, false, nil, updateFilterWhiteList, U["ChatFilterWhiteListTip"]},
-		{2, "ACCOUNT", "ChatFilterList", U["Filter List"].."*", true, false, updateFilterList},
-		{2, "Chat", "Keyword", U["Whisper Keyword"].."*", true, true, updateWhisperList},
+		{2, "ACCOUNT", "ChatFilterList", U["Filter List"].."*", true, false, nil, updateFilterList},
+		{2, "Chat", "Keyword", U["Whisper Keyword"].."*", true, true, nil, updateWhisperList},
 	},
 	[6] = {
 		{1, "Tooltip", "CombatHide", U["Hide Tooltip"].."*"},
@@ -459,8 +473,8 @@ local optionList = {		-- type, key, value, name, horizon, horizon2, doubleline
 		{1, "Misc", "AutoDismount", U["AutoDismount"], true, true},
 		{},--blank
 		{1, "Map", "Coord", U["Map Coords"]},
-		{1, "Map", "MapFader", U["MapFader"].."*", true, nil, updateMapFader},
-		{1, "Map", "Clock", U["Minimap Clock"], true, true, showMinimapClock},
+		{1, "Map", "MapFader", U["MapFader"].."*", true, false, nil, updateMapFader},
+		{1, "Map", "Clock", U["Minimap Clock"], true, true, nil, showMinimapClock},
 		--{1, "Map", "CombatPulse", U["Minimap Pulse"]},
 		{1, "Map", "WhoPings", U["Show WhoPings"]},
 		{1, "Misc", "ExpRep", U["Show Expbar"], true},
@@ -470,8 +484,8 @@ local optionList = {		-- type, key, value, name, horizon, horizon2, doubleline
 		{1, "Misc", "Mail", U["Mail Tool"], true, true},
 	},
 	[7] = {
-		{1, "Misc", "FasterLoot", U["Faster Loot"], false, false, updateFasterLoot},
-		{1, "Misc", "HideErrors", U["Hide Error"], true, false, updateErrorBlocker},
+		{1, "Misc", "FasterLoot", U["Faster Loot"], false, false, nil, updateFasterLoot},
+		{1, "Misc", "HideErrors", U["Hide Error"], true, false, nil, updateErrorBlocker},
 		{1, "ACCOUNT", "AutoBubbles", U["AutoBubbles"], true, true},
 		--{1, "Skins", "DBM", U["DBM Skin"]},
 		--{1, "Skins", "Skada", U["Skada Skin"], true},
@@ -621,7 +635,7 @@ local function CreateOption(i)
 				x, y = 10, -offset - 26
 				offset = offset + 58
 			end
-			local s = M.CreateSlider(parent, name, min, max, x, y, width)
+			local s = M.CreateSlider(parent, name, min, max, x, y)
 			s:SetValue(NDUI_VARIABLE(key, value))
 			s:SetScript("OnValueChanged", function(_, v)
 				local current = tonumber(format("%."..step.."f", v))

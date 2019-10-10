@@ -262,7 +262,6 @@ local function BuildBAR(barWidth, iconSize)
 	frame.Spellname = M.CreateFS(frame.Statusbar, 11, "", false, "LEFT", 1, 8)
 	frame.Spellname:SetWidth(frame.Statusbar:GetWidth()*.65)
 	frame.Spellname:SetJustifyH("LEFT")
-
 	if not MaoRUISettingDB["AuraWatch"]["ClickThrough"] then enableTooltip(frame) end
 
 	frame:Hide()

@@ -138,19 +138,19 @@ function S:DBMSkin()
 					name:SetPoint("LEFT", frame, "LEFT", 2, 8)
 					name:SetPoint("RIGHT", frame, "LEFT", tbar:GetWidth()*.85, 8)
 					name.SetPoint = M.Dummy
-					name:SetFont(I.Font[1], 14, "OUTLINE")
+					name:SetFont(I.Font[1], 14, I.Font[3])
 					name.SetFont = M.Dummy
 					name:SetJustifyH("LEFT")
 					name:SetWordWrap(false)
 					name:SetShadowColor(0, 0, 0, 0)
 					name.styled = true
 				end
-		
-				if not timer.styled then	
+
+				if not timer.styled then
 					timer:ClearAllPoints()
 					timer:SetPoint("RIGHT", frame, "RIGHT", -2, 8)
 					timer.SetPoint = M.Dummy
-					timer:SetFont(I.Font[1], 14, "OUTLINE")
+					timer:SetFont(I.Font[1], 14, I.Font[3])
 					timer.SetFont = M.Dummy
 					timer:SetJustifyH("RIGHT")
 					timer:SetShadowColor(0, 0, 0, 0)

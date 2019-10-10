@@ -2,9 +2,11 @@ local _, ns = ...
 local M, R, U, I = unpack(ns)
 local TT = M:GetModule("Tooltip")
 
-local strmatch, format, tonumber, select = string.match, string.format, tonumber, select
+local strmatch, format, tonumber, select, strfind = string.match, string.format, tonumber, select, string.find
 local UnitAura, GetItemCount, GetItemInfo, GetUnitName, GetCurrencyListLink = UnitAura, GetItemCount, GetItemInfo, GetUnitName, GetCurrencyListLink
+local GetMouseFocus = GetMouseFocus
 local BAGSLOT, BANK = BAGSLOT, BANK
+local SELL_PRICE_TEXT = format("%s:", SELL_PRICE)
 
 local types = {
 	spell = SPELLS.."ID:",
@@ -18,6 +20,38 @@ local types = {
 	mount = "MountID",
 }
 
+local function setupMoneyString(amount)
+	local module = M:GetModule("Infobar")
+	if module then
+		return module:GetMoneyString(amount, true)
+	end
+end
+
+function TT:UpdateItemSellPrice()
+	local frame = GetMouseFocus()
+	if frame and frame.GetName then
+		local name = frame:GetName()
+		if not MerchantFrame:IsShown() or name and (strfind(name, "Character") or strfind(name, "TradeSkill")) then
+			local link = select(2, self:GetItem())
+			if link then
+				local price = select(11, GetItemInfo(link))
+				if price and price > 0 then
+					local object = frame:GetObjectType()
+					local count
+					if object == "Button" then -- ContainerFrameItem, QuestInfoItem, PaperDollItem
+						count = frame.count
+					elseif object == "CheckButton" then -- MailItemButton or ActionButton
+						count = frame.count or tonumber(frame.Count:GetText())
+					end
+
+					local cost = (tonumber(count) or 1) * price
+					self:AddDoubleLine(SELL_PRICE_TEXT, setupMoneyString(cost), nil,nil,nil, 1,1,1)
+				end
+			end
+		end
+	end
+end
+
 function TT:AddLineForID(id, linkType, noadd)
 	if (IsShiftKeyDown() or IsControlKeyDown() or IsAltKeyDown()) then
 	for i = 1, self:NumLines() do
@@ -29,6 +63,8 @@ function TT:AddLineForID(id, linkType, noadd)
 	if not noadd then self:AddLine(" ") end
 
 	if linkType == types.item then
+		TT.UpdateItemSellPrice(self)
+
 		local bagCount = GetItemCount(id)
 		local bankCount = GetItemCount(id, true) - GetItemCount(id)
 		local itemStackCount = select(8, GetItemInfo(id))
@@ -89,6 +125,8 @@ function TT:UpdateSpellCaster(...)
 end
 
 function TT:SetupTooltipID()
+	if MaoRUISettingDB["Tooltip"]["HideAllID"] then return end
+
 	-- Update all
 	hooksecurefunc(GameTooltip, "SetHyperlink", TT.SetHyperLinkID)
 	hooksecurefunc(ItemRefTooltip, "SetHyperlink", TT.SetHyperLinkID)

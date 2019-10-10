@@ -76,11 +76,12 @@ local function updateUsage()
 	return total
 end
 
---local systemText = {
-	--[0] = "|cff55ff55"..U["Rotation"],
-	--[1] = "|cffff9900"..U["FPS"],
-	--[2] = "|cffffff55"..U["Latency"]
---}
+local systemText = {
+	[0] = "|cff55ff55"..U["Rotation"],
+	[1] = "|cffff9900"..U["FPS"],
+	[2] = "|cffffff55"..U["Latency"]
+}
+
 info.onEnter = function(self)
 	entered = true
 	GameTooltip:SetOwner(self, "ANCHOR_BOTTOM", 0, -15)
@@ -126,7 +127,7 @@ info.onEnter = function(self)
 	GameTooltip:AddDoubleLine(U["World Latency"]..":", colorLatency(latencyWorld).."|r Ms", .6,.8,1, 1,1,1)
 	GameTooltip:AddDoubleLine(FRAMERATE_LABEL, colorFPS(fps).."|r Fps", .6,.8,1, 1,1,1)
 	GameTooltip:AddDoubleLine(" ", I.LineString)
-	if GetCVarBool("scriptProfile") then
+	if scriptProfile then
 		GameTooltip:AddDoubleLine(" ", I.RightButton..U["ResetCPUUsage"].." ", 1,1,1, .6,.8,1)
 	end
 	GameTooltip:AddDoubleLine(" ", I.LeftButton..U["CPU Usage"]..": "..(scriptProfile and "|cff55ff55"..VIDEO_OPTIONS_ENABLED or "|cffff5555"..VIDEO_OPTIONS_DISABLED).." ", 1,1,1, .6,.8,1)
@@ -152,7 +153,9 @@ info.onMouseUp = function(self, btn)
 	if btn == "RightButton" and scriptProfile then
 		ResetCPUUsage()
 		module.loginTime = GetTime()
-	elseif  btn == "LeftButton"  then
+	elseif btn == "MiddleButton" then
+		MaoRUIDB["SystemInfoType"] = mod(MaoRUIDB["SystemInfoType"] + 1, 3)
+	elseif btn == "LeftButton" then
 		if scriptProfile then
 			SetCVar("scriptProfile", 0)
 		else

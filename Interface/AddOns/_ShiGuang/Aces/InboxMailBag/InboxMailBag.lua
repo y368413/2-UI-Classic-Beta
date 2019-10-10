@@ -29,7 +29,7 @@ local GLYPH = GetItemClassInfo (LE_ITEM_CLASS_GLYPH)
 local MB_Items = {};
 local MB_Queue = {};
 local MB_Ready = true;
-local MB_SearchField = _G["BagItemSearchBox"];
+local MB_SearchField = CreateFrame("EditBox", nil, _G["MailFrame"], "BagSearchBoxTemplate")
 local MB_Tab; -- The tab for our frame.
 
 function InboxMailbagSearch_OnEditFocusGained(self, ...)

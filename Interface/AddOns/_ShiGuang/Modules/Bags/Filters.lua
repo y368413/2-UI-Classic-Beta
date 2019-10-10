@@ -2,7 +2,7 @@ local _, ns = ...
 local M, R, U, I = unpack(ns)
 local module = M:GetModule("Bags")
 
-local LE_ITEM_QUALITY_POOR, LE_ITEM_QUALITY_COMMON, LE_ITEM_QUALITY_LEGENDARY = LE_ITEM_QUALITY_POOR, LE_ITEM_QUALITY_COMMON, LE_ITEM_QUALITY_LEGENDARY
+local LE_ITEM_QUALITY_POOR, LE_ITEM_QUALITY_LEGENDARY = LE_ITEM_QUALITY_POOR, LE_ITEM_QUALITY_LEGENDARY
 local LE_ITEM_CLASS_CONSUMABLE, LE_ITEM_CLASS_ITEM_ENHANCEMENT, EJ_LOOT_SLOT_FILTER_ARTIFACT_RELIC = LE_ITEM_CLASS_CONSUMABLE, LE_ITEM_CLASS_ITEM_ENHANCEMENT, EJ_LOOT_SLOT_FILTER_ARTIFACT_RELIC
 local LE_ITEM_CLASS_WEAPON, LE_ITEM_CLASS_ARMOR = LE_ITEM_CLASS_WEAPON, LE_ITEM_CLASS_ARMOR
 
@@ -37,17 +37,20 @@ end
 
 local function isItemAmmo(item)
 	if not MaoRUISettingDB["Bags"]["ItemFilter"] then return end
-	if I.MyClass ~= "HUNTER" then return end
-	return item.equipLoc == "INVTYPE_AMMO" or module.AmmoBags[item.bagID]
+	if I.MyClass == "HUNTER" then
+		return item.equipLoc == "INVTYPE_AMMO" or module.BagsType[item.bagID] == -1
+	elseif I.MyClass == "WARLOCK" then
+		return item.id == 6265 or module.BagsType[item.bagID] == 1
+	end
 end
 
 local function isItemEquipment(item)
 	if not MaoRUISettingDB["Bags"]["ItemFilter"] then return end
-	if MaoRUISettingDB["Bags"]["ItemSetFilter"] then
-		return item.isInSet
-	else
-		return item.level and item.rarity > LE_ITEM_QUALITY_COMMON and (item.subType == EJ_LOOT_SLOT_FILTER_ARTIFACT_RELIC or item.classID == LE_ITEM_CLASS_WEAPON or item.classID == LE_ITEM_CLASS_ARMOR)
-	end
+	--if MaoRUISettingDB["Bags"]["ItemSetFilter"] then
+	--	return item.isInSet
+	--else
+		return item.level and item.rarity > LE_ITEM_QUALITY_POOR and (item.subType == EJ_LOOT_SLOT_FILTER_ARTIFACT_RELIC or item.classID == LE_ITEM_CLASS_WEAPON or item.classID == LE_ITEM_CLASS_ARMOR)
+	--end
 end
 
 local function isItemConsumble(item)
@@ -68,7 +71,7 @@ end
 
 local function isEmptySlot(item)
 	if not MaoRUISettingDB["Bags"]["GatherEmpty"] then return end
-	return not item.texture and not module.SpecialBags[item.bagID]
+	return not item.texture and module.BagsType[item.bagID] == 0
 end
 
 function module:GetFilters()

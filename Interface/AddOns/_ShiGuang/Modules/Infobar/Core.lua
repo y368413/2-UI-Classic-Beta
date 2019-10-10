@@ -69,7 +69,7 @@ function module:LoadInfobar(info)
 end
 
 function module:OnLogin()
-	--if MaoRUIDB["DisableInfobars"] then return end
+	if MaoRUIDB["DisableInfobars"] then return end
 
 	if not self.modules then return end
 	for _, info in pairs(self.modules) do

@@ -11,7 +11,7 @@ print("--------------- 有你们的魔兽,才是世界 -->>>")
 
 -- Tuitorial
 local function DefaultSettings()
-	SetCVar("scriptErrors", 1)     --0是屏蔽错误1是不屏蔽错误 
+	SetCVar("scriptErrors", 0)     --0是屏蔽错误1是不屏蔽错误 
 	SetCVar("alwaysCompareItems", 1)
 	SetCVar("synchronizeSettings", 1)
   SetCVar("synchronizeMacros", 1)
@@ -40,7 +40,7 @@ local function ForceDefaultSettings()
 	SetCVar("ActionButtonUseKeyDown", 1)
 	SetCVar("alwaysShowActionBars", 1)
 	SetCVar("lockActionBars", 1)
-	SetActionBarToggles(1, 1, 0, 0)
+	SetActionBarToggles(1, 1, 1, 1)
 	SetCVar("enableFloatingCombatText", 0)
 	SetCVar("floatingCombatTextCombatState", 0)
 	SetCVar("floatingCombatTextCombatDamage", 0)
@@ -72,7 +72,6 @@ local function ForceDefaultSettings()
 	SetCVar("cameraYawMoveSpeed", 360); -- Maximum in-game: 270
 	SetCVar("statusText",1) --状态文字
 	SetCVar("statusTextDisplay","NUMERIC")--头像状态文字形式："NUMERIC"数值"PERCENT"百分比"BOTH"同时显示
-	SetCVar("showTutorials",0)
 	SetCVar("autoLootDefault",1) --自动拾取
 end
 
@@ -331,7 +330,7 @@ local function ForceBigwigs()
 						["posx"] = 1002,
 						["fontSize"] = 14,
 						["font"] = I.Font[1],
-						["fontOutline"] = "OUTLINE",
+						["fontOutline"] = I.Font[3],
 						["posy"] = 490,
 					},
 				},
@@ -503,8 +502,6 @@ end
 SlashCmdList["ShiGuang"] = HelloWorld
 SLASH_ShiGuang1 = "/loadmr"
 
------------------------------------------
-function sendCmd(cmd) ChatFrame1EditBox:SetText(""); ChatFrame1EditBox:Insert(cmd); ChatEdit_SendText(ChatFrame1EditBox); end
 function module:OnLogin()
 	M.HideOption(Advanced_UseUIScale)
 	M.HideOption(Advanced_UIScaleSlider)

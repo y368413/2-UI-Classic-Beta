@@ -1,6 +1,6 @@
 local _, ns = ...
 local M, R, U, I = unpack(ns)
-if GetLocale() ~= "zhCN" then return end
+if I.Client ~= "zhCN" then return end
 
 local strsplit, pairs = string.split, pairs
 
@@ -97,11 +97,6 @@ local function lovewow()
 	close:SetScript("OnClick", function() f:Hide() end)
 end
 
-SlashCmdList["HELPLIST"] = Helplist
-SLASH_HELPLIST1 = '/MrHelp'
-SlashCmdList["WELOVEWOW"] = lovewow
-SLASH_WELOVEWOW1 = '/welovewow'
-
 local function compareToShow(event)
 	if UI_Tutorial then return end
 
@@ -115,3 +110,8 @@ local function compareToShow(event)
 	M:UnregisterEvent(event, compareToShow)
 end
 M:RegisterEvent("PLAYER_ENTERING_WORLD", compareToShow)
+
+SlashCmdList["HELPLIST"] = Helplist
+SLASH_HELPLIST1 = '/MrHelp'
+SlashCmdList["WELOVEWOW"] = lovewow
+SLASH_WELOVEWOW1 = '/welovewow'

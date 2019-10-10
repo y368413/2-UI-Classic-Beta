@@ -129,36 +129,37 @@ local function SetupBackdrop(button)
 	end
 end
 
---update hotkey func
-	local replaces = {
-		{"(Mouse Button )", "M"},
-		{"(Middle Mouse)", "●"},
-		{"(Mouse Wheel Down)", "▲"},
-		{"(Mouse Wheel Up)", "▼"},
-		{"(鼠标按键)", "M"},
-		{"(滑鼠按鍵)", "M"},
-		{"(鼠标中键)", "●"},
-		{"(鼠标滚轮向上滚动)", "▲"},
-		{"(鼠标滚轮向下滚动)", "▼"},
-		{"(a%-)", "A"},
-		{"(c%-)", "C"},
-		{"(s%-)", "S"},
-		{KEY_BUTTON3, "M3"},
-		{KEY_MOUSEWHEELUP, "M↑"},
-		{KEY_MOUSEWHEELDOWN, "M↓"},
-		{KEY_SPACE, "■■"},
-		{CAPSLOCK_KEY_TEXT, "CL"},
-		{"(Num Pad )", "Num"},
-		{"(Num Pad +)", "+"},
-		{"(数字键盘 +)", "+"},
-		{"(数字键盘 %-)", "Num"},
-		{"(Page Up)", "P↑"},
-		{"(Page Down)", "P↓"},
-		{"(Insert)", "Ins"},
-		{"(Delete)", "Del"},
-		{"(`)", "~"},
-		{"(鼠标按键)", "M"},
-	}
+local keyButton = gsub(KEY_BUTTON4, "%d", "")
+local keyNumpad = gsub(KEY_NUMPAD1, "%d", "")
+
+local replaces = {
+	{"("..keyButton..")", "M"},
+	{"("..keyNumpad..")", "N"},
+	{"(a%-)", "A"},
+	{"(c%-)", "C"},
+	{"(s%-)", "S"},
+	{KEY_BUTTON3, "●"},
+	{KEY_MOUSEWHEELUP, "▲"},
+	{KEY_MOUSEWHEELDOWN, "▼"},
+	{KEY_SPACE, "■■"},
+	{CAPSLOCK_KEY_TEXT, "CL"},
+	{"BUTTON", "M"},
+	{"NUMPAD", "Num"},
+	{"(Num Pad +)", "+"},
+	{"(数字键盘 +)", "+"},
+	{"(数字键盘 %-)", "Num"},
+	{"(ALT%-)", "A"},
+	{"(CTRL%-)", "C"},
+	{"(SHIFT%-)", "S"},
+	{"MOUSEWHEELUP", "▲"},
+	{"MOUSEWHEELDOWN", "▼"},
+	{"SPACE", "■■"},
+	{"(Page Up)", "P↑"},
+	{"(Page Down)", "P↓"},
+	{"(Insert)", "Ins"},
+	{"(Delete)", "Del"},
+	{"(`)", "~"},
+}
 
 function Bar:UpdateHotKey()
 	local hotkey = _G[self:GetName().."HotKey"]
@@ -312,6 +313,13 @@ function Bar:StyleExtraActionButton(cfg)
 	button.__styled = true
 end
 
+function Bar:UpdateStanceHotKey()
+	for i = 1, NUM_STANCE_SLOTS do
+		_G["StanceButton"..i.."HotKey"]:SetText(GetBindingKey("SHAPESHIFTBUTTON"..i))
+		Bar.UpdateHotKey(_G["StanceButton"..i])
+	end
+end
+
 function Bar:StyleAllActionButtons(cfg)
 	for i = 1, NUM_ACTIONBAR_BUTTONS do
 		Bar:StyleActionButton(_G["ActionButton"..i], cfg)
@@ -392,8 +400,16 @@ function Bar:ReskinBars()
 		},
 		buttonstyle = {file = ""},
 	}
+
 	Bar:StyleAllActionButtons(cfg)
+
+	-- Update hotkeys
 	hooksecurefunc("ActionButton_UpdateHotkeys", Bar.UpdateHotKey)
+	hooksecurefunc("PetActionButton_SetHotkeys", Bar.UpdateHotKey)
+	if MaoRUISettingDB["Actionbar"]["Hotkeys"] then
+		Bar:UpdateStanceHotKey()
+		M:RegisterEvent("UPDATE_BINDINGS", Bar.UpdateStanceHotKey)
+	end
 end
 
 --------------------------------X   HotSpotMicroMenu by Sojik X --------------------------------

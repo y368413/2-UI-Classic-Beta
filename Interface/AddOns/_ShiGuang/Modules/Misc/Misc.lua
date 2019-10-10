@@ -46,6 +46,7 @@ function MISC:OnLogin()
 	self:TradeTargetInfo()
 	self:MenuButton_Add()
 	self:AutoDismount()
+	self:BidPriceHighlight()
 	self:WallpaperKit()
 	
 
@@ -245,7 +246,8 @@ local function formats(value)
 	end
 	return str
 end
-do
+function MISC:BidPriceHighlight()
+	if IsAddOnLoaded("Auc-Advanced") then return end
 	local function setupMisc(event, addon)
 		if addon == "Blizzard_AuctionUI" then
 			hooksecurefunc("AuctionFrameBrowse_Update", function()
@@ -266,7 +268,7 @@ do
 						local itemName = _G[buttonName.."Name"]
 						local moneyFrame = _G[buttonName.."MoneyFrame"]
 						local buyoutMoney = _G[buttonName.."BuyoutFrameMoney"]
-						if buyoutPrice >= 5*1e7 then color = "red" end
+						if buyoutPrice >= 1e6 then color = "red" end
 							if bidAmount > 0 then
 								name = name .. " |cffffff00[￥]|r"
 								alpha = 1.0

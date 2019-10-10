@@ -182,7 +182,7 @@ function MISC:ItemLevel_UpdateInspect(...)
 end
 
 function MISC:ShowItemLevel()
-	if not MaoRUISettingDB["Misc"]["ShowItemLevel"] then return end
+	if not MaoRUISettingDB["Misc"]["ItemLevel"] then return end
 
 	-- iLvl on CharacterFrame
 	CharacterFrame:HookScript("OnShow", MISC.ItemLevel_UpdatePlayer)

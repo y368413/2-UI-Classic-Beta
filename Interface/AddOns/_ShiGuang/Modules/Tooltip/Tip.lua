@@ -18,8 +18,8 @@ local GetRaidTargetIndex, GetGuildInfo, IsInGuild = GetRaidTargetIndex, GetGuild
 
 local classification = {
 	elite = " |cffcc8800"..ELITE.."|r",
-	rare = " |cffff99cc"..RARITY.."|r",
-	rareelite = " |cffff99cc"..RARITY.."|r ".."|cffcc8800"..ELITE.."|r",
+	rare = " |cffff99cc"..U["Rare"].."|r",
+	rareelite = " |cffff99cc"..U["Rare"].."|r ".."|cffcc8800"..ELITE.."|r",
 	worldboss = " |cffff0000"..BOSS.."|r",
 }
 
@@ -297,7 +297,7 @@ local function getBackdropBorderColor() return 0, 0, 0 end
 
 function TT:ReskinTooltip()
 	if not self then
-		--if I.isDeveloper then print("Unknown tooltip spotted.") end
+		if I.isDeveloper then print("Unknown tooltip spotted.") end
 		return
 	end
 	if self:IsForbidden() then return end
@@ -401,6 +401,7 @@ TT:RegisterTooltips("_ShiGuang", function()
 		FriendsTooltip,
 		GeneralDockManagerOverflowButtonList,
 		NamePlateTooltip,
+		WorldMapTooltip,
 		IMECandidatesFrame
 	}
 	for _, f in pairs(tooltips) do

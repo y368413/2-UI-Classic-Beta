@@ -21,7 +21,7 @@ local zoneInfo = {
 	neutral = {format(FACTION_CONTROLLED_TERRITORY, FACTION_STANDING_LABEL4), {1, .93, .76}}
 }
 
-local subzone, zone, pvp
+local subzone, zone, pvpType, faction
 local coordX, coordY = 0, 0
 
 local function formatCoords()
@@ -36,9 +36,10 @@ info.eventList = {
 }
 
 info.onEvent = function(self)
-	subzone, realzone, zone, pvp = GetSubZoneText(), GetRealZoneText(), GetZoneText(), {GetZonePVPInfo()}
-	if not pvp[1] then pvp[1] = "neutral" end
-	local r, g, b = unpack(zoneInfo[pvp[1]][2])
+	subzone, realzone, zone = GetSubZoneText(), GetRealZoneText(), GetZoneText()
+	pvpType, _, faction = GetZonePVPInfo()
+	pvpType = pvpType or "neutral"
+	local r, g, b = unpack(zoneInfo[pvpType][2])
 	if subzone ~= '' and subzone ~= realzone then self.text:SetFormattedText('%s - %s', realzone, subzone) else self.text:SetText(realzone) end
 	self.text:SetTextColor(r, g, b)
 end

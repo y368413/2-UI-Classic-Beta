@@ -301,7 +301,7 @@ local function CreatePanel()
 		bu:SetScript("OnClick", function()
 			MaoRUISettingDB["AuraWatchList"]["Switcher"][index] = bu:GetChecked()
 		end)
-		M.CreateFS(bu, 15, "|cffff0000".."AW Switcher", false, "RIGHT", -25, 0)
+		M.CreateFS(bu, 15, "|cffff0000"..U["AW Switcher"], false, "RIGHT", -25, 0)
 	end
 
 	-- Main
@@ -454,9 +454,9 @@ local function CreatePanel()
 				for i = 2, 12 do G:ClearEdit(Option[i]) end
 			elseif i == 10 then
 				local intID, duration, trigger, unit, itemID = tonumber(Option[13]:GetText()), tonumber(Option[14]:GetText()), Option[15].Text:GetText(), Option[16].Text:GetText(), tonumber(Option[17]:GetText())
-				if not intID or not duration or not trigger or not unit then UIErrorsFrame:AddMessage(I.InfoColor.."Incomplete Input") return end
-				if intID and not GetSpellInfo(intID) then UIErrorsFrame:AddMessage(I.InfoColor.."Incorrect SpellID") return end
-				if MaoRUISettingDB["InternalCD"][intID] then UIErrorsFrame:AddMessage(I.InfoColor.."Existing ID") return end
+				if not intID or not duration or not trigger or not unit then UIErrorsFrame:AddMessage(I.InfoColor..U["Incomplete Input"]) return end
+				if intID and not GetSpellInfo(intID) then UIErrorsFrame:AddMessage(I.InfoColor..U["Incorrect SpellID"]) return end
+				if MaoRUISettingDB["InternalCD"][intID] then UIErrorsFrame:AddMessage(I.InfoColor..U["Existing ID"]) return end
 
 				MaoRUISettingDB["InternalCD"][intID] = {intID, duration, trigger, unit, itemID}
 				AddInternal(tabs[i].List.child, i, MaoRUISettingDB["InternalCD"][intID])

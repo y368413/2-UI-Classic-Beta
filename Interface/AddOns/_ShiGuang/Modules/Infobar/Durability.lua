@@ -117,7 +117,6 @@ end
 local repairlist = {
 	[0] = "|cffff5555"..VIDEO_OPTIONS_DISABLED,
 	[1] = "|cff55ff55"..VIDEO_OPTIONS_ENABLED,
-	[2] = "|cffffff55"..U["NFG"]
 }
 
 info.onEnter = function(self)
@@ -152,58 +151,33 @@ end
 info.onLeave = M.HideTooltip
 
 -- Auto repair
-local isShown, isBankEmpty, autoRepair, repairAllCost, canRepair
+local isShown
 
-local function delayFunc()
-	if isBankEmpty then
-		autoRepair(true)
-	else
-		print(format(I.InfoColor.."%s:|r %s", U["Guild repair"], module:GetMoneyString(repairAllCost)))
-	end
-end
-
-function autoRepair(override)
+local function autoRepair(override)
 	if isShown and not override then return end
 	isShown = true
-	isBankEmpty = false
 
 	local myMoney = GetMoney()
-	repairAllCost, canRepair = GetRepairAllCost()
+	local repairAllCost, canRepair = GetRepairAllCost()
 
 	if canRepair and repairAllCost > 0 then
-		if (not override) and MaoRUIDB["RepairType"] == 1 and not I.isClassic then
-			RepairAllItems(true)
+		if myMoney > repairAllCost then
+			RepairAllItems()
+			print(format(I.InfoColor.."%s|r%s", U["Repair cost"], module:GetMoneyString(repairAllCost)))
 		else
-			if myMoney > repairAllCost then
-				RepairAllItems()
-				print(format(I.InfoColor.."%s:|r %s", U["Repair cost"], module:GetMoneyString(repairAllCost)))
-				return
-			else
-				print(I.InfoColor..U["Repair error"])
-				return
-			end
+			print(I.InfoColor..U["Repair error"])
 		end
-
-		C_Timer_After(.5, delayFunc)
-	end
-end
-
-local function checkBankFund(_, msgType)
-	if msgType == LE_GAME_ERR_GUILD_NOT_ENOUGH_MONEY then
-		isBankEmpty = true
 	end
 end
 
 local function merchantClose()
 	isShown = false
-	M:UnregisterEvent("UI_ERROR_MESSAGE", checkBankFund)
 	M:UnregisterEvent("MERCHANT_CLOSED", merchantClose)
 end
 
 local function merchantShow()
 	if IsShiftKeyDown() or MaoRUIDB["RepairType"] == 0 or not CanMerchantRepair() then return end
 	autoRepair()
-	M:RegisterEvent("UI_ERROR_MESSAGE", checkBankFund)
 	M:RegisterEvent("MERCHANT_CLOSED", merchantClose)
 end
 M:RegisterEvent("MERCHANT_SHOW", merchantShow)

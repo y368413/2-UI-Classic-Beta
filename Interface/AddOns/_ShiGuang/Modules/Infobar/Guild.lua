@@ -61,7 +61,7 @@ local function setupInfoFrame()
 
 	gName = M.CreateFS(infoFrame, 16, "Guild", true, "TOPLEFT", 15, -10)
 	gOnline = M.CreateFS(infoFrame, 13, "Online", false, "TOPLEFT", 15, -35)
-	gApps = M.CreateFS(infoFrame, 13, "Applications", false, "TOPRIGHT", -15, -35)
+	--gApps = M.CreateFS(infoFrame, 13, "Applications", false, "TOPRIGHT", -15, -35)
 	gRank = M.CreateFS(infoFrame, 13, "Rank", false, "TOPLEFT", 15, -51)
 
 	local bu = {}
@@ -273,7 +273,7 @@ info.eventList = {
 	"PLAYER_GUILD_UPDATE",
 }
 
-info.onEvent = function(self, event, ...)
+info.onEvent = function(self, event, arg1)
 	if not IsInGuild() then
 		self.text:SetText(I.MyColor.."Orz" or "Orz")
 		return
