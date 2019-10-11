@@ -1,41 +1,9 @@
---## Version: 1.0.5  ## Author: LODWise
+--## Version: 1.0.7  ## Author: LODWise
 local addon = CreateFrame('Button', 'MudmenItemColor');
 local defaultSlotWidth, defaultSlotHeight = 68, 68;
 
--- here we add on new color for quest items in the quality color ref array
-LE_ITEM_QUALITY_QUEST = #BAG_ITEM_QUALITY_COLORS + 12;
-LE_ITEM_QUALITY_POOR = 0;
-LE_ITEM_QUALITY_COMMON = 1;
-LE_ITEM_QUALITY_EPIC = #BAG_ITEM_QUALITY_COLORS + 14;
-LE_ITEM_QUALITY_LEGENDARY = #BAG_ITEM_QUALITY_COLORS + 13;
-LE_ITEM_QUALITY_ARROW = #BAG_ITEM_QUALITY_COLORS + 2;
-LE_ITEM_QUALITY_RECIPE = #BAG_ITEM_QUALITY_COLORS + 3;
-LE_ITEM_QUALITY_TRASH = #BAG_ITEM_QUALITY_COLORS + 4;
-LE_ITEM_QUALITY_CONSUMABLE = #BAG_ITEM_QUALITY_COLORS + 5;
-LE_ITEM_QUALITY_CRAFT = #BAG_ITEM_QUALITY_COLORS + 6;
-LE_ITEM_QUALITY_HEARTH = #BAG_ITEM_QUALITY_COLORS + 7;
-LE_ITEM_QUALITY_BAG = #BAG_ITEM_QUALITY_COLORS + 8;
-LE_ITEM_QUALITY_CONJURED = #BAG_ITEM_QUALITY_COLORS + 9;
-LE_ITEM_QUALITY_CONSUMABLE2 = #BAG_ITEM_QUALITY_COLORS + 10;
-LE_ITEM_QUALITY_TOOL = #BAG_ITEM_QUALITY_COLORS + 11;
 
-BAG_ITEM_QUALITY_COLORS[LE_ITEM_QUALITY_POOR] = {r=0.505, g=0.509, b=0.533}
-BAG_ITEM_QUALITY_COLORS[LE_ITEM_QUALITY_COMMON] = {r=1, g=1, b=1}
-BAG_ITEM_QUALITY_COLORS[LE_ITEM_QUALITY_EPIC] = {r=0.607, g=0.188, b=0.992}
-BAG_ITEM_QUALITY_COLORS[LE_ITEM_QUALITY_LEGENDARY] = {r=1, g=0.584, b=0.058}
-BAG_ITEM_QUALITY_COLORS[LE_ITEM_QUALITY_QUEST] = {r=0.933, g=0.066, b=0.525}
-BAG_ITEM_QUALITY_COLORS[LE_ITEM_QUALITY_ARROW] = {r=.011, g=0, b=0.980}
-BAG_ITEM_QUALITY_COLORS[LE_ITEM_QUALITY_RECIPE] = {r=0.752, g=0.541, b=0.086}
-BAG_ITEM_QUALITY_COLORS[LE_ITEM_QUALITY_TRASH] = {r=153, g=51, b=0}
-BAG_ITEM_QUALITY_COLORS[LE_ITEM_QUALITY_CONSUMABLE] = {r=5, g=.40, b=.20}
-BAG_ITEM_QUALITY_COLORS[LE_ITEM_QUALITY_CRAFT] = {r=0.278, g=1, b=0.905}
-BAG_ITEM_QUALITY_COLORS[LE_ITEM_QUALITY_HEARTH] = {r=500, g=.10, b=.10}
-BAG_ITEM_QUALITY_COLORS[LE_ITEM_QUALITY_BAG] = {r=0.360, g=1, b=0.482}
-BAG_ITEM_QUALITY_COLORS[LE_ITEM_QUALITY_CONJURED] = {r=0.78, g=.61, b=0.43}
-BAG_ITEM_QUALITY_COLORS[LE_ITEM_QUALITY_CONSUMABLE2] = {r=0.125, g=0.411, b=0.309}
-BAG_ITEM_QUALITY_COLORS[LE_ITEM_QUALITY_TOOL] = {r=0.713, g=0.262, b=0.372}
-
-mmDefaultConfig = {
+local mmDefaultConfig = {
     ['bags'] = 1,
     ['bank'] = 1,
     ['char'] = 1,
@@ -413,15 +381,44 @@ function addon:createBorder(name, parent, width, height, x, y)
     return border;
 end
 
----
--- custom quality color function because we injected custom colors
+LE_ITEM_QUALITY_QUEST = #BAG_ITEM_QUALITY_COLORS + 12;
+LE_ITEM_QUALITY_POOR = 0;
+LE_ITEM_QUALITY_COMMON = 1;
+LE_ITEM_QUALITY_EPIC = #BAG_ITEM_QUALITY_COLORS + 14;
+LE_ITEM_QUALITY_LEGENDARY = #BAG_ITEM_QUALITY_COLORS + 13;
+LE_ITEM_QUALITY_ARROW = #BAG_ITEM_QUALITY_COLORS + 2;
+LE_ITEM_QUALITY_RECIPE = #BAG_ITEM_QUALITY_COLORS + 3;
+LE_ITEM_QUALITY_TRASH = #BAG_ITEM_QUALITY_COLORS + 4;
+LE_ITEM_QUALITY_CONSUMABLE = #BAG_ITEM_QUALITY_COLORS + 5;
+LE_ITEM_QUALITY_CRAFT = #BAG_ITEM_QUALITY_COLORS + 6;
+LE_ITEM_QUALITY_HEARTH = #BAG_ITEM_QUALITY_COLORS + 7;
+LE_ITEM_QUALITY_BAG = #BAG_ITEM_QUALITY_COLORS + 8;
+LE_ITEM_QUALITY_CONJURED = #BAG_ITEM_QUALITY_COLORS + 9;
+LE_ITEM_QUALITY_CONSUMABLE2 = #BAG_ITEM_QUALITY_COLORS + 10;
+LE_ITEM_QUALITY_TOOL = #BAG_ITEM_QUALITY_COLORS + 11;
+
+BAG_ITEM_QUALITY_COLORS[LE_ITEM_QUALITY_POOR] = {r=0.505, g=0.509, b=0.533}
+BAG_ITEM_QUALITY_COLORS[LE_ITEM_QUALITY_COMMON] = {r=1, g=1, b=1}
+BAG_ITEM_QUALITY_COLORS[LE_ITEM_QUALITY_EPIC] = {r=0.607, g=0.188, b=0.992}
+BAG_ITEM_QUALITY_COLORS[LE_ITEM_QUALITY_LEGENDARY] = {r=1, g=0.584, b=0.058}
+BAG_ITEM_QUALITY_COLORS[LE_ITEM_QUALITY_QUEST] = {r=0.933, g=0.066, b=0.525}
+BAG_ITEM_QUALITY_COLORS[LE_ITEM_QUALITY_ARROW] = {r=.011, g=0, b=0.980}
+BAG_ITEM_QUALITY_COLORS[LE_ITEM_QUALITY_RECIPE] = {r=0.752, g=0.541, b=0.086}
+BAG_ITEM_QUALITY_COLORS[LE_ITEM_QUALITY_TRASH] = {r=153, g=51, b=0}
+BAG_ITEM_QUALITY_COLORS[LE_ITEM_QUALITY_CONSUMABLE] = {r=5, g=.40, b=.20}
+BAG_ITEM_QUALITY_COLORS[LE_ITEM_QUALITY_CRAFT] = {r=0.278, g=1, b=0.905}
+BAG_ITEM_QUALITY_COLORS[LE_ITEM_QUALITY_HEARTH] = {r=500, g=.10, b=.10}
+BAG_ITEM_QUALITY_COLORS[LE_ITEM_QUALITY_BAG] = {r=0.360, g=1, b=0.482}
+BAG_ITEM_QUALITY_COLORS[LE_ITEM_QUALITY_CONJURED] = {r=0.78, g=.61, b=0.43}
+BAG_ITEM_QUALITY_COLORS[LE_ITEM_QUALITY_CONSUMABLE2] = {r=0.125, g=0.411, b=0.309}
+BAG_ITEM_QUALITY_COLORS[LE_ITEM_QUALITY_TOOL] = {r=0.713, g=0.262, b=0.372}
+
 function GetQualityColor(quality)
     local q = BAG_ITEM_QUALITY_COLORS[quality];
     return q.r, q.g, q.b;
 end
 
----
--- custom quality function to manage custom items
+
 function GetItemQuality(itemId)
     local quality, _, _, _, _, _, _, _, _, classId = select(3, GetItemInfo(itemId));
     if (classId == 12) then quality = LE_ITEM_QUALITY_QUEST;end
@@ -432,8 +429,128 @@ function GetItemQuality(itemId)
 	if (classId == 7) then quality = LE_ITEM_QUALITY_CRAFT;end
 	if (classId == 5) then quality = LE_ITEM_QUALITY_CRAFT;end
 	if (classId == 14) then quality = LE_ITEM_QUALITY_CRAFT;end
-	if (itemId == 6948) then quality = LE_ITEM_QUALITY_HEARTH;end
 	if (classId == 1) then quality = LE_ITEM_QUALITY_BAG;end
+	if (itemId == 6948) then quality = LE_ITEM_QUALITY_HEARTH;end
+	
+	--Mounts--
+	if (itemId == 2414) then quality = LE_ITEM_QUALITY_HEARTH;end
+	if (itemId == 5656) then quality = LE_ITEM_QUALITY_HEARTH;end
+	if (itemId == 5655) then quality = LE_ITEM_QUALITY_HEARTH;end	
+	if (itemId == 18777) then quality = LE_ITEM_QUALITY_HEARTH;end
+    if (itemId == 18776) then quality = LE_ITEM_QUALITY_HEARTH;end
+	if (itemId == 18778) then quality = LE_ITEM_QUALITY_HEARTH;end
+	if (itemId == 5872) then quality = LE_ITEM_QUALITY_HEARTH;end
+	if (itemId == 5864) then quality = LE_ITEM_QUALITY_HEARTH;end
+	if (itemId == 5873) then quality = LE_ITEM_QUALITY_HEARTH;end	
+	if (itemId == 18786) then quality = LE_ITEM_QUALITY_HEARTH;end
+    if (itemId == 18787) then quality = LE_ITEM_QUALITY_HEARTH;end
+	if (itemId == 18785) then quality = LE_ITEM_QUALITY_HEARTH;end
+	if (itemId == 8632) then quality = LE_ITEM_QUALITY_HEARTH;end
+	if (itemId == 8631) then quality = LE_ITEM_QUALITY_HEARTH;end
+	if (itemId == 8629) then quality = LE_ITEM_QUALITY_HEARTH;end	
+	if (itemId == 18766) then quality = LE_ITEM_QUALITY_HEARTH;end
+    if (itemId == 18767) then quality = LE_ITEM_QUALITY_HEARTH;end
+	if (itemId == 18902) then quality = LE_ITEM_QUALITY_HEARTH;end
+	if (itemId == 8595) then quality = LE_ITEM_QUALITY_HEARTH;end
+	if (itemId == 13321) then quality = LE_ITEM_QUALITY_HEARTH;end
+	if (itemId == 8563) then quality = LE_ITEM_QUALITY_HEARTH;end
+	if (itemId == 13322) then quality = LE_ITEM_QUALITY_HEARTH;end	
+	if (itemId == 18772) then quality = LE_ITEM_QUALITY_HEARTH;end
+    if (itemId == 18773) then quality = LE_ITEM_QUALITY_HEARTH;end
+	if (itemId == 18774) then quality = LE_ITEM_QUALITY_HEARTH;end
+	if (itemId == 18241) then quality = LE_ITEM_QUALITY_HEARTH;end
+	if (itemId == 18244) then quality = LE_ITEM_QUALITY_HEARTH;end	
+	if (itemId == 18242) then quality = LE_ITEM_QUALITY_HEARTH;end
+    if (itemId == 18243) then quality = LE_ITEM_QUALITY_HEARTH;end
+	if (itemId == 19030) then quality = LE_ITEM_QUALITY_HEARTH;end
+	if (itemId == 13086) then quality = LE_ITEM_QUALITY_HEARTH;end
+	if (itemId == 5668) then quality = LE_ITEM_QUALITY_HEARTH;end
+	if (itemId == 5665) then quality = LE_ITEM_QUALITY_HEARTH;end	
+	if (itemId == 1132) then quality = LE_ITEM_QUALITY_HEARTH;end
+    if (itemId == 18796) then quality = LE_ITEM_QUALITY_HEARTH;end
+	if (itemId == 18798) then quality = LE_ITEM_QUALITY_HEARTH;end
+	if (itemId == 18797) then quality = LE_ITEM_QUALITY_HEARTH;end
+	if (itemId == 13332) then quality = LE_ITEM_QUALITY_HEARTH;end	
+	if (itemId == 13333) then quality = LE_ITEM_QUALITY_HEARTH;end
+    if (itemId == 13331) then quality = LE_ITEM_QUALITY_HEARTH;end
+	if (itemId == 13334) then quality = LE_ITEM_QUALITY_HEARTH;end
+	if (itemId == 18791) then quality = LE_ITEM_QUALITY_HEARTH;end
+	if (itemId == 15290) then quality = LE_ITEM_QUALITY_HEARTH;end	
+	if (itemId == 15277) then quality = LE_ITEM_QUALITY_HEARTH;end
+    if (itemId == 18794) then quality = LE_ITEM_QUALITY_HEARTH;end
+	if (itemId == 18795) then quality = LE_ITEM_QUALITY_HEARTH;end
+	if (itemId == 18793) then quality = LE_ITEM_QUALITY_HEARTH;end
+	if (itemId == 8588) then quality = LE_ITEM_QUALITY_HEARTH;end	
+	if (itemId == 8591) then quality = LE_ITEM_QUALITY_HEARTH;end	
+	if (itemId == 8592) then quality = LE_ITEM_QUALITY_HEARTH;end
+    if (itemId == 18788) then quality = LE_ITEM_QUALITY_HEARTH;end
+	if (itemId == 18789) then quality = LE_ITEM_QUALITY_HEARTH;end
+	if (itemId == 18790) then quality = LE_ITEM_QUALITY_HEARTH;end
+	if (itemId == 18245) then quality = LE_ITEM_QUALITY_HEARTH;end	
+	if (itemId == 18248) then quality = LE_ITEM_QUALITY_HEARTH;end
+    if (itemId == 18247) then quality = LE_ITEM_QUALITY_HEARTH;end
+	if (itemId == 18246) then quality = LE_ITEM_QUALITY_HEARTH;end
+	if (itemId == 19029) then quality = LE_ITEM_QUALITY_HEARTH;end
+	if (itemId == 13335) then quality = LE_ITEM_QUALITY_HEARTH;end
+	if (itemId == 19872) then quality = LE_ITEM_QUALITY_HEARTH;end
+	if (itemId == 19902) then quality = LE_ITEM_QUALITY_HEARTH;end
+	if (itemId == 21218) then quality = LE_ITEM_QUALITY_HEARTH;end	
+	if (itemId == 21323) then quality = LE_ITEM_QUALITY_HEARTH;end
+    if (itemId == 21324) then quality = LE_ITEM_QUALITY_HEARTH;end
+	if (itemId == 21321) then quality = LE_ITEM_QUALITY_HEARTH;end
+	if (itemId == 21176) then quality = LE_ITEM_QUALITY_HEARTH;end
+	
+	--Companions--
+	if (itemId == 11474) then quality = LE_ITEM_QUALITY_HEARTH;end
+	if (itemId == 11110) then quality = LE_ITEM_QUALITY_HEARTH;end
+	if (itemId == 10398) then quality = LE_ITEM_QUALITY_HEARTH;end
+	if (itemId == 21277) then quality = LE_ITEM_QUALITY_HEARTH;end
+	if (itemId == 11826) then quality = LE_ITEM_QUALITY_HEARTH;end
+	if (itemId == 11825) then quality = LE_ITEM_QUALITY_HEARTH;end
+	if (itemId == 15996) then quality = LE_ITEM_QUALITY_HEARTH;end
+	if (itemId == 4401) then quality = LE_ITEM_QUALITY_HEARTH;end
+	if (itemId == 8499) then quality = LE_ITEM_QUALITY_HEARTH;end
+	if (itemId == 10822) then quality = LE_ITEM_QUALITY_HEARTH;end
+	if (itemId == 8498) then quality = LE_ITEM_QUALITY_HEARTH;end
+	if (itemId == 20769) then quality = LE_ITEM_QUALITY_HEARTH;end
+	if (itemId == 8494) then quality = LE_ITEM_QUALITY_HEARTH;end
+	if (itemId == 8491) then quality = LE_ITEM_QUALITY_HEARTH;end
+	if (itemId == 12529) then quality = LE_ITEM_QUALITY_HEARTH;end
+	if (itemId == 12264) then quality = LE_ITEM_QUALITY_HEARTH;end
+	if (itemId == 8492) then quality = LE_ITEM_QUALITY_HEARTH;end
+	if (itemId == 8490) then quality = LE_ITEM_QUALITY_HEARTH;end
+	if (itemId == 11023) then quality = LE_ITEM_QUALITY_HEARTH;end
+	if (itemId == 8496) then quality = LE_ITEM_QUALITY_HEARTH;end
+	if (itemId == 8495) then quality = LE_ITEM_QUALITY_HEARTH;end
+	if (itemId == 10360) then quality = LE_ITEM_QUALITY_HEARTH;end
+	if (itemId == 10361) then quality = LE_ITEM_QUALITY_HEARTH;end
+	if (itemId == 10392) then quality = LE_ITEM_QUALITY_HEARTH;end
+	if (itemId == 10393) then quality = LE_ITEM_QUALITY_HEARTH;end
+	if (itemId == 10394) then quality = LE_ITEM_QUALITY_HEARTH;end
+	if (itemId == 8497) then quality = LE_ITEM_QUALITY_HEARTH;end
+	if (itemId == 8501) then quality = LE_ITEM_QUALITY_HEARTH;end
+	if (itemId == 8500) then quality = LE_ITEM_QUALITY_HEARTH;end
+	if (itemId == 8485) then quality = LE_ITEM_QUALITY_HEARTH;end
+	if (itemId == 8486) then quality = LE_ITEM_QUALITY_HEARTH;end
+	if (itemId == 8487) then quality = LE_ITEM_QUALITY_HEARTH;end
+	if (itemId == 8488) then quality = LE_ITEM_QUALITY_HEARTH;end
+	if (itemId == 8489) then quality = LE_ITEM_QUALITY_HEARTH;end
+	if (itemId == 22235) then quality = LE_ITEM_QUALITY_HEARTH;end
+	if (itemId == 23007) then quality = LE_ITEM_QUALITY_HEARTH;end
+	if (itemId == 23015) then quality = LE_ITEM_QUALITY_HEARTH;end
+	if (itemId == 23002) then quality = LE_ITEM_QUALITY_HEARTH;end
+	if (itemId == 23083) then quality = LE_ITEM_QUALITY_HEARTH;end
+	if (itemId == 21308) then quality = LE_ITEM_QUALITY_HEARTH;end
+	if (itemId == 21309) then quality = LE_ITEM_QUALITY_HEARTH;end
+	if (itemId == 21305) then quality = LE_ITEM_QUALITY_HEARTH;end
+	if (itemId == 21301) then quality = LE_ITEM_QUALITY_HEARTH;end
+	if (itemId == 11027) then quality = LE_ITEM_QUALITY_HEARTH;end
+	if (itemId == 11026) then quality = LE_ITEM_QUALITY_HEARTH;end
+	if (itemId == 19450) then quality = LE_ITEM_QUALITY_HEARTH;end
+	--Collectors Edition--
+	if (itemId == 13582) then quality = LE_ITEM_QUALITY_HEARTH;end
+	if (itemId == 13584) then quality = LE_ITEM_QUALITY_HEARTH;end
+	if (itemId == 13583) then quality = LE_ITEM_QUALITY_HEARTH;end
 	
 	--TOOLS--
 	if (itemId == 4471) then quality = LE_ITEM_QUALITY_TOOL;end
@@ -472,6 +589,12 @@ function GetItemQuality(itemId)
     if (itemId == 15870) then quality = LE_ITEM_QUALITY_TOOL;end
 	if (itemId == 15869) then quality = LE_ITEM_QUALITY_TOOL;end
 	if (itemId == 15871) then quality = LE_ITEM_QUALITY_TOOL;end
+	if (itemId == 18251) then quality = LE_ITEM_QUALITY_TOOL;end
+	if (itemId == 4265) then quality = LE_ITEM_QUALITY_TOOL;end	
+    if (itemId == 2304) then quality = LE_ITEM_QUALITY_TOOL;end
+    if (itemId == 2313) then quality = LE_ITEM_QUALITY_TOOL;end
+	if (itemId == 15564) then quality = LE_ITEM_QUALITY_TOOL;end
+	if (itemId == 8173) then quality = LE_ITEM_QUALITY_TOOL;end
 	
 	--CRAFT--
 	if (itemId == 17056) then quality = LE_ITEM_QUALITY_CRAFT;end
@@ -480,6 +603,7 @@ function GetItemQuality(itemId)
 	--TRASH--
     if (itemId == 2296) then quality = LE_ITEM_QUALITY_TRASH;end
 	if (itemId == 878) then quality = LE_ITEM_QUALITY_TRASH;end
+	if (itemId == 6986) then quality = LE_ITEM_QUALITY_TRASH;end
 	
 	--CONJURED--
 	if (itemId == 2288) then quality = LE_ITEM_QUALITY_CONJURED;end
@@ -568,6 +692,13 @@ function GetItemQuality(itemId)
     if (itemId == 6532) then quality = LE_ITEM_QUALITY_CONSUMABLE2;end
 	if (itemId == 7307) then quality = LE_ITEM_QUALITY_CONSUMABLE2;end
 	if (itemId == 6533) then quality = LE_ITEM_QUALITY_CONSUMABLE2;end	
+	if (itemId == 2091) then quality = LE_ITEM_QUALITY_CONSUMABLE2;end	
+	if (itemId == 1127) then quality = LE_ITEM_QUALITY_CONSUMABLE2;end
+	if (itemId == 1178) then quality = LE_ITEM_QUALITY_CONSUMABLE2;end	
+    if (itemId == 4598) then quality = LE_ITEM_QUALITY_CONSUMABLE2;end
+    if (itemId == 10830) then quality = LE_ITEM_QUALITY_CONSUMABLE2;end
+	if (itemId == 1399) then quality = LE_ITEM_QUALITY_CONSUMABLE2;end
+	if (itemId == 17202) then quality = LE_ITEM_QUALITY_CONSUMABLE2;end
 	
     --ARROW--
 	if (itemId == 2946) then quality = LE_ITEM_QUALITY_ARROW;end
@@ -660,6 +791,7 @@ function GetItemQuality(itemId)
 	if (itemId == 13873) then quality = LE_ITEM_QUALITY_QUEST;end
 	if (itemId == 6893) then quality = LE_ITEM_QUALITY_QUEST;end
 	if (itemId == 13197) then quality = LE_ITEM_QUALITY_QUEST;end
+	if (itemId == 6929) then quality = LE_ITEM_QUALITY_QUEST;end
     return quality;
 end
 
