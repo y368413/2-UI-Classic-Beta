@@ -1,4 +1,4 @@
---## Author: Wardz ## Version: v1.0.8
+--## Author: Wardz ## Version: v1.1.0
 local ClassicCastbars = {}
 local PoolManager = {}
 ClassicCastbars.PoolManager = PoolManager
@@ -1649,7 +1649,7 @@ ClassicCastbars.crowdControls = {
 
 -- Addon Savedvariables
 ClassicCastbars.defaultConfig = {
-    version = "13", -- settings version
+    version = "14", -- settings version
     pushbackDetect = true,
     movementDetect = true,
     locale = GetLocale(),
@@ -1661,6 +1661,7 @@ ClassicCastbars.defaultConfig = {
         iconSize = 16,
         showCastInfoOnly = false,
         showTimer = true,
+        showIcon = true,
         autoPosition = true,
         castFont = _G.STANDARD_TEXT_FONT,
         castFontSize = 8,
@@ -1687,6 +1688,7 @@ ClassicCastbars.defaultConfig = {
         iconSize = 16,
         showCastInfoOnly = false,
         showTimer = false,
+        showIcon = true,
         autoPosition = true,
         castFont = _G.STANDARD_TEXT_FONT,
         castFontSize = 10,
@@ -1713,6 +1715,7 @@ ClassicCastbars.defaultConfig = {
         iconSize = 16,
         showCastInfoOnly = false,
         showTimer = false,
+        showIcon = true,
         autoPosition = false,
         castFont = _G.STANDARD_TEXT_FONT,
         castFontSize = 9,
@@ -1739,6 +1742,7 @@ ClassicCastbars.defaultConfig = {
         iconSize = 16,
         showCastInfoOnly = false,
         showTimer = false,
+        showIcon = true,
         autoPosition = true,
         castFont = _G.STANDARD_TEXT_FONT,
         castFontSize = 12,
@@ -2419,6 +2423,7 @@ function addon:SetCastbarStyle(castbar, cast, db)
     end
 
     castbar.Spark:SetHeight(db.height * 2.1)
+    castbar.Icon:SetShown(db.showIcon)
     castbar.Icon:SetSize(db.iconSize, db.iconSize)
     castbar.Icon:SetPoint("BOTTOMLEFT", castbar, db.iconPositionX - db.iconSize, db.iconPositionY)
     castbar.Border:SetVertexColor(unpack(db.borderColor))
@@ -2570,9 +2575,11 @@ function addon:HideCastbar(castbar, noFadeOut)
     UIFrameFadeOut(castbar, cast and cast.isInterrupted and 1.5 or 0.2, 1, 0)
 end
 
+local CastingBarFrameManagedPosTable
 -- TODO: reset to default skin on mode disabled without having to reloadui
 function addon:SkinPlayerCastbar()
     local db = self.db.player
+    if not db.enabled then return end
 
     if not CastingBarFrame.Timer then
         CastingBarFrame.Timer = CastingBarFrame:CreateFontString(nil, "OVERLAY")
@@ -2602,12 +2609,15 @@ function addon:SkinPlayerCastbar()
 	CastingBarFrame_SetStartChannelColor(CastingBarFrame, unpack(db.statusColorChannel))
 	--CastingBarFrame_SetFinishedCastColor(CastingBarFrame, unpack(db.statusColor))
 	--CastingBarFrame_SetNonInterruptibleCastColor(CastingBarFrame, 0.7, 0.7, 0.7)
-	--CastingBarFrame_SetFailedCastColor(CastingBarFrame, 1.0, 0.0, 0.0)
+    --CastingBarFrame_SetFailedCastColor(CastingBarFrame, 1.0, 0.0, 0.0)
+    if CastingBarFrame.isTesting then
+        CastingBarFrame:SetStatusBarColor(CastingBarFrame.startCastColor:GetRGB())
+    end
 
     CastingBarFrame.Text:ClearAllPoints()
     CastingBarFrame.Text:SetPoint("CENTER")
     CastingBarFrame.Icon:ClearAllPoints()
-    CastingBarFrame.Icon:SetShown(db.enabled)
+    CastingBarFrame.Icon:SetShown(db.showIcon)
 
     if not CastingBarFrame.Background then
         for k, v in pairs({ CastingBarFrame:GetRegions() }) do
@@ -2622,13 +2632,13 @@ function addon:SkinPlayerCastbar()
     CastingBarFrame:ClearAllPoints()
     if not db.autoPosition then
         local pos = db.position
+        CastingBarFrame:SetAttribute("ignoreFramePositionManager", true)
+        CastingBarFrameManagedPosTable = UIPARENT_MANAGED_FRAME_POSITIONS.CastingBarFrame
+        UIPARENT_MANAGED_FRAME_POSITIONS.CastingBarFrame = nil
         CastingBarFrame:SetPoint(pos[1], UIParent, pos[2], pos[3])
-        CastingBarFrame.OldSetPoint = CastingBarFrame.SetPoint
-        CastingBarFrame.SetPoint = function() end -- just incase any Blizzard code modifies it again
     else
-        if CastingBarFrame.OldSetPoint then
-            CastingBarFrame.SetPoint = CastingBarFrame.OldSetPoint
-        end
+        CastingBarFrame:SetAttribute("ignoreFramePositionManager", false)
+        UIPARENT_MANAGED_FRAME_POSITIONS.CastingBarFrame = CastingBarFrameManagedPosTable
         CastingBarFrame:SetPoint("BOTTOM", UIParent, 0, 150)
     end
 
