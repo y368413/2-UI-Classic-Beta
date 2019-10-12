@@ -2,7 +2,7 @@
 ## Title:-|cFFFFFF00 2|r|cFFFF0000 UI |r Classic -
 ## Author: ShiGuang、TuTu、Siweia
 ## Notes: Time Flies...
-## Version: 0.3.5
+## Version: 0.3.6
 ## SavedVariables: MaoRUIDB,ShiGuangDB,CastbarsDB,DialogKeyDB,TinyRosterDB
 ## SavedVariablesPerCharacter: MaoRUISettingDB,ShiGuangPerDB,DEX_SAVE
 

@@ -87,8 +87,8 @@ local function ForceRaidFrame()
 	--SetRaidProfileOption(CompactUnitFrameProfiles.selectedProfile, "autoActivate25Players", true)
 	--SetRaidProfileOption(CompactUnitFrameProfiles.selectedProfile, "autoActivate40Players", true)
 	--SetRaidProfileOption(CompactUnitFrameProfiles.selectedProfile, "keepGroupsTogether", true) --保持小队相连 
-	SetRaidProfileOption(CompactUnitFrameProfiles.selectedProfile, "displayHealPrediction", true) --显示预计治疗 
-	SetRaidProfileOption(CompactUnitFrameProfiles.selectedProfile, "displayAggroHighlight", true) --高亮显示仇恨目标 
+	--SetRaidProfileOption(CompactUnitFrameProfiles.selectedProfile, "displayHealPrediction", true) --显示预计治疗 
+	--SetRaidProfileOption(CompactUnitFrameProfiles.selectedProfile, "displayAggroHighlight", true) --高亮显示仇恨目标 
 	SetRaidProfileOption(CompactUnitFrameProfiles.selectedProfile, "displayPets", false) --显示宠物 
 	SetRaidProfileOption(CompactUnitFrameProfiles.selectedProfile, "displayMainTankAndAssist", false) --显示主坦克和主助理 
 	SetRaidProfileOption(CompactUnitFrameProfiles.selectedProfile, "displayOnlyDispellableDebuffs", true) --只显示可供驱散的负面
