@@ -21,13 +21,13 @@ end
 local function memoryColor(value, times)
 	if not times then times = 1 end
 
-	if value <= 1024*times then
+	if value <= 2048*times then
 		return 0, 1, 0
-	elseif value <= 2048*times then
-		return .75, 1, 0
 	elseif value <= 4096*times then
-		return 1, 1, 0
+		return .75, 1, 0
 	elseif value <= 8192*times then
+		return 1, 1, 0
+	elseif value <= 10240*times then
 		return 1, .75, 0
 	elseif value <= 16384*times then
 		return 1, .5, 0

@@ -2,5 +2,4 @@
 	<Script file="WorldMap.lua"/>
 	<Script file="MapReveal.lua"/>
 	<Script file="Minimap.lua"/>
-	<Script file="TidyMinimap.lua"/>
 </Ui>

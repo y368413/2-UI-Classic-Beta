@@ -69,34 +69,33 @@ end
 ----------------------------------------------------------------------------	右键菜单--------------------------------------------------------------------------
 --动作条样式
 local SetMrbarMenuFrame = CreateFrame("Frame", "ClickMenu", UIParent, "UIDropDownMenuTemplate")
---local SetMrbarMenuFrame = MSA_DropDownMenu_Create("ClickMenu", UIParent)
 local SetMrbarMicromenu = {  
     { text = "|cffff8800 ------------------------|r", notCheckable = true },
     { text = "           "..MAINMENU_BUTTON.."", isTitle = true, notCheckable = true},
     { text = "|cffff8800 ------------------------|r", notCheckable = true },
     { text = CHARACTER, icon = 'Interface\\PaperDollInfoFrame\\UI-EquipmentManager-Toggle',
-        func = function() securecall(ToggleCharacter, 'PaperDollFrame') end, notCheckable = true},
+        func = function() ToggleFrame(CharacterFrame) end, notCheckable = true},
     { text = SPELLBOOK, icon = 'Interface\\MINIMAP\\TRACKING\\Class',
-        func = function() securecall(ToggleSpellBook, BOOKTYPE_SPELL) end, notCheckable = true},
+        func = function() ToggleFrame(SpellBookFrame) end, notCheckable = true},
     { text = TALENTS, icon = 'Interface\\MINIMAP\\TRACKING\\Ammunition',
         func = function() if (not PlayerTalentFrame) then LoadAddOn('Blizzard_TalentUI') end
         if (not GlyphFrame) then LoadAddOn('Blizzard_GlyphUI') end
-        securecall(ToggleTalentFrame) end, notCheckable = true},
+        ToggleTalentFrame() end, notCheckable = true},
     { text = INVENTORY_TOOLTIP,  icon = 'Interface\\MINIMAP\\TRACKING\\Banker',
-        func = function() securecall(ToggleAllBags) end, notCheckable = true},
-    { text = ACHIEVEMENTS, icon = 'Interface\\ACHIEVEMENTFRAME\\UI-Achievement-Shield',
-        func = function() securecall(ToggleAchievementFrame) end, notCheckable = true},
+        func = function() ToggleAllBags() end, notCheckable = true},
+    --{ text = ACHIEVEMENTS, icon = 'Interface\\ACHIEVEMENTFRAME\\UI-Achievement-Shield',
+        --func = function() ToggleAchievementFrame() end, notCheckable = true},
     { text = QUEST_LOG, icon = 'Interface\\GossipFrame\\ActiveQuestIcon',
         func = function() ToggleQuestLog() end, notCheckable = true},
     { text = FRIENDS, icon = 'Interface\\FriendsFrame\\PlusManz-BattleNet',
-        func = function() securecall(ToggleFriendsFrame) end, notCheckable = true},
+        func = function() ToggleFriendsFrame() end, notCheckable = true},
     { text = GUILD, icon = 'Interface\\GossipFrame\\TabardGossipIcon',
         func = function() if (IsTrialAccount()) then UIErrorsFrame:AddMessage(ERR_RESTRICTED_ACCOUNT, 1, 0, 0)
-        else securecall(ToggleGuildFrame) end end, notCheckable = true},
-    { text = GROUP_FINDER, icon = 'Interface\\LFGFRAME\\BattleNetWorking0',
-        func = function() securecall(PVEFrame_ToggleFrame, 'GroupFinderFrame', LFDParentFrame) end, notCheckable = true},
-    { text = ENCOUNTER_JOURNAL, icon = 'Interface\\MINIMAP\\TRACKING\\Profession',
-        func = function() securecall(ToggleEncounterJournal) end, notCheckable = true},
+        else ToggleGuildFrame() end end, notCheckable = true},
+    --{ text = GROUP_FINDER, icon = 'Interface\\LFGFRAME\\BattleNetWorking0',
+        --func = function() securecall(PVEFrame_ToggleFrame, 'GroupFinderFrame', LFDParentFrame) end, notCheckable = true},
+    --{ text = ENCOUNTER_JOURNAL, icon = 'Interface\\MINIMAP\\TRACKING\\Profession',
+        --func = function() ToggleEncounterJournal() end, notCheckable = true},
     --{ text = PLAYER_V_PLAYER, icon = 'Interface\\MINIMAP\\TRACKING\\BattleMaster', --broke
 	     --func = function() securecall(PVEFrame_ToggleFrame, 'PVPUIFrame', HonorFrame) end, notCheckable = true},
     --{ text = MOUNTS, icon = 'Interface\\MINIMAP\\TRACKING\\StableMaster',  --broke
@@ -112,7 +111,7 @@ local SetMrbarMicromenu = {
     --{ text = BLIZZARD_STORE, icon = 'Interface\\MINIMAP\\TRACKING\\BattleMaster',
          --func = function() LoadAddOn('Blizzard_StoreUI') securecall(ToggleStoreUI) end, notCheckable = true},
     { text = GAMEMENU_HELP, icon = 'Interface\\CHATFRAME\\UI-ChatIcon-Blizz',
-         func = function() securecall(ToggleHelpFrame) end, notCheckable = true},
+         func = function() ToggleFrame(HelpFrame) end, notCheckable = true},
     --{ text = BATTLEFIELD_MINIMAP,
          --func = function() securecall(ToggleBattlefieldMinimap) end, notCheckable = true},
     { text = "|cffff8800 ------------------------|r", notCheckable = true },

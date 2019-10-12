@@ -27,7 +27,7 @@ local defaultSettings = {
 		DecimalCD = true,
 		Style = 6,
 		Bar4Fade = false,
-		Bar5Fade = true,
+		Bar5Fade = false,
 		Scale = 1,
 		BindType = 1,
 		OverrideWA = false,
@@ -430,8 +430,6 @@ local optionList = {		-- type, key, value, name, horizon, horizon2, doubleline
 		{},--blank
 	  {1, "Misc", "ShowItemLevel", "|cff00cc4c"..U["Show ItemLevel"]},
 		{1, "Misc", "GemNEnchant", U["Show GemNEnchant"].."*", true},
-		--{1, "Misc", "ShowItemLevel", U["Show ItemLevel"].."*", true, true},
-		{1, "Misc", "FreeMountCD", "CD君(CN only)", true, true},
 	  {1, "Skins", "InfobarLine", U["Bar Line"]},
 	  {1, "Misc", "xMerchant", U["xMerchant"], true},
 	  {1, "Misc", "WallpaperKit", U["WallpaperKit"], true, true},

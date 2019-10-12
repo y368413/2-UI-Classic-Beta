@@ -146,8 +146,7 @@ end
 R.CustomBommUnits = {
 	[120651] = true, -- 爆炸物
 }
---	[88288] = true, -- 木桩
---	[87761] = true, -- 木桩
+
 -- 特殊单位的染色列表
 R.CustomUnits = {
 	[141851] = true, -- 戈霍恩之嗣

@@ -1,11 +1,10 @@
 ﻿<Ui xmlns="http://www.blizzard.com/wow/ui/">
-	<Script file="Nameplates.lua"/>
 	<Script file="iFrame.lua"/>
 	<Script file="iBuffs.lua"/>
 	<Script file="PartyTarget.lua"/>
 	<Script file="PowerSpark.lua"/>
-	<!--Script file="PartyCastbar.lua"/-->
-	<Script file="PetTarget.lua"/>
+	<!--Script file="PartyCastbar.lua"/>
+	<Script file="PetTarget.lua"/-->
 	<Script file="UnitFramesStyle.lua"/>
 	<Script file="WhoaThickFrames.lua"/>
 	<Script file="AlternatePowerBar.lua"/>

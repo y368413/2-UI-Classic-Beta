@@ -10,7 +10,6 @@ Addon.canSearch = true
 
 function Addon:OnEnable()
 	self:StartupSettings()
-
 	self:CreateFrame('inventory')
 	self:CreateSlashCommands(ADDON:lower(), 'cbt')
 	self:CreateOptionsLoader()

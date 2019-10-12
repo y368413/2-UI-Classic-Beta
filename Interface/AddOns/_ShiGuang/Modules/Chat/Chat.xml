@@ -4,7 +4,4 @@
 	<Script file="Chatbar.lua"/>
 	<Script file="Urlcopy.lua"/>
 	<Script file="Filter.lua"/>
-	<Script file="ChatMod.lua"/>
-	<Script file="VirtualScrollList-1.0.lua"/>
-	<Script file="WhisperPop.lua"/>
 </Ui>

@@ -62,7 +62,7 @@ local ProfileDefaults = {
 		reversedTabs = true,
 		borderColor = {1, 1, 1, 1},
 		point = 'BOTTOMRIGHT',
-		x = -43, y = 120,
+		x = -43, y = 160,
 		columns = 10,
 		width = 430,
 		height = 600,

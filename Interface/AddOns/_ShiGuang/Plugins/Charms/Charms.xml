@@ -3,7 +3,9 @@
 	<Script file="rlTools.lua"/>
 	<Script file="kAutoOpen.lua"/>
 	<Script file="xMerchant.lua"/>
+	<Script file="EnemyReminder.lua"/>
 	<Script file="MudmenItemColor.lua"/>
 	<Script file="CharacterDurability.lua"/>
 	<Script file="CharacterStatsClass.lua"/>
+	<Script file="FriendGroups.lua"/>
 </Ui>

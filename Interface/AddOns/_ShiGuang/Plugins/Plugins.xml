@@ -1,8 +1,6 @@
 <Ui xmlns="http://www.blizzard.com/wow/ui/">
-	<Script file="AlreadyKnown.lua"/>
-	<Script file="DragEmAll.lua"/>
-	<Script file="QuickQuest.lua"/>
-	<Script file="yClassColors.lua"/>
+	<Include file="Chat\Chat.xml"/>
+	<Include file="Maps\Maps.xml"/>
 	<Include file="Loot\Loot.xml"/>
 	<Include file="Gear\Gear.xml"/>
 	<Include file="Charms\Charms.xml"/>
@@ -10,4 +8,5 @@
 	<Include file="DamageExm\DamageExm.xml"/>
 	<Include file="Notice\Notice.xml"/>
 	<Include file="UnitFrames\UnitFrames.xml"/>
+	<Include file="Aces\Aces.xml"/>
 </Ui>

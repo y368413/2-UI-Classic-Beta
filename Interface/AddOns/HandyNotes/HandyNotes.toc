@@ -1,0 +1,29 @@
+﻿## Interface: 11302
+## Author: Xinhuan + Revel of Pagle
+## Version: v1.5.9 +1.17
+## Title: HandyNotes_NPCs
+## Title-zhCN:|cff0080ff[地图]|rNPC坐标
+## Title-zhTW:|cff0080ff[地图]|rNPC坐标
+## Notes: Handynotes with(Shows locations of various old world npcs)
+## Notes-zhCN: 宝藏将会在地图上标记出，概览所有稀有，判定你是否击杀了一次性稀有。
+## Notes-zhTW: 宝藏将会在地图上标记出，概覽所有稀有，并判定時候已擊殺過。
+## SavedVariables: HandyNotesDB, HandyNotes_HandyNotesDB, HandyNotes_NPCsClassicDB
+## Dependencies: _ShiGuang
+
+## LoadManagers: AddonLoader
+## X-LoadOn-Always: delayed
+## X-Repple: 2 UI
+
+libs\LibUIDropDownMenu\LibUIDropDownMenu.xml
+libs\LibQTip-1.0\LibQTip-1.0.lua
+libs\HereBeDragons\HereBeDragons.xml
+
+# Locale files
+Locales\Locales.xml
+
+# Core files
+HandyNotes.lua
+HandyNotes.xml
+HandyNotes_HandyNotes.lua
+HandyNotes_EditFrame.lua
+HandyNotes_NPCs.lua
