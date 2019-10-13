@@ -7,5 +7,4 @@
 	<Script file="MudmenItemColor.lua"/>
 	<Script file="CharacterDurability.lua"/>
 	<Script file="CharacterStatsClass.lua"/>
-	<Script file="FriendGroups.lua"/>
 </Ui>

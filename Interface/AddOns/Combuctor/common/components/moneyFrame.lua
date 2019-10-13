@@ -84,7 +84,7 @@ function MoneyFrame:OnEnter()
 			local coins = GetMoneyString(owner.money, true)
 			local color = Addon:GetOwnerColor(owner)
 
-			GameTooltip:AddDoubleLine(icon .. ' ' .. owner.name, coins, color.r, color.g, color.b, 1,1,1)
+			GameTooltip:AddDoubleLine(owner.name, coins, color.r, color.g, color.b, 1,1,1)  --icon .. ' ' .. 
 		end
 	end
 
