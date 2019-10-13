@@ -1,7 +1,7 @@
 ﻿local _, ns = ...
 local M, R, U, I = unpack(ns)
 local S = M:GetModule("Skins")
-local cr, cg, cb = I.r, I.g, I.b
+
 local _G = getfenv(0)
 local pairs, tinsert, select = pairs, tinsert, select
 local GetNumQuestLogEntries, GetQuestLogTitle, GetNumQuestWatches = GetNumQuestLogEntries, GetQuestLogTitle, GetNumQuestWatches
@@ -140,6 +140,12 @@ function S:QuestLogLevel()
 					questTitleTag:SetTextColor(1, .5, 1)
 				end
 			end
+		end
+
+		local questNumGroupMates = _G["QuestLogTitle"..i.."GroupMates"]
+		if not questNumGroupMates.anchored then
+			questNumGroupMates:SetPoint("LEFT")
+			questNumGroupMates.anchored = true
 		end
 	end
 end

@@ -53,14 +53,13 @@ function TT:UpdateItemSellPrice()
 end
 
 function TT:AddLineForID(id, linkType, noadd)
-	if (IsShiftKeyDown() or IsControlKeyDown() or IsAltKeyDown()) then
 	for i = 1, self:NumLines() do
 		local line = _G[self:GetName().."TextLeft"..i]
 		if not line then break end
 		local text = line:GetText()
 		if text and text == linkType then return end
 	end
-	if not noadd then self:AddLine(" ") end
+	--if not noadd then self:AddLine(" ") end
 
 	if linkType == types.item then
 		TT.UpdateItemSellPrice(self)
@@ -68,18 +67,21 @@ function TT:AddLineForID(id, linkType, noadd)
 		local bagCount = GetItemCount(id)
 		local bankCount = GetItemCount(id, true) - GetItemCount(id)
 		local itemStackCount = select(8, GetItemInfo(id))
-		if bankCount > 0 then
-			self:AddDoubleLine(BAGSLOT.."/"..BANK..":", I.InfoColor..bagCount.."/"..bankCount)
-		elseif bagCount > 0 then
-			self:AddDoubleLine(BAGSLOT..":", I.InfoColor..bagCount)
-		end
-		if itemStackCount and itemStackCount > 1 then
-			self:AddDoubleLine(U["Stack Cap"]..":", I.InfoColor..itemStackCount)
+		if (not IsAddOnLoaded("Combuctor")) and (IsShiftKeyDown() or IsControlKeyDown() or IsAltKeyDown()) then
+			if bankCount > 0 then
+				self:AddDoubleLine(BAGSLOT.."/"..BANK..":", I.InfoColor..bagCount.."/"..bankCount)
+			elseif bagCount > 0 then
+				self:AddDoubleLine(BAGSLOT..":", I.InfoColor..bagCount)
+			end
+			if itemStackCount and itemStackCount > 1 then
+				self:AddDoubleLine(U["Stack Cap"]..":", I.InfoColor..itemStackCount)
+			end
 		end
 	end
 
-	self:AddDoubleLine(linkType, format(I.InfoColor.."%s|r", id))
-	self:Show()
+	if (IsShiftKeyDown() or IsControlKeyDown() or IsAltKeyDown()) then
+		self:AddDoubleLine(linkType, format(I.InfoColor.."%s|r", id))
+		self:Show()
 	end
 end
 
