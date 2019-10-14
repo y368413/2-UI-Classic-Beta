@@ -2,9 +2,6 @@
 --  ... finer detail for how long items may stay in the inbox
 --  ... PUSH_ITEM event based queue operation
 
-local _, ns = ...
-local M, R, U, I = unpack(ns)
-
 NUM_BAGITEMS_PER_ROW = 6;
 NUM_BAGITEMS_ROWS = 7;
 

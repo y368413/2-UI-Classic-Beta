@@ -7,7 +7,7 @@
 ## Notes: Handynotes with(Shows locations of various old world npcs)
 ## Notes-zhCN: 宝藏将会在地图上标记出，概览所有稀有，判定你是否击杀了一次性稀有。
 ## Notes-zhTW: 宝藏将会在地图上标记出，概覽所有稀有，并判定時候已擊殺過。
-## SavedVariables: HandyNotesDB, HandyNotes_HandyNotesDB, HandyNotes_NPCsClassicDB
+## SavedVariables: HandyNotesDB, HandyNotes_HandyNotesDB, HandyNotes_NPCsDB, HandyNotes_DungeonLocationsDB
 ## Dependencies: _ShiGuang
 
 ## LoadManagers: AddonLoader
@@ -26,4 +26,7 @@ HandyNotes.lua
 HandyNotes.xml
 HandyNotes_HandyNotes.lua
 HandyNotes_EditFrame.lua
+
+# Mod files
 HandyNotes_NPCs.lua
+HandyNotes_DungeonLocations.lua

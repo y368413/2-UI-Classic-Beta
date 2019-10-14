@@ -57554,7 +57554,7 @@ local iconDefault = "Interface\\MINIMAP\\TRACKING\\FlightMaster" -- Remove this 
 local nodes = data["nodes"]
 local icons = {
 	flightmasters = "Interface\\MINIMAP\\TRACKING\\FlightMaster",
-	flightmastersUndiscovered = "Interface\\Addons\\HandyNotes\\flightmaster_undiscovered.tga",
+	flightmastersUndiscovered = "Interface\\Addons\\HandyNotes\\Medias\\flightmaster_undiscovered.tga",
 	auctioneers = "Interface\\MINIMAP\\TRACKING\\Auctioneer",
 	bankers = "Interface\\MINIMAP\\TRACKING\\Banker",
 	guildmasters = "Interface\\MINIMAP\\TRACKING\\POIArrow", -- TODO: Find a better icon
@@ -57948,7 +57948,7 @@ local defaults = {
 }
 
 function Addon:OnInitialize()
-	self.db = LibStub("AceDB-3.0"):New("HandyNotes_NPCsClassicDB", defaults, true)
+	self.db = LibStub("AceDB-3.0"):New("HandyNotes_NPCsDB", defaults, true)
 	db = self.db.profile
 	learned = self.db.char.learned
 
