@@ -1,9 +1,13 @@
---## Author: Mikeprod  ## Version: 1.13_classic-fix1
+--## Author: Mikeprod  ## Version: 1.13.2_classic
 local hooks = {}
 
 local function Hook(source, target, secure)
-    hooks[source] = _G[source]
-    if secure then hooksecurefunc(source, target) else _G[source] = target end
+	hooks[source] = _G[source]
+	if secure then
+		hooksecurefunc(source, target)
+	else
+		_G[source] = target
+	end
 end
 
 local FRIENDS_GROUP_NAME_COLOR = NORMAL_FONT_COLOR
@@ -25,8 +29,22 @@ local GroupTotal = {}
 local GroupOnline = {}
 local GroupSorted = {}
 local FriendRequestString = string.sub(FRIEND_REQUESTS,1,-6)
+local FriendsScrollFrame
+local FriendButtonTemplate
 
-local function ClassColourCode(class,table)
+if FriendsListFrameScrollFrame then
+	FriendsScrollFrame = FriendsListFrameScrollFrame
+	FriendButtonTemplate = "FriendsListButtonTemplate"
+else
+	FriendsScrollFrame = FriendsFrameFriendsScrollFrame
+	FriendButtonTemplate = "FriendsFrameButtonTemplate"
+end
+
+local function ClassColourCode(class, canCooperate, returnTable)
+	if not canCooperate then
+		return returnTable and FRIENDS_GRAY_COLOR or string.format("|cFF%02x%02x%02x", FRIENDS_GRAY_COLOR.r*255, FRIENDS_GRAY_COLOR.g*255, FRIENDS_GRAY_COLOR.b*255)
+	end
+
 	local initialClass = class
 	for k, v in pairs(LOCALIZED_CLASS_NAMES_FEMALE) do
 		if class == v then
@@ -42,14 +60,14 @@ local function ClassColourCode(class,table)
 			end
 		end
 	end
-	local colour = RAID_CLASS_COLORS[class]
+	local colour = class ~= "" and RAID_CLASS_COLORS[class] or FRIENDS_GRAY_COLOR
 	-- Shaman color is incorrectly shared with pally in the table in classic
 	if class == "SHAMAN" then
 		colour.r = 0
 		colour.g = 0.44
 		colour.b = 0.87
 	end
-	if table then
+	if returnTable then
 		return colour
 	else
 		return string.format("|cFF%02x%02x%02x", colour.r*255, colour.g*255, colour.b*255)
@@ -69,6 +87,109 @@ local function FriendGroups_GetTopButton(offset)
 	return 0,0
 end
 
+local function GetOnlineInfoText(client, isMobile, rafLinkType, locationText)
+	if not locationText or locationText == "" then
+		return UNKNOWN
+	end
+	if isMobile then
+		return LOCATION_MOBILE_APP
+	end
+	if (client == BNET_CLIENT_WOW) and (rafLinkType ~= Enum.RafLinkType.None) and not isMobile then
+		if rafLinkType == Enum.RafLinkType.Recruit then
+			return RAF_RECRUIT_FRIEND:format(locationText)
+		else
+			return RAF_RECRUITER_FRIEND:format(locationText)
+		end
+	end
+	return locationText
+end
+
+local function GetFriendInfoById(id)
+	local accountName, characterName, class, level, isFavoriteFriend, isOnline, bnetAccountId, client, canCoop, wowProjectID, lastOnline, isAFK, isGameAFK, isDND, isGameBusy, mobile, zoneName
+	local realmName
+	if C_BattleNet and C_BattleNet.GetFriendAccountInfo then
+		local accountInfo = C_BattleNet.GetFriendAccountInfo(id)
+		if accountInfo then
+			accountName = accountInfo.accountName
+			isFavoriteFriend = accountInfo.isFavorite
+			bnetAccountId = accountInfo.bnetAccountID
+			canCoop = CanCooperateWithGameAccount(accountInfo)
+			isAFK = accountInfo.isAFK
+			isGameAFK = accountInfo.isGameAFK
+			isDND = accountInfo.isDND
+			isGameBusy = accountInfo.isGameBusy
+			mobile = accountInfo.isWowMobile
+			zoneName = accountInfo.areaName
+			lastOnline = accountInfo.lastOnlineTime
+
+			local gameAccountInfo = accountInfo.gameAccountInfo
+
+			if gameAccountInfo then
+				isOnline = gameAccountInfo.isOnline
+				characterName = gameAccountInfo.characterName
+				class = gameAccountInfo.className
+				level = gameAccountInfo.characterLevel
+				client = gameAccountInfo.clientProgram
+				wowProjectID = gameAccountInfo.wowProjectID
+				gameText = gameAccountInfo.richPresence
+				zoneName = gameAccountInfo.areaName
+				realmName = gameAccountInfo.realmName
+			end
+		end
+	else
+		bnetIDAccount, accountName, _, _, characterName, bnetAccountId, client, isOnline, lastOnline, isAFK, isDND, _, _, _, _, wowProjectID, _, _, isFavorite, mobile = BNGetFriendInfo(id)
+
+		if isOnline then
+			_, _, _, realmName, realmID, faction, _, class, _, zoneName, level, gameText, _, _, _, _, _, isGameAFK, isGameBusy, guid, wowProjectID, mobile = BNGetGameAccountInfo(bnetAccountId)
+		end
+
+		canCoop = CanCooperateWithGameAccount(bnetAccountId)
+	end
+
+	if realmName and realmName ~= "" then
+		zoneName = zoneName .. " - " .. realmName
+	end
+
+	return accountName, characterName, class, level, isFavoriteFriend, isOnline, bnetAccountId, client, canCoop, wowProjectID, lastOnline, isAFK, isGameAFK, isDND, isGameBusy, mobile, zoneName, gameText
+end
+
+local function FriendGroups_GetBNetButtonNameText(accountName, client, canCoop, characterName, class, level)
+	local nameText
+
+	-- set up player name and character name
+	if accountName then
+		nameText = accountName
+	else
+		nameText = UNKNOWN
+	end
+
+	-- append character name
+	if characterName then
+		local coopLabel = ""
+		if not canCoop then
+			coopLabel = CANNOT_COOPERATE_LABEL
+		end
+		local characterNameSuffix
+		if not level then
+			characterNameSuffix = coopLabel
+		else
+			characterNameSuffix= level.." "..coopLabel
+		end
+		if client == BNET_CLIENT_WOW then
+			local nameColor = ClassColourCode(class, canCoop)
+			nameText = nameText.." "..nameColor.."("..characterNameSuffix..characterName..")"..FONT_COLOR_CODE_CLOSE
+		else
+			if ENABLE_COLORBLIND_MODE == "1" then
+				characterName = characterName..coopLabel
+			end
+			local characterNameAndLevel = characterNameSuffix..characterName
+			nameText = nameText.." "..FRIENDS_OTHER_NAME_COLOR_CODE.."("..characterNameAndLevel..")"..FONT_COLOR_CODE_CLOSE
+		end
+	end
+
+	return nameText
+end
+
 local function FriendGroups_UpdateFriendButton(button)
 	--local function CampIcon(CampGroup)                   ---DIY by y368413
 		--if ( CampGroup == "Alliance" ) then return "Interface\\TargetingFrame\\UI-PVP-ALLIANCE"
@@ -80,11 +201,10 @@ local function FriendGroups_UpdateFriendButton(button)
 	button.buttonType = FriendButtons[index].buttonType
 	button.id = FriendButtons[index].id
 	local height = FRIENDS_BUTTON_HEIGHTS[button.buttonType]
-	local nameText, nameColor, infoText, broadcastText, isFavoriteFriend
+	local nameText, nameColor, infoText, isFavoriteFriend, statusTexture
 	local hasTravelPassButton = false
 	if button.buttonType == FRIENDS_BUTTON_TYPE_WOW then
 		local info = C_FriendList.GetFriendInfoByIndex(FriendButtons[index].id)
-		broadcastText = nil
 		if info.connected then
 			button.background:SetColorTexture(FRIENDS_WOW_BACKGROUND_COLOR.r, FRIENDS_WOW_BACKGROUND_COLOR.g, FRIENDS_WOW_BACKGROUND_COLOR.b, FRIENDS_WOW_BACKGROUND_COLOR.a)
 			if info.afk then
@@ -94,13 +214,14 @@ local function FriendGroups_UpdateFriendButton(button)
 			else
 				button.status:SetTexture(FRIENDS_TEXTURE_ONLINE)
 			end
-			nameColor = ClassColourCode(info.className,true)  --nameColor = FRIENDS_WOW_NAME_COLOR
+			nameColor = ClassColourCode(info.className, CanCooperateWithGameAccount(C_BattleNet.GetFriendAccountInfo(FriendButtons[index].id)), true) or FRIENDS_WOW_NAME_COLOR
 			nameText = info.name..", "..format(FRIENDS_LEVEL_TEMPLATE, info.level, info.className)
 		else
 			button.background:SetColorTexture(FRIENDS_OFFLINE_BACKGROUND_COLOR.r, FRIENDS_OFFLINE_BACKGROUND_COLOR.g, FRIENDS_OFFLINE_BACKGROUND_COLOR.b, FRIENDS_OFFLINE_BACKGROUND_COLOR.a)
 			button.status:SetTexture(FRIENDS_TEXTURE_OFFLINE)
 			nameText = info.name
 			nameColor = FRIENDS_GRAY_COLOR
+			infoText = FRIENDS_LIST_OFFLINE
 		end
 		infoText = info.mobile and LOCATION_MOBILE_APP or info.area
 		button.gameIcon:Hide()
@@ -108,42 +229,16 @@ local function FriendGroups_UpdateFriendButton(button)
 		button.summonButton:SetPoint("TOPRIGHT", button, "TOPRIGHT", 1, -1)
 		FriendsFrame_SummonButton_Update(button.summonButton)
 	elseif button.buttonType == FRIENDS_BUTTON_TYPE_BNET then
-		local bnetIDAccount, accountName, battleTag, isBattleTag, characterName, bnetIDGameAccount, client, isOnline, lastOnline, isBnetAFK, isBnetDND, messageText, noteText, isRIDFriend, messageTime, wowProjectID, isReferAFriend, canSummonFriend, isFavorite, mobile = BNGetFriendInfo(FriendButtons[index].id)
-		broadcastText = messageText
-		isFavoriteFriend = isFavorite
-		-- set up player name and character name
-		local characterName = characterName
-		if accountName then
-			nameText = accountName
-			if isOnline then
-				characterName = BNet_GetValidatedCharacterName(characterName, battleTag, client)
-			end
-		else
-			nameText = UNKNOWN
-		end
+		local id = FriendButtons[index].id
+		local accountName, characterName, class, level, isFavoriteFriend, isOnline, bnetAccountId, client, canCoop, wowProjectID, lastOnline, isAFK, isGameAFK, isDND, isGameBusy, mobile, zoneName, gameText = GetFriendInfoById(id)
 
-		-- append character name
-		if characterName then
-			local level = select(11, BNGetGameAccountInfo(bnetIDGameAccount))
-			if client == BNET_CLIENT_WOW and CanCooperateWithGameAccount(bnetIDGameAccount) then
-				local class = select(8, BNGetGameAccountInfo(bnetIDGameAccount))
-				local nameColor = ClassColourCode(class) or FRIENDS_WOW_NAME_COLOR_CODE
-				nameText = nameText.." "..nameColor.."["..level.." "..characterName.."]"..FONT_COLOR_CODE_CLOSE
-			else
-				if ENABLE_COLORBLIND_MODE == "1" then
-					characterName = characterName..CANNOT_COOPERATE_LABEL
-				end
-				local characterNameAndLevel = level ~= "" and level.." "..characterName or characterName
-				nameText = nameText.." "..FRIENDS_OTHER_NAME_COLOR_CODE.."["..characterNameAndLevel.."]"..FONT_COLOR_CODE_CLOSE
-			end
-		end
+		nameText = FriendGroups_GetBNetButtonNameText(accountName, client, canCoop, characterName, class, level)
 
 		if isOnline then
-			local _, _, _, realmName, realmID, faction, _, _, _, zoneName, _, gameText, _, _, _, _, _, isGameAFK, isGameBusy, guid, wowProjectID, mobile = BNGetGameAccountInfo(bnetIDGameAccount)
 			button.background:SetColorTexture(FRIENDS_BNET_BACKGROUND_COLOR.r, FRIENDS_BNET_BACKGROUND_COLOR.g, FRIENDS_BNET_BACKGROUND_COLOR.b, FRIENDS_BNET_BACKGROUND_COLOR.a)
-			if isBnetAFK or isGameAFK then
+			if isAFK or isGameAFK then
 				button.status:SetTexture(FRIENDS_TEXTURE_AFK)
-			elseif isBnetDND or isGameBusy then
+			elseif isDND or isGameBusy then
 				button.status:SetTexture(FRIENDS_TEXTURE_DND)
 			else
 				button.status:SetTexture(FRIENDS_TEXTURE_ONLINE)
@@ -166,7 +261,12 @@ local function FriendGroups_UpdateFriendButton(button)
 			end
 			button.gameIcon:SetTexture(BNet_GetClientTexture(client))
 			nameColor = FRIENDS_BNET_NAME_COLOR
-
+			local fadeIcon = (client == BNET_CLIENT_WOW) and (wowProjectID ~= WOW_PROJECT_ID)
+			if fadeIcon then
+				button.gameIcon:SetAlpha(0.6)
+			else
+				button.gameIcon:SetAlpha(1)
+			end
 			--Note - this logic should match the logic in FriendsFrame_ShouldShowSummonButton
 
 			local shouldShowSummonButton = FriendsFrame_ShouldShowSummonButton(button.summonButton)
@@ -202,11 +302,17 @@ local function FriendGroups_UpdateFriendButton(button)
 		else
 			title = group
 		end
-		button.text:SetText(title)
-		button.text:Show()
-
 		local counts = "(" .. GroupOnline[group] .. "/" .. GroupTotal[group] .. ")"
-		nameText = counts
+
+		if button["text"] then
+			button.text:SetText(title)
+			button.text:Show()
+			nameText = counts
+			--button.name:SetJustifyH("RIGHT")
+		else
+			nameText = title.." "..counts
+			--button.name:SetJustifyH("CENTER")
+		end
 		nameColor = FRIENDS_GROUP_NAME_COLOR
 		button.name:SetJustifyH("RIGHT")
 
@@ -220,13 +326,13 @@ local function FriendGroups_UpdateFriendButton(button)
 		button.gameIcon:Hide()
 		button.background:SetColorTexture(FRIENDS_OFFLINE_BACKGROUND_COLOR.r, FRIENDS_OFFLINE_BACKGROUND_COLOR.g, FRIENDS_OFFLINE_BACKGROUND_COLOR.b, FRIENDS_OFFLINE_BACKGROUND_COLOR.a)
 		button.background:SetAlpha(0.5)
-		local scrollFrame = FriendsFrameFriendsScrollFrame
-		local divider = scrollFrame.dividerPool:Acquire()
+		local scrollFrame = FriendsScrollFrame
+		--[[local divider = scrollFrame.dividerPool:Acquire()
 		divider:SetParent(scrollFrame.ScrollChild)
 		divider:SetAllPoints(button)
-		divider:Show()
+		divider:Show()--]]
 	elseif ( button.buttonType == FRIENDS_BUTTON_TYPE_INVITE_HEADER ) then
-		local header = FriendsFrameFriendsScrollFrame.PendingInvitesHeaderButton
+		local header = FriendsScrollFrame.PendingInvitesHeaderButton
 		header:SetPoint("TOPLEFT", button, 1, 0)
 		header:Show()
 		header:SetFormattedText(FRIEND_REQUESTS, BNGetNumFriendInvites())
@@ -240,7 +346,7 @@ local function FriendGroups_UpdateFriendButton(button)
 		end
 		nameText = nil
 	elseif ( button.buttonType == FRIENDS_BUTTON_TYPE_INVITE ) then
-		local scrollFrame = FriendsFrameFriendsScrollFrame
+		local scrollFrame = FriendsScrollFrame
 		local invite = scrollFrame.invitePool:Acquire()
 		invite:SetParent(scrollFrame.ScrollChild)
 		invite:SetAllPoints(button)
@@ -266,7 +372,9 @@ local function FriendGroups_UpdateFriendButton(button)
 	-- finish setting up button if it's not a header
 	if ( nameText ) then
 		if button.buttonType ~= FRIENDS_BUTTON_TYPE_DIVIDER then
+		if button["text"] then
 			button.text:Hide()
+		end
 			button.name:SetJustifyH("LEFT")
 			button.background:SetAlpha(1)
 			button.info:Show()
@@ -286,17 +394,18 @@ local function FriendGroups_UpdateFriendButton(button)
 		button:Hide()
 	end
 	-- update the tooltip if hovering over a button
-	if ( FriendsTooltip.button == button ) then
-		FriendsFrameTooltip_Show(button)
-	end
-	if ( GetMouseFocus() == button ) then
-		FriendsFrameTooltip_Show(button)
+	if ( FriendsTooltip.button == button ) or ( GetMouseFocus() == button ) then
+		if FriendsFrameTooltip_Show then
+			FriendsFrameTooltip_Show(button)
+		else
+			button:OnEnter()
+		end
 	end
 	return height
 end
 
 local function FriendGroups_UpdateFriends()
-	local scrollFrame = FriendsFrameFriendsScrollFrame
+	local scrollFrame = FriendsScrollFrame
 	local offset = HybridScrollFrame_GetOffset(scrollFrame)
 	local buttons = scrollFrame.buttons
 	local numButtons = #buttons
@@ -539,8 +648,8 @@ local function FriendGroups_Update(forceUpdate)
 	-- 1.5 is a magic number which prevents the list scroll to be too long
 	totalScrollHeight = totalButtonHeight + GroupCount * FRIENDS_BUTTON_HEIGHTS[FRIENDS_BUTTON_TYPE_DIVIDER]
 
-	FriendsFrameFriendsScrollFrame.totalFriendListEntriesHeight = totalScrollHeight
-	FriendsFrameFriendsScrollFrame.numFriendListEntries = addButtonIndex
+	FriendsScrollFrame.totalFriendListEntriesHeight = totalScrollHeight
+	FriendsScrollFrame.numFriendListEntries = addButtonIndex
 
 	if buttonCount > #FriendButtons then
 		for i = #FriendButtons + 1, buttonCount do
@@ -666,31 +775,15 @@ local function FriendGroups_Update(forceUpdate)
 	end
 	if showRIDWarning then
 		FriendsListFrame.RIDWarning:Show()
-		FriendsFrameFriendsScrollFrame.scrollBar:Disable()
-		FriendsFrameFriendsScrollFrame.scrollUp:Disable()
-		FriendsFrameFriendsScrollFrame.scrollDown:Disable()
+		FriendsScrollFrame.scrollBar:Disable()
+		FriendsScrollFrame.scrollUp:Disable()
+		FriendsScrollFrame.scrollDown:Disable()
 	else
 		FriendsListFrame.RIDWarning:Hide()
 	end
 	FriendGroups_UpdateFriends()
 end
 
-local function FriendGroups_OnClick(self, button)
-	if not self.text:IsShown() then
-		hooks["FriendsFrameFriendButton_OnClick"](self, button)
-		return
-	end
-
-	local group = self.info:GetText() or ""
-	if button == "RightButton" then
-        --ToggleDropDownMenu(1, group, FriendGroups_Menu, "cursor", 0, 0)
-        ShiGuangDB["FriendGroupsHideOffline"] = not ShiGuangDB["FriendGroupsHideOffline"]
-        FriendGroups_Update()
-    else
-        ShiGuangDB["FriendGroupsCollapsed"][group] = not ShiGuangDB["FriendGroupsCollapsed"][group]
-        FriendGroups_Update()
-    end
-end
 
 local function InviteOrGroup(clickedgroup, invite)
 	local groups = {}
@@ -727,6 +820,52 @@ end
 
 local frame = CreateFrame("Frame")
 frame:RegisterEvent("PLAYER_LOGIN")
+
+local function FriendGroups_OnClick(self, button)
+	if self["text"] and not self.text:IsShown() then
+		hooks["FriendsFrameFriendButton_OnClick"](self, button)
+		return
+	end
+
+	if self.buttonType ~= FRIENDS_BUTTON_TYPE_DIVIDER then
+		if FriendsListButtonMixin then
+			FriendsListButtonMixin.OnClick(self, button)
+			return
+		end
+	end
+
+	local group = self.info:GetText() or ""
+	if button == "RightButton" then
+        ShiGuangDB["FriendGroupsHideOffline"] = not ShiGuangDB["FriendGroupsHideOffline"]
+        FriendGroups_Update()
+    else
+        ShiGuangDB["FriendGroupsCollapsed"][group] = not ShiGuangDB["FriendGroupsCollapsed"][group]
+        FriendGroups_Update()
+    end
+end
+
+local function FriendGroups_OnEnter(self)
+	if ( self.buttonType == FRIENDS_BUTTON_TYPE_DIVIDER ) then
+		if FriendsTooltip:IsShown() then
+			FriendsTooltip:Hide()
+		end
+		return
+	end
+end
+local function HookButtons()
+	local scrollFrame = FriendsScrollFrame
+	local buttons = scrollFrame.buttons
+	local numButtons = #buttons
+	for i = 1, numButtons do
+		if not FriendsFrameFriendButton_OnClick then
+			buttons[i]:SetScript("OnClick", FriendGroups_OnClick)
+		end
+		if not FriendsFrameTooltip_Show then
+			buttons[i]:HookScript("OnEnter", FriendGroups_OnEnter)
+		end
+	end
+end
+
 frame:SetScript("OnEvent", function(self, event, ...)
     --if not MaoRUISettingDB["Misc"]["FriendGroups"] then self:UnregisterAllEvents() return end
 	if event == "PLAYER_LOGIN" then
@@ -735,28 +874,24 @@ frame:SetScript("OnEvent", function(self, event, ...)
 		if not issecurevariable("FriendsFrame_UpdateFriends") then
 			Hook("FriendsFrame_UpdateFriends", FriendGroups_UpdateFriends)
 		end
-		Hook("FriendsFrameFriendButton_OnClick", FriendGroups_OnClick)
-		Hook("FriendsFrameTooltip_Show",function(button)
-			if ( button.buttonType == FRIENDS_BUTTON_TYPE_DIVIDER ) then
-				if FriendsTooltip:IsShown() then
-					FriendsTooltip:Hide()
-				end
-				return
-			end
-		end,true)-- Fixes tooltip showing on groups
-
-		FriendsFrameFriendsScrollFrame.dynamic = FriendGroups_GetTopButton
-		FriendsFrameFriendsScrollFrame.update = FriendGroups_UpdateFriends
+		if FriendsFrameFriendButton_OnClick then
+			Hook("FriendsFrameFriendButton_OnClick", FriendGroups_OnClick)
+		end
+		if FriendsFrameTooltip_Show then
+			Hook("FriendsFrameTooltip_Show", FriendGroups_OnEnter, true)-- Fixes tooltip showing on groups
+		end
+		FriendsScrollFrame.dynamic = FriendGroups_GetTopButton
+		FriendsScrollFrame.update = FriendGroups_UpdateFriends
 
 		--add some more buttons
-		FriendsFrameFriendsScrollFrame.buttons[1]:SetHeight(FRIENDS_FRAME_FRIENDS_FRIENDS_HEIGHT)
-		HybridScrollFrame_CreateButtons(FriendsFrameFriendsScrollFrame, "FriendsFrameButtonTemplate")
+		FriendsScrollFrame.buttons[1]:SetHeight(FRIENDS_FRAME_FRIENDS_FRIENDS_HEIGHT)
+		HybridScrollFrame_CreateButtons(FriendsScrollFrame, FriendButtonTemplate)
 
-		--table.remove(UnitPopupMenus["BN_FRIEND"], 5) --remove target option
-
+		table.remove(UnitPopupMenus["BN_FRIEND"], 5) --remove target option
+		
+		HookButtons()
 
         if ShiGuangDB["FriendGroupsCollapsed"] == nil then ShiGuangDB["FriendGroupsCollapsed"] = {} end
         if ShiGuangDB["FriendGroupsHideOffline"] == nil then ShiGuangDB["FriendGroupsHideOffline"] = true end
-        --if ShiGuangDB["FriendGroupsColourClasses"] == nil then ShiGuangDB["FriendGroupsColourClasses"] = true end
     end
 end)
