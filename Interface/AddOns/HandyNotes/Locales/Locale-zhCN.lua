@@ -1969,6 +1969,7 @@ L["Show Spirit Healers"] = "灵魂医者"
 L["Show Undiscovered"] = "显示未开启的飞行点"
 L["Show Vendors"] = "商人"
 L["Show Weapon Masters"] = "武器大师"
+L["Show Mount Trainers"] = "坐骑商人"
 --[[Translation missing --]]
 L["Show which alts can learn a recipe in the item's tooltip"] = "Show which alts can learn a recipe in the item's tooltip"
 L["Show/Hide Toggle"] = "切换显示/隐藏"

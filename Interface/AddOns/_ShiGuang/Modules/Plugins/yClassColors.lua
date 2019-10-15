@@ -140,7 +140,7 @@ hooksecurefunc("FriendsFrame_UpdateFriends", friendsFrame)
 
 -- Whoframe
 local columnTable = {}
-local function updateWhoList()
+hooksecurefunc("WhoList_Update", function()
 	local whoOffset = FauxScrollFrame_GetOffset(WhoListScrollFrame)
 	local playerZone = GetRealZoneText()
 	local playerGuild = GetGuildInfo("player")
@@ -168,5 +168,4 @@ local function updateWhoList()
 			variableText:SetText(columnTable[UIDropDownMenu_GetSelectedID(WhoFrameDropDown)])
 		end
 	end
-end
-hooksecurefunc("WhoList_Update", updateWhoList)
+end)

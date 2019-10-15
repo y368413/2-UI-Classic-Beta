@@ -3399,7 +3399,8 @@ nodes[1454] = {
 	},
 	[69201300] = {
 		name = L["Kildar"],
-		category = "trainers",
+		npcID = 4752,
+		category = "mountTrainer",
 		description = L["Wolf Riding Instructor"],
 		faction = "Horde",
 	},
@@ -3503,7 +3504,8 @@ nodes[1454] = {
 	},
 	[80202320] = {
 		name = L["Shayis Steelfury"],
-		category = "trainers",
+		category = "primaryProfession",
+		profession = "blacksmithing",
 		description = L["Armor Crafter"],
 		faction = "Horde",
 	},
@@ -3555,7 +3557,8 @@ nodes[1454] = {
 	},
 	[79602360] = {
 		name = L["Borgosh Corebender"],
-		category = "trainers",
+		category = "primaryProfession",
+		profession = "blacksmithing",
 		description = L["Weaponsmith"],
 		faction = "Horde",
 	},
@@ -4317,7 +4320,8 @@ nodes[1455] = {
 	},
 	[50204260] = {
 		name = L["Grumnus Steelshaper"],
-		category = "trainers",
+		category = "primaryProfession",
+		profession = "blacksmithing",
 		description = L["Armor Crafter"],
 		faction = "Alliance",
 	},
@@ -4476,7 +4480,8 @@ nodes[1455] = {
 	},
 	[49804500] = {
 		name = L["Ironus Coldsteel"],
-		category = "trainers",
+		category = "primaryProfession",
+		profession = "blacksmithing",
 		description = L["Special Weapon Crafter"],
 		faction = "Alliance",
 	},
@@ -5898,7 +5903,8 @@ nodes[1457] = {
 	},
 	[38601600] = {
 		name = L["Jartsam"],
-		category = "trainers",
+		npcID = 4753,
+		category = "mountTrainer",
 		description = L["Nightsaber Riding Instructor"],
 		faction = "Alliance",
 	},
@@ -12284,7 +12290,8 @@ nodes[1448] = {
 	},
 	[65600280] = {
 		name = L["Meilosh"],
-		category = "trainers",
+		category = "primaryProfession",
+		profession = "tailoring",
 		faction = "Neutral",
 	},
 	[62202560] = {
@@ -13965,7 +13972,8 @@ nodes[1444] = {
 	},
 	[89404640] = {
 		name = L["Caryssia Moonhunter"],
-		category = "trainers",
+		category = "primaryProfession",
+		profession = "Leatherworking",
 		description = L["Tribal Leatherworking Trainer"],
 		faction = "Alliance",
 	},
@@ -23685,7 +23693,8 @@ nodes[1427] = {
 	},
 	[63607580] = {
 		name = L["Sarah Tanner"],
-		category = "trainers",
+		category = "primaryProfession",
+		profession = "Leatherworking",
 		description = L["Master Elemental Leatherworker"],
 		faction = "Alliance",
 	},
@@ -25650,7 +25659,8 @@ nodes[1417] = {
 	},
 	[28204500] = {
 		name = L["Brumn Winterhoof"],
-		category = "trainers",
+		category = "primaryProfession",
+		profession = "Leatherworking",
 		description = L["Master Elemental Leatherworker"],
 		faction = "Horde",
 	},
@@ -35825,7 +35835,8 @@ nodes[1412] = {
 	},
 	[47605840] = {
 		name = L["Kar Stormsinger"],
-		category = "trainers",
+		npcID = 3690,
+		category = "mountTrainer",
 		description = L["Kodo Riding Instructor"],
 		faction = "Horde",
 	},
@@ -37883,7 +37894,8 @@ nodes[1411] = {
 	},
 	[55207540] = {
 		name = L["Xar'Ti"],
-		category = "trainers",
+		npcID = 7953,
+		category = "mountTrainer",
 		description = L["Raptor Riding Trainer"],
 		faction = "Horde",
 	},
@@ -39151,7 +39163,8 @@ nodes[1426] = {
 	},
 	[63805020] = {
 		name = L["Ultham Ironhorn"],
-		category = "trainers",
+		npcID = 4772,
+		category = "mountTrainer",
 		description = L["Ram Riding Instructor"],
 		faction = "Alliance",
 	},
@@ -39176,7 +39189,8 @@ nodes[1426] = {
 	},
 	[49204800] = {
 		name = L["Binjy Featherwhistle"],
-		category = "trainers",
+		npcID = 7954,
+		category = "mountTrainer",
 		description = L["Mechanostrider Pilot"],
 		faction = "Alliance",
 	},
@@ -40365,7 +40379,8 @@ nodes[1420] = {
 	},
 	[60005240] = {
 		name = L["Velma Warnam"],
-		category = "trainers",
+		npcID = 4773,
+		category = "mountTrainer",
 		description = L["Undead Horse Riding Instructor"],
 		faction = "Horde",
 	},
@@ -42446,7 +42461,8 @@ nodes[1429] = {
 	},
 	[84206480] = {
 		name = L["Randal Hunter"],
-		category = "trainers",
+		npcID = 4732,
+		category = "mountTrainer",
 		description = L["Horse Riding Instructor"],
 		faction = "Alliance",
 	},
@@ -57584,6 +57600,7 @@ local icons = {
 	mining = "Interface\\ICONS\\Trade_Mining",
 	skinning = "Interface\\ICONS\\inv_misc_pelt_wolf_01",
 	tailoring = "Interface\\ICONS\\Trade_Tailoring",
+	mountTrainer = "Interface\\MINIMAP\\TRACKING\\Profession",
 }
 
 local PROFESSIONS = { }
@@ -57644,7 +57661,7 @@ function pluginHandler:OnEnter(uiMapId, coord)
 		if (nodeData.description) then
 			tooltip:AddLine(nodeData.description, 0, 0.6, 0.1)
 		end
-		if nodeData.subcategory == "weaponmaster" then
+		if nodeData.subcategories and nodeData.subcategories["weaponmaster"] then
 			if nodeData.npcID and data["weaponmasters"][nodeData.npcID] then
 				for skill in data["weaponmasters"][nodeData.npcID]:gmatch("([^,]+)") do
 					skill = tonumber(skill)
@@ -57690,7 +57707,7 @@ do
 				if not (value.category == "flightmasters") or db.showFlightMasters and (not value.classes or value.classes[class]) then
 				if not (value.category == "guildmasters") or db.showGuildMasters then
 				if not (value.category == "rares") or db.showRares then
-				if not (value.subcatogories and value.subcategories["weaponmaster"]) or db.showWeaponMasters then
+				if not (value.category == "trainers" and value.subcategories and value.subcategories["weaponmaster"]) or db.showWeaponMasters then
 				if not (value.category == "spirithealers") or db.showSpiritHealers then
 				if not (value.category == "vendors") or ((db.showAmmoVendors and (value.vendors and value.vendors['ammo'])) or (db.showReagentVendors and (value.subcategories and value.subcategories["reagent"])) or (db.showPoisonVendors and (value.subcategories and value.subcategories["poison"])) or (db.showMisc)) then
 				if not (value.category == "repair") or ((db.showAmmoVendors and (value.vendors and value.vendors['ammo'])) or db.showRepair) then
@@ -57698,8 +57715,9 @@ do
 				if not (value.category == "bankers") or db.showBankers then
 				if not (value.category == "innkeepers") or db.showInnkeepers then
 				if not (value.category == "mailboxes") or db.showMailboxes then
+				if not (value.category == "mountTrainer") or db.showMountTrainers then
 				if not (value.category == "stablemasters") or class == "HUNTER" then -- Hide stablemasters for non-hunters
-				if not (value.category == "trainers" and value.description == "Pet Trainer") or class == "HUNTER" or db.showClassTrainers == "ALL" then -- Hide pet trainers for non-hunters
+				if not (value.category == "trainers" and value.description == L["Pet Trainer"]) or class == "HUNTER" or db.showClassTrainers == "ALL" then -- Hide pet trainers for non-hunters
 				if not (value.category == "trainers" and value.subcategories and value.subcategories["classTrainer"]) or ((db.showClassTrainers == "ALL") or (db.showClassTrainers == "MINE" and value.classes and value.classes[class])) then
 				if not (value.category == "primaryProfession" or value.category == "secondaryProfession") or ((db.showProfessions == "ALL") or (db.showProfessions == "MINE" and professions[value.profession])) then
 					-- TODO merge subcategory and subcategories
@@ -57751,6 +57769,7 @@ do
 				end
 				end
 				end
+				end
 			end
 			state, value = next(data, state)
 		end
@@ -57778,7 +57797,7 @@ do
 					if not (value.category == "flightmasters") or db.showFlightMasters and (not value.classes or value.classes[class]) then
 					if not (value.category == "guildmasters") or db.showGuildMasters then
 					if not (value.category == "rares") or db.showRares then
-					if not (value.subcategory == "weaponmaster") or db.showWeaponMasters then
+					if not (value.subcategories and value.subcategories["weaponmaster"]) or db.showWeaponMasters then
 					if not (value.category == "spirithealers") or db.showSpiritHealers then
 					if not (value.category == "vendors") or ((db.showAmmoVendors and (value.vendors and value.vendors['ammo'])) or (db.showReagentVendors and (value.subcategories and value.subcategories["reagent"])) or (db.showPoisonVendors and (value.subcategories and value.subcategories["poison"])) or (db.showMisc)) then
 					if not (value.category == "repair") or ((db.showAmmoVendors and (value.vendors and value.vendors['ammo'])) or db.showRepair) then
@@ -57786,9 +57805,10 @@ do
 					if not (value.category == "bankers") or db.showBankers then
 					if not (value.category == "innkeepers") or db.showInnkeepers then
 					if not (value.category == "mailboxes") or db.showMailboxes then
+					if not (value.category == "mountTrainer") or db.showMountTrainers then
 					if not (value.category == "stablemasters") or class == "HUNTER" then -- Hide stablemasters for non-hunters
-					if not (value.category == "trainers" and value.description == "Pet Trainer") or class == "HUNTER" or db.showClassTrainers == "ALL" then -- Hide pet trainers for non-hunters
-					if not (value.category == "trainers" and value.subcategory == "classTrainer") or ((db.showClassTrainers == "ALL") or (db.showClassTrainers == "MINE" and value.classes and value.classes[class])) then
+					if not (value.category == "trainers" and value.description == L["Pet Trainer"]) or class == "HUNTER" or db.showClassTrainers == "ALL" then -- Hide pet trainers for non-hunters
+					if not (value.category == "trainers" and value.subcategories and value.subcategories["classTrainer"]) or ((db.showClassTrainers == "ALL") or (db.showClassTrainers == "MINE" and value.classes and value.classes[class])) then
 					if not (value.category == "primaryProfession" or value.category == "secondaryProfession") or ((db.showProfessions == "ALL") or (db.showProfessions == "MINE" and professions[value.profession])) then
 						
 					local icon = icons[value.category] or iconDefault
@@ -57817,6 +57837,7 @@ do
 							icon = learned[value.fpName] and icons[value.category] or icons["flightmastersUndiscovered"]
 						end
 						return state, zone, icon, db.continentScale, db.continentAlpha
+					end
 					end
 					end
 					end
@@ -57922,6 +57943,7 @@ local defaults = {
 		showWeaponMasters = true,
 		showProfessions = "ALL",
 		showClassTrainers = "MINE",
+		showMountTrainers = true,
 		showMisc = true,
 		showReagentVendors = true,
 		showPoisonVendors = true,
@@ -58107,6 +58129,11 @@ function Addon:PLAYER_LOGIN()
 	name = L["Show Weapon Masters"],
 	order = 3.7,
   },
+  showMountTrainers = {
+	type = "toggle",
+	name = L["Show Mount Trainers"],
+	order = 3.71,
+  },
   showRares = {
 	type = "toggle",
 	name = L["Show Rares"],
@@ -58281,6 +58308,7 @@ function HandyNotes_NPCsDropDownMenu(frame, level, menuList)
 			showAuctioneers = L["Show Auctioneers"],
 			showInnkeepers = L["Show Innkeepers"],
 			showGuildMasters = L["Show Guildmasters"],
+			showMountTrainers = L["Show Mount Trainers"],
 			showRares = L["Show Rares"],
 		}
 
@@ -58572,6 +58600,11 @@ function HandyNotes_NPCs_Options:OnInitialize()
 						name = L["Show Weapon Masters"],
 						order = 3.7,
 					},
+					showMountTrainers = {
+						type = "toggle",
+						name = L["Show Mount Trainers"],
+						order = 3.71,
+					},
 					showRares = {
 						type = "toggle",
 						name = L["Show Rares"],
@@ -58700,7 +58733,7 @@ local function update(self)
 				frame:SetScript("OnEnter", function(self) Search:TooltipShow(self, entry.itemID) end)
 				frame:SetScript("OnLeave", function(self) GameTooltip:Hide() end)
 			end
-			if entry.type == "npc" or entry.type == "weaponmaster" then
+			if entry.type == "npc" or entry.type == "weaponmaster" or entry.type == "mountTrainer" then
 				lastSearchedItem = entry.type == "npc" and entry.itemID or nil
 				local distanceText = ''
 				local zoneName = HBD:GetLocalizedMap(entry.zone)
@@ -58716,6 +58749,20 @@ local function update(self)
 				end
 				frame.rtext:SetText(distanceText)
 				frame:SetScript("OnEnter", nil)
+				if entry.type == "mountTrainer" then
+					frame:SetScript("OnEnter", function(self)
+						local tooltip = GameTooltip
+						if ( frame:GetCenter() > UIParent:GetCenter() ) then -- compare X coordinate
+							tooltip:SetOwner(frame, "ANCHOR_LEFT")
+						else
+							tooltip:SetOwner(frame, "ANCHOR_RIGHT")
+						end
+						tooltip:AddLine(entry.name)
+						tooltip:AddLine(entry.desc, 0, 0.6, 0.1)
+						tooltip:Show()
+						return
+					end)
+				end
 				if entry.type == "weaponmaster" then
 					frame:SetScript("OnEnter", function(self)
 						local tooltip = GameTooltip
@@ -58880,14 +58927,20 @@ function Search:OnInitialize()
 	window.wmButton = CreateFrame("Button", nil, window, "UIPanelButtonTemplate")
 	window.wmButton:SetSize(36, 26)
 	window.wmButton:SetText('WM')
-	window.wmButton:SetPoint("LEFT", window.zoneButton, "RIGHT", 10, 0)
+	window.wmButton:SetPoint("LEFT", window.zoneButton, "RIGHT", 6, 0)
 	window.wmButton:SetScript("OnClick", function() self:DumpWeaponMasters() end)
 	
 	window.recipeButton = CreateFrame("Button", nil, window, "UIPanelButtonTemplate")
 	window.recipeButton:SetSize(36, 26)
 	window.recipeButton:SetText('R')
-	window.recipeButton:SetPoint("LEFT", window.wmButton, "RIGHT", 10, 0)
+	window.recipeButton:SetPoint("LEFT", window.wmButton, "RIGHT", 6, 0)
 	window.recipeButton:SetScript("OnClick", function() self:DumpRecipesForZone() end)
+	
+	window.mtButton = CreateFrame("Button", nil, window, "UIPanelButtonTemplate")
+	window.mtButton:SetSize(36, 26)
+	window.mtButton:SetText('MT')
+	window.mtButton:SetPoint("LEFT", window.recipeButton, "RIGHT", 6, 0)
+	window.mtButton:SetScript("OnClick", function() self:DumpMountTrainers() end)
 
 	self:RegisterChatCommand("npcs", "SlashCommand") -- Maybe move this into the main file
 	self.window = window
@@ -59067,7 +59120,6 @@ function Search:DumpWeaponMasters()
 			skillsWeCanLearn[k] = true
 		end
 	end
-	local npcsThatCanTeachUs = { }
 	for zone, coords in pairs(data["nodes"]) do
 		for coord, npc in pairs(data["nodes"][zone]) do
 			if npc.npcID and data["weaponmasters"][npc.npcID] then
@@ -59088,7 +59140,28 @@ function Search:DumpWeaponMasters()
 		end
 	end
 	table.sort(list, function(a,b) return a.distance < b.distance or a.distance == b.distance and a.name < b.name end)
-	self:UpdateHeader(L["Weapon Masters"], nil)
+	self:UpdateHeader(L["Weapon Masters"], L["Distance"])
+	update(self.window.f)
+end
+
+function Search:DumpMountTrainers()
+	table.wipe(list)
+	local playerX, playerY, playerMapID = HBD:GetPlayerZonePosition()
+
+	for zone, coords in pairs(data["nodes"]) do
+		for coord, npc in pairs(data["nodes"][zone]) do
+			if npc.category == "mountTrainer" and npc.npcID and (npc.faction == "Neutral" or npc.faction == data.faction) then
+				local npcX, npcY = HandyNotes:getXY(coord)
+				distance = HBD:GetZoneDistance(playerMapID, playerX, playerY, zone, npcX, npcY)
+				if distance == nil then
+					distance = 10000000 -- Just some unreasonably large value for sorting
+				end
+				table.insert(list, { name = npc.name, npcID = npc.npcID, type = "mountTrainer", desc = npc.description, distance = Round(distance), zone = zone, coord = coord })
+			end
+		end
+	end
+	table.sort(list, function(a,b) return a.distance < b.distance or a.distance == b.distance and a.name < b.name end)
+	self:UpdateHeader(L["Mount Trainers"], L["Distance"])
 	update(self.window.f)
 end
 
