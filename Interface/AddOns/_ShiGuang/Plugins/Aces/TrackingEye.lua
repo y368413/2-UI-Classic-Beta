@@ -45,7 +45,7 @@ local LDB = LibStub("LibDataBroker-1.1"):NewDataObject("TrackingEyeData",
 {
 	type = "group",
 	text = "Tracking Eye",
-	icon = "",
+	icon = "Interface\\AddOns\\_ShiGuang\\Media\\Modules\\Role\\bubbleTex",
 	OnClick = function(_, msg)
 		if msg == "LeftButton" then
 			TrackingEye:Menu_Open();
@@ -61,6 +61,6 @@ function TrackingEye:OnInitialize()
 	LDBIcon:Register("TrackingEyeData", LDB)
 	--LDBIcon:GetMinimapButton("TrackingEyeData"):SetScale(1.13)
 	LDB.icon = GetTrackingTexture()
-	self:RegisterChatCommand("te", "MinimapButton_ToggleLock")
+	--self:RegisterChatCommand("te", "MinimapButton_ToggleLock")
 	self:RegisterEvent("MINIMAP_UPDATE_TRACKING", function() LDB.icon = GetTrackingTexture() end)
 end
