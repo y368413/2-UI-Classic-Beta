@@ -1,5 +1,5 @@
 -----------------------------------------
--- SortBags 0.1.2, shirsig
+-- SortBags 0.1.3, shirsig
 -- https://github.com/shirsig/SortBags
 -----------------------------------------
 
@@ -40,7 +40,7 @@ function _G.GetSortBagsRightToLeft(enabled)
 end
 
 function _G.SetSortBagsRightToLeft(enabled)
-	SortBagsRightToLeft = enabled and 1 or nil
+	_G.SortBagsRightToLeft = enabled and 1 or nil
 end
 
 local function set(...)
@@ -210,9 +210,37 @@ function Move(src, dst)
     end
 end
 
+do
+    local patterns = {}
+    for i = 1, 10 do
+    	local text = gsub(ITEM_SPELL_CHARGES, "(-?%d+)(.-)|4([^;]-);", function(numberString, gap, numberForms)
+	        local singular, dual, plural
+	        _, _, singular, dual, plural = strfind(numberForms, "(.+):(.+):(.+)");
+	        if not singular then
+	            _, _, singular, plural = strfind(numberForms, "(.+):(.+)")
+	        end
+	        local i = abs(tonumber(numberString))
+	        local numberForm
+	        if i == 1 then
+	            numberForm = singular
+	        elseif i == 2 then
+	            numberForm = dual or plural
+	        else
+	            numberForm = plural
+	        end
+	        return numberString .. gap .. numberForm
+	    end)
+        patterns[text] = i
+    end
+
+	function itemCharges(text)
+        return patterns[text]
+	end
+end
+
 function TooltipInfo(container, position)
 	-- local chargesPattern = "^" .. gsub(gsub(ITEM_SPELL_CHARGES_P1, "%%d", "(%%d+)"), "%%%d+%$d", "(%%d+)") .. "$" TODO retail
-	local chargesPattern = "^" .. gsub(gsub(ITEM_SPELL_CHARGES, "%%d", "(%%d+)"), "%%%d+%$d", "(%%d+)") .. "$"
+	--local chargesPattern = "^" .. gsub(gsub(ITEM_SPELL_CHARGES, "%%d", "(%%d+)"), "%%%d+%$d", "(%%d+)") .. "$"
 
 	sortTooltip:SetOwner(UIParent, "ANCHOR_NONE")
 	sortTooltip:ClearLines()
@@ -227,9 +255,9 @@ function TooltipInfo(container, position)
 	for i = 1, sortTooltip:NumLines() do
 		local text = _G[sortTooltip:GetName().."TextLeft"..i]:GetText()
 
-		local _, _, chargeString = strfind(text, chargesPattern)
-		if chargeString then
-			charges = tonumber(chargeString)
+		local charges = itemCharges(text)
+		if charges then
+			charges = charges
 		elseif strfind(text, "^" .. ITEM_SPELL_TRIGGER_ONUSE) then
 			usable = true
 		elseif text == ITEM_SOULBOUND then
@@ -394,7 +422,7 @@ function Item(container, position)
 	if link then
 		local _, _, itemID, enchantID, suffixID, uniqueID = strfind(link, "item:(%d+):(%d*):(%d*):(%d*)")
 		itemID = tonumber(itemID)
-		local _, _, quality, _, _, _, _, stack, slot, _, _, classId, subClassId = GetItemInfo("item:" .. itemID)
+		local _, _, quality, _, _, _, _, stack, slot, _, sellPrice, classId, subClassId = GetItemInfo("item:" .. itemID)
 		local charges, usable, soulbound, quest, conjured = TooltipInfo(container, position)
 
 		local sortKey = {}
@@ -458,10 +486,12 @@ function Item(container, position)
 		-- common quality
 		elseif quality == 1 then
 			tinsert(sortKey, 13)
+			tinsert(sortKey, -sellPrice)
 
 		-- junk
 		elseif quality == 0 then
 			tinsert(sortKey, 14)
+			tinsert(sortKey, sellPrice)
 		end
 		
 		tinsert(sortKey, classId)

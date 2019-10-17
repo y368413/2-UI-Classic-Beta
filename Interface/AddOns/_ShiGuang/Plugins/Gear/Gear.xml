@@ -2,6 +2,7 @@
 	<Script file="Molinari.lua"/>
 	<Script file="AHhelper.lua"/>
 	<Script file="AutoFollow.lua"/>
+	<Script file="LockboxMailer.lua"/>
 	<Script file="NeedsFoodBadly.lua"/>
 	<Script file="solQuickShifter.lua"/>
 </Ui>
