@@ -6,8 +6,8 @@ function LockboxMailer:FindLockboxes()
     wipe(self.LockboxTable)
     for bag = BACKPACK_CONTAINER, NUM_BAG_SLOTS do
         for slot = 1, GetContainerNumSlots(bag) do
-            local itemLink = GetContainerItemLink(bag, slot)
-            if itemLink then
+            local lootable, itemLink = select(6,GetContainerItemInfo(bag, slot))
+            if lootable and itemLink then
                 tooltip:SetBagItem(bag, slot)
                 if tooltip:IsShown() then
                     for i = 1, tooltip:NumLines() do

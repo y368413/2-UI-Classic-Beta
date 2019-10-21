@@ -1,4 +1,4 @@
---## Version: 1.0.7  ## Author: LODWise
+--## Version: 1.0.8  ## Author: LODWise
 local addon = CreateFrame('Button', 'MudmenItemColor');
 local defaultSlotWidth, defaultSlotHeight = 68, 68;
 
@@ -396,6 +396,7 @@ LE_ITEM_QUALITY_BAG = #BAG_ITEM_QUALITY_COLORS + 8;
 LE_ITEM_QUALITY_CONJURED = #BAG_ITEM_QUALITY_COLORS + 9;
 LE_ITEM_QUALITY_CONSUMABLE2 = #BAG_ITEM_QUALITY_COLORS + 10;
 LE_ITEM_QUALITY_TOOL = #BAG_ITEM_QUALITY_COLORS + 11;
+LE_ITEM_QUALITY_WEVENT = #BAG_ITEM_QUALITY_COLORS + 15;
 
 BAG_ITEM_QUALITY_COLORS[LE_ITEM_QUALITY_POOR] = {r=0.505, g=0.509, b=0.533}
 BAG_ITEM_QUALITY_COLORS[LE_ITEM_QUALITY_COMMON] = {r=1, g=1, b=1}
@@ -412,6 +413,8 @@ BAG_ITEM_QUALITY_COLORS[LE_ITEM_QUALITY_BAG] = {r=0.360, g=1, b=0.482}
 BAG_ITEM_QUALITY_COLORS[LE_ITEM_QUALITY_CONJURED] = {r=0.78, g=.61, b=0.43}
 BAG_ITEM_QUALITY_COLORS[LE_ITEM_QUALITY_CONSUMABLE2] = {r=0.125, g=0.411, b=0.309}
 BAG_ITEM_QUALITY_COLORS[LE_ITEM_QUALITY_TOOL] = {r=0.713, g=0.262, b=0.372}
+BAG_ITEM_QUALITY_COLORS[LE_ITEM_QUALITY_WEVENT] = {r=1, g=0.596, b=0.141}
+
 
 function GetQualityColor(quality)
     local q = BAG_ITEM_QUALITY_COLORS[quality];
@@ -699,6 +702,11 @@ function GetItemQuality(itemId)
     if (itemId == 10830) then quality = LE_ITEM_QUALITY_CONSUMABLE2;end
 	if (itemId == 1399) then quality = LE_ITEM_QUALITY_CONSUMABLE2;end
 	if (itemId == 17202) then quality = LE_ITEM_QUALITY_CONSUMABLE2;end
+	if (itemId == 3434) then quality = LE_ITEM_QUALITY_CONSUMABLE2;end
+		if (itemId == 4480) then quality = LE_ITEM_QUALITY_CONSUMABLE2;end
+	if (itemId == 4481) then quality = LE_ITEM_QUALITY_CONSUMABLE2;end
+	if (itemId == 4479) then quality = LE_ITEM_QUALITY_CONSUMABLE2;end
+	
 	
     --ARROW--
 	if (itemId == 2946) then quality = LE_ITEM_QUALITY_ARROW;end
@@ -792,6 +800,45 @@ function GetItemQuality(itemId)
 	if (itemId == 6893) then quality = LE_ITEM_QUALITY_QUEST;end
 	if (itemId == 13197) then quality = LE_ITEM_QUALITY_QUEST;end
 	if (itemId == 6929) then quality = LE_ITEM_QUALITY_QUEST;end
+	if (itemId == 6842) then quality = LE_ITEM_QUALITY_QUEST;end
+	
+	----Events items----
+	
+	---Hallow's End---
+	--WANDS--
+	if (itemId == 20397) then quality = LE_ITEM_QUALITY_WEVENT;end
+	if (itemId == 20398) then quality = LE_ITEM_QUALITY_WEVENT;end
+	if (itemId == 20414) then quality = LE_ITEM_QUALITY_WEVENT;end
+	if (itemId == 20410) then quality = LE_ITEM_QUALITY_WEVENT;end
+	if (itemId == 20399) then quality = LE_ITEM_QUALITY_WEVENT;end
+	if (itemId == 20411) then quality = LE_ITEM_QUALITY_WEVENT;end
+	if (itemId == 20409) then quality = LE_ITEM_QUALITY_WEVENT;end
+	if (itemId == 20413) then quality = LE_ITEM_QUALITY_WEVENT;end
+	--MASKS--
+	if (itemId == 20566) then quality = LE_ITEM_QUALITY_WEVENT;end
+	if (itemId == 20573) then quality = LE_ITEM_QUALITY_WEVENT;end
+	if (itemId == 20568) then quality = LE_ITEM_QUALITY_WEVENT;end
+	if (itemId == 20570) then quality = LE_ITEM_QUALITY_WEVENT;end
+	if (itemId == 20574) then quality = LE_ITEM_QUALITY_WEVENT;end
+	if (itemId == 20565) then quality = LE_ITEM_QUALITY_WEVENT;end
+	if (itemId == 20561) then quality = LE_ITEM_QUALITY_WEVENT;end
+	if (itemId == 20572) then quality = LE_ITEM_QUALITY_WEVENT;end
+	if (itemId == 20569) then quality = LE_ITEM_QUALITY_WEVENT;end
+	if (itemId == 20562) then quality = LE_ITEM_QUALITY_WEVENT;end
+	if (itemId == 20567) then quality = LE_ITEM_QUALITY_WEVENT;end
+	if (itemId == 20391) then quality = LE_ITEM_QUALITY_WEVENT;end
+	if (itemId == 20564) then quality = LE_ITEM_QUALITY_WEVENT;end
+	if (itemId == 20392) then quality = LE_ITEM_QUALITY_WEVENT;end
+	if (itemId == 20571) then quality = LE_ITEM_QUALITY_WEVENT;end
+	if (itemId == 20563) then quality = LE_ITEM_QUALITY_WEVENT;end
+	--BAGS--
+	if (itemId == 20393) then quality = LE_ITEM_QUALITY_WEVENT;end
+	if (itemId == 20400) then quality = LE_ITEM_QUALITY_WEVENT;end
+	--CANDY--
+	if (itemId == 20389) then quality = LE_ITEM_QUALITY_WEVENT;end
+	if (itemId == 20388) then quality = LE_ITEM_QUALITY_WEVENT;end
+	if (itemId == 20390) then quality = LE_ITEM_QUALITY_WEVENT;end
+	if (itemId == 20516) then quality = LE_ITEM_QUALITY_WEVENT;end
     return quality;
 end
 
