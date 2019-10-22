@@ -49,10 +49,11 @@ RelicInspector_TITLE = "|cff8080ff[提示]|r聖物屬性";
 Savedinstances_TITLE = "|c00FF68CC[小號]|r管理助手";
 QuestNotifier_TITLE = "|cff0080ff[任務]|r任務通報";
 Boomkinator_TITLE = "|c00FF68CC[輸出]|r技能監控";
-DialogKey_TITLE = '|cff0080ff[任務]|r快捷對話'
-Farmer_TITLE = '|cff8080ff[拾取]|r拾取提示'
-HardYards_TITLE = '|cFFD2691E [菜单]|r距离显示:'
-MTG_TITLE = "|cff69ccf0[購買]|r魚人助手"
+DialogKey_TITLE = '|cff0080ff[任務]|r快捷對話';
+Farmer_TITLE = '|cff8080ff[拾取]|r拾取提示';
+HardYards_TITLE = '|cFFD2691E [菜单]|r距离显示:';
+MTG_TITLE = "|cff69ccf0[購買]|r魚人助手";
+ITEMTOOLTIPPROFESSION_TITLE = "|cff8080ff[专业]|r鼠标提示";
 BINDING_HEADER_TARGETCLASSBUTTON = "目标交互"
 ----------------Charms----------------------
 CHARMS_BUY_STACK="你確定購買|cffff0000一組|r下列物品嗎？";

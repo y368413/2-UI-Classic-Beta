@@ -5,4 +5,5 @@
 	<Script file="LockboxMailer.lua"/>
 	<Script file="NeedsFoodBadly.lua"/>
 	<Script file="solQuickShifter.lua"/>
+	<Script file="ItemTooltipProfession.lua"/>
 </Ui>

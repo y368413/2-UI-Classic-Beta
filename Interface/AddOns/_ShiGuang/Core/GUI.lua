@@ -92,6 +92,7 @@ local defaultSettings = {
 		Chatbar = true,
 		ChatWidth = 360,
 		ChatHeight = 121,
+		Outline = false,
 	},
 	Map = {
 		Coord = true,
@@ -437,7 +438,7 @@ local optionList = {		-- type, key, value, name, horizon, horizon2, doubleline
 	  {1, "Misc", "PlacedItemAlert", U["Placed Item Alert"], true},
 	},
 	[5] = {
-		{1, "Chat", "Oldname", U["Default Channel"]},
+		{1, "Chat", "Outline", U["Font Outline"]},
 		{1, "ACCOUNT", "Timestamp", U["Timestamp"], true, false, nil, updateTimestamp},
 		{1, "Chat", "Sticky", U["Chat Sticky"].."*", true, true, nil, updateChatSticky},
 		--{1, "Chat", "WhisperColor", U["Differ WhipserColor"].."*"},

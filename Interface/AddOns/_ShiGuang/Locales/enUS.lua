@@ -33,10 +33,11 @@ RelicInspector_TITLE = "|cff8080ff[Tips]|rRelicInspector";
 Savedinstances_TITLE = "|c00FF68CC[Tips]|rSavedinstances";
 QuestNotifier_TITLE = "|cff0080ff[Quest]|rQuestNotifier";
 Boomkinator_TITLE = "|c00FF68CC[Spell]|rBoomkinator";
-DialogKey_TITLE = '|cff0080ff[Quest]|rDialogKey'
-Farmer_TITLE = '|cff8080ff[Loot]|rFarmer'
-HardYards_TITLE = '|cFFD2691E [Range]|rHardYards:'
-MTG_TITLE = "|cff69ccf0[Buy]|rMrrl'sTradeGame"
+DialogKey_TITLE = '|cff0080ff[Quest]|rDialogKey';
+Farmer_TITLE = '|cff8080ff[Loot]|rFarmer';
+HardYards_TITLE = '|cFFD2691E [Range]|rHardYards:';
+MTG_TITLE = "|cff69ccf0[Buy]|rMrrl'sTradeGame";
+ITEMTOOLTIPPROFESSION_TITLE = "|cff8080ff[Profession]|rTooltip icon";
 BINDING_HEADER_TARGETCLASSBUTTON = "Target Class Button"
 ----------------Charms----------------------
 CHARMS_BUY_STACK="You sure buy|cffff0000 a stack |rthis item？"  ;

@@ -39,8 +39,12 @@ function module:SkinChat()
 	self:SetClampRectInsets(0, 0, 0, 0)
 	self:SetMaxResize(maxWidth, maxHeight)
 	self:SetMinResize(120, 60)
-	self:SetFont(fontStyle, fontSize)  --, "OUTLINE"
-	self:SetShadowOffset(1, -1)
+	if MaoRUISettingDB["Chat"]["Outline"] then
+	  self:SetFont(I.Font[1], fontSize, "OUTLINE")
+	else
+	  self:SetFont(fontStyle, fontSize)
+	  self:SetShadowOffset(1, -1)
+	end
 	self:SetShadowColor(0, 0, 0, 0)
 	self:SetClampRectInsets(0, 0, 0, 0)
 	self:SetClampedToScreen(false)

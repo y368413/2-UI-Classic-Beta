@@ -1,4 +1,4 @@
---## Author: Peter Getov  ## Version: 2.3
+﻿--## Author: Peter Getov  ## Version: 2.4.1
 -- core - table (namespace) shared between every lua file
 local CharacterStatsClassic_UIConfig = {};
 
@@ -663,6 +663,13 @@ function CSC_PaperDollFrame_SetSpellCritChance(statFrame, unit)
 			-- set the new maximum
 			maxSpellCrit = max(maxSpellCrit, statFrame.holyCrit);
 		end
+	elseif (unitClassLoc == "PALADIN") then
+		local paladinHolyCrit = CSC_GetPaladinCritStatsFromTalents();
+		if (paladinHolyCrit > 0) then
+			statFrame.holyCrit = statFrame.holyCrit + paladinHolyCrit;
+			-- set the new maximum
+			maxSpellCrit = max(maxSpellCrit, statFrame.holyCrit);
+		end
 	end
 
 	CSC_PaperDollFrame_SetLabelAndText(statFrame, STAT_CRITICAL_STRIKE, maxSpellCrit, true, maxSpellCrit);
@@ -784,13 +791,19 @@ function CSC_PaperDollFrame_SetDefense(statFrame, unit)
 
 	local numSkills = GetNumSkillLines();
 	local skillIndex = 0;
+	local currentHeader = nil;
 
 	for i = 1, numSkills do
 		local skillName = select(1, GetSkillLineInfo(i));
+		local isHeader = select(2, GetSkillLineInfo(i));
 
-		if (skillName == DEFENSE) then
-			skillIndex = i;
-			break;
+		if isHeader ~= nil and isHeader then
+			currentHeader = skillName;
+		else
+			if (currentHeader == "武器技能" and skillName == DEFENSE) or (currentHeader == "Weapon Skills" and skillName == DEFENSE) then
+				skillIndex = i;
+				break;
+			end
 		end
 	end
 
