@@ -17,7 +17,6 @@ local types = {
 	achievement = ACHIEVEMENTS.."ID:",
 	currency = CURRENCY.."ID:",
 	azerite = U["Trait"].."ID:",
-	mount = "MountID",
 }
 
 local function setupMoneyString(amount)
@@ -63,16 +62,19 @@ function TT:AddLineForID(id, linkType, noadd)
 
 	if linkType == types.item then
 		TT.UpdateItemSellPrice(self)
-
 		local bagCount = GetItemCount(id)
 		local bankCount = GetItemCount(id, true) - GetItemCount(id)
 		local itemStackCount = select(8, GetItemInfo(id))
-		if (not IsAddOnLoaded("Combuctor")) and (IsShiftKeyDown() or IsControlKeyDown() or IsAltKeyDown()) then
-			if bankCount > 0 then
+		if not IsAddOnLoaded("Combuctor") then
+			if bagCount > 0 then
+				if bankCount > 0 then
 				self:AddDoubleLine(BAGSLOT.."/"..BANK..":", I.InfoColor..bagCount.."/"..bankCount)
-			elseif bagCount > 0 then
+				else
 				self:AddDoubleLine(BAGSLOT..":", I.InfoColor..bagCount)
+				end
 			end
+		end
+		if IsShiftKeyDown() or IsControlKeyDown() or IsAltKeyDown() then
 			if itemStackCount and itemStackCount > 1 then
 				self:AddDoubleLine(U["Stack Cap"]..":", I.InfoColor..itemStackCount)
 			end
@@ -101,8 +103,6 @@ function TT:SetHyperLinkID(link)
 		TT.AddLineForID(self, id, types.item)
 	elseif linkType == "currency" then
 		TT.AddLineForID(self, id, types.currency)
-	elseif linkType == "summonmount" then
-    TT.AddLineForID(self, id, types.mount)
 	end
 end
 
@@ -114,6 +114,15 @@ function TT:SetItemID()
 		if keystone then id = tonumber(keystone) end
 		if id then TT.AddLineForID(self, id, types.item) end
 	end
+end
+
+function TT:SetNPCID()
+  local unit = select(2, self:GetUnit())
+  if unit then
+    local guid = UnitGUID(unit) or ""
+    local id = tonumber(guid:match("-(%d+)-%x+$"), 10)
+    if id and guid:match("%a+") ~= "Player" then TT.AddLineForID(self, id, types.NPCs) end
+  end
 end
 
 function TT:UpdateSpellCaster(...)
@@ -156,14 +165,7 @@ function TT:SetupTooltipID()
 	ItemRefShoppingTooltip2:HookScript("OnTooltipSetItem", TT.SetItemID)
 
 -- NPCs
-GameTooltip:HookScript("OnTooltipSetUnit", function(self)
-  local unit = select(2, self:GetUnit())
-  if unit then
-    local guid = UnitGUID(unit) or ""
-    local id = tonumber(guid:match("-(%d+)-%x+$"), 10)
-    if id and guid:match("%a+") ~= "Player" then TT.AddLineForID(self, id, types.NPCs) end
-  end
-end)
+GameTooltip:HookScript("OnTooltipSetUnit", TT.SetNPCID)
 
 	-- Spell caster
 	hooksecurefunc(GameTooltip, "SetUnitAura", TT.UpdateSpellCaster)

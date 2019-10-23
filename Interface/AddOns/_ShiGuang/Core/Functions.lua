@@ -595,8 +595,8 @@ function M:CreateButton(width, height, text, fontSize)
 	if type(text) == "boolean" then
 		M.PixelIcon(bu, fontSize, true)
 	else
-	M.CreateBC(bu)
-	bu.text = M.CreateFS(bu, fontSize or 14, text, true)
+		M.CreateBC(bu)
+		bu.text = M.CreateFS(bu, fontSize or 14, text, true)
 	end
 
 	return bu

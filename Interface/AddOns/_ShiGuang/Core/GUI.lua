@@ -196,6 +196,7 @@ local defaultSettings = {
 		SorasThreat = true,
 		EnhancedMenu = false,
 		AutoDismount = true,
+		TradeTabs = true,
 	},
 	Tutorial = {
 		Complete = false,
@@ -716,7 +717,7 @@ local function CreateOption(i)
 		else
 			local l = CreateFrame("Frame", nil, parent)
 			l:SetPoint("TOPLEFT", 25, -offset - 12)
-			M.CreateGF(l, 550, R.mult, "Horizontal", .7, .7, .7, .7, 0)
+			M.CreateGF(l, 560, R.mult, "Horizontal", 1, 1, 1, .25, .25)
 			offset = offset + 32
 		end
 	end

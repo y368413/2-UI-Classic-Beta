@@ -4,7 +4,7 @@ kAutoOpen:SetScript('OnEvent', function(self, event, ...)
  self[event](...)
 end)
 
-local atBank, atMail, atMerchant, isLooting
+local atBank, atMail, atMerchant
 
 local autoOpenItems = {
 --	[4632]	 = true, -- Ornate Bronze Lockbox -- Lockpicking
@@ -704,40 +704,14 @@ function kAutoOpen:Register(event, func)
 	end
 end
 
-kAutoOpen:Register('BANKFRAME_OPENED', function()
-	atBank = true
-end)
-
-kAutoOpen:Register('BANKFRAME_CLOSED', function()
-	atBank = false
-end)
-
---kAutoOpen:Register('GUILDBANKFRAME_OPENED', function()
-	--atBank = true
---end)
-
---kAutoOpen:Register('GUILDBANKFRAME_CLOSED', function()
-	--atBank = false
---end)
-
-kAutoOpen:Register('MAIL_SHOW', function()
-	atMail = true
-end)
-
-kAutoOpen:Register('MAIL_CLOSED', function()
-	atMail = false
-end)
-
-kAutoOpen:Register('MERCHANT_SHOW', function()
-	atMerchant = true
-end)
-
-kAutoOpen:Register('MERCHANT_CLOSED', function()
-	atMerchant = false
-end)
-
+kAutoOpen:Register('BANKFRAME_OPENED', function() atBank = true end)
+kAutoOpen:Register('BANKFRAME_CLOSED', function()	atBank = false end)
+kAutoOpen:Register('MAIL_SHOW', function() atMail = true end)
+kAutoOpen:Register('MAIL_CLOSED', function() atMail = false end)
+kAutoOpen:Register('MERCHANT_SHOW', function() atMerchant = true end)
+kAutoOpen:Register('MERCHANT_CLOSED', function() atMerchant = false end)
 kAutoOpen:Register('BAG_UPDATE_DELAYED', function(bag)
-	if(atBank or atMail or atMerchant) then return end
+	if (atBank or atMail or atMerchant) then return end
 	for bag = 0, 4 do
 		for slot = 0, GetContainerNumSlots(bag) do
 			local id = GetContainerItemID(bag, slot)

@@ -223,7 +223,7 @@ function TT:StatusBar_OnValueChanged(value)
 	if (value < min) or (value > max) then return end
 
 	if not self.text then
-			self.text = M.CreateFS(self, 12, "")
+		self.text = M.CreateFS(self, 12, "")
 	end
 
 	if value > 0 and max == 1 then

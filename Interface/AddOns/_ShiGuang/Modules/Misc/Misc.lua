@@ -47,6 +47,7 @@ function MISC:OnLogin()
 	self:MenuButton_Add()
 	self:AutoDismount()
 	self:BidPriceHighlight()
+	self:TradeTabs()
 	self:WallpaperKit()
 	
 
