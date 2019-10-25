@@ -1,31 +1,33 @@
---## Author: LBXZero ## Version: 2.3
-SpellBookList = {};  --- Stores the Filtered Spell List
-local RankFilter = true;
+--## Author: LBXZero ## Version: 2.4
+local SpellBookList = {};  --- Stores the Filtered Spell List
 local SBA_SkillLines = {}; --- Stores offset and number of Spells data for the SpellTabs/SkillLines.
 local SpellsChanged = true; -- Flags when SpellBookFrame_Update needs the list rebuilt.
 
 local PET_SPELL = 16777216; -- 2^24 Spell Flag for Pet Spell
-local AUTOCAST_STATE = 1073741824; -- 2^30 Spell Flag for Autocast's State (0 = off, 1 = on);
-local IS_CASTABLE = 2147483648; -- 2^31 Assuming Spell Flag for Is Castable (0 = passive, 1 = castable);
+local AUTOCAST_STATE = 1073741824; -- 2^30 Spell Flag for Autocast's State (0 = off, 1 = on)
+local IS_CASTABLE = 2147483648; -- 2^31 Assuming Spell Flag for Is Castable (0 = passive, 1 = castable)
 local FLAG_MASK = 16777215; -- Value for retrieving the SpellID from Pet Spells
 
--- Slash command to reset Rank Filter Button Location
-SLASH_SBA1 = "/sba";
-SlashCmdList["SBA"] = function (msg, editbox)
-	RankFilterButton:ClearAllPoints();
-	RankFilterButton:SetPoint("TOPRIGHT", SpellBookFrame, "TOPRIGHT", -96, -43);
-end
+local newSpellBacklog = {}; -- Backlog if it is possible to learn new ranks of spells while in combat
 
 
 function SpellBookAbridged_OnLoad(self)
-	--- Ensure the SpellList is properly generated when starting
+
+	-- Ensure the SpellList is properly generated when starting
 	self:RegisterEvent("PLAYER_LOGIN");
+	self:RegisterEvent("ADDON_LOADED");
+	self:RegisterEvent("PLAYER_LOGOUT");
 	
-	--- These are the events SpellBookFrame watches.
+	-- These are the events SpellBookFrame watches.
 	self:RegisterEvent("SPELLS_CHANGED");
 	self:RegisterEvent("LEARNED_SPELL_IN_TAB");
 	
+	-- Events Registered to determine if Player enters combat
+	self:RegisterEvent("PLAYER_REGEN_DISABLED");
+	self:RegisterEvent("PLAYER_REGEN_ENABLED");
+	
 	getglobal(RankFilterButton:GetName() .. "Text"):SetText(FILTERS);  --"Rank Filter"
+	--getglobal(AutoUpRankButton:GetName() .. "Text"):SetText("Auto UpRank");
 	
 	-- Ensure there is SpellTabInfo to grab as early as possible
 	SpellBookAbridged_CreateSpellList();
@@ -44,9 +46,6 @@ function SpellBookAbridged_OnLoad(self)
 	SBA_SpellButton10 = CreateFrame("CheckButton", "SBA_SpellButton10", SpellButton10, "SBA_SpellButtonTemplate");
 	SBA_SpellButton11 = CreateFrame("CheckButton", "SBA_SpellButton11", SpellButton11, "SBA_SpellButtonTemplate");
 	SBA_SpellButton12 = CreateFrame("CheckButton", "SBA_SpellButton12", SpellButton12, "SBA_SpellButtonTemplate");
-	
-	-- Stuff for Rank Filter Button
-	self:RegisterForDrag("RightButton");
 end
 
 function SpellBookAbridged_OnEvent(self, event, ...)
@@ -70,6 +69,34 @@ function SpellBookAbridged_OnEvent(self, event, ...)
 					child:SetFrameLevel(SBAchild:GetFrameLevel() +1);
 				end
 			end
+		end
+		
+	elseif (event == "ADDON_LOADED") then
+			if ShiGuangPerDB["RankFilter"] == nil then ShiGuangPerDB["RankFilter"] = true end;
+			if ShiGuangPerDB["AutoUpRank"] == nil then ShiGuangPerDB["AutoUpRank"] = true end;
+		RankFilterButton:SetChecked(ShiGuangPerDB["RankFilter"]);
+		--AutoUpRankButton:SetChecked(ShiGuangPerDB["AutoUpRank"]);
+	
+	elseif (event == "PLAYER_LOGOUT") then
+		-- Store current states
+		ShiGuangPerDB["RankFilter"] = RankFilterButton:GetChecked();
+		--ShiGuangPerDB["AutoUpRank"] = AutoUpRankButton:GetChecked();
+	
+	elseif (event == "PLAYER_REGEN_DISABLED") then
+		-- Player enters combat.  Protected functions don't work and will cause errors if the Spellbook is open.
+		-- Current Solution, close the spellbook when this is detected.
+		SpellBookFrame:Hide();
+		SpellBookFrame:SetParent("SpellBookFrameAbridged");
+	
+	elseif (event == "PLAYER_REGEN_ENABLED") then
+		-- Player leaves combat.  Restore spellbook functionality
+		SpellBookFrame:SetParent("UIParent");
+
+	elseif (event == "LEARNED_SPELL_IN_TAB") then
+		-- Auto UpRank Function
+		if (AutoUpRankButton:GetChecked()) then
+			local spellID, skillTab = ...;
+			SpellBookAbridged_AutoUpRank(spellID, skillTab);
 		end
 	end
 	
@@ -129,22 +156,30 @@ function SBA_SpellButton_OnEnter(self, motion)
 		SpellButton_OnEnter(self.parent, motion);
 end
 
--- Functions for RankFilterButton
+-- Functions for Option Buttons
+function SBA_OptionButton_OnLoad(self)
+	-- Register dragging with Right Button
+	self:RegisterForDrag("RightButton");
+end
+
+function SBA_OptionButton_OnDragStart(self)
+	if (IsControlKeyDown() and not(InCombatLockdown())) then
+		self:StartMoving();
+	end
+end
+
+function SBA_OptionButton_OnDragStop(self)
+	self:StopMovingOrSizing();
+end
+
 function RankFilterButton_OnClick()
 	SpellBookAbridged_CreateSpellList();
 	if (SpellBookFrame:IsVisible()) then
 		SpellBookFrame_Update();
 	end
 end
-
-function RankFilterButton_OnDragStart(self)
-	if (IsControlKeyDown() and not(InCombatLockdown())) then
-		self:StartMoving();
-	end
-end
-
-function RankFilterButton_OnDragStop(self)
-	self:StopMovingOrSizing();
+function AutoUpRankButton_OnClick()
+	
 end
 
 -- Functions to read Spell List
@@ -229,6 +264,47 @@ function SpellBookAbridged_GetSpellBookItemInfo(slot, bookType)
 	return realSlot[1], GetSpellBookItemInfo(realSlot[1],bookType);
 end
 
+-- Functions for Auto Up Rank
+
+function SpellBookAbridged_AutoUpRank(spellID, skillTab)
+	local spellName = GetSpellInfo(spellID);
+	local _, _, offset, numSpells = GetSpellTabInfo(skillTab);
+	
+	local iStart = offset + 1; -- First SpellBook Slot in Spell Tab
+	local iEnd = offset + numSpells; -- Last SpellBook Slot in Spell Tab
+	
+	local spellIndex = 0; -- index of last iteration of spell name detected
+	local spellOldIndex = 0; -- index of prior to last iteration of the spell name detected
+	
+	ClearCursor(); -- Initial Clear Cursor
+	
+	for i = iStart, iEnd do
+		--Search spellbook range for the indices with the new spell name and find the previous highest rank
+		local iName, iRank = GetSpellBookItemName(i, BOOKTYPE_SPELL);
+		if (spellName == iName) then
+			spellOldIndex = spellIndex;
+			spellIndex = i;
+		end
+	end
+	
+	local _, spellOldID = GetSpellBookItemInfo(spellOldIndex, BOOKTYPE_SPELL);
+	
+	if (spellOldIndex > 0) then
+		-- If spellOldIndex is nil or 0, then the spell is new or rank was automatically replaced (not Mana based spell)
+		-- If greater than 0, then a previous highest rank exists and should be updated to new highest rank.
+		-- Search ActionSlots and replace
+		for j = 1, 120 do -- 120 Action Slots
+			local actionType, actionID = GetActionInfo(j);
+			if ( actionType == "spell" ) then
+				if (actionID == spellOldID) then
+					PickupSpell(spellID);  -- set new spell to cursor
+					PlaceAction(j); -- place spell in cursor (no other function exists to alter action slots)
+					ClearCursor(); -- clear old spell from cursor
+				end				
+			end
+		end		
+	end
+end
 
 --- Functions to replace SpellBookFrame's functions
 
