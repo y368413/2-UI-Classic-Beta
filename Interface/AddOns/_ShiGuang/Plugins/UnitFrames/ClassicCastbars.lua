@@ -1,4 +1,4 @@
---## Author: Wardz ## Version: v1.1.1
+--## Author: Wardz ## Version: v1.1.3
 local ClassicCastbars = {}
 local PoolManager = {}
 ClassicCastbars.PoolManager = PoolManager
@@ -30,7 +30,6 @@ end
 
 function PoolManager:InitializeNewFrame(frame)
     frame:Hide() -- New frames are always shown, hide it while we're updating it
-    frame.Flash:SetAlpha(0) -- we don't use this atm
 
     -- Some of the points set by SmallCastingBarFrameTemplate doesn't
     -- work well when user modify castbar size, so set our own points instead
@@ -38,6 +37,9 @@ function PoolManager:InitializeNewFrame(frame)
     frame.Icon:ClearAllPoints()
     frame.Text:ClearAllPoints()
     frame.Icon:SetPoint("LEFT", frame, -15, 0)
+    frame.Flash:ClearAllPoints()
+    frame.Flash:SetPoint("TOPLEFT", -20, 14)
+    frame.Flash:SetPoint("BOTTOMRIGHT", 20, -14)
     frame.Text:SetPoint("CENTER")
 
     -- Clear any scripts inherited from frame template
@@ -1400,7 +1402,6 @@ ClassicCastbars.channeledSpells = {
     [GetSpellInfo(7290)] = { 10, 7290 },      -- Soul Siphon
     [GetSpellInfo(24322)] = { 8, 24322 },     -- Blood Siphon
     [GetSpellInfo(27177)] = { 10, 27177 },    -- Defile
-    [GetSpellInfo(16045)] = { 30, 16045 },    -- Encage
 
     -- DRUID
     [GetSpellInfo(17401)] = { 10, 17401 },   -- Hurricane
@@ -1931,11 +1932,9 @@ function addon:ToggleUnitEvents(shouldReset)
     if self.db.party.enabled then
         self:RegisterEvent("GROUP_ROSTER_UPDATE")
         self:RegisterEvent("GROUP_JOINED")
-        self:RegisterEvent("GROUP_LEFT")
     else
         self:UnregisterEvent("GROUP_ROSTER_UPDATE")
         self:UnregisterEvent("GROUP_JOINED")
-        self:UnregisterEvent("GROUP_LEFT") -- TODO: check if needed
     end
 
     if shouldReset then
@@ -2096,26 +2095,34 @@ function addon:COMBAT_LOG_EVENT_UNFILTERED()
     if eventType == "SPELL_CAST_START" then
         local spellID = castedSpells[spellName]
         if not spellID then return end
+
         local _, _, icon, castTime = GetSpellInfo(spellID)
         if not castTime or castTime < 300 then return end
 
         local isPlayer = bit_band(srcFlags, COMBATLOG_OBJECT_TYPE_PLAYER_OR_PET) > 0
 
-        if isPlayer then
-            -- Use talent reduced cast time for certain player spells
-            local reducedTime = castTimeTalentDecreases[spellName]
-            if reducedTime then
-                castTime = reducedTime
+        if srcGUID ~= self.PLAYER_GUID then
+            if isPlayer then
+                -- Use talent reduced cast time for certain player spells
+                local reducedTime = castTimeTalentDecreases[spellName]
+                if reducedTime then
+                    castTime = reducedTime
+                end
+            else
+                local cachedTime = npcCastTimeCache[srcName .. spellName]
+                if cachedTime then
+                    -- Use cached time stored from earlier sightings for NPCs.
+                    -- This is because mobs have various cast times, e.g a lvl 20 mob casting Frostbolt might have
+                    -- 3.5 cast time but another lvl 40 mob might have 2.5 cast time instead for Frostbolt.
+                    castTime = cachedTime
+                else
+                    npcCastTimeCacheStart[srcGUID] = GetTime()
+                end
             end
         else
-            local cachedTime = npcCastTimeCache[srcName .. spellName]
-            if cachedTime then
-                -- Use cached time stored from earlier sightings for NPCs.
-                -- This is because mobs have various cast times, e.g a lvl 20 mob casting Frostbolt might have
-                -- 3.5 cast time but another lvl 40 mob might have 2.5 cast time instead for Frostbolt.
-                castTime = cachedTime
-            else
-                npcCastTimeCacheStart[srcGUID] = GetTime()
+            local _, _, _, startTime, endTime = CastingInfo()
+            if endTime and startTime then
+                castTime = endTime - startTime
             end
         end
 
@@ -2235,7 +2242,6 @@ addon:SetScript("OnUpdate", function(self, elapsed)
     -- Update all shown castbars in a single OnUpdate call
     for unit, castbar in pairs(activeFrames) do
         local cast = castbar._data
-
         if cast then
             local castTime = cast.endTime - currTime
 
@@ -2258,8 +2264,10 @@ addon:SetScript("OnUpdate", function(self, elapsed)
                     castbar.Spark:SetPoint("CENTER", castbar, "LEFT", sparkPosition, 0)
                 end
             else
-                -- Delete cast incase stop event wasn't detected in CLEU
-                self:DeleteCast(cast.unitGUID, false, true, false, true)
+                if castTime <= -0.25 then -- wait atleast 0.25s before deleting incase CLEU stop event is happening at same time
+                    -- Delete cast incase stop event wasn't detected in CLEU
+                    self:DeleteCast(cast.unitGUID, false, true, false, true)
+                end
             end
         end
     end
@@ -2272,6 +2280,7 @@ local PoolManager = ClassicCastbars.PoolManager
 --local addon = ClassicCastbars.addon
 local activeFrames = addon.activeFrames
 local gsub = _G.string.gsub
+local strfind = _G.string.find
 local unpack = _G.unpack
 local min = _G.math.min
 local max = _G.math.max
@@ -2314,6 +2323,9 @@ function addon:SetCastbarIconAndText(castbar, cast, db)
     local spellName = cast.spellName
 
     if castbar.Text:GetText() ~= spellName then
+        if cast.icon == 136235 then
+            cast.icon = 136243
+        end
         castbar.Icon:SetTexture(cast.icon)
         castbar.Text:SetText(spellName)
 
@@ -2359,6 +2371,7 @@ function addon:SetCastbarStyle(castbar, cast, db)
 
         -- Update border to match castbar size
         local width, height = castbar:GetWidth() * 1.16, castbar:GetHeight() * 1.16
+        castbar.Border:ClearAllPoints()
         castbar.Border:SetPoint("TOPLEFT", width, height)
         castbar.Border:SetPoint("BOTTOMRIGHT", -width, -height)
     else
@@ -2367,26 +2380,17 @@ function addon:SetCastbarStyle(castbar, cast, db)
     end
 end
 
--- LSM uses backdrop for borders instead of normal textures
+local textureFrameLevels = {
+    ["Interface\\CHARACTERFRAME\\UI-Party-Border"] = 1,
+    ["Interface\\Tooltips\\ChatBubble-Backdrop"] = 1,
+}
+
 function addon:SetLSMBorders(castbar, cast, db)
-    -- Create new frame to contain our backdrop
-    -- (castbar.Border is a texture object and not a frame so we can't reuse that)
+    -- Create new frame to contain our LSM backdrop
     if not castbar.BorderFrame then
         castbar.BorderFrame = CreateFrame("Frame", nil, castbar)
         castbar.BorderFrame:SetPoint("TOPLEFT", castbar, -2, 2)
         castbar.BorderFrame:SetPoint("BOTTOMRIGHT", castbar, 2, -2)
-    end
-
-    castbar.Border:SetAlpha(0) -- hide default border
-    castbar.BorderFrame:SetAlpha(1)
-
-    -- TODO: should be a better way to handle this.
-    -- Certain borders with transparent textures requires frame level 1 to show correctly.
-    -- Meanwhile non-transparent textures requires the frame level to be higher than the castbar frame level
-    if db.castBorder == "Interface\\CHARACTERFRAME\\UI-Party-Border" or db.castBorder == "Interface\\Tooltips\\ChatBubble-Backdrop" then
-        castbar.BorderFrame:SetFrameLevel(1)
-    else
-        castbar.BorderFrame:SetFrameLevel(castbar:GetFrameLevel() + 1)
     end
 
     -- Apply backdrop if it isn't already active
@@ -2398,12 +2402,15 @@ function addon:SetLSMBorders(castbar, cast, db)
         })
         castbar.BorderFrame.currentTexture = db.castBorder
     end
+
+    castbar.Border:SetAlpha(0) -- hide default border
+    castbar.BorderFrame:SetAlpha(1)
+    castbar.BorderFrame:SetFrameLevel(textureFrameLevels[db.castBorder] or castbar:GetFrameLevel() + 1)
     castbar.BorderFrame:SetBackdropBorderColor(unpack(db.borderColor))
 end
 
 function addon:SetCastbarFonts(castbar, cast, db)
     local fontName, fontHeight = castbar.Text:GetFont()
-
     if fontName ~= db.castFont or db.castFontSize ~= fontHeight then
         castbar.Text:SetFont(db.castFont, db.castFontSize)
         castbar.Timer:SetFont(db.castFont, db.castFontSize)
@@ -2415,9 +2422,19 @@ function addon:SetCastbarFonts(castbar, cast, db)
     castbar.Text:SetPoint("LEFT", db.textPositionX, db.textPositionY)
 end
 
+local function GetStatusBarBackgroundTexture(statusbar)
+    if statusbar.Background then return statusbar.Background end
+
+    for _, v in pairs({ statusbar:GetRegions() }) do
+        if v.GetTexture and v:GetTexture() and strfind(v:GetTexture(), "Color-") then
+            return v
+        end
+    end
+end
+
 function addon:DisplayCastbar(castbar, unitID)
     local parentFrame = AnchorManager:GetAnchor(unitID)
-    if not parentFrame then return end -- sanity check
+    if not parentFrame then return end
 
     local db = self.db[gsub(unitID, "%d", "")] -- nameplate1 -> nameplate
     if unitID == "nameplate-testmode" then
@@ -2432,26 +2449,25 @@ function addon:DisplayCastbar(castbar, unitID)
         castbar.fadeInfo.finishedFunc = nil
     end
 
-    local cast = castbar._data
-    cast.showCastInfoOnly = db.showCastInfoOnly
-    castbar:SetParent(parentFrame)
-    castbar.Text:SetWidth(db.width - 10) -- ensure text gets truncated
-
     if not castbar.Background then
-        for k, v in pairs({ castbar:GetRegions() }) do
-            if v.GetTexture and v:GetTexture() and strfind(v:GetTexture(), "Color-") then
-                castbar.Background = v
-                break
-            end
-        end
+        castbar.Background = GetStatusBarBackgroundTexture(castbar)
     end
     castbar.Background:SetColorTexture(unpack(db.statusBackgroundColor))
 
+    local cast = castbar._data
+    cast.showCastInfoOnly = db.showCastInfoOnly
     if cast.isChanneled then
         castbar:SetStatusBarColor(unpack(db.statusColorChannel))
     else
         castbar:SetStatusBarColor(unpack(db.statusColor))
     end
+
+    -- Note: since frames are recycled and we also allow having different styles
+    -- between castbars for all the unitframes, we need to always update the style here
+    -- incase it was modified to something else on last recycle
+    self:SetCastbarStyle(castbar, cast, db)
+    self:SetCastbarFonts(castbar, cast, db)
+    self:SetCastbarIconAndText(castbar, cast, db)
 
     if unitID == "target" and self.db.target.autoPosition then
         self:SetTargetCastbarPosition(castbar, parentFrame)
@@ -2459,19 +2475,15 @@ function addon:DisplayCastbar(castbar, unitID)
         castbar:SetPoint(db.position[1], parentFrame, db.position[2], db.position[3])
     end
 
-    -- Note: since frames are recycled and we also allow having different styles
-    -- between castbars for target frame & nameplates, we need to always update the style here
-    -- incase it was modified to something else on last recycle
-    self:SetCastbarStyle(castbar, cast, db)
-    self:SetCastbarFonts(castbar, cast, db)
-    self:SetCastbarIconAndText(castbar, cast, db)
-
     if not castbar.isTesting then
         castbar:SetMinMaxValues(0, cast.maxValue)
         castbar:SetValue(0)
         castbar.Spark:SetPoint("CENTER", castbar, "LEFT", 0, 0)
     end
 
+    castbar.Flash:Hide()
+    castbar:SetParent(parentFrame)
+    castbar.Text:SetWidth(db.width - 10) -- ensures text gets truncated
     castbar:SetAlpha(1)
     castbar:Show()
 end
@@ -2484,21 +2496,31 @@ function addon:HideCastbar(castbar, noFadeOut)
     end
 
     local cast = castbar._data
-
     if cast and cast.isInterrupted then
         castbar.Text:SetText(_G.INTERRUPTED)
         castbar:SetStatusBarColor(castbar.failedCastColor:GetRGB())
+        castbar:SetMinMaxValues(0, 1)
+        castbar:SetValue(1)
+        castbar.Spark:SetAlpha(0)
     end
 
-    --[[if cast and cast.isCastComplete and not cast.isChanneled then
-        castbar:SetStatusBarColor(0, 1, 0)
-    end]]
+    if cast and cast.isCastComplete then
+        if castbar.Border:GetAlpha() == 1 then -- not using LSM borders
+            local tex = castbar.Border:GetTexture()
+            if tex == "Interface\\CastingBar\\UI-CastingBar-Border" or tex == "Interface\\CastingBar\\UI-CastingBar-Border-Small" then
+                castbar.Flash:Show()
+            end
+        end
+
+        if not cast.isChanneled then
+            castbar:SetStatusBarColor(0, 1, 0)
+        end
+    end
 
     UIFrameFadeOut(castbar, cast and cast.isInterrupted and 1.5 or 0.2, 1, 0)
 end
 
 local CastingBarFrameManagedPosTable
--- TODO: reset to default skin on mode disabled without having to reloadui
 function addon:SkinPlayerCastbar()
     local db = self.db.player
     if not db.enabled then return end
@@ -2519,6 +2541,23 @@ function addon:SkinPlayerCastbar()
         end)
     end
     CastingBarFrame.Timer:SetShown(db.showTimer)
+
+    if not CastingBarFrame.CC_isHooked then
+        CastingBarFrame:HookScript("OnShow", function(frame)
+            if frame.Icon:GetTexture() == 136235 then
+                frame.Icon:SetTexture(136243)
+            end
+        end)
+
+        hooksecurefunc("PlayerFrame_DetachCastBar", function()
+            addon:SkinPlayerCastbar()
+        end)
+
+        hooksecurefunc("PlayerFrame_AttachCastBar", function()
+            addon:SkinPlayerCastbar()
+        end)
+        CastingBarFrame.CC_isHooked = true
+    end
 
     if db.castBorder == "Interface\\CastingBar\\UI-CastingBar-Border" or db.castBorder == "Interface\\CastingBar\\UI-CastingBar-Border-Small" then
         CastingBarFrame.Flash:SetSize(db.width + 61, db.height + 51)
@@ -2542,26 +2581,25 @@ function addon:SkinPlayerCastbar()
     CastingBarFrame.Icon:SetShown(db.showIcon)
 
     if not CastingBarFrame.Background then
-        for k, v in pairs({ CastingBarFrame:GetRegions() }) do
-            if v.GetTexture and v:GetTexture() and strfind(v:GetTexture(), "Color-") then
-                CastingBarFrame.Background = v
-                break
-            end
-        end
+        CastingBarFrame.Background = GetStatusBarBackgroundTexture(CastingBarFrame)
     end
     CastingBarFrame.Background:SetColorTexture(unpack(db.statusBackgroundColor))
 
-    CastingBarFrame:ClearAllPoints()
     if not db.autoPosition then
-        local pos = db.position
+        CastingBarFrame:ClearAllPoints()
         CastingBarFrame:SetAttribute("ignoreFramePositionManager", true)
-        CastingBarFrameManagedPosTable = CopyTable(UIPARENT_MANAGED_FRAME_POSITIONS.CastingBarFrame)
+        CastingBarFrameManagedPosTable = CastingBarFrameManagedPosTable or CopyTable(UIPARENT_MANAGED_FRAME_POSITIONS.CastingBarFrame)
         UIPARENT_MANAGED_FRAME_POSITIONS.CastingBarFrame = nil
+
+        local pos = db.position
         CastingBarFrame:SetPoint(pos[1], UIParent, pos[2], pos[3])
     else
-        CastingBarFrame:SetAttribute("ignoreFramePositionManager", false)
-        UIPARENT_MANAGED_FRAME_POSITIONS.CastingBarFrame = CastingBarFrameManagedPosTable
-        CastingBarFrame:SetPoint("BOTTOM", UIParent, 0, 150)
+        UIPARENT_MANAGED_FRAME_POSITIONS.CastingBarFrame = UIPARENT_MANAGED_FRAME_POSITIONS.CastingBarFrame or CastingBarFrameManagedPosTable
+        if not _G.PLAYER_FRAME_CASTBARS_SHOWN then
+            CastingBarFrame:SetAttribute("ignoreFramePositionManager", false)
+            CastingBarFrame:ClearAllPoints()
+            CastingBarFrame:SetPoint("BOTTOM", UIParent, 0, 150)
+        end
     end
 
     self:SetCastbarStyle(CastingBarFrame, nil, db)
