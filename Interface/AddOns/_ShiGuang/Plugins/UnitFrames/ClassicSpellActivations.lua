@@ -1,7 +1,7 @@
 --## Author: d87
 local ClassicSpellActivations = {}
 
-local f = CreateFrame("Frame", nil) --, UIParent)
+local f = CreateFrame("Frame", "ClassicSpellActivations") --, UIParent)
 
 f:SetScript("OnEvent", function(self, event, ...)
 	return self[event](self, event, ...)
@@ -205,14 +205,16 @@ function f:SPELLS_CHANGED()
             self:SetScript("OnUpdate", nil)
         end
     elseif class == "WARLOCK" then
+        self:SetScript("OnUpdate", self.timerOnUpdate)
         if IsPlayerSpell(18094) or IsPlayerSpell(18095) then
             self:RegisterUnitEvent("UNIT_AURA", "player")
+            self:SetScript("OnUpdate", self.timerOnUpdate)
             self.UNIT_AURA = function(self, event, unit)
                 local name, _, _, _, duration, expirationTime = FindAura(unit, 17941, "HELPFUL") -- Shadow Trance
                 local haveShadowTrance = name ~= nil
                 if hadShadowTrance ~= haveShadowTrance then
                     if haveShadowTrance then
-                        f:Activate("ShadowBolt", duration)
+                        f:Activate("ShadowBolt", duration, true)
                     else
                         f:Deactivate("ShadowBolt")
                     end
@@ -220,6 +222,7 @@ function f:SPELLS_CHANGED()
                 end
             end
         else
+            self:SetScript("OnUpdate", nil)
             self:UnregisterEvent("UNIT_AURA")
         end
     end
@@ -294,7 +297,7 @@ function ClassicSpellActivations.findHighestRank(spellName)
 end
 local findHighestRank = ClassicSpellActivations.findHighestRank
 
-function f:Activate(spellName, duration)
+function f:Activate(spellName, duration, keepExpiration)
     local state = activations[spellName]
     if not state then
         activations[spellName] = {}
@@ -306,7 +309,7 @@ function f:Activate(spellName, duration)
 
         local highestRankSpellID = findHighestRank(spellName)
         self:FanoutEvent("SPELL_ACTIVATION_OVERLAY_GLOW_SHOW", highestRankSpellID)
-    else
+    elseif not keepExpiration then
         state.expirationTime = duration and GetTime() + duration
     end
 end
@@ -361,7 +364,9 @@ function ClassicSpellActivations.ExecuteCheck(self, event, unit)
     if UnitExists("target") and not UnitIsFriend("player", "target") then
         local h = UnitHealth("target")
         local hm = UnitHealthMax("target")
-        if h > 0 and h/hm <= 0.2 then
+        local executeID = ClassicSpellActivations.findHighestRank("Execute")
+
+        if h > 0 and (h/hm < 0.2 or IsUsableSpell(executeID)) then
             f:Activate("Execute", 10)
         else
             f:Deactivate("Execute")

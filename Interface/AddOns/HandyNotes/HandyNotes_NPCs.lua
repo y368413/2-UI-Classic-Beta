@@ -2980,7 +2980,8 @@ nodes[1453] = {
 	},
 	[51401260] = {
 		name = L["Borgus Steelhand"],
-		category = "trainers",
+		category = "primaryProfession",
+		profession = "blacksmithing",
 		description = L["Weapon Crafter"],
 		faction = "Alliance",
 	},
@@ -4212,7 +4213,8 @@ nodes[1454] = {
 	},
 	[82001840] = {
 		name = L["Kelgruk Bloodaxe"],
-		category = "trainers",
+		category = "primaryProfession",
+		profession = "blacksmithing",
 		description = L["Weapon Crafter"],
 		faction = "Horde",
 	},
@@ -4264,7 +4266,8 @@ nodes[1454] = {
 	},
 	[79802380] = {
 		name = L["Okothos Ironrager"],
-		category = "trainers",
+		category = "primaryProfession",
+		profession = "blacksmithing",
 		description = L["Armorsmith"],
 		faction = "Horde",
 	},

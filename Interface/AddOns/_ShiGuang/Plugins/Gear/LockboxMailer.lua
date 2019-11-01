@@ -1,4 +1,4 @@
-﻿--## Version: 0.1.4
+﻿--## Version: 0.1.5
 local LockboxMailer = CreateFrame("Frame")
 do
     local LockBoxButton = CreateFrame("Button", "LockBoxMailButton", SendMailFrame, "ActionButtonTemplate")
@@ -18,13 +18,17 @@ function LockboxMailer:FindLockboxes()
     for bag = BACKPACK_CONTAINER, NUM_BAG_SLOTS do
         for slot = 1, GetContainerNumSlots(bag) do
             local lootable, itemLink = select(6,GetContainerItemInfo(bag, slot))
-            if lootable and itemLink then
-                tooltip:SetBagItem(bag, slot)
-                if tooltip:IsShown() then
-                    for i = 1, tooltip:NumLines() do
-                        local line = _G["LockboxMailerTooltipTextLeft"..i]:GetText()
-                        if line == LOCKED then
-                            tinsert(self.LockboxTable, { bag, slot } )
+            if itemLink then
+                local bindType = select(14, GetItemInfo(itemLink))
+
+                if bindType ~= 1 and lootable then
+                    tooltip:SetBagItem(bag, slot)
+                    if tooltip:IsShown() then
+                        for i = 1, tooltip:NumLines() do
+                            local line = _G["LockboxMailerTooltipTextLeft"..i]:GetText()
+                            if (line == LOCKED) or (line == ITEM_OPENABLE) then
+                                tinsert(self.LockboxTable, { bag, slot } )
+                            end
                         end
                     end
                 end
@@ -32,7 +36,7 @@ function LockboxMailer:FindLockboxes()
         end
     end
 end
-function LockboxMailer:ProcessMailing()
+function LockboxMailer:ProcessMailing(click)
         --ClearSendMail()
         --SendMailNameEditBox:SetText("烂柯人")
     local attachmentIndex = 0

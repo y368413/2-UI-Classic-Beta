@@ -35,7 +35,7 @@ DANWEI_YI = "亿";
 
 TOASTY_TRANSMOG_ADDED = "幻化外观已添加";
 TOASTY_TRANSMOG_REMOVED = "幻化外观已移除";
-  
+----------------Binding----------------------
 TOMEOFTELEPORTATIONTITLE = "传送大师";
 TITLEREADME = "点击图标打开传送大师";
  
@@ -259,47 +259,141 @@ SHIGUANG_Craft="专业";
 SHIGUANG_Gets="[获得]:";
 SHIGUANG_Lost="[失去]:";
 SHIGUANG_Refund="[退款]:";
+----------------Announcer----------------------
+Announcer_Sap = ">>>被闷棍<<<";
+Announcer_RocketPP = "漏油!!!救命啊~";
+Announcer_Purgatory = "要死啦要死啦~";
+Announcer_SpellIDnof = "<法术链接(ID)没有找到>";
+----------------Chat----------------------
+REPAIR_COST = "修理：";
+Chatbar_ChatMiniMizeButtonText = "缩";
+Chatbar_rollText = "骰";
+Chatbar_StatReport = "报";
+Chatbar_ChannelYell = "喊";
+Chatbar_ChannelSay = "说";
+Chatbar_ChannelParty = "队";
+Chatbar_ChannelRaidWarns = "通";
+Chatbar_ChannelRaid = "团";
+Chatbar_ChannelBattleGround = "副";
+Chatbar_ChannelGuild = "公";
+Chatbar_ChannelOfficer = "官";
+Chatbar_EmoteCallButtonText = "圖";
+----------------InboxMailBag----------------------
+InboxMailBag_Advanced = "进阶";
+InboxMailBag_ADVANCED_MODE_DESC = "启用进阶模式。显示您信箱更多的讯息，并且能很好的挽回大笔的金钱。";
+InboxMailBag_ADVANCED_MODE_DISABLED = "|cff00ff96InboxMailbag: 进阶模式|r 关闭";
+InboxMailBag_ADVANCED_MODE_ENABLED = "|cff00ff96InboxMailbag: 进阶模式|r 启用";
+InboxMailBag_BAGNAME = "邮 包";
+InboxMailBag_DELETED = "%s 从 %s |cff20FF20 将删除于 %d |4日:日; 后|r";
+InboxMailBag_DELETED_1 = "%s 从 %s |cffFF2020 将删除于 %s 后|r";
+InboxMailBag_DELETED_7 = "%s 从 %s |cffFF6020 将删除于 %d |4日:日; 后|r";
+InboxMailBag_FRAMENAME = "|cffFFFFFF[邮件]|r信箱包裹";
+InboxMailBag_Group_Stacks = "群组堆叠";
+InboxMailBag_MAIL_DEFAULT = "预设为邮包";
+InboxMailBag_MAIL_DEFAULT_DESC = "启用此选项会导致信箱最初打开的是邮包，而非一般%s";
+InboxMailBag_MAIL_DEFAULT_DISABLED = "|cff00ff96InboxMailbag: 信箱预设为|r %s";
+InboxMailBag_MAIL_DEFAULT_ENABLED = "|cff00ff96InboxMailbag: 信箱预设为|r 信箱邮包";
+InboxMailBag_QUALITY_COLOR_MODE_DESC = "启用可由物品的边框显示物品的品质";
+InboxMailBag_Quality_Colors = "品质着色";
+InboxMailBag_QUALITY_COLORS_MODE_DISABLED = "|cff00ff96InboxMailbag: 品质着色|r 关闭";
+InboxMailBag_QUALITY_COLORS_MODE_ENABLED = "|cff00ff96InboxMailbag: 品质着色|r 启用";
+InboxMailBag_RETURNED = "%s 从 %s |cff20FF20 将返回于 %d |4日:日; 后|r";
+InboxMailBag_RETURNED_1 = "%s 从 %s |cffFF2020 将返回于 %s 后|r";
+InboxMailBag_RETURNED_7 = "%s 从 %s |cffFFA020 将返回于 %d |4日:日; 后|r";
+InboxMailBag_TOTAL = "总计讯息: %d";
+InboxMailBag_TOTAL_MORE = "总计讯息: %d (%d)";
+----------------GRIDCLICKSETS----------------------
+GRIDCLICKSETS_MENUNAME = "点击施法设置";
+GRIDCLICKSETS_MENUTIP = "设置血条按钮的点击动作, 例如施法, 协助等.";
+GRIDCLICKSETS_TITLE = "点击施法设置";
+GRIDCLICKSETS_LOCKWARNING = "战斗中无法设置按钮属性, 设置已保存, 脱离战斗后自动生效。";
+GRIDCLICKSETS_SET = "团框点击施法已更新设置。";
+GRIDCLICKSETS_SET_WHEEL_UP = "上滚";
+GRIDCLICKSETS_SET_WHEEL_DOWN = "下滚";
+GRIDCLICKSETS_SET_RESET_WARNING = "当前专精的设置将全部重置且无法恢复！";
+----------------CurrencyTracking----------------------
+CurrencyTracking_Notes = "|cff00CC33追踪所有获取的通货，并显示在游戏画面上|r";
+CurrencyTracking_Elemental = "元素";
+CurrencyTracking_Meat = "肉";
+CurrencyTracking_ADDON_NOTES = "追踪所有获取的货币，并显示在游戏画面上";
+CurrencyTracking_OPTIONS = "选项";
+CurrencyTracking_DISPLAYSETTINGS = "显示设定";
+CurrencyTracking_OPT_SHOWONSCREEN = "在游戏画面上显示通货信息";
+CurrencyTracking_SHOWTOOLTIP = "显示提示";
+CurrencyTracking_SHOWTOOLTIPINFO = "显示所有货币信息提示";
+CurrencyTracking_SHOW_MONEY = "在游戏画面上显示现金信息";
+CurrencyTracking_ENABLE_SHOW_MONEY_WITH_CURRENCIES = "启用后显示货币信息提示和货币总金额。";
+CurrencyTracking_SHOW_ICON = "仅显示图标";
+CurrencyTracking_SHOW_ICON = "仅显示货币或道具的图标，不显示金额";
+CurrencyTracking_RESET_POSITION = "重置位置";
+CurrencyTracking_RESET_SCREEN_POSITION = "重置框体在界面的显示位置。";
+CurrencyTracking_SHOW_LOWER_DENOMINATIONS = "显示低面额货币"
+CurrencyTracking_SHOW_LOWER_DENOMINATIONS_DEC = "允许显示低面额货币，禁用仅显示金币。"
+CurrencyTracking_BREAKUP_NUMBERS = "千分号";
+CurrencyTracking_OPT_BREAKUP_NUMBERS = "将数字加上本地化千分号。";
+CurrencyTracking_HIDEZERO = "隐藏未获取的货币";
+CurrencyTracking_AUTOHIDEITEMS = "自动隐藏数值为0的货币和道具";
+CurrencyTracking_ICON_FIRST = "图标前置";
+CurrencyTracking_OPT_ICON_PRIORTO_NUMBER = "先显示通货图标再显示其数量";
+CurrencyTracking_OPT_ALWAYS_LOCK = "永远锁定通货信息窗口";
+CurrencyTracking_OPT_ALWAYS_LOCK_TIP = "启用则将不仅限于战斗中才锁定。停用则仅会于战斗中才锁定。";
+CURRENCYTRACKING_OPT_HIDE_IN_COMBAT = "在战斗中隐藏"
+CURRENCYTRACKING_OPT_HIDE_IN_COMBAT_DEC = "在战斗中自动隐藏框体。"
+CurrencyTracking_OPT_HIDE_IN_BATTLEGROUND = "在战场中隐藏"
+CurrencyTracking_OPT_HIDE_IN_BATTLEGROUND_DEC = "在战场中自动隐藏框体。"
+CurrencyTracking_OPT_HIDE_IN_PETBATTLE = "宠物对战时隐藏";
+CurrencyTracking_OPT_AUTO_HIDE_IN_PETBATTLE = "在宠物对战开始后自动隐藏框体";
+-- Scale and Transparency
+CurrencyTracking_SCALE_TRANSPARENCY = "大小和透明度";
+CurrencyTracking_ON_SCREEN_FRAME = "显示框体";
+CurrencyTracking_TOOLTIP = "鼠标提示";
+CurrencyTracking_SCALE = "大小";
+CurrencyTracking_TRANSPARENCY = "透明度";
+CurrencyTracking_BACKGROUND = "背景";
+CurrencyTracking_OPT_BGTRANSPARENCY = "通货信息的背景透明度";
+-- Others
+CurrencyTracking_MAXITEMS = "每行最大项目数";
+CurrencyTracking_MAXITEMSINFO = "设置每行显示的最大项目数量。设置为0则为无数量限制。";
+CurrencyTracking_CURRENCY_TO_TRACK = "在游戏画面上要追踪的通货：";
+CurrencyTracking_TRACKED_CURRENCY = "追踪的货币";
+CurrencyTracking_TRACKED_ITEMS = "追踪的物品";
+CurrencyTracking_PROFILE_OPTIONS = "设定选项";
 ----------------MTG----------------------
-  U["Don't buy cape items"] = "不要买稀有品"
-  U["buy cape items that don't need taco"] = "购买不含饼干的的稀有品"
-  U["buy every cape items"] = "购买每一件珍稀物品"
-  U["Buy normal items"] = "购买普通物品"
-  U["Don't buy normal items"] = "不购买普通物品"
-  U["Check taco before buying rare items with taco"] = "先检查塔可饼,然后再用它购买"
-  U["Detected WeakAuras's Mrrl's"] = "检测到你已加载WA的Mrrl's trade game,为了避免重复购买,MTG插件已自动关闭,接下来使用的是WA的Mrrl's trade game购买."
-  U["Use it manually in the water"] = "去水里手动使用"
-  U["This item wants a Taco cake"] = "这个物品要塔可饼"
-  U["This item doesn't need tower cakes"] = "这个物品不需要塔可饼"
-  U[168053] = "奖励:单个保镖75经验"--极其聪明的寄居蟹
-  U[168091] = "奖励:长满藤壶的宝箱"--严重生锈的保险箱
-  U[168092] = "奖励:解密实验洞穴所需物品"--一捆异常暖和的洗澡
-  U[168093] = "奖励:3个棱彩珍珠"--污秽的法力珍珠手镯
-  U[168094] = "奖励:占卜石"--微微嗡鸣的海石
-  U[168095] = "奖励:神器能量"--奇特的珊瑚丛
-  U[168096] = "奖励:发芽之种,卤岩矿锄,鱼饵等召唤用任务物品"--浸水的工具箱
-  U[168097] = "奖励:底栖装备"--被盗的护甲箱
-  --## the following items require Azsh'ari Stormsurger Cape
-  --## as the wowhead data is not completed yet, some might skip taco check 
-  U[170159] = "奖励:3个棱彩珍珠"--污秽的法力珍珠手镯
-  U[170152] = "奖励:深渊海螺150声望"--裹影贝壳
-  U[170153] = "奖励:保镖全加150经验"--看起来很不祥的书典
-  U[170157] = "奖励:解密实验洞穴所需物品"--一堆凶兆之沙
-  U[170161] = "奖励:单个保镖75经验"--极其聪明的寄居蟹
-  U[170162] = "奖励:发芽之种,卤岩矿锄,鱼饵等召唤用任务物品" --浸水的工具箱
-  U[170101] = "奖励:底栖装备"--被盗的护甲箱
-  U[169202] = "奖励:坐骑"
-  U[170158] = "奖励:7个棱彩珍珠"--不可名状的珍珠人偶
-  U["Mrrglrlr"] = "穆勒格勒勒"
-  U["Grrmrlg"] = "格姆勒格"
-  U["Flrgrrl"] = "弗勒格勒"
-  U["Hurlgrl"] = "胡勒格勒"
-  U["Mrrl"] = "穆勒尔" 
-  
-U["Lock UIScale"] = "锁定推荐UI缩放值"
-U["Lock Chat"] = "锁定聊天窗口设置"
-U["Minimap Clock"] = "小地图时间"
-U["Setup UIScale"] = "调整UI缩放"
-U["Setup GUIScale"] = "设置面板缩放"
+U["Don't buy cape items"] = "不要买稀有品"
+U["buy cape items that don't need taco"] = "购买不含饼干的的稀有品"
+U["buy every cape items"] = "购买每一件珍稀物品"
+U["Buy normal items"] = "购买普通物品"
+U["Don't buy normal items"] = "不购买普通物品"
+U["Check taco before buying rare items with taco"] = "先检查塔可饼,然后再用它购买"
+U["Detected WeakAuras's Mrrl's"] = "检测到你已加载WA的Mrrl's trade game,为了避免重复购买,MTG插件已自动关闭,接下来使用的是WA的Mrrl's trade game购买."
+U["Use it manually in the water"] = "去水里手动使用"
+U["This item wants a Taco cake"] = "这个物品要塔可饼"
+U["This item doesn't need tower cakes"] = "这个物品不需要塔可饼"
+U[168053] = "奖励:单个保镖75经验"--极其聪明的寄居蟹
+U[168091] = "奖励:长满藤壶的宝箱"--严重生锈的保险箱
+U[168092] = "奖励:解密实验洞穴所需物品"--一捆异常暖和的洗澡
+U[168093] = "奖励:3个棱彩珍珠"--污秽的法力珍珠手镯
+U[168094] = "奖励:占卜石"--微微嗡鸣的海石
+U[168095] = "奖励:神器能量"--奇特的珊瑚丛
+U[168096] = "奖励:发芽之种,卤岩矿锄,鱼饵等召唤用任务物品"--浸水的工具箱
+U[168097] = "奖励:底栖装备"--被盗的护甲箱
+--## the following items require Azsh'ari Stormsurger Cape
+--## as the wowhead data is not completed yet, some might skip taco check 
+U[170159] = "奖励:3个棱彩珍珠"--污秽的法力珍珠手镯
+U[170152] = "奖励:深渊海螺150声望"--裹影贝壳
+U[170153] = "奖励:保镖全加150经验"--看起来很不祥的书典
+U[170157] = "奖励:解密实验洞穴所需物品"--一堆凶兆之沙
+U[170161] = "奖励:单个保镖75经验"--极其聪明的寄居蟹
+U[170162] = "奖励:发芽之种,卤岩矿锄,鱼饵等召唤用任务物品" --浸水的工具箱
+U[170101] = "奖励:底栖装备"--被盗的护甲箱
+U[169202] = "奖励:坐骑"
+U[170158] = "奖励:7个棱彩珍珠"--不可名状的珍珠人偶
+U["Mrrglrlr"] = "穆勒格勒勒"
+U["Grrmrlg"] = "格姆勒格"
+U["Flrgrrl"] = "弗勒格勒"
+U["Hurlgrl"] = "胡勒格勒"
+U["Mrrl"] = "穆勒尔" 
+
 U["PlayerFrame Scale"] = "头像缩放"
 U["Map Scale"] = "世界地图缩放"
 U["Map Coords"] = "显示世界地图坐标"
@@ -570,49 +664,6 @@ U["Slash_RemindConfig"] = "到 ESC -> 界面 -> 插件 -> %s 来设置"
 U["Slash_Error_Unkown"] = "错误：出现一些错误！"
 U["Weights"] = "自定义"
 
-Announcer_Sap = ">>>被闷棍<<<";
-Announcer_RocketPP = "漏油!!!救命啊~";
-Announcer_Purgatory = "要死啦要死啦~";
-Announcer_SpellIDnof = "<法术链接(ID)没有找到>";
-
-REPAIR_COST = "修理：";
-Chatbar_ChatMiniMizeButtonText = "缩";
-Chatbar_rollText = "骰";
-Chatbar_StatReport = "报";
-Chatbar_ChannelYell = "喊";
-Chatbar_ChannelSay = "说";
-Chatbar_ChannelParty = "队";
-Chatbar_ChannelRaidWarns = "通";
-Chatbar_ChannelRaid = "团";
-Chatbar_ChannelBattleGround = "副";
-Chatbar_ChannelGuild = "公";
-Chatbar_ChannelOfficer = "官";
-Chatbar_EmoteCallButtonText = "圖";
-
-InboxMailBag_Advanced = "进阶";
-InboxMailBag_ADVANCED_MODE_DESC = "启用进阶模式。显示您信箱更多的讯息，并且能很好的挽回大笔的金钱。";
-InboxMailBag_ADVANCED_MODE_DISABLED = "|cff00ff96InboxMailbag: 进阶模式|r 关闭";
-InboxMailBag_ADVANCED_MODE_ENABLED = "|cff00ff96InboxMailbag: 进阶模式|r 启用";
-InboxMailBag_BAGNAME = "邮包";
-InboxMailBag_DELETED = "%s 从 %s |cff20FF20 将删除于 %d |4日:日; 后|r";
-InboxMailBag_DELETED_1 = "%s 从 %s |cffFF2020 将删除于 %s 后|r";
-InboxMailBag_DELETED_7 = "%s 从 %s |cffFF6020 将删除于 %d |4日:日; 后|r";
-InboxMailBag_FRAMENAME = "|cffFFFFFF[邮件]|r信箱包裹";
-InboxMailBag_Group_Stacks = "群组堆叠";
-InboxMailBag_MAIL_DEFAULT = "预设为邮包";
-InboxMailBag_MAIL_DEFAULT_DESC = "启用此选项会导致信箱最初打开的是邮包，而非一般%s";
-InboxMailBag_MAIL_DEFAULT_DISABLED = "|cff00ff96InboxMailbag: 信箱预设为|r %s";
-InboxMailBag_MAIL_DEFAULT_ENABLED = "|cff00ff96InboxMailbag: 信箱预设为|r 信箱邮包";
-InboxMailBag_QUALITY_COLOR_MODE_DESC = "启用可由物品的边框显示物品的品质";
-InboxMailBag_Quality_Colors = "品质着色";
-InboxMailBag_QUALITY_COLORS_MODE_DISABLED = "|cff00ff96InboxMailbag: 品质着色|r 关闭";
-InboxMailBag_QUALITY_COLORS_MODE_ENABLED = "|cff00ff96InboxMailbag: 品质着色|r 启用";
-InboxMailBag_RETURNED = "%s 从 %s |cff20FF20 将返回于 %d |4日:日; 后|r";
-InboxMailBag_RETURNED_1 = "%s 从 %s |cffFF2020 将返回于 %s 后|r";
-InboxMailBag_RETURNED_7 = "%s 从 %s |cffFFA020 将返回于 %d |4日:日; 后|r";
-InboxMailBag_TOTAL = "总计讯息: %d";
-InboxMailBag_TOTAL_MORE = "总计讯息: %d (%d)";
-
 DEX_FontList = {
 	"Fonts\\ARHei.TTF",
 	"Fonts\\ARKai_C.TTF",
@@ -668,16 +719,6 @@ DEXOptionsColorPickerEx = {
 	["DEX_ColorSpec"] = { title = "打断、驱散等颜色"},
 	["DEX_ColorMana"] = { title = "法力伤害颜色"},
 };
-
-GRIDCLICKSETS_MENUNAME = "点击施法设置";
-GRIDCLICKSETS_MENUTIP = "设置血条按钮的点击动作, 例如施法, 协助等.";
-GRIDCLICKSETS_TITLE = "点击施法设置";
-GRIDCLICKSETS_LOCKWARNING = "战斗中无法设置按钮属性, 设置已保存, 脱离战斗后自动生效。";
-GRIDCLICKSETS_SET = "团框点击施法已更新设置。";
-GRIDCLICKSETS_SET_WHEEL_UP = "上滚";
-GRIDCLICKSETS_SET_WHEEL_DOWN = "下滚";
-GRIDCLICKSETS_SET_RESET_WARNING = "当前专精的设置将全部重置且无法恢复！";
-
 	
 	WHISPERPOP_LOCALE = {
 		["title"] = "|cffC495DD[聊天]|r密语管理",
@@ -696,53 +737,7 @@ GRIDCLICKSETS_SET_RESET_WARNING = "当前专精的设置将全部重置且无法
 		["keep messages tooltip"] = "保留一天以内的消息，而且同帐号的各个角色均可查看。\n \n|cffff3333严重警告：因密语记录可以打开魔兽存档随意查看，因此请不要在网吧等公共环境开启此选项，以免信息泄漏。|r",
 		["toggle frame"] = "    打开/关闭密语框体",
 	};
-	
-	CurrencyTracking_Notes = "|cff00CC33追踪所有获取的通货，并显示在游戏画面上|r";
-	CurrencyTracking_Elemental = "元素";
-	CurrencyTracking_Meat = "肉";
-	CurrencyTracking_ADDON_NOTES = "追踪所有获取的货币，并显示在游戏画面上";
-	CurrencyTracking_OPTIONS = "选项";
-	CurrencyTracking_DISPLAYSETTINGS = "显示设定";
-	CurrencyTracking_OPT_SHOWONSCREEN = "在游戏画面上显示通货信息";
-	CurrencyTracking_SHOWTOOLTIP = "显示提示";
-	CurrencyTracking_SHOWTOOLTIPINFO = "显示所有货币信息提示";
-	CurrencyTracking_SHOW_MONEY = "在游戏画面上显示现金信息";
-	CurrencyTracking_ENABLE_SHOW_MONEY_WITH_CURRENCIES = "启用后显示货币信息提示和货币总金额。";
-	CurrencyTracking_SHOW_ICON = "仅显示图标";
-	CurrencyTracking_SHOW_ICON = "仅显示货币或道具的图标，不显示金额";
-	CurrencyTracking_RESET_POSITION = "重置位置";
-	CurrencyTracking_RESET_SCREEN_POSITION = "重置框体在界面的显示位置。";
-	CurrencyTracking_SHOW_LOWER_DENOMINATIONS = "显示低面额货币"
-	CurrencyTracking_SHOW_LOWER_DENOMINATIONS_DEC = "允许显示低面额货币，禁用仅显示金币。"
-	CurrencyTracking_BREAKUP_NUMBERS = "千分号";
-	CurrencyTracking_OPT_BREAKUP_NUMBERS = "将数字加上本地化千分号。";
-	CurrencyTracking_HIDEZERO = "隐藏未获取的货币";
-  CurrencyTracking_AUTOHIDEITEMS = "自动隐藏数值为0的货币和道具";
-	CurrencyTracking_ICON_FIRST = "图标前置";
-	CurrencyTracking_OPT_ICON_PRIORTO_NUMBER = "先显示通货图标再显示其数量";
-	CurrencyTracking_OPT_ALWAYS_LOCK = "永远锁定通货信息窗口";
-	CurrencyTracking_OPT_ALWAYS_LOCK_TIP = "启用则将不仅限于战斗中才锁定。停用则仅会于战斗中才锁定。";
-	CURRENCYTRACKING_OPT_HIDE_IN_COMBAT = "在战斗中隐藏"
-	CURRENCYTRACKING_OPT_HIDE_IN_COMBAT_DEC = "在战斗中自动隐藏框体。"
-	CurrencyTracking_OPT_HIDE_IN_BATTLEGROUND = "在战场中隐藏"
-	CurrencyTracking_OPT_HIDE_IN_BATTLEGROUND_DEC = "在战场中自动隐藏框体。"
-	CurrencyTracking_OPT_HIDE_IN_PETBATTLE = "宠物对战时隐藏";
-  CurrencyTracking_OPT_AUTO_HIDE_IN_PETBATTLE = "在宠物对战开始后自动隐藏框体";
-	-- Scale and Transparency
-  CurrencyTracking_SCALE_TRANSPARENCY = "大小和透明度";
-  CurrencyTracking_ON_SCREEN_FRAME = "显示框体";
-  CurrencyTracking_TOOLTIP = "鼠标提示";
-  CurrencyTracking_SCALE = "大小";
-  CurrencyTracking_TRANSPARENCY = "透明度";
-  CurrencyTracking_BACKGROUND = "背景";
-  CurrencyTracking_OPT_BGTRANSPARENCY = "通货信息的背景透明度";
-  -- Others
-  CurrencyTracking_MAXITEMS = "每行最大项目数";
-  CurrencyTracking_MAXITEMSINFO = "设置每行显示的最大项目数量。设置为0则为无数量限制。";
-  CurrencyTracking_CURRENCY_TO_TRACK = "在游戏画面上要追踪的通货：";
-  CurrencyTracking_TRACKED_CURRENCY = "追踪的货币";
-  CurrencyTracking_TRACKED_ITEMS = "追踪的物品";
-  CurrencyTracking_PROFILE_OPTIONS = "设定选项";
+
 
 U["Drog"] = "药剂"
 U["ClassBar"] = "职业条"

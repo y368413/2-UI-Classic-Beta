@@ -1,4 +1,4 @@
--- ////// ## Author: solariz.de  ## Version: 2.05
+-- ////// ## Author: solariz.de  ## Version: 2.06
 
 function SQS_UpdateButtonDisplay()
 	-- called to update the buttons if skill is castable / available or not
@@ -318,7 +318,7 @@ if (GetLocale() == 'zhCN') then
 	L["SQS_3_CAT"] = "猎豹形态"
 	L["SQS_4_TRAVEL"] = "旅行形态"
 	L["SQS_5_MOONKIN"] = "枭兽形态"
-	L["SQS_MOUNT_KODO_1"] = "蓝色科多兽"
+	L["SQS_MOUNT_KODO_1"] = "灰色科多兽"
 	L["SQS_MOUNT_KODO_2"] = "棕色科多兽"
 	L["SQS_MOUNT_KODO_3"] = "大型白色科多兽"
 	L["SQS_MOUNT_KODO_4"] = "金色科多兽"
@@ -332,7 +332,7 @@ else
 	L["SQS_3_CAT"] = "Cat Form"
 	L["SQS_4_TRAVEL"] = "Travel Form"
 	L["SQS_5_MOONKIN"] = "Moonkin Form"
-	L["SQS_MOUNT_KODO_1"] = "Teal Kodo"
+	L["SQS_MOUNT_KODO_1"] = "Gray Kodo"
 	L["SQS_MOUNT_KODO_2"] = "Brown Kodo"
 	L["SQS_MOUNT_KODO_3"] = "White Kodo"
 	L["SQS_MOUNT_KODO_4"] = "Golden Kodo"	

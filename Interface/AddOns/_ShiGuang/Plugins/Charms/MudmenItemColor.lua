@@ -801,6 +801,8 @@ function GetItemQuality(itemId)
 	if (itemId == 13197) then quality = LE_ITEM_QUALITY_QUEST;end
 	if (itemId == 6929) then quality = LE_ITEM_QUALITY_QUEST;end
 	if (itemId == 6842) then quality = LE_ITEM_QUALITY_QUEST;end
+	if (itemId == 13703) then quality = LE_ITEM_QUALITY_QUEST;end
+	if (itemId == 14542) then quality = LE_ITEM_QUALITY_QUEST;end
 	
 	----Events items----
 	
@@ -839,6 +841,8 @@ function GetItemQuality(itemId)
 	if (itemId == 20388) then quality = LE_ITEM_QUALITY_WEVENT;end
 	if (itemId == 20390) then quality = LE_ITEM_QUALITY_WEVENT;end
 	if (itemId == 20516) then quality = LE_ITEM_QUALITY_WEVENT;end
+	if (itemId == 7228) then quality = LE_ITEM_QUALITY_WEVENT;end
+	if (itemId == 20557) then quality = LE_ITEM_QUALITY_WEVENT;end
     return quality;
 end
 
