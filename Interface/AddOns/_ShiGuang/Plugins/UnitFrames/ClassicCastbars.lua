@@ -1,4 +1,4 @@
---## Author: Wardz ## Version: v1.1.3
+--## Author: Wardz ## Version: v1.1.4
 local ClassicCastbars = {}
 local PoolManager = {}
 ClassicCastbars.PoolManager = PoolManager
@@ -1389,7 +1389,7 @@ C_Timer.After(0.1, BuildSpellNameToSpellIDTable) -- run asap once the current ca
 -- GetSpellInfo doesn't return any cast time for channeled casts.
 -- value[1] is the cast time in seconds, value[2] is the spell ID used to retrive
 -- spell icon later on.
--- TODO: merge with main spell table and just store the cast time here as table value
+-- TODO: merge with main spell table and just store the cast time here as value
 ClassicCastbars.channeledSpells = {
     -- MISC
     [GetSpellInfo(746)] = { 8, 746 },         -- First Aid
@@ -1437,36 +1437,53 @@ ClassicCastbars.channeledSpells = {
 }
 
 -- List of abilities that increases cast time (reduces speed)
--- Value here is the slow percentage, from highest spell rank.
+-- Value here is the slow percentage.
 -- TODO: check if these also affect Aimed Shot/Volley + bosses
 ClassicCastbars.castTimeIncreases = {
-    -- WARLOCK
-    [GetSpellInfo(1714)] = 60,    -- Curse of Tongues
-    [GetSpellInfo(1098)] = 30,    -- Enslave Demon
-
-    -- ROGUE
-    [GetSpellInfo(5760)] = 60,    -- Mind-Numbing Poison
-
     -- ITEMS
-    [GetSpellInfo(17331)] = 10,   -- Fang of the Crystal Spider
+    [17331] = 10,   -- Fang of the Crystal Spider
 
     -- NPCS
-    [GetSpellInfo(7127)] = 20,    -- Wavering Will
-    [GetSpellInfo(7102)] = 25,    -- Contagion of Rot
-    [GetSpellInfo(3603)] = 35,    -- Distracting Pain
-    [GetSpellInfo(8140)] = 50,    -- Befuddlement
-    [GetSpellInfo(8272)] = 20,    -- Mind Tremor
-    [GetSpellInfo(12255)] = 15,   -- Curse of Tuten'kash
-    [GetSpellInfo(10651)] = 20,   -- Curse of the Eye
-    [GetSpellInfo(14538)] = 35,   -- Aural Shock
-    [GetSpellInfo(22247)] = 80,   -- Suppression Aura
-    [GetSpellInfo(22642)] = 50,   -- Brood Power: Bronze
-    [GetSpellInfo(23153)] = 50,   -- Brood Power: Blue
-    [GetSpellInfo(24415)] = 50,   -- Slow
-    [GetSpellInfo(19365)] = 50,   -- Ancient Dread
-    [GetSpellInfo(28732)] = 25,   -- Widow's Embrace
-    [GetSpellInfo(22909)] = 50,   -- Eye of Immol'thar
+    [7127] = 20,    -- Wavering Will
+    [7102] = 25,    -- Contagion of Rot
+    [7103] = 25,    -- Contagion of Rot 2
+    [3603] = 35,    -- Distracting Pain
+    [8140] = 50,    -- Befuddlement
+    [8272] = 20,    -- Mind Tremor
+    [12255] = 15,   -- Curse of Tuten'kash
+    [10651] = 20,   -- Curse of the Eye
+    [14538] = 35,   -- Aural Shock
+    [22247] = 80,   -- Suppression Aura
+    [22642] = 50,   -- Brood Power: Bronze
+    [23153] = 50,   -- Brood Power: Blue
+    [24415] = 50,   -- Slow
+    [19365] = 50,   -- Ancient Dread
+    [28732] = 25,   -- Widow's Embrace
+    [22909] = 50,   -- Eye of Immol'thar
+    [13338] = 50,   -- Curse of Tongues
+    [12889] = 50,   -- Curse of Tongues
+    [15470] = 50,   -- Curse of Tongues
+    [25195] = 75,   -- Curse of Tongues
+
+    -- WARLOCK
+    [1714] = 50,    -- Curse of Tongues Rank 1
+    [11719] = 60,   -- Curse of Tongues Rank 2
+    [1098] = 30,    -- Enslave Demon Rank 1
+    [11725] = 30,   -- Enslave Demon Rank 2
+    [11726] = 30,   -- Enslave Demon Rank 3
+
+    -- ROGUE
+    [5760] = 40,    -- Mind-Numbing Poison Rank 1
+    [8692] = 50,    -- Mind-Numbing Poison Rank 2
+    [25810] = 50,   -- Mind-Numbing Poison Rank 2 incorrect?
+    [11398] = 60,   -- Mind-Numbing Poison Rank 3
 }
+
+-- Store both spellID and spell name in this table since UnitAura returns spellIDs but combat log doesn't.
+-- Order here is important so we only store highest rank for spell names
+for spellID, slowPercentage in ipairs(ClassicCastbars.castTimeIncreases) do
+    ClassicCastbars.castTimeIncreases[GetSpellInfo(spellID)] = slowPercentage
+end
 
 -- Spells that have cast time reduced by talents.
 ClassicCastbars.castTimeTalentDecreases = {
@@ -1541,6 +1558,8 @@ ClassicCastbars.crowdControls = {
     [GetSpellInfo(18425)] = 1,      -- Kick - Silenced
     [GetSpellInfo(24259)] = 1,      -- Spell Lock
     [GetSpellInfo(18498)] = 1,      -- Shield Bash - Silenced
+    [GetSpellInfo(2878)] = 1,       -- Turn Undead
+    [GetSpellInfo(710)] = 1,        -- Banish
 
     -- ITEMS
     [GetSpellInfo(13327)] = 1,      -- Reckless Charge
@@ -1565,6 +1584,124 @@ ClassicCastbars.crowdControls = {
     [GetSpellInfo(15283)] = 1,      -- Stunning Blow (Weapon Proc)
     [GetSpellInfo(56)] = 1,         -- Stun (Weapon Proc)
     [GetSpellInfo(26108)] = 1,      -- Glimpse of Madness
+    [GetSpellInfo(8345)] = 1,       -- Control Machine (Gnomish Universal Remote trinket)
+    [GetSpellInfo(13235)] = 1,      -- Forcefield Collapse (Gnomish Harm Prevention Belt)
+    [GetSpellInfo(15753)] = 1,      -- Linken's Boomerang (trinket)
+    [GetSpellInfo(15535)] = 1,      -- Enveloping Winds (Six Demon Bag trinket)
+    [GetSpellInfo(28406)] = 1,      -- Polymorph Backfire
+    [GetSpellInfo(16600)] = 1,      -- Might of Shahram (Blackblade of Shahram sword)
+    [GetSpellInfo(13907)] = 1,      -- Smite Demon (Enchant Weapon - Demonslaying)
+    [GetSpellInfo(15822)] = 1,      -- Dreamless Sleep Potion
+    [GetSpellInfo(16053)] = 1,      -- Dominion of Soul (Orb of Draconic Energy)
+    [GetSpellInfo(21330)] = 1,      -- Corrupted Fear (Deathmist Raiment set)
+
+    -- NPCS
+    [GetSpellInfo(3242)] = 1,       -- Ravage
+    [GetSpellInfo(3271)] = 1,       -- Fatigued
+    [GetSpellInfo(5708)] = 1,       -- Swoop
+    [GetSpellInfo(11430)] = 1,      -- Slam
+    [GetSpellInfo(17276)] = 1,      -- Scald
+    [GetSpellInfo(18812)] = 1,      -- Knockdown
+    [GetSpellInfo(3442)] = 1,       -- Enslave
+    [GetSpellInfo(20683)] = 1,      -- Highlord's Justice
+    [GetSpellInfo(17286)] = 1,      -- Crusader's Hammer
+    [GetSpellInfo(3109)] = 1,       -- Presence of Death
+    [GetSpellInfo(3143)] = 1,       -- Glacial Roar
+    [GetSpellInfo(3263)] = 1,       -- Touch of Ravenclaw
+    [GetSpellInfo(5106)] = 1,       -- Crystal Flash
+    [GetSpellInfo(6266)] = 1,       -- Kodo Stomp
+    [GetSpellInfo(6730)] = 1,       -- Head Butt
+    [GetSpellInfo(6982)] = 1,       -- Gust of Wind
+    [GetSpellInfo(7961)] = 1,       -- Azrethoc's Stomp
+    [GetSpellInfo(8151)] = 1,       -- Surprise Attack
+    [GetSpellInfo(3635)] = 1,       -- Crystal Gaze
+    [GetSpellInfo(21188)] = 1,      -- Stun Bomb Attack
+    [GetSpellInfo(16451)] = 1,      -- Judge's Gavel
+    [GetSpellInfo(3589)] = 1,       -- Deafening Screech
+    [GetSpellInfo(4320)] = 1,       -- Trelane's Freezing Touch
+    [GetSpellInfo(6942)] = 1,       -- Overwhelming Stench
+    [GetSpellInfo(8715)] = 1,       -- Terrifying Howl
+    [GetSpellInfo(8817)] = 1,       -- Smoke Bomb
+    [GetSpellInfo(25772)] = 1,      -- Mental Domination
+    [GetSpellInfo(15859)] = 1,      -- Dominate Mind
+    [GetSpellInfo(24753)] = 1,      -- Trick
+    [GetSpellInfo(19408)] = 1,      -- Panic
+    [GetSpellInfo(23364)] = 1,      -- Tail Lash
+    [GetSpellInfo(19364)] = 1,      -- Ground Stomp
+    [GetSpellInfo(19369)] = 1,      -- Ancient Despair
+    [GetSpellInfo(19641)] = 1,      -- Pyroclast Barrage
+    [GetSpellInfo(19393)] = 1,      -- Soul Burn
+    [GetSpellInfo(20277)] = 1,      -- Fist of Ragnaros
+    [GetSpellInfo(19780)] = 1,      -- Hand of Ragnaros
+    [GetSpellInfo(18431)] = 1,      -- Bellowing Roar
+    [GetSpellInfo(22289)] = 1,      -- Brood Power: Green
+    [GetSpellInfo(22291)] = 1,      -- Brood Power: Bronze
+    [GetSpellInfo(22561)] = 1,      -- Brood Power: Green
+    [GetSpellInfo(19872)] = 1,      -- Calm Dragonkin
+    [GetSpellInfo(22274)] = 1,      -- Greater Polymorph
+    [GetSpellInfo(23310)] = 1,      -- Time Lapse
+    [GetSpellInfo(23174)] = 1,      -- Chromatic Mutation
+    [GetSpellInfo(23171)] = 1,      -- Time Stop (Brood Affliction: Bronze)
+    [GetSpellInfo(22667)] = 1,      -- Shadow Command
+    [GetSpellInfo(23603)] = 1,      -- Wild Polymorph
+    [GetSpellInfo(23182)] = 1,      -- Mark of Frost
+    [GetSpellInfo(25043)] = 1,      -- Aura of Nature
+    [GetSpellInfo(24811)] = 1,      -- Draw Spirit
+    [GetSpellInfo(25806)] = 1,      -- Creature of Nightmare
+    [GetSpellInfo(6253)] = 1,       -- Backhand
+    [GetSpellInfo(6466)] = 1,       -- Axe Toss
+    [GetSpellInfo(8242)] = 1,       -- Shield Slam
+    [GetSpellInfo(8285)] = 1,       -- Rampage
+    [GetSpellInfo(6524)] = 1,       -- Ground Tremor
+    [GetSpellInfo(6607)] = 1,       -- Lash
+    [GetSpellInfo(7399)] = 1,       -- Terrify
+    [GetSpellInfo(8150)] = 1,       -- Thundercrack
+    [GetSpellInfo(11020)] = 1,      -- Petrify
+    [GetSpellInfo(11641)] = 1,      -- Hex
+    [GetSpellInfo(17307)] = 1,      -- Knockout
+    [GetSpellInfo(16075)] = 1,      -- Throw Axe
+    [GetSpellInfo(16104)] = 1,      -- Crystallize
+    [GetSpellInfo(11836)] = 1,      -- Freeze Solid
+    [GetSpellInfo(29419)] = 1,      -- Flash Bomb
+    [GetSpellInfo(6304)] = 1,       -- Rhahk'Zor Slam
+    [GetSpellInfo(6435)] = 1,       -- Smite Slam
+    [GetSpellInfo(6432)] = 1,       -- Smite Stomp
+    [GetSpellInfo(228)] = 1,        -- Polymorph: Chicken
+    [GetSpellInfo(8040)] = 1,       -- Druid's Slumber
+    [GetSpellInfo(7967)] = 1,       -- Naralex's Nightmare
+    [GetSpellInfo(7139)] = 1,       -- Fel Stomp
+    [GetSpellInfo(7621)] = 1,       -- Arugal's Curse
+    [GetSpellInfo(7803)] = 1,       -- Thundershock
+    [GetSpellInfo(7074)] = 1,       -- Screams of the Past
+    [GetSpellInfo(8281)] = 1,       -- Sonic Burst
+    [GetSpellInfo(8359)] = 1,       -- Left for Dead
+    [GetSpellInfo(9256)] = 1,       -- Deep Sleep
+    [GetSpellInfo(12946)] = 1,      -- Putrid Stench
+    [GetSpellInfo(3636)] = 1,       -- Crystalline Slumber
+    [GetSpellInfo(10093)] = 1,      -- Harsh Winds
+    [GetSpellInfo(21808)] = 1,      -- Summon Shardlings
+    [GetSpellInfo(21869)] = 1,      -- Repulsive Gaze
+    [GetSpellInfo(12888)] = 1,      -- Cause Insanity
+    [GetSpellInfo(12480)] = 1,      -- Hex of Jammal'an
+    [GetSpellInfo(12890)] = 1,      -- Deep Slumber
+    [GetSpellInfo(25774)] = 1,      -- Mind Shatter
+    [GetSpellInfo(15471)] = 1,      -- Enveloping Web
+    [GetSpellInfo(3609)] = 1,       -- Paralyzing Poison
+    [GetSpellInfo(17492)] = 1,      -- Hand of Thaurissan
+    [GetSpellInfo(14870)] = 1,      -- Drunken Stupor
+    [GetSpellInfo(13902)] = 1,      -- Fist of Ragnaros
+    [GetSpellInfo(6945)] = 1,       -- Chest Pains
+    [GetSpellInfo(3551)] = 1,       -- Skull Crack
+    [GetSpellInfo(15618)] = 1,      -- Snap Kick
+    [GetSpellInfo(16508)] = 1,      -- Intimidating Roar
+    [GetSpellInfo(16497)] = 1,      -- Stun Bomb
+    [GetSpellInfo(17405)] = 1,      -- Domination
+    [GetSpellInfo(16798)] = 1,      -- Enchanting Lullaby
+    [GetSpellInfo(12734)] = 1,      -- Ground Smash
+    [GetSpellInfo(17293)] = 1,      -- Burning Winds
+    [GetSpellInfo(16869)] = 1,      -- Ice Tomb
+    [GetSpellInfo(22856)] = 1,      -- Ice Lock
+    [GetSpellInfo(16838)] = 1,      -- Banshee Shriek
 }
 
 -- Addon Savedvariables
@@ -1700,6 +1837,7 @@ local npcCastTimeCache = {}
 addon.AnchorManager = ClassicCastbars.AnchorManager
 addon.defaultConfig = ClassicCastbars.defaultConfig
 addon.activeFrames = activeFrames
+addon.activeTimers = activeTimers
 --ClassicCastbars.addon = addon
 --ClassicCastbars = addon -- global ref for ClassicCastbars_Options
 
@@ -1720,28 +1858,37 @@ local bit_band = _G.bit.band
 local COMBATLOG_OBJECT_TYPE_PLAYER_OR_PET = _G.COMBATLOG_OBJECT_TYPE_PLAYER + _G.COMBATLOG_OBJECT_TYPE_PET
 local castTimeIncreases = ClassicCastbars.castTimeIncreases
 
-function addon:CheckCastModifier(unitID, unitGUID)
+function addon:CheckCastModifier(unitID, cast)
     if not self.db.pushbackDetect then return end
-    for i = 1, 16 do
-        local name = UnitAura(unitID, i, "HARMFUL")
-        if not name then return end -- no more debuffs
+    if not cast or cast.isChanneled or cast.hasCastModified or cast.skipCastModifier then return end
 
-        local slowPercentage = castTimeIncreases[name]
-        if slowPercentage then
-            return self:SetCastDelay(unitGUID, slowPercentage, nil, true)
+    local highestSlow = 0
+    for i = 1, 16 do
+        local _, _, _, _, _, _, _, _, _, spellID = UnitAura(unitID, i, "HARMFUL")
+        if not spellID then break end -- no more debuffs
+
+        local slow = castTimeIncreases[spellID]
+        if slow and slow > highestSlow then -- might be several slow debuffs
+            highestSlow = slow
         end
+    end
+
+    if highestSlow > 0 then
+        cast.endTime = cast.timeStart + (cast.endTime - cast.timeStart) * ((highestSlow / 100) + 1)
+        cast.hasCastModified = true
     end
 end
 
 function addon:StartCast(unitGUID, unitID)
-    if not activeTimers[unitGUID] then return end
+    local cast = activeTimers[unitGUID]
+    if not cast then return end
 
     local castbar = self:GetCastbarFrame(unitID)
     if not castbar then return end
 
-    castbar._data = activeTimers[unitGUID] -- set ref to current cast data
+    castbar._data = cast -- set ref to current cast data
     self:DisplayCastbar(castbar, unitID)
-    self:CheckCastModifier(unitID, unitGUID)
+    self:CheckCastModifier(unitID, cast)
 end
 
 function addon:StopCast(unitID, noFadeOut)
@@ -1790,8 +1937,8 @@ function addon:StoreCast(unitGUID, spellName, iconTexturePath, castTime, isPlaye
     cast.unitGUID = unitGUID
     cast.timeStart = currTime
     cast.isPlayer = isPlayer
-    cast.prevCurrTimeModValue = nil
-    cast.currTimeModValue = nil
+    cast.hasCastModified = nil
+    cast.skipCastModifier = nil
     cast.pushbackValue = nil
     cast.showCastInfoOnly = nil
     cast.isInterrupted = nil
@@ -1815,76 +1962,6 @@ function addon:DeleteCast(unitGUID, isInterrupted, skipDeleteCache, isCastComple
     -- Weak tables doesn't work with literal values so we need to manually handle memory for this cache :/
     if not skipDeleteCache and npcCastTimeCacheStart[unitGUID] then
         npcCastTimeCacheStart[unitGUID] = nil
-    end
-end
-
--- Spaghetti code inc, you're warned.
--- A lot of this complexity is so we can also track modifiers in the combat log without
--- having to rely on UnitAura that requires a valid unitID.
-function addon:SetCastDelay(unitGUID, percentageAmount, auraFaded, skipStore)
-    if not self.db.pushbackDetect then return end
-    local cast = activeTimers[unitGUID]
-    if not cast or cast.isChanneled then return end
-
-    --if cast.prevCurrTimeModValue then print("stored total:", #cast.prevCurrTimeModValue) end
-
-    -- Set cast time modifier (i.e Curse of Tongues)
-    if not auraFaded and percentageAmount and percentageAmount > 0 then
-        if not cast.currTimeModValue or cast.currTimeModValue < percentageAmount then -- run only once unless % changed to higher val
-            if cast.currTimeModValue then -- already was reduced
-                -- if existing modifer is e.g 50% and new is 60%, we only want to adjust cast by 10%
-                percentageAmount = percentageAmount - cast.currTimeModValue
-
-                -- Store previous lesser modifier that was active incase new one expires first or gets dispelled
-                cast.prevCurrTimeModValue = cast.prevCurrTimeModValue or {}
-                cast.prevCurrTimeModValue[#cast.prevCurrTimeModValue + 1] = cast.currTimeModValue
-                --print("stored lesser modifier")
-            end
-
-            --print("refreshing timer", percentageAmount)
-            cast.currTimeModValue = (cast.currTimeModValue or 0) + percentageAmount -- highest active modifier
-            cast.maxValue = cast.maxValue + (cast.maxValue * percentageAmount) / 100
-            cast.endTime = cast.endTime + (cast.maxValue * percentageAmount) / 100
-        elseif cast.currTimeModValue == percentageAmount and not skipStore then
-            -- new modifier has same percentage as current active one, just store it for later
-            --print("same percentage, storing")
-            cast.prevCurrTimeModValue = cast.prevCurrTimeModValue or {}
-            cast.prevCurrTimeModValue[#cast.prevCurrTimeModValue + 1] = percentageAmount
-        end
-    elseif auraFaded and percentageAmount then
-        -- Reset cast time modifier
-        if cast.currTimeModValue == percentageAmount then
-            cast.maxValue = cast.maxValue - (cast.maxValue * percentageAmount) / 100
-            cast.endTime = cast.endTime - (cast.maxValue * percentageAmount) / 100
-            cast.currTimeModValue = nil
-
-            -- Reset to lesser modifier if available
-            if cast.prevCurrTimeModValue then
-                local highest, index = 0
-                for i = 1, #cast.prevCurrTimeModValue do
-                    if cast.prevCurrTimeModValue[i] and cast.prevCurrTimeModValue[i] > highest then
-                        highest, index = cast.prevCurrTimeModValue[i], i
-                    end
-                end
-
-                if index then
-                    cast.prevCurrTimeModValue[index] = nil
-                    --print("resetting to lesser modifier", highest)
-                    return self:SetCastDelay(unitGUID, highest)
-                end
-            end
-        end
-
-        if cast.prevCurrTimeModValue then
-            -- Delete 1 old modifier (doesn't matter which one aslong as its the same %)
-            for i = 1, #cast.prevCurrTimeModValue do
-                if cast.prevCurrTimeModValue[i] == percentageAmount then
-                    --print("deleted lesser modifier, new total:", #cast.prevCurrTimeModValue - 1)
-                    cast.prevCurrTimeModValue[i] = nil
-                    return
-                end
-            end
-        end
     end
 end
 
@@ -2172,21 +2249,17 @@ function addon:COMBAT_LOG_EVENT_UNFILTERED()
         -- We also check the expiration timer in OnUpdate script just incase this event doesn't trigger when i.e unit is no longer in range.
         return self:DeleteCast(srcGUID, nil, nil, true)
     elseif eventType == "SPELL_AURA_APPLIED" then
-        if castTimeIncreases[spellName] then
-            -- Aura that slows casting speed was applied
-            return self:SetCastDelay(dstGUID, ClassicCastbars.castTimeIncreases[spellName])
-        elseif crowdControls[spellName] then
+        if crowdControls[spellName] then
             -- Aura that interrupts cast was applied
             return self:DeleteCast(dstGUID)
+        elseif castTimeIncreases[spellName] and activeTimers[dstGUID] then
+            activeTimers[dstGUID].skipCastModifier = true
         end
     elseif eventType == "SPELL_AURA_REMOVED" then
         -- Channeled spells has no SPELL_CAST_* event for channel stop,
         -- so check if aura is gone instead since most (all?) channels has an aura effect.
         if channeledSpells[spellName] and srcGUID == dstGUID then
             return self:DeleteCast(srcGUID, nil, nil, true)
-        elseif castTimeIncreases[spellName] then
-            -- Aura that slows casting speed was removed.
-            return self:SetCastDelay(dstGUID, castTimeIncreases[spellName], true)
         end
     elseif eventType == "SPELL_CAST_FAILED" then
         if srcGUID == self.PLAYER_GUID then
@@ -2520,7 +2593,6 @@ function addon:HideCastbar(castbar, noFadeOut)
     UIFrameFadeOut(castbar, cast and cast.isInterrupted and 1.5 or 0.2, 1, 0)
 end
 
-local CastingBarFrameManagedPosTable
 function addon:SkinPlayerCastbar()
     local db = self.db.player
     if not db.enabled then return end
@@ -2587,16 +2659,13 @@ function addon:SkinPlayerCastbar()
 
     if not db.autoPosition then
         CastingBarFrame:ClearAllPoints()
-        CastingBarFrame:SetAttribute("ignoreFramePositionManager", true)
-        CastingBarFrameManagedPosTable = CastingBarFrameManagedPosTable or CopyTable(UIPARENT_MANAGED_FRAME_POSITIONS.CastingBarFrame)
-        UIPARENT_MANAGED_FRAME_POSITIONS.CastingBarFrame = nil
+        CastingBarFrame.ignoreFramePositionManager = true
 
         local pos = db.position
         CastingBarFrame:SetPoint(pos[1], UIParent, pos[2], pos[3])
     else
-        UIPARENT_MANAGED_FRAME_POSITIONS.CastingBarFrame = UIPARENT_MANAGED_FRAME_POSITIONS.CastingBarFrame or CastingBarFrameManagedPosTable
         if not _G.PLAYER_FRAME_CASTBARS_SHOWN then
-            CastingBarFrame:SetAttribute("ignoreFramePositionManager", false)
+            CastingBarFrame.ignoreFramePositionManager = false
             CastingBarFrame:ClearAllPoints()
             CastingBarFrame:SetPoint("BOTTOM", UIParent, 0, 150)
         end
