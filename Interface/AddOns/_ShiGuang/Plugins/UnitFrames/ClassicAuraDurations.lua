@@ -11,9 +11,11 @@ end)
 
 local defaults = {
     portraitIcon = true,
+    playerPortraitIcon = true,
     enemyBuffs = true,
     hookTargetFrame = true,
     verbosePortraitIcon = false,
+    largePersonalDebuffs = true,
 }
 
 -- Redefining blizzard consts
@@ -33,7 +35,7 @@ local PLAYER_UNITS = {
 	player = true,
 	pet = true,
 };
-local function ShouldAuraBeLarge(caster)
+local function ShouldAuraBeLargePersonalDebuffs(caster)
     if not caster then
 		return false;
 	end
@@ -45,10 +47,14 @@ local function ShouldAuraBeLarge(caster)
 	end
 end
 
+local function ShouldAuraBeLargeAlways(caster)
+    return true
+end
 
+local ShouldAuraBeLarge = ShouldAuraBeLargeAlways
 
-local UpdatePortraitIcon = function(unit, maxPrio, maxPrioIndex, maxPrioFilter)
-    local auraCD = TargetFrame.CADPortraitFrame
+local UpdatePortraitIcon = function(frame, unit, maxPrio, maxPrioIndex, maxPrioFilter)
+    local auraCD = frame.CADPortraitFrame
     local originalPortrait = auraCD.originalPortrait
 
     local isLocked = LibSpellLocks:GetSpellLockInfo(unit)
@@ -163,7 +169,7 @@ f.SimpleTargetFrameHook = function(self)
 
     --[[ PORTRAIT AURA ]]
     if defaults.portraitIcon then
-        UpdatePortraitIcon(self.unit, maxPrio, maxPrioIndex, maxPrioFilter)
+        UpdatePortraitIcon(TargetFrame, self.unit, maxPrio, maxPrioIndex, maxPrioFilter)
     end
 end
 
@@ -181,25 +187,36 @@ function f.PLAYER_LOGIN(self, event)
         end
     end)
 
-    local originalPortrait = _G["TargetFramePortrait"];
+    ShouldAuraBeLarge = defaults.largePersonalDebuffs and ShouldAuraBeLargePersonalDebuffs or ShouldAuraBeLargeAlways
 
-    local auraCD = CreateFrame("Cooldown", "ClassicAuraDurationsPortraitAura", TargetFrame, "CooldownFrameTemplate")
-    auraCD:SetFrameStrata("LOW")
-    auraCD:SetFrameLevel(1)
-    auraCD:SetDrawEdge(false);
-    -- auraCD:SetHideCountdownNumbers(true);
-    auraCD:SetReverse(true)
-    auraCD:SetSwipeTexture("Interface\\CHARACTERFRAME\\TempPortraitAlphaMaskSmall")
-    auraCD:SetAllPoints(originalPortrait)
-    TargetFrame.CADPortraitFrame = auraCD
-    auraCD.originalPortrait = originalPortrait
+    local makePortraitOverlay = function(frame, portraitGlobalName)
+        local originalPortrait = _G[portraitGlobalName];
 
-    local auraIconTexture = auraCD:CreateTexture(nil, "BORDER", nil, 2)
-    auraIconTexture:SetAllPoints(originalPortrait)
-    -- auraIconTexture:Hide()
-    -- SetPortraitToTexture(auraIconTexture, 136039)
-    auraCD.texture = auraIconTexture
-    auraCD:Hide()
+        local auraCD = CreateFrame("Cooldown", "CAD"..portraitGlobalName, frame, "CooldownFrameTemplate")
+        auraCD:SetParent(frame)
+        auraCD:SetFrameStrata("LOW")
+        if frame == PlayerFrame then
+            auraCD:SetFrameLevel(2)
+        else
+            auraCD:SetFrameLevel(1)
+        end
+        auraCD:SetDrawEdge(false);
+        -- auraCD:SetHideCountdownNumbers(true);
+        auraCD:SetReverse(true)
+        auraCD:SetSwipeTexture("Interface\\CHARACTERFRAME\\TempPortraitAlphaMaskSmall")
+        auraCD:SetAllPoints(originalPortrait)
+        frame.CADPortraitFrame = auraCD
+        auraCD.originalPortrait = originalPortrait
+
+        local auraIconTexture = auraCD:CreateTexture(nil, "BORDER", nil, 2)
+        auraIconTexture:SetAllPoints(originalPortrait)
+        -- auraIconTexture:Hide()
+        -- SetPortraitToTexture(auraIconTexture, 136039)
+        auraCD.texture = auraIconTexture
+        auraCD:Hide()
+    end
+    makePortraitOverlay(TargetFrame, "TargetFramePortrait")
+    makePortraitOverlay(PlayerFrame, "PlayerPortrait")
 
     if defaults.hookTargetFrame then
         if defaults.enemyBuffs then
@@ -250,6 +267,43 @@ function f.PLAYER_LOGIN(self, event)
             CooldownFrame_Clear(debuffFrame.cooldown);
         end
     end)
+
+    self:RegisterUnitEvent("UNIT_AURA", "player") -- for player portrait icon
+end
+
+function f:UNIT_AURA(event, unit)
+    if unit == "player" then
+        local maxPrio = 0
+        local maxPrioFilter
+        local maxPrioIndex = 1
+        if defaults.playerPortraitIcon then
+            for index=1,100 do --debuffs
+                local name, icon, count, debuffType, duration, expirationTime, caster, _, _, spellId, _, _, casterIsPlayer, nameplateShowAll = UnitAura(unit, index, "HARMFUL");
+                if not name then break end
+
+                local rootSpellID, spellType, prio = LibAuraTypes.GetDebuffInfo(spellId)
+                if prio and prio > maxPrio then
+                    maxPrio = prio
+                    maxPrioIndex = index
+                    maxPrioFilter = "HARMFUL"
+                end
+            end
+
+            for index=1,100 do --buffs
+                local name, icon, count, debuffType, duration, expirationTime, caster, _, _, spellId, _, _, casterIsPlayer, nameplateShowAll = UnitAura(unit, index, "HELPFUL");
+                if not name then break end
+
+                local rootSpellID, spellType, prio = LibAuraTypes.GetDebuffInfo(spellId)
+                if prio and prio > maxPrio then
+                    maxPrio = prio
+                    maxPrioIndex = index
+                    maxPrioFilter = "HELPFUL"
+                end
+            end
+
+            UpdatePortraitIcon(PlayerFrame, unit, maxPrio, maxPrioIndex, maxPrioFilter)
+        end
+    end
 end
 
 f.EnemyBuffsTargetFrameHook = function(self)
@@ -325,7 +379,7 @@ f.EnemyBuffsTargetFrameHook = function(self)
 
                 -- set the buff to be big if the buff is cast by the player or his pet
                 numBuffs = numBuffs + 1;
-                largeBuffList[numBuffs] = ShouldAuraBeLarge(caster);
+                largeBuffList[numBuffs] = true--ShouldAuraBeLarge(caster);
 
                 frame:ClearAllPoints();
                 frame:Show();
@@ -458,6 +512,6 @@ f.EnemyBuffsTargetFrameHook = function(self)
 
     --[[ PORTRAIT AURA ]]
     if defaults.portraitIcon then
-        UpdatePortraitIcon(self.unit, maxPrio, maxPrioIndex, maxPrioFilter)
+        UpdatePortraitIcon(TargetFrame, self.unit, maxPrio, maxPrioIndex, maxPrioFilter)
     end
 end
