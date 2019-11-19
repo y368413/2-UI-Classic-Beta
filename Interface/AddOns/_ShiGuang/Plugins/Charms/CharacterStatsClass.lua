@@ -1,4 +1,4 @@
-﻿--## Author: Peter Getov  ## Version: 2.4.2
+﻿--## Author: Peter Getov  ## Version: 2.6
 -- core - table (namespace) shared between every lua file
 local CharacterStatsClassic_UIConfig = {};
 
@@ -170,41 +170,16 @@ function UIConfig:SetupDropdown()
     UIDropDownMenu_JustifyText(CSC_UIFrame.CharacterStatsPanel.rightStatsDropDown, "LEFT");
 end
 
--- Extend the functionality of the default CharacterFrameTab
-function ToggleCharacter(tab, onlyShow)
-    if ( tab == "PaperDollFrame") then
+-- Hook a custom function in order to extend the functionality of the default ToggleCharacter function
+local function CSC_ToggleCharacterPostHook(tab, onlyShow)
+    if (tab == "PaperDollFrame") then
         CSC_UIFrame.CharacterStatsPanel:Show();
         CSC_UIFrame:UpdateStats();
     else
         CSC_UIFrame.CharacterStatsPanel:Hide();
     end
-
-	if ( tab == "PetPaperDollFrame" and not HasPetUI() and not PetPaperDollFrame:IsVisible() ) then
-		return;
-	end
-	if ( tab == "HonorFrame" and not HonorSystemEnabled() and not HonorFrame:IsVisible() ) then
-		return;
-	end
-	local subFrame = _G[tab];
-	if ( subFrame ) then
-		if (not subFrame.hidden) then
-			PanelTemplates_SetTab(CharacterFrame, subFrame:GetID());
-			if ( CharacterFrame:IsShown() ) then
-				if ( subFrame:IsShown() ) then
-					if ( not onlyShow ) then
-						HideUIPanel(CharacterFrame);
-					end
-				else
-					PlaySound(SOUNDKIT.IG_CHARACTER_INFO_TAB);
-					CharacterFrame_ShowSubFrame(tab);
-				end
-			else
-				CharacterFrame_ShowSubFrame(tab);
-				ShowUIPanel(CharacterFrame);
-			end
-		end
-    end
 end
+hooksecurefunc("ToggleCharacter", CSC_ToggleCharacterPostHook);
 
 -- Serializing the DB
 local dbLoader = CreateFrame("Frame");
@@ -695,6 +670,36 @@ function CSC_PaperDollFrame_SetHitChance(statFrame, unit)
 	statFrame:Show();
 end
 
+local function CSC_GetHitFromBiznicksAccurascope(unit)
+	CSC_ScanTooltip:ClearLines();
+
+	local hitFromScope = 0;
+	local rangedIndex = 18;
+
+	local hasItem = CSC_ScanTooltip:SetInventoryItem(unit, rangedIndex);
+	if hasItem then
+		local maxLines = CSC_ScanTooltip:NumLines();
+		for line=1, maxLines do
+			local leftText = getglobal(CSC_ScanTooltipPrefix.."TextLeft"..line);
+			if leftText:GetText() then
+				local valueTxt = string.match(leftText:GetText(), "+%d+%% "..CSC_HIT_BIZNICKS_TXT);
+				if valueTxt then
+					valueTxt = string.match(valueTxt, "%d+");
+					if valueTxt then
+						local numValue = tonumber(valueTxt);
+						if numValue then
+							hitFromScope = numValue;
+							break;
+						end
+					end
+				end
+			end
+		end
+	end
+
+	return hitFromScope;
+end
+
 function CSC_PaperDollFrame_SetRangedHitChance(statFrame, unit)
 	
 	if not IsRangedWeapon() then
@@ -707,6 +712,11 @@ function CSC_PaperDollFrame_SetRangedHitChance(statFrame, unit)
 	
 	if not hitChance then
 		hitChance = 0;
+	end
+
+	local hitFromScope = CSC_GetHitFromBiznicksAccurascope(unit);
+	if (hitFromScope > 0) then
+		hitChance = hitChance + hitFromScope;
 	end
 
 	local hitChanceText = hitChance;
@@ -873,6 +883,7 @@ local function CSC_GetBlockValue(unit)
 						local numValue = tonumber(valueTxt);
 						if numValue then
 							blockFromShield = numValue;
+							break;
 						end
 					end
 				end

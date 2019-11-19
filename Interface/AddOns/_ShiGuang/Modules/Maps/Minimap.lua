@@ -231,7 +231,7 @@ function module:SetupMinimap()
 	Minimap:SetMaskTexture("Interface\\Buttons\\WHITE8X8")
 	DropDownList1:SetClampedToScreen(true)
 
-	local mover = M.Mover(Minimap, U["Minimap"], "Minimap", R.Minimap.Pos, Minimap:GetWidth(), Minimap:GetHeight())
+	local mover = M.Mover(Minimap, U["Minimap"], "Minimap", R.Minimap.Pos)
 	Minimap:ClearAllPoints()
 	Minimap:SetPoint("TOPRIGHT", mover)
 	Minimap.mover = mover

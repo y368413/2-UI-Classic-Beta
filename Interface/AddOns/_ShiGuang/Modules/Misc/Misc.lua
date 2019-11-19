@@ -449,3 +449,26 @@ function MISC:AutoDismount()
 	end
 	M:RegisterEvent("UI_ERROR_MESSAGE", updateEvent)
 end
+
+do
+hooksecurefunc("TextStatusBar_UpdateTextStringWithValues",function(self,textString,value,_,maxValue)  ---	Custom status text format.
+	if self.RightText and value and maxValue>0 and not self.showPercentage and GetCVar("statusTextDisplay")=="BOTH" then
+		self.RightText:SetText(M.Numb(value))
+		if value == 0 then self.RightText:SetText(" "); end
+	end
+	if maxValue>0 and GetCVar("statusTextDisplay")=="NUMERIC" then 
+     if maxValue == value then textString:SetText(M.Numb(maxValue))
+     else textString:SetText(M.Numb(value) .." / "..M.Numb(maxValue))
+       --textString:SetText(tostring(math.ceil((value / maxValue) * 100)).."% "..maxValue.." ")
+     end 
+   end 
+   --[[for i = 1, 4 do
+		_G["PartyMemberFrame"..i.."HealthBarText"]:SetText(" ");
+		_G["PartyMemberFrame"..i.."HealthBarTextLeft"]:SetText(" ");
+		_G["PartyMemberFrame"..i.."HealthBarTextRight"]:SetText(" ");
+		_G["PartyMemberFrame"..i.."ManaBarText"]:SetText(" ");
+		_G["PartyMemberFrame"..i.."ManaBarTextLeft"]:SetText(" ");
+		_G["PartyMemberFrame"..i.."ManaBarTextRight"]:SetText(" ");
+	end]]
+end)
+end

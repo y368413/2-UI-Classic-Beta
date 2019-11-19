@@ -53,14 +53,14 @@ end
 
 local ShouldAuraBeLarge = ShouldAuraBeLargeAlways
 
-local UpdatePortraitIcon = function(frame, unit, maxPrio, maxPrioIndex, maxPrioFilter)
+local UpdatePortraitIcon = function(frame, unit, maxPrio, maxPrioIndex, maxPrioFilter, targetType)
     local auraCD = frame.CADPortraitFrame
     local originalPortrait = auraCD.originalPortrait
 
     local isLocked = LibSpellLocks:GetSpellLockInfo(unit)
 
     local CUTOFF_AURA_TYPE = defaults.verbosePortraitIcon and "SPEED_BOOST" or "SILENCE"
-    local PRIO_SILENCE = LibAuraTypes.GetDebuffTypePriority(CUTOFF_AURA_TYPE)
+    local PRIO_SILENCE = LibAuraTypes.GetAuraTypePriority(CUTOFF_AURA_TYPE, targetType)
     if isLocked and PRIO_SILENCE > maxPrio then
         maxPrio = PRIO_SILENCE
         maxPrioIndex = -1
@@ -93,20 +93,22 @@ f.SimpleTargetFrameHook = function(self)
     local numBuffs = 0;
     -- local playerIsTarget = UnitIsUnit(PlayerFrame.unit, self.unit);
     local selfName = self:GetName();
+    local unit = self.unit
+    local targetType = UnitIsFriend(unit, "player") and "ALLY" or "ENEMY"
     --[[ PORTRAIT AURA ]]
     local maxPrio = 0
     local maxPrioFilter
     local maxPrioIndex = 1
 
     for i = 1, MAX_TARGET_BUFFS do
-        local buffName, icon, count, debuffType, duration, expirationTime, caster, canStealOrPurge, _ , spellId, _, _, casterIsPlayer, nameplateShowAll = UnitBuff(self.unit, i, nil);
+        local buffName, icon, count, debuffType, duration, expirationTime, caster, canStealOrPurge, _ , spellId, _, _, casterIsPlayer, nameplateShowAll = UnitBuff(unit, i, nil);
         if (buffName) then
             frameName = selfName.."Buff"..(i);
             frame = _G[frameName];
 
             -- Handle cooldowns
             frameCooldown = _G[frameName.."Cooldown"];
-            local durationNew, expirationTimeNew = LibClassicDurations:GetAuraDurationByUnit(self.unit, spellId, caster)
+            local durationNew, expirationTimeNew = LibClassicDurations:GetAuraDurationByUnit(unit, spellId, caster)
             if duration == 0 and durationNew then
                 duration = durationNew
                 expirationTime = expirationTimeNew
@@ -115,7 +117,7 @@ f.SimpleTargetFrameHook = function(self)
 
             --[[ PORTRAIT AURA ]]
             if defaults.portraitIcon then
-                local rootSpellID, spellType, prio = LibAuraTypes.GetDebuffInfo(spellId)
+                local prio, spellType = LibAuraTypes.GetAuraInfo(spellId, targetType)
                 if prio and prio > maxPrio then
                     maxPrio = prio
                     maxPrioIndex = i
@@ -134,7 +136,7 @@ f.SimpleTargetFrameHook = function(self)
 
     local maxDebuffs = self.maxDebuffs or MAX_TARGET_DEBUFFS;
     while ( frameNum <= maxDebuffs and index <= maxDebuffs ) do
-        local debuffName, icon, count, debuffType, duration, expirationTime, caster, _, _, spellId, _, _, casterIsPlayer, nameplateShowAll = UnitDebuff(self.unit, index, "INCLUDE_NAME_PLATE_ONLY");
+        local debuffName, icon, count, debuffType, duration, expirationTime, caster, _, _, spellId, _, _, casterIsPlayer, nameplateShowAll = UnitDebuff(unit, index, "INCLUDE_NAME_PLATE_ONLY");
         if ( debuffName ) then
             if ( TargetFrame_ShouldShowDebuffs(self.unit, caster, nameplateShowAll, casterIsPlayer) ) then
                 frameName = selfName.."Debuff"..frameNum;
@@ -153,7 +155,7 @@ f.SimpleTargetFrameHook = function(self)
 
                 --[[ PORTRAIT AURA ]]
                 if defaults.portraitIcon then
-                    local rootSpellID, spellType, prio = LibAuraTypes.GetDebuffInfo(spellId)
+                    local prio, spellType = LibAuraTypes.GetAuraInfo(spellId, targetType)
                     if prio and prio > maxPrio then
                         maxPrio = prio
                         maxPrioIndex = index
@@ -169,7 +171,7 @@ f.SimpleTargetFrameHook = function(self)
 
     --[[ PORTRAIT AURA ]]
     if defaults.portraitIcon then
-        UpdatePortraitIcon(TargetFrame, self.unit, maxPrio, maxPrioIndex, maxPrioFilter)
+        UpdatePortraitIcon(TargetFrame, self.unit, maxPrio, maxPrioIndex, maxPrioFilter, targetType)
     end
 end
 
@@ -281,7 +283,7 @@ function f:UNIT_AURA(event, unit)
                 local name, icon, count, debuffType, duration, expirationTime, caster, _, _, spellId, _, _, casterIsPlayer, nameplateShowAll = UnitAura(unit, index, "HARMFUL");
                 if not name then break end
 
-                local rootSpellID, spellType, prio = LibAuraTypes.GetDebuffInfo(spellId)
+                local prio, spellType = LibAuraTypes.GetAuraInfo(spellId, "ALLY")
                 if prio and prio > maxPrio then
                     maxPrio = prio
                     maxPrioIndex = index
@@ -293,7 +295,7 @@ function f:UNIT_AURA(event, unit)
                 local name, icon, count, debuffType, duration, expirationTime, caster, _, _, spellId, _, _, casterIsPlayer, nameplateShowAll = UnitAura(unit, index, "HELPFUL");
                 if not name then break end
 
-                local rootSpellID, spellType, prio = LibAuraTypes.GetDebuffInfo(spellId)
+                local prio, spellType = LibAuraTypes.GetAuraInfo(spellId, "ALLY")
                 if prio and prio > maxPrio then
                     maxPrio = prio
                     maxPrioIndex = index
@@ -301,7 +303,7 @@ function f:UNIT_AURA(event, unit)
                 end
             end
 
-            UpdatePortraitIcon(PlayerFrame, unit, maxPrio, maxPrioIndex, maxPrioFilter)
+            UpdatePortraitIcon(PlayerFrame, unit, maxPrio, maxPrioIndex, maxPrioFilter, "ALLY")
         end
     end
 end
@@ -316,6 +318,7 @@ f.EnemyBuffsTargetFrameHook = function(self)
 
 
     local unit = self.unit
+    local targetType = UnitIsFriend(unit, "player") and "ALLY" or "ENEMY"
     --[[ PORTRAIT AURA ]]
     local maxPrio = 0
     local maxPrioFilter
@@ -361,7 +364,7 @@ f.EnemyBuffsTargetFrameHook = function(self)
 
                 --[[ PORTRAIT AURA ]]
                 if defaults.portraitIcon then
-                    local rootSpellID, spellType, prio = LibAuraTypes.GetDebuffInfo(spellId)
+                    local prio, spellType = LibAuraTypes.GetAuraInfo(spellId, targetType)
                     if prio and prio > maxPrio then
                         maxPrio = prio
                         maxPrioIndex = i
@@ -445,7 +448,7 @@ f.EnemyBuffsTargetFrameHook = function(self)
 
                     --[[ PORTRAIT AURA ]]
                     if defaults.portraitIcon then
-                        local rootSpellID, spellType, prio = LibAuraTypes.GetDebuffInfo(spellId)
+                        local prio, spellType = LibAuraTypes.GetAuraInfo(spellId, targetType)
                         if prio and prio > maxPrio then
                             maxPrio = prio
                             maxPrioIndex = index
@@ -512,6 +515,6 @@ f.EnemyBuffsTargetFrameHook = function(self)
 
     --[[ PORTRAIT AURA ]]
     if defaults.portraitIcon then
-        UpdatePortraitIcon(TargetFrame, self.unit, maxPrio, maxPrioIndex, maxPrioFilter)
+        UpdatePortraitIcon(TargetFrame, self.unit, maxPrio, maxPrioIndex, maxPrioFilter, targetType)
     end
 end

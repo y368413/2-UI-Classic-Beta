@@ -523,7 +523,5 @@ function module:OnLogin()
 	      sendCmd("/bht off")
 	      PlayerFrame:SetAlpha(1)
         TargetFrame:SetAlpha(1)
-	  end
-	
-	--if MaoRUISettingDB["Chat"]["Lock"] then ForceChatSettings() end
+	  end	
 end

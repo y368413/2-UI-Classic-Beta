@@ -421,11 +421,11 @@ end
 local day, hour, minute = 86400, 3600, 60
 function M.FormatTime(s)
 	if s >= day then
-		return format("%d"..I.MyColor.."d", s/day), s % day
+		return format("%d"..I.MyColor.."d", s/day), s%day
 	elseif s >= hour then
-		return format("%d"..I.MyColor.."h", s/hour), s % hour
+		return format("%d"..I.MyColor.."h", s/hour), s%hour
 	elseif s >= minute then
-		return format("%d"..I.MyColor.."m", s/minute), s % minute
+		return format("%d"..I.MyColor.."m", s/minute), s%minute
 	elseif s > 10 then
 		return format("|cffcccc33%d|r", s), s - floor(s)
 	elseif s > 3 then
@@ -610,6 +610,10 @@ function M:CreateCheckBox()
 	return cb
 end
 
+local function editBoxClearFocus(self)
+	self:ClearFocus()
+end
+
 function M:CreateEditBox(width, height)
 	local eb = CreateFrame("EditBox", nil, self)
 	eb:SetSize(width, height)
@@ -617,16 +621,12 @@ function M:CreateEditBox(width, height)
 	eb:SetTextInsets(5, 5, 0, 0)
 	eb:SetFont(I.Font[1], I.Font[2]+2, I.Font[3])
 	M.CreateBD(eb, .3)
-	eb:SetScript("OnEscapePressed", function()
-		eb:ClearFocus()
-	end)
-	eb:SetScript("OnEnterPressed", function()
-		eb:ClearFocus()
-	end)
+	eb:SetScript("OnEscapePressed", editBoxClearFocus)
+	eb:SetScript("OnEnterPressed", editBoxClearFocus)
 
 	eb.Type = "EditBox"
 	return eb
-end 
+end
 
 local function optOnClick(self)
 	PlaySound(SOUNDKIT.GS_TITLE_OPTION_OK)
@@ -654,6 +654,15 @@ local function optOnLeave(self)
 	self:SetBackdropColor(0, 0, 0)
 end
 
+local function buttonOnShow(self)
+	self.__list:Hide()
+end
+
+local function buttonOnClick(self)
+	PlaySound(SOUNDKIT.GS_TITLE_OPTION_OK)
+	ToggleFrame(self.__list)
+end
+
 function M:CreateDropDown(width, height, data)
 	local dd = CreateFrame("Frame", nil, self)
 	dd:SetSize(width, height)
@@ -670,11 +679,9 @@ function M:CreateDropDown(width, height, data)
 	M.CreateBD(list, 1)
 	list:SetBackdropBorderColor(1, 1, 1, .2)
 	list:Hide()
-	bu:SetScript("OnShow", function() list:Hide() end)
-	bu:SetScript("OnClick", function()
-		PlaySound(SOUNDKIT.GS_TITLE_OPTION_OK)
-		ToggleFrame(list)
-	end)
+	bu.__list = list
+	bu:SetScript("OnShow", buttonOnShow)
+	bu:SetScript("OnClick", buttonOnClick)
 	dd.button = bu
 
 	local opt, index = {}, 0
@@ -700,15 +707,44 @@ function M:CreateDropDown(width, height, data)
 	return dd
 end
 
-function M:CreateColorSwatch()
+local function updatePicker()
+	local swatch = ColorPickerFrame.__swatch
+	local r, g, b = ColorPickerFrame:GetColorRGB()
+	swatch.tex:SetVertexColor(r, g, b)
+	swatch.color.r, swatch.color.g, swatch.color.b = r, g, b
+end
+
+local function cancelPicker()
+	local swatch = ColorPickerFrame.__swatch
+	local r, g, b = ColorPicker_GetPreviousValues()
+	swatch.tex:SetVertexColor(r, g, b)
+	swatch.color.r, swatch.color.g, swatch.color.b = r, g, b
+end
+
+local function openColorPicker(self)
+	local r, g, b = self.color.r, self.color.g, self.color.b
+	ColorPickerFrame.__swatch = self
+	ColorPickerFrame.func = updatePicker
+	ColorPickerFrame.previousValues = {r = r, g = g, b = b}
+	ColorPickerFrame.cancelFunc = cancelPicker
+	ColorPickerFrame:SetColorRGB(r, g, b)
+	ColorPickerFrame:Show()
+end
+
+function M:CreateColorSwatch(name, color)
 	local swatch = CreateFrame("Button", nil, self)
 	swatch:SetSize(18, 18)
 	M.CreateBD(swatch, 1)
+	swatch.text = M.CreateFS(swatch, 14, name, false, "LEFT", 26, 0)
 	local tex = swatch:CreateTexture()
 	tex:SetPoint("TOPLEFT", R.mult, -R.mult)
 	tex:SetPoint("BOTTOMRIGHT", -R.mult, R.mult)
 	tex:SetTexture(I.bdTex)
+	tex:SetVertexColor(color.r, color.g, color.b)
+
 	swatch.tex = tex
+	swatch.color = color
+	swatch:SetScript("OnClick", openColorPicker)
 
 	return swatch
 end

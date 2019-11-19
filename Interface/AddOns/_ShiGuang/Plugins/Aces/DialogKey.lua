@@ -1,6 +1,6 @@
 ﻿--## Author: Foxthorn  ## Version: 1.7.3
 
-DialogKey = LibStub("AceAddon-3.0"):NewAddon("DialogKey", "AceConsole-3.0", "AceTimer-3.0", "AceEvent-3.0")
+local DialogKey = LibStub("AceAddon-3.0"):NewAddon("DialogKey", "AceConsole-3.0", "AceTimer-3.0", "AceEvent-3.0")
 
 
 local defaults = {								-- Default settings
@@ -686,7 +686,7 @@ function DialogKey:DisableQuestScrolling()		-- Frees up mouse wheel input again 
 	if not found then UIParent:EnableMouseWheel(false) end
 end
 
-function DialogKey:HandleScroll(delta)		-- Run when the mouse wheel is trapped and the user scrolls it
+function DialogKey:HandleScroll(delta)			-- Run when the mouse wheel is trapped and the user scrolls it
 	if not DialogKey.db.global.scrollQuests then return end
 	
 	local scrollFrame
@@ -711,14 +711,14 @@ end]]
 function DialogKey:CreateOptionsFrame()		-- Constructs the options frame
 	self.options = CreateFrame("Frame")
 	
-	-- scroll frame
+	--[[ scroll frame
 	local scrollFrame = CreateFrame("ScrollFrame", nil, self.options)
 	scrollFrame:SetPoint("TOPLEFT", 5, -5)
 	scrollFrame:SetPoint("BOTTOMRIGHT", -25, 5)
 	scrollFrame:EnableMouse(true)
 	scrollFrame:EnableMouseWheel(true)
 	
-	--[[scrollFrame:SetScript("OnMouseWheel", function(self, delta)
+	scrollFrame:SetScript("OnMouseWheel", function(self, delta)
 		local current = self.scrollBar:GetValue()
 		local minV, maxV = self.scrollBar:GetMinMaxValues()
 			
@@ -747,12 +747,6 @@ function DialogKey:CreateOptionsFrame()		-- Constructs the options frame
 	self.options.scrollBar = scrollBar]]
 	
 	-- options frame
-		local scrollFrame = CreateFrame("ScrollFrame", nil, self.options)
-	scrollFrame:SetPoint("TOPLEFT", 5, -5)
-	scrollFrame:SetPoint("BOTTOMRIGHT", -25, 5)
-	scrollFrame:EnableMouse(true)
-	scrollFrame:EnableMouseWheel(true)
-	
 	local optionsContent = CreateFrame("Frame", nil, self.options)
 	optionsContent:SetPoint("TOPLEFT", 5, -5)
 	--optionsContent:SetPoint("BOTTOMRIGHT", -25, 5)
@@ -767,7 +761,7 @@ function DialogKey:CreateOptionsFrame()		-- Constructs the options frame
 	
 	local subtitle = optionsContent:CreateFontString(nil, "ARTWORK", "GameFontHighlightSmall")
 	subtitle:SetFont(STANDARD_TEXT_FONT, 10)
-	subtitle:SetText("Version 1.7.3")
+	subtitle:SetText("Version 1.7.4")
 	subtitle:SetPoint("TOPLEFT", title, "BOTTOMLEFT", 4, -8)
 	
 	optionsContent.keybindButtons = {}

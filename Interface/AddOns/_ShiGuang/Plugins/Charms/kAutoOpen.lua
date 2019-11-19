@@ -4,7 +4,7 @@ kAutoOpen:SetScript('OnEvent', function(self, event, ...)
  self[event](...)
 end)
 
-local atBank, atMail, atMerchant
+local atBank, atMail, atMerchant, isLooting
 
 local autoOpenItems = {
 --	[4632]	 = true, -- Ornate Bronze Lockbox -- Lockpicking

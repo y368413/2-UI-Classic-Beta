@@ -455,7 +455,8 @@ function InboxMailbagItem_OnEnter(self, index)
 			end
 		end
 
-		local addSeparator = true;
+		--local addSeparator = true;
+		local GroupStacks = true;
 
 		for i, link in ipairs(links) do
 			local packageIcon, stationeryIcon, sender, subject, money, CODAmount, daysLeft, itemCount, wasRead, wasReturned, textCreated, canReply, isGM = GetInboxHeaderInfo(link.mailID);
@@ -479,7 +480,7 @@ function InboxMailbagItem_OnEnter(self, index)
 
 				-- Format expiration time
 				if strAmount then
-					if addSeparator then  tip:AddLine(" ");  addSeparator = false;  end
+					--if addSeparator then  tip:AddLine(" ");  addSeparator = false;  end
 
 					local canDelete = InboxItemCanDelete(link.mailID);
 

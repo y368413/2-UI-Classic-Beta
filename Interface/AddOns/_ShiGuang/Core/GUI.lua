@@ -679,7 +679,7 @@ local function CreateOption(i)
 			M.CreateFS(dd, 14, name, "system", "CENTER", 0, 25)
 		-- Colorswatch
 		elseif optType == 5 then
-			local f = M.CreateColorSwatch(parent)
+			local f = M.CreateColorSwatch(parent, name, NDUI_VARIABLE(key, value))
 			local width = 25 + (horizon or 0)*155
 			if horizon2 then
 				dd:SetPoint("TOPLEFT", width, -offset + 30)
@@ -689,30 +689,6 @@ local function CreateOption(i)
 				f:SetPoint("TOPLEFT", width, -offset - 6)
 				offset = offset + 36
 			end
-			M.CreateFS(f, 14, name, false, "LEFT", 26, 0)
-			f.tex:SetVertexColor(NDUI_VARIABLE(key, value).r, NDUI_VARIABLE(key, value).g, NDUI_VARIABLE(key, value).b)
-
-			local function onUpdate()
-				local r, g, b = ColorPickerFrame:GetColorRGB()
-				f.tex:SetVertexColor(r, g, b)
-				NDUI_VARIABLE(key, value).r, NDUI_VARIABLE(key, value).g, NDUI_VARIABLE(key, value).b = r, g, b
-				if callback then callback() end
-			end
-
-			local function onCancel()
-				local r, g, b = ColorPicker_GetPreviousValues()
-				f.tex:SetVertexColor(r, g, b)
-				NDUI_VARIABLE(key, value).r, NDUI_VARIABLE(key, value).g, NDUI_VARIABLE(key, value).b = r, g, b
-			end
-
-			f:SetScript("OnClick", function()
-				local r, g, b = NDUI_VARIABLE(key, value).r, NDUI_VARIABLE(key, value).g, NDUI_VARIABLE(key, value).b
-				ColorPickerFrame.func = onUpdate
-				ColorPickerFrame.previousValues = {r = r, g = g, b = b}
-				ColorPickerFrame.cancelFunc = onCancel
-				ColorPickerFrame:SetColorRGB(r, g, b)
-				ColorPickerFrame:Show()
-			end)
 		-- Blank, no optType
 		else
 			local l = CreateFrame("Frame", nil, parent)
@@ -843,8 +819,9 @@ local function importData()
 			for _, itemID in next, items do
 				MaoRUISettingDB[key][value][tonumber(itemID)] = true
 			end
-		elseif key == "Mover" then
+		elseif key == "Mover" or key == "AuraWatchMover" then
 			local relFrom, parent, relTo, x, y = select(3, strsplit(":", option))
+			value = tonumber(value) or value
 			x = tonumber(x)
 			y = tonumber(y)
 			MaoRUISettingDB[key][value] = {relFrom, parent, relTo, x, y}

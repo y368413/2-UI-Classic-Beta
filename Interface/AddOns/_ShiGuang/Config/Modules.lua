@@ -17,9 +17,6 @@ R.Auras = {
 	MageArcaneChargesPos	= {'BOTTOM', UIParent, "CENTER", 0, -200},
 	
   -- 技能监控各组初始位置
-	ClassBarPos	  = {"CENTER", UIParent, "CENTER", -102.5, -260},	    -- 职业分组
-	AbsorbPos	    = {"CENTER", UIParent, "CENTER",-110, -80},	      -- 吸收分组
-	ShieldPos	    = {"CENTER", UIParent, "CENTER",90, -80},	        -- 盾牌分组
 	PlayerAuraPos	= {"RIGHT", UIParent, "CENTER", -360, -160},	    -- 玩家光环分组
 	TargetAuraPos   = {"LEFT", UIParent, "CENTER", 240, -155},		    -- 目标光环分组
 	SpecialPos		= {"RIGHT", UIParent, "CENTER", -240, -155},	    -- 玩家重要光环分组

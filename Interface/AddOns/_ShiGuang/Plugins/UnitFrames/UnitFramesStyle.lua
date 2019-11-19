@@ -1,6 +1,3 @@
-local _, ns = ...
-local M, R, U, I = unpack(ns)
-
   PlayerFrame:ClearAllPoints() PlayerFrame:SetPoint("RIGHT",UIParent,"CENTER", -150, -250) PlayerFrame:SetUserPlaced(true)  --PlayerFrame:SetScale(0.8) 
   TargetFrame:ClearAllPoints() TargetFrame:SetPoint("LEFT",UIParent,"CENTER", 150, -250) TargetFrame:SetUserPlaced(true)  --TargetFrame:SetScale(0.8) 
   PartyMemberFrame1:ClearAllPoints() PartyMemberFrame1:SetPoint("TOPLEFT", 260, -143) PartyMemberFrame1:SetUserPlaced(true)
@@ -29,19 +26,6 @@ hooksecurefunc("UnitFramePortrait_Update",function(self)
                         self.portrait:SetTexCoord(0,1,0,1) 
                 end 
         end 
-end)
-
--------------------------------------------	Custom status text format.-----------------------------------------
-hooksecurefunc("TextStatusBar_UpdateTextStringWithValues",function(self,textString,value,_,maxValue)
-	if self.RightText and value and maxValue>0 and not self.showPercentage and GetCVar("statusTextDisplay")=="BOTH" then
-		self.RightText:SetText(M.Numb(value))
-		if value == 0 then self.RightText:SetText(" "); end
-	end
-	if maxValue>0 and GetCVar("statusTextDisplay")=="NUMERIC" then 
-       if maxValue == value then textString:SetText(M.Numb(maxValue))
-       else textString:SetText(M.Numb(value) .." / "..M.Numb(maxValue))  --textString:SetText(tostring(math.ceil((value / maxValue) * 100)).."% "..maxValue.." ")
-       end 
-    end 
 end)
 
 -----------------------------------------	     隐藏头像动态伤害      -----------------------------------------

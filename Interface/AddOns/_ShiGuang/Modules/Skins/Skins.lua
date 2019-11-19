@@ -55,6 +55,8 @@ function S:OnLogin()
 	self:DBMSkin()
 	self:SkadaSkin()
 	self:BigWigsSkin()
+	self:RecountSkin()
+	self:LootEx()		-- Ê°È¡ÔöÇ¿
 	-- Register skin
 	local media = LibStub and LibStub("LibSharedMedia-3.0", true)
 	if media then

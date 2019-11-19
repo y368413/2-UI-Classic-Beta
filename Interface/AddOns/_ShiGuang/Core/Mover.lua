@@ -18,7 +18,7 @@ function M:Mover(text, value, anchor, width, height, isAuraWatch)
 		tinsert(MoverList, mover)
 	end
 
-	if not MaoRUISettingDB[key][value] then 
+	if not MaoRUISettingDB[key][value] then
 		mover:SetPoint(unpack(anchor))
 	else
 		mover:SetPoint(unpack(MaoRUISettingDB[key][value]))

@@ -1,4 +1,4 @@
-﻿local strfind, strrep, strmatch, pairs = string.find, string.rep, string.match, pairs
+﻿local strfind, strrep, strmatch, pairs, C_Timer_After, ChatTypeInfo = string.find, string.rep, string.match, pairs, C_Timer.After, ChatTypeInfo
 --[[--------------------------------------------------------------------
 	ChatLinkTooltips	Written by Junxx EU-Khaz'goroth <addons@colordesigns.de>
 ----------------------------------------------------------------------]]
@@ -152,6 +152,8 @@ local CHAT_WHISPER_INFORM_GET = CHAT_WHISPER_INFORM_GET or "<<%s:"
 local rules = {
     { pat = "|c%x+|HChatCopy|h.-|h|r",      repl = "" },   --去掉本插件定義的鏈接
     { pat = "|c%x%x%x%x%x%x%x%x(.-)|r",     repl = "%1" }, --替換所有顔色值
+    { pat = CHAT_WHISPER_GET:gsub("%%s",".-"), repl = "", button = "LeftButton" }, --密語
+    { pat = CHAT_WHISPER_INFORM_GET:gsub("%%s",".-"), repl = "", button = "LeftButton" }, --密語
     { pat = "|Hchannel:.-|h.-|h",           repl = "", button = "LeftButton" }, --(L)去掉頻道文字
     { pat = "|Hplayer:.-|h.-|h" .. ":",     repl = "", button = "LeftButton" }, --(L)去掉發言玩家名字
     { pat = "|Hplayer:.-|h.-|h" .. "：",    repl = "", button = "LeftButton" }, --(L)去掉發言玩家名字
@@ -163,6 +165,7 @@ local rules = {
     { pat = "|H.-|h(.-)|h",                 repl = "%1" },  --替換所有超連接
     { pat = "|TInterface\\TargetingFrame\\UI%-RaidTargetingIcon_(%d):0|t", repl = "{rt%1}" },
     { pat = "|T.-|t",                       repl = "" },    --替換所有素材
+    { pat = "|[rcTtHhkK]",                  repl = "" },    --去掉單獨的|r|c|K
     { pat = "^%s+",                         repl = "" },    --去掉空格
 }
 --替換字符

@@ -1,7 +1,7 @@
 ﻿---------------------------------------------------- MAIN ADDON FRAME
 local MAF=CreateFrame("Frame","MyParent",UIParent)
 	MAF:SetSize(21,21)
-	MAF:SetPoint("RIGHT", UIParent, "RIGHT", -66, 111)
+	MAF:SetPoint("RIGHT", UIParent, "RIGHT", -66, 88)
 	MAF:SetBackdrop({bgFile = "Interface\\AddOns\\_ShiGuang\\Media\\Hexagon"})
 	MAF:SetBackdropColor(RAID_CLASS_COLORS[select(2, UnitClass("player"))].r, RAID_CLASS_COLORS[select(2, UnitClass("player"))].g, RAID_CLASS_COLORS[select(2, UnitClass("player"))].b)
 	MAF:SetMovable(true)

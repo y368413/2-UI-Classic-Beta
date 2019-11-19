@@ -249,13 +249,6 @@ local function FriendGroups_UpdateFriendButton(button)
 				else
 					infoText = mobile and LOCATION_MOBILE_APP or zoneName
 				end
-			--if not button.facIcon then button.facIcon = button:CreateTexture("facIcon") end   --DIY by y368413
-				--button.facIcon:ClearAllPoints()
-				--button.facIcon:SetPoint("RIGHT", button.gameIcon, "LEFT", 7, -5)
-				--button.facIcon:SetWidth(button.gameIcon:GetWidth())
-				--button.facIcon:SetHeight(button.gameIcon:GetHeight())
-				--button.facIcon:SetTexture(CampIcon(faction))
-				--button.facIcon:Show()
 			else
 				infoText = gameText
 			end
@@ -838,10 +831,10 @@ local function FriendGroups_OnClick(self, button)
 	if button == "RightButton" then
         ShiGuangDB["FriendGroupsHideOffline"] = not ShiGuangDB["FriendGroupsHideOffline"]
         FriendGroups_Update()
-    else
-        ShiGuangDB["FriendGroupsCollapsed"][group] = not ShiGuangDB["FriendGroupsCollapsed"][group]
-        FriendGroups_Update()
-    end
+	else
+		ShiGuangDB["FriendGroupsCollapsed"][group] = not ShiGuangDB["FriendGroupsCollapsed"][group]
+		FriendGroups_Update()
+	end
 end
 
 local function FriendGroups_OnEnter(self)

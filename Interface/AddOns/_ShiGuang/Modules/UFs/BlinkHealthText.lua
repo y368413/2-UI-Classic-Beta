@@ -5,7 +5,7 @@ local M, R, U, I = unpack(ns)
 -- 描述: 在屏幕中下方显示玩家(宠物)和目标(ToT)的基本信息  版权所有@多玩游戏网
 -- Author: Kill & dugu from duowan  Thanks warbaby
 -------------------------------------------------------------------------------
-BlinkHealth = LibStub("AceAddon-3.0"):NewAddon("SimpleInfo",  "AceEvent-3.0", "AceTimer-3.0");
+local BlinkHealth = LibStub("AceAddon-3.0"):NewAddon("SimpleInfo",  "AceEvent-3.0", "AceTimer-3.0");
 
 local WARRIOR       = 1
 local PALADIN       = 2
@@ -221,10 +221,10 @@ function BlinkHealth:UpdateUnitValues()
 	local heal, maxheal, perh, petheal, petmax, name;
 	local power, maxpower, powertype, _;
 		heal, maxheal = UnitHealth("player"), UnitHealthMax("player");
-		local _, powertype = UnitPowerType("player")
 		power, maxpower = UnitPower("player"), UnitPowerMax("player");
 		petheal, petmax = UnitHealth("pet"), UnitHealthMax("pet");
 		name = UnitName("pet");
+		_, powertype = UnitPowerType("player");
 	
 	perh = heal/maxheal * 100 + 0.5;
 	self:SetPercentText("player", perh);
@@ -255,14 +255,20 @@ function BlinkHealth:UpdateUnitValues()
 		else
 			hexColor = self:ToHexColor(UnitSelectionColor("player"));
 		end
-		self.frame["player"].playername:SetFormattedText("|cff%s%s|r", hexColor, UnitName("player"));
+		self.frame["player"].name:SetFormattedText("|cff%s%s|r", hexColor, UnitName("player"));
 		
 	-- target
 	local hexH, hexP;
 	if (UnitExists("target")) then
-		heal, maxheal = UnitHealth("target"), UnitHealthMax("target");
-		local _, powertype = UnitPowerType("target")
+		if RealMobHealth and RealMobHealth.GetUnitHealth then 
+			heal, maxheal = RealMobHealth.GetUnitHealth("target")
+		else
+			heal = UnitHealth("target") or 0
+			maxheal = UnitHealthMax("target") or 1
+		end
+		--heal, maxheal = UnitHealth("target"), UnitHealthMax("target");
 		power, maxpower = UnitPower("target"), UnitPowerMax("target");
+		_, powertype = UnitPowerType("target");
 		name = UnitName("target");
 		perh = heal/maxheal * 100 + 0.5;
 		self:SetPercentText("target", perh);		
@@ -286,6 +292,19 @@ function BlinkHealth:UpdateUnitValues()
 		else
 			hexColor = self:ToHexColor(UnitSelectionColor("target"));
 		end
+		--精英、银英、世界boss加前缀
+		if(UnitClassification("target")=="elite") then
+			name="[精英]"..name;
+		end
+		if(UnitClassification("target")=="rare") then
+			name="[稀有]"..name;
+		end
+		if(UnitClassification("target")=="rareelite") then
+			name="[稀有精英]"..name;
+		end
+		if(UnitClassification("target")=="worldboss") then
+			name="[世界BOSS]"..name;
+		end
 		self.frame["target"].name:SetFormattedText("|cff%s%s|r", hexColor, name);
 	
 		if (UnitExists("targettarget")) then
@@ -296,7 +315,7 @@ function BlinkHealth:UpdateUnitValues()
 			if (UnitIsUnit("targettarget", "player")) then
 				name = " "..YOU.." <";
 			end
-			self.frame["target"].tot:SetFormattedText("|cff%s>%s★%d%%|r", hexColor, name, perh);
+			self.frame["target"].tot:SetFormattedText("|cff%s>%s ★%d%%|r", hexColor, name, perh);
 			self.frame["target"].tot:Show();
 		else
 			self.frame["target"].tot:Hide();
@@ -412,17 +431,16 @@ function BlinkHealth:ConstructHealth(unit)
 	this.heal = heal;
 
 	-- Name
-	local name, playername, pet, tot;
+	local name, pet, tot;
 	if (unit == "player") then
+		name = this:CreateFontString(nil, "OVERLAY");
+		name:SetFontObject("SIFontMedium");
+		name:SetPoint("BOTTOMRIGHT", power, "BOTTOMRIGHT", 0, 18);
+
 		pet = this:CreateFontString(nil, "OVERLAY");
 		pet:SetFontObject("SIFontSmall");
 		pet:SetPoint("BOTTOMRIGHT", health[4], "TOPRIGHT", 0, 6);
 		this.pet = pet;
-		
-		playername = this:CreateFontString(nil, "OVERLAY");
-		playername:SetFontObject("SIFontMedium");
-		playername:SetPoint("BOTTOMRIGHT", power, "BOTTOMRIGHT", 0, 18);
-		this.playername = playername;
 	else
 		name = this:CreateFontString(nil, "OVERLAY");
 		name:SetFontObject("SIFontMedium");

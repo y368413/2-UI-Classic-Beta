@@ -7,7 +7,6 @@ local pairs, next, format, wipe = pairs, next, string.format, wipe
 local AuraWatchList = {}
 local groups = {
 	-- groups name = direction, interval, mode, iconsize, position, barwidth
-	["ClassBar"] = {"RIGHT", 6, "ICON", 36, R.Auras.ClassBarPos},
 	["Player Aura"] = {"UP", 2, "BAR2", 21, R.Auras.PlayerAuraPos, 60},
 	["Target Aura"] = {"UP", 2, "BAR", 28, R.Auras.TargetAuraPos, 80},
 	["Special Aura"] = {"UP", 2, "BAR2", 28, R.Auras.SpecialPos, 80},
@@ -18,8 +17,6 @@ local groups = {
 	["Raid Debuff"] = {"UP", 2, "ICON", 36, R.Auras.RaidDebuffPos},
 	["Warning"] = {"UP", 2, "ICON", 32, R.Auras.WarningPos},
 	["InternalCD"] = {"DOWN", 2, "BAR2", 16, R.Auras.InternalPos, 120},
-	["Absorb"] = {"DOWN", 2, "TEXT", 21, R.Auras.AbsorbPos},
-	["Shield"] = {"DOWN", 2, "TEXT", 21, R.Auras.ShieldPos},
 }
 
 local function newAuraFormat(value)

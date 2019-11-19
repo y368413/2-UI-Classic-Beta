@@ -1,13 +1,16 @@
+local _, ns = ...
+local M, R, U, I = unpack(ns)
+local P = M:GetModule("Skins")
+
+function P:LootEx()
+	--if not MaoRUISettingDB["Skins"]["Loot"] then return end
+	
 ------------------------------------------------------------ImprovedLootFrame
 local wow_classic = WOW_PROJECT_ID and WOW_PROJECT_ID == WOW_PROJECT_CLASSIC
 	--LOOTFRAME_AUTOLOOT_DELAY = 0.5;
 	--LOOTFRAME_AUTOLOOT_RATE = 0.1;
-	
-	-- Woah, nice coding, blizz.
-	-- Anchor something positioned at the top of the frame to the center of the frame instead,
-	-- and make it an anonymous font string so I have to work to find it
-	local i = 1
 
+	local i = 1
 	while true do
 		local r = select(i, LootFrame:GetRegions())
 		if not r then break end
@@ -38,7 +41,6 @@ OverflowText:Hide()
 local t = {}
 local function CalculateNumMobsLooted()
 	wipe(t)
-
 	for i = 1, GetNumLootItems() do
 		for n = 1, select("#", GetLootSourceInfo(i)), 2 do
 			local GUID, num = select(n, GetLootSourceInfo(i))
@@ -50,23 +52,17 @@ local function CalculateNumMobsLooted()
 	for k, v in pairs(t) do
 		n = n + 1
 	end
-
 	return n
 end
 
 hooksecurefunc("LootFrame_Show", function(self, ...)
 	local maxButtons = floor(UIParent:GetHeight()/LootButton1:GetHeight() * 0.7)
-	
 	local num = GetNumLootItems()
-
 	if self.AutoLootTable then
 		num = #self.AutoLootTable
 	end
-
 	--self.AutoLootDelay = 0.4 + (num * 0.05)
-	
 	num = min(num, maxButtons)
-	
 	LootFrame:SetHeight(baseHeight + (num * buttonHeight))
 	for i = 1, num do
 		if i > LOOTFRAME_NUMBUTTONS then
@@ -82,59 +78,55 @@ hooksecurefunc("LootFrame_Show", function(self, ...)
 			button:SetPoint(p, "LootButton"..(i-1), r, x, y)
 		end
 	end
-
 	if CalculateNumMobsLooted() >= 50 then
 		OverflowText:Show()
 	else
 		OverflowText:Hide()
 	end
-
 	LootFrame_Update();
 end)
 
--------BGRoll----------------##Author: NOGARUKA  ##Version: 2
-local NeedList = {
-[18231] = true,
-[71951] = true,
-[71952] = true,
-[71953] = true,
-}
-local BGRoll = CreateFrame("Frame")
-BGRoll:RegisterEvent("START_LOOT_ROLL")
-BGRoll:RegisterEvent("CONFIRM_LOOT_ROLL")
-BGRoll:SetScript("OnEvent", function(self, event, id, rt)
-if event == 'START_LOOT_ROLL' then
-	local _, Name, _, _, _, Need, Greed, _ = GetLootRollItemInfo(id)
-	local Link = GetLootRollItemLink(id)
-	local ItemID = tonumber(strmatch(Link, 'item:(%d+)'))
-	if NeedList[ItemID] then
-		if Need then
-			print("→: ", (Name))
-			RollOnLoot(id, 1)
-		elseif Greed then
-			print("→: ", (Name))
-			RollOnLoot(id, 2)
+	local chn = { "say", "guild", "party", "raid"}
+	local chncolor = {
+		say = { 1, 1, 1},
+		guild = { .25, 1, .25},
+		party = { 2/3, 2/3, 1},
+		raid = { 1, .5, 0},
+	}
+
+	local function Announce(chn)
+		if (GetNumLootItems() == 0) then return end
+		--if UnitIsPlayer("target") or not UnitExists("target") then -- Chests are hard to identify!
+			--SendChatMessage(format("*** %s ***", "箱子中的战利品"), chn)
+		--else
+			--SendChatMessage(format("*** %s%s ***", UnitName("target"), "的战利品"), chn)
+		--end
+		for i = 1, GetNumLootItems() do
+			local link
+			if(LootSlotHasItem(i)) then     --判断，只发送物品
+				link = GetLootSlotLink(i)
+			else
+				_, link = GetLootSlotInfo(i)
+			end
+			if link then
+				local messlink = "- %s"
+				SendChatMessage(format(messlink, link), chn)
+			end
 		end
 	end
-end
-if event == 'CONFIRM_LOOT_ROLL' then ConfirmLootRoll(id, rt) end
-end)
 
---[[local UnLootAlert = CreateFrame("Frame", "UnLootAlert")
-UnLootAlert:RegisterEvent("ZONE_CHANGED_NEW_AREA")
-UnLootAlert:RegisterEvent("PLAYER_ENTERING_WORLD")
-UnLootAlert:SetScript("OnEvent", function(self, event, ...)
-  if event == "PLAYER_ENTERING_WORLD" or event == "ZONE_CHANGED_NEW_AREA" then
-    if select(2, IsInInstance()) == "raid" then
-    AlertFrame:UnregisterEvent('SHOW_LOOT_TOAST')
-    AlertFrame:UnregisterEvent('LOOT_ITEM_ROLL_WON')
-    AlertFrame:UnregisterEvent('SHOW_LOOT_TOAST_UPGRADE')
-    AlertFrame:UnregisterEvent('BONUS_ROLL_RESULT')
-    end
-  else
-    AlertFrame:RegisterEvent('SHOW_LOOT_TOAST')
-    AlertFrame:RegisterEvent('LOOT_ITEM_ROLL_WON')
-    AlertFrame:RegisterEvent('SHOW_LOOT_TOAST_UPGRADE')
-    AlertFrame:RegisterEvent('BONUS_ROLL_RESULT')
-  end
- end)]]
+	LootFrame.announce = {}
+	for i = 1, #chn do
+		LootFrame.announce[i] = CreateFrame("Button", "ItemLootAnnounceButton"..i, LootFrame)
+		LootFrame.announce[i]:SetSize(21, 21)
+		M.PixelIcon(LootFrame.announce[i], I.normTex, true)
+		M.CreateSD(LootFrame.announce[i])
+		LootFrame.announce[i].Icon:SetVertexColor(unpack(chncolor[chn[i]]))
+		if i==1 then
+		LootFrame.announce[i]:SetPoint("TOPRIGHT", LootFrameCloseButton, "BOTTOM", 3, -3)
+		else
+		LootFrame.announce[i]:SetPoint("RIGHT", LootFrame.announce[i-1], "LEFT", -6, 0)
+		end
+		LootFrame.announce[i]:SetScript("OnClick", function() Announce(chn[i]) end)
+	end
+end
