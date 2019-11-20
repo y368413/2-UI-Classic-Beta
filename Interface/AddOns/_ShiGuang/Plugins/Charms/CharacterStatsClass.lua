@@ -682,7 +682,7 @@ local function CSC_GetHitFromBiznicksAccurascope(unit)
 		for line=1, maxLines do
 			local leftText = getglobal(CSC_ScanTooltipPrefix.."TextLeft"..line);
 			if leftText:GetText() then
-				local valueTxt = string.match(leftText:GetText(), "+%d+%% "..CSC_HIT_BIZNICKS_TXT);
+				local valueTxt = string.match(leftText:GetText(), "+%d+%% "..HIT);
 				if valueTxt then
 					valueTxt = string.match(valueTxt, "%d+");
 					if valueTxt then
