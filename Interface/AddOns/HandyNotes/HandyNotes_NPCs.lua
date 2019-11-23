@@ -72862,7 +72862,7 @@ local defaults = {
 }
 
 function Addon:OnInitialize()
-	self.db = LibStub("AceDB-3.0"):New("HandyNotes_NPCsClassicDB", defaults, true)
+	self.db = LibStub("AceDB-3.0"):New("HandyNotes_NPCsDB", defaults, true)
 	db = self.db.profile
 	learned = self.db.char.learned
 

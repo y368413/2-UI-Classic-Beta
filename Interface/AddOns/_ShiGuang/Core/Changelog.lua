@@ -16,6 +16,7 @@ local quest = {
 	 "点击聊天框角色名称可实现:|cff3399FF     Shift-密语 Ctrl-邀请工会 Alt-组队邀请",
    "|cFF00DDFF如需改进和反馈，可以回帖或者在讨论组(n9PnFl0o)告诉我，谢谢。",
    "-------------------------------2019-11-19----[怀旧]",
+   "[修复]大地图Npc显示过滤保存失效的bug",
    "[更新]ClassicCastbars、LibClassicDurations和CharacterStatsClass",
    "[插件]版本号升级为v 0.4.0",
    "--------------------------over",

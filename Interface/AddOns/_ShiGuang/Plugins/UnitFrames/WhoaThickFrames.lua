@@ -1,9 +1,9 @@
 --	Player class colors.
-function whoaUnitClass(healthbar, unit)
+local function whoaUnitClass(healthbar, unit)
 	if UnitIsPlayer(unit) and UnitIsConnected(unit) and UnitClass(unit) then
 		_, class = UnitClass(unit);
-		local c = CUSTOM_CLASS_COLORS and CUSTOM_CLASS_COLORS[class] or RAID_CLASS_COLORS[class];
-		healthbar:SetStatusBarColor(c.r, c.g, c.b);
+		local class = CUSTOM_CLASS_COLORS and CUSTOM_CLASS_COLORS[class] or RAID_CLASS_COLORS[class];
+		healthbar:SetStatusBarColor(class.r, class.g, class.b);
 	elseif UnitIsPlayer(unit) and (not UnitIsConnected(unit)) then
 		healthbar:SetStatusBarColor(0.5,0.5,0.5);
 	else
@@ -14,19 +14,23 @@ hooksecurefunc("UnitFrameHealthBar_Update", whoaUnitClass)
 hooksecurefunc("HealthBar_OnValueChanged", function(self) whoaUnitClass(self, self.unit) end)
 
 --	Unit faction colors.
-function whoaUnitReaction(healthbar, unit)
-	if UnitExists(unit) and (not UnitIsPlayer(unit)) then
-		if (UnitIsTapDenied(unit)) and not UnitPlayerControlled(unit) then
-			healthbar:SetStatusBarColor(0.5, 0.5, 0.5)
-		elseif (not UnitIsTapDenied(unit)) then
-			local reaction = FACTION_BAR_COLORS[UnitReaction(unit,"player")];
-			if reaction then
-				healthbar:SetStatusBarColor(reaction.r, reaction.g, reaction.b);
-			else
-				healthbar:SetStatusBarColor(0,0.6,0.1)
+local function whoaUnitReaction(healthbar, unit)
+		if UnitExists(unit) and (not UnitIsPlayer(unit)) then
+			if (UnitIsTapDenied(unit)) and not UnitPlayerControlled(unit) then
+				healthbar:SetStatusBarColor(0.5, 0.5, 0.5)
+			elseif (not UnitIsTapDenied(unit)) then
+				local reaction = FACTION_BAR_COLORS[UnitReaction(unit,"player")];
+				if reaction then
+					healthbar:SetStatusBarColor(reaction.r, reaction.g, reaction.b);
+				else
+					healthbar:SetStatusBarColor(0,0.6,0.1)
+				end
 			end
+		--else
+			--if (UnitIsTapDenied(unit)) and not UnitPlayerControlled(unit) then
+				--healthbar:SetStatusBarColor(0.5, 0.5, 0.5)
+			--end
 		end
-	end
 end
 hooksecurefunc("TargetFrame_CheckFaction", whoaUnitReaction)
 hooksecurefunc("UnitFrameHealthBar_Update", whoaUnitReaction)
@@ -66,7 +70,7 @@ hooksecurefunc("TargetFrame_UpdateAuraPositions", function(self, auraName, numAu
 	end
 end)
 -- NOTE: Blizzards API will return targets current and max healh as a percentage instead of exact value (ex. 100/100).
-function whoaTextFormat(statusFrame, textString, value, valueMin, valueMax)
+local function whoaTextFormat(statusFrame, textString, value, valueMin, valueMax)
 	if ( ( tonumber(valueMax) ~= valueMax or valueMax > 0 ) and not ( statusFrame.pauseUpdates ) ) then
 		local valueDisplay = value;
 		local valueMaxDisplay = valueMax;
@@ -196,9 +200,12 @@ hooksecurefunc("TextStatusBar_UpdateTextStringWithValues",function(self)
 		for i, v in pairs({	PlayerFrameHealthBar.LeftText, PlayerFrameHealthBar.RightText, PlayerFrameManaBar.LeftText, PlayerFrameManaBar.RightText, PlayerFrameManaBar.TextString, PlayerFrameManaBar }) do v:SetAlpha(0); end
 		PlayerFrameHealthBar.TextString:Show();
 	else
-		PlayerFrameHealthBar.TextString:SetFontObject(SystemFont_Outline_Small);
+		
 		PlayerFrameHealthBar.TextString:SetTextColor(1,1,1,1);
 		for i, v in pairs({	PlayerFrameHealthBar.LeftText, PlayerFrameHealthBar.RightText, PlayerFrameManaBar.LeftText, PlayerFrameManaBar.RightText, PlayerFrameManaBar.TextString, PlayerFrameManaBar }) do v:SetAlpha(1); end
+		-- if cfg.styleFont then
+			-- PlayerFrameHealthBar.TextString:SetFontObject(SystemFont_Outline_Small);
+		-- end
 	end
 	if UnitIsDead("player") then
 		PlayerFrameHealthBar.TextString:SetText(deadText);
@@ -206,6 +213,7 @@ hooksecurefunc("TextStatusBar_UpdateTextStringWithValues",function(self)
 		PlayerFrameHealthBar.TextString:SetText(ghostText);
 	-- end
 	elseif not UnitIsDead("player") and not UnitIsGhost("player") then
+			PlayerFrameHealthBar.TextString:SetFontObject(SystemFont_Outline_Small);
 		-- PlayerFrameHealthBar.TextString:SetFontObject(SystemFont_Outline_Small);
 		-- PlayerFrameHealthBar.TextString:SetTextColor(1,1,1,1);
 		-- for i, v in pairs({	PlayerFrameHealthBar.LeftText, PlayerFrameHealthBar.RightText, PlayerFrameManaBar.LeftText, PlayerFrameManaBar.RightText, PlayerFrameManaBar.TextString, PlayerFrameManaBar }) do v:SetAlpha(1); end
@@ -252,7 +260,7 @@ hooksecurefunc("PlayerFrame_ToPlayerArt", function(self)
 		self.manabar.LeftText:SetFontObject(SystemFont_Outline_Small);
 		self.manabar.RightText:SetFontObject(SystemFont_Outline_Small);
 		-- self.healthbar.TextString:SetFontObject(SystemFont_Outline_Small);
-		-- self.manabar.TextString:SetFontObject(SystemFont_Outline_Small);
+		self.manabar.TextString:SetFontObject(SystemFont_Outline_Small);
 		--PlayerFrameGroupIndicatorText:ClearAllPoints();
 		--PlayerFrameGroupIndicatorText:SetPoint("BOTTOMLEFT", PlayerFrame,"TOP",0,-20);
 		PlayerFrameGroupIndicatorLeft:Hide();
@@ -288,13 +296,28 @@ hooksecurefunc("PlayerFrame_ToPlayerArt", function()
 	PetFrameHealthBarTextRight:SetPoint("RIGHT",PetFrameHealthBar,"RIGHT",0,0);
 	-- PetFrameManaBarTextLeft:ClearAllPoints();
 	PetFrameManaBarTextLeft:SetPoint("LEFT",PetFrameManaBar,"LEFT",0,-2);
-	-- PetFrameManaBarTextRight:ClearAllPoints();
 	PetFrameManaBarTextRight:SetPoint("RIGHT",PetFrameManaBar,"RIGHT",0,-2);
+		PetFrameHealthBarText:SetFontObject(SystemFont_Outline_Small);
 	PetFrameHealthBarTextLeft:SetFontObject(SystemFont_Outline_Small);
 	PetFrameHealthBarTextRight:SetFontObject(SystemFont_Outline_Small);
+		PetFrameManaBarText:SetFontObject(SystemFont_Outline_Small);
 	PetFrameManaBarTextLeft:SetFontObject(SystemFont_Outline_Small);
 	PetFrameManaBarTextRight:SetFontObject(SystemFont_Outline_Small);
 end)
+
+hooksecurefunc("PetFrame_Update", function(self, override)
+	if ( (not PlayerFrame.animating) or (override) ) then
+		if ( UnitIsVisible(self.unit) and PetUsesPetFrame() and not PlayerFrame.vehicleHidesPet ) then
+			if ( UnitPowerMax(self.unit) == 0 ) then
+					PetFrameTexture:SetTexture("Interface\\TargetingFrame\\UI-SmallTargetingFrame-NoMana");
+				PetFrameManaBarText:Hide();
+			else
+					PetFrameTexture:SetTexture("Interface\\TargetingFrame\\UI-SmallTargetingFrame");
+			end
+		end
+	end
+end)
+
 function whoaPetFrameBg()
 	local f = CreateFrame("Frame",nil,PetFrame)
 	f:SetFrameStrata("BACKGROUND")
@@ -474,7 +497,7 @@ hooksecurefunc("TextStatusBar_UpdateTextStringWithValues", function()
 	end
 end)]]
 
---	Party Frames.
+--[[	Party Frames.
 function whoaPartyFrames()
 	local useCompact = GetCVarBool("useCompactPartyFrames");
 	if IsInGroup(player) and (not IsInRaid(player)) and (not useCompact) then 
@@ -506,4 +529,15 @@ function whoaPartyFrames()
 end
 hooksecurefunc("UnitFrame_Update", whoaPartyFrames)
 hooksecurefunc("PartyMemberFrame_ToPlayerArt", whoaPartyFrames)
+
+hooksecurefunc("TextStatusBar_UpdateTextStringWithValues", function()
+	--if (cfg.usePartyFrames) then
+		for i = 1, 4 do
+				_G["PartyMemberFrame"..i.."ManaBarText"]:SetText(" ");
+				_G["PartyMemberFrame"..i.."ManaBarTextLeft"]:SetText(" ");
+				_G["PartyMemberFrame"..i.."ManaBarTextRight"]:SetText(" ");
+		end
+	--end
+end)]]
+
 --------------------------------------------------------------------------------------whoa end
