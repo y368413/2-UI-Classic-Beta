@@ -15,22 +15,18 @@ hooksecurefunc("HealthBar_OnValueChanged", function(self) whoaUnitClass(self, se
 
 --	Unit faction colors.
 local function whoaUnitReaction(healthbar, unit)
-		if UnitExists(unit) and (not UnitIsPlayer(unit)) then
-			if (UnitIsTapDenied(unit)) and not UnitPlayerControlled(unit) then
-				healthbar:SetStatusBarColor(0.5, 0.5, 0.5)
-			elseif (not UnitIsTapDenied(unit)) then
-				local reaction = FACTION_BAR_COLORS[UnitReaction(unit,"player")];
-				if reaction then
-					healthbar:SetStatusBarColor(reaction.r, reaction.g, reaction.b);
-				else
-					healthbar:SetStatusBarColor(0,0.6,0.1)
-				end
+	if UnitExists(unit) and (not UnitIsPlayer(unit)) then
+		if (UnitIsTapDenied(unit)) and not UnitPlayerControlled(unit) then
+			healthbar:SetStatusBarColor(0.5, 0.5, 0.5)
+		elseif (not UnitIsTapDenied(unit)) then
+			local reaction = FACTION_BAR_COLORS[UnitReaction(unit,"player")];
+			if reaction then
+				healthbar:SetStatusBarColor(reaction.r, reaction.g, reaction.b);
+			else
+				healthbar:SetStatusBarColor(0,0.6,0.1)
 			end
-		--else
-			--if (UnitIsTapDenied(unit)) and not UnitPlayerControlled(unit) then
-				--healthbar:SetStatusBarColor(0.5, 0.5, 0.5)
-			--end
 		end
+	end
 end
 hooksecurefunc("TargetFrame_CheckFaction", whoaUnitReaction)
 hooksecurefunc("UnitFrameHealthBar_Update", whoaUnitReaction)
@@ -70,142 +66,161 @@ hooksecurefunc("TargetFrame_UpdateAuraPositions", function(self, auraName, numAu
 	end
 end)
 -- NOTE: Blizzards API will return targets current and max healh as a percentage instead of exact value (ex. 100/100).
-local function whoaTextFormat(statusFrame, textString, value, valueMin, valueMax)
-	if ( ( tonumber(valueMax) ~= valueMax or valueMax > 0 ) and not ( statusFrame.pauseUpdates ) ) then
-		local valueDisplay = value;
-		local valueMaxDisplay = valueMax;
+-- local function whoaTextFormat(statusFrame, textString, value, valueMin, valueMax)
+	-- if ( ( tonumber(valueMax) ~= valueMax or valueMax > 0 ) and not ( statusFrame.pauseUpdates ) ) then
+		-- local valueDisplay = value;
+		-- local valueMaxDisplay = valueMax;
+		-- local k,m=1e3
+		-- local m=k*k
+		-- local textDisplay = GetCVar("statusTextDisplay");
+		-- if ( value and valueMax > 0 and ( (textDisplay ~= "NUMERIC" and textDisplay ~= "NONE") or statusFrame.showPercentage ) and not statusFrame.showNumeric) then
+			-- if ( value == 0 and statusFrame.zeroText ) then
+				-- textString:SetText(statusFrame.zeroText);
+				-- statusFrame.isZero = 1;
+				-- textString:Show();
+			-- elseif ( textDisplay == "BOTH" and not statusFrame.showPercentage) then
+				-- if( statusFrame.LeftText and statusFrame.RightText ) then
+					-- if(not statusFrame.powerToken or statusFrame.powerToken == "MANA") then
+						-- statusFrame.LeftText:SetText(math.ceil((value / valueMax) * 100) .. "%");
+						-- statusFrame.LeftText:Show();
+					-- end
+					-- if (value < 1e3) then
+						-- valueDisplay = format(valueDisplay);
+					-- elseif (value >= 1e3) and (value < 1e5) then
+						-- valueDisplay = format("%1.3f",value/k);
+					-- elseif (value >= 1e5) and (value < 1e6) then
+						-- valueDisplay = format("%1.0f K",value/k);
+					-- elseif (value >= 1e6) then
+						-- valueDisplay = format("%1.1f M",value/m);
+					-- end
+					-- if (value == 0) then
+						-- statusFrame.RightText:SetText("");
+					-- elseif (value ~= 0) then
+						-- statusFrame.RightText:SetText(valueDisplay);
+					-- end
+					-- statusFrame.RightText:Show();
+					-- textString:Hide();
+				-- else
+					-- valueDisplay = "(" .. math.ceil((value / valueMax) * 100) .. "%) " .. valueDisplay .. " / " .. valueMaxDisplay;
+				-- end
+				-- textString:SetText(valueDisplay);
+			-- else
+				-- if (value == 0) then
+					-- valueDisplay = ("");
+				-- elseif (value ~= 0) then
+					-- valueDisplay = math.ceil((value / valueMax) * 100) .. "%";
+				-- end
+				-- if ( statusFrame.prefix and (statusFrame.alwaysPrefix or not (statusFrame.cvar and GetCVar(statusFrame.cvar) == "1" and statusFrame.textLockable) ) ) then
+					-- textString:SetText(statusFrame.prefix .. " " .. valueDisplay);
+				-- else
+					-- textString:SetText(valueDisplay);
+				-- end
+			-- end
+		-- elseif ( value == 0 and statusFrame.zeroText ) then
+			-- textString:SetText(statusFrame.zeroText);
+			-- statusFrame.isZero = 1;
+			-- textString:Show();
+			-- return;
+		-- else
+			-- statusFrame.isZero = nil;
+			-- if ( statusFrame.prefix and (statusFrame.alwaysPrefix or not (statusFrame.cvar and GetCVar(statusFrame.cvar) == "1" and statusFrame.textLockable) ) ) then
+				-- if (value < 1e3) then
+					-- valueDisplay = format(valueDisplay);
+				-- elseif (value >= 1e3) and (value < 1e5) then
+					-- valueDisplay = format("%1.3f",value/k);
+				-- elseif (value >= 1e5) and (value < 1e6) then
+					-- valueDisplay = format("%1.0f K",value/k);
+				-- elseif (value >= 1e6) then
+					-- valueDisplay = format("%1.1f M",value/m);
+				-- end
+				-- if (valueMax < 1e3) then
+					-- valueMaxDisplay = format(valueMaxDisplay);
+				-- elseif (valueMax >= 1e3) and (valueMax < 1e5) then
+					-- valueMaxDisplay = format("%1.3f",valueMaxDisplay/k);
+				-- elseif (valueMax >= 1e5) and (valueMax < 1e6) then
+					-- valueMaxDisplay = format("%1.0f K",valueMaxDisplay/k);
+				-- elseif (valueMax >= 1e6) then
+					-- valueMaxDisplay = format("%1.1f M",valueMaxDisplay/m);
+				-- end
+				-- if (value == 0) then
+					-- textString:SetText("");
+				-- elseif (value ~= 0) then
+					-- textString:SetText(statusFrame.prefix.." "..valueDisplay.." / "..valueMaxDisplay);
+				-- end
+			-- else
+				-- if (value < 1e3) then
+					-- valueDisplay = format(valueDisplay);
+				-- elseif (value >= 1e3) and (value < 1e5) then
+					-- valueDisplay = format("%1.3f",value/k);
+				-- elseif (value >= 1e5) and (value < 1e6) then
+					-- valueDisplay = format("%1.0f K",value/k);
+				-- elseif (value >= 1e6) then
+					-- valueDisplay = format("%1.1f M",value/m);
+				-- end
+				-- if (valueMax < 1e3) then
+					-- valueMaxDisplay = format(valueMaxDisplay);
+				-- elseif (valueMax >= 1e3) and (valueMax < 1e5) then
+					-- valueMaxDisplay = format("%1.3f",valueMaxDisplay/k);
+				-- elseif (valueMax >= 1e5) and (valueMax < 1e6) then
+					-- valueMaxDisplay = format("%1.0f K",valueMaxDisplay/k);
+				-- elseif (valueMax >= 1e6) then
+					-- valueMaxDisplay = format("%1.1f M",valueMaxDisplay/m);
+				-- end
+				-- if (value == 0) then
+					-- textString:SetText("");
+				-- elseif (value ~= 0) then
+					-- textString:SetText(valueDisplay.." / "..valueMaxDisplay);
+				-- end
+			-- end
+		-- end
+	-- else
+		-- textString:Hide();
+		-- textString:SetText("");
+		-- if ( not statusFrame.alwaysShow ) then
+			-- statusFrame:Hide();
+		-- else
+			-- statusFrame:SetValue(0);
+		-- end
+	-- end
+-- end
+-- hooksecurefunc("TextStatusBar_UpdateTextStringWithValues",whoaTextFormat)
+
+--	Custom status text format.
+hooksecurefunc("TextStatusBar_UpdateTextStringWithValues",function(self,_,value,_,maxValue)
+	-- local value = 99999
+	-- local maxValue = 999999
+	if self.RightText and value and maxValue>0 and not self.showPercentage and GetCVar("statusTextDisplay")=="BOTH" then
+
 		local k,m=1e3
-		local m=k*k
-		local textDisplay = GetCVar("statusTextDisplay");
-		if ( value and valueMax > 0 and ( (textDisplay ~= "NUMERIC" and textDisplay ~= "NONE") or statusFrame.showPercentage ) and not statusFrame.showNumeric) then
-			if ( value == 0 and statusFrame.zeroText ) then
-				textString:SetText(statusFrame.zeroText);
-				statusFrame.isZero = 1;
-				textString:Show();
-			elseif ( textDisplay == "BOTH" and not statusFrame.showPercentage) then
-				if( statusFrame.LeftText and statusFrame.RightText ) then
-					if(not statusFrame.powerToken or statusFrame.powerToken == "MANA") then
-						statusFrame.LeftText:SetText(math.ceil((value / valueMax) * 100) .. "%");
-						statusFrame.LeftText:Show();
-					end
-					if (value < 1e3) then
-						valueDisplay = format(valueDisplay);
-					elseif (value >= 1e3) and (value < 1e5) then
-						valueDisplay = format("%1.3f",value/k);
-					elseif (value >= 1e5) and (value < 1e6) then
-						valueDisplay = format("%1.0f K",value/k);
-					elseif (value >= 1e6) then
-						valueDisplay = format("%1.1f M",value/m);
-					end
-					if (value == 0) then
-						statusFrame.RightText:SetText("");
-					elseif (value ~= 0) then
-						statusFrame.RightText:SetText(valueDisplay);
-					end
-					statusFrame.RightText:Show();
-					textString:Hide();
-				else
-					valueDisplay = "(" .. math.ceil((value / valueMax) * 100) .. "%) " .. valueDisplay .. " / " .. valueMaxDisplay;
-				end
-				textString:SetText(valueDisplay);
-			else
-				if (value == 0) then
-					valueDisplay = ("");
-				elseif (value ~= 0) then
-					valueDisplay = math.ceil((value / valueMax) * 100) .. "%";
-				end
-				if ( statusFrame.prefix and (statusFrame.alwaysPrefix or not (statusFrame.cvar and GetCVar(statusFrame.cvar) == "1" and statusFrame.textLockable) ) ) then
-					textString:SetText(statusFrame.prefix .. " " .. valueDisplay);
-				else
-					textString:SetText(valueDisplay);
-				end
-			end
-		elseif ( value == 0 and statusFrame.zeroText ) then
-			textString:SetText(statusFrame.zeroText);
-			statusFrame.isZero = 1;
-			textString:Show();
-			return;
-		else
-			statusFrame.isZero = nil;
-			if ( statusFrame.prefix and (statusFrame.alwaysPrefix or not (statusFrame.cvar and GetCVar(statusFrame.cvar) == "1" and statusFrame.textLockable) ) ) then
-				if (value < 1e3) then
-					valueDisplay = format(valueDisplay);
-				elseif (value >= 1e3) and (value < 1e5) then
-					valueDisplay = format("%1.3f",value/k);
-				elseif (value >= 1e5) and (value < 1e6) then
-					valueDisplay = format("%1.0f K",value/k);
-				elseif (value >= 1e6) then
-					valueDisplay = format("%1.1f M",value/m);
-				end
-				if (valueMax < 1e3) then
-					valueMaxDisplay = format(valueMaxDisplay);
-				elseif (valueMax >= 1e3) and (valueMax < 1e5) then
-					valueMaxDisplay = format("%1.3f",valueMaxDisplay/k);
-				elseif (valueMax >= 1e5) and (valueMax < 1e6) then
-					valueMaxDisplay = format("%1.0f K",valueMaxDisplay/k);
-				elseif (valueMax >= 1e6) then
-					valueMaxDisplay = format("%1.1f M",valueMaxDisplay/m);
-				end
-				if (value == 0) then
-					textString:SetText("");
-				elseif (value ~= 0) then
-					textString:SetText(statusFrame.prefix.." "..valueDisplay.." / "..valueMaxDisplay);
-				end
-			else
-				if (value < 1e3) then
-					valueDisplay = format(valueDisplay);
-				elseif (value >= 1e3) and (value < 1e5) then
-					valueDisplay = format("%1.3f",value/k);
-				elseif (value >= 1e5) and (value < 1e6) then
-					valueDisplay = format("%1.0f K",value/k);
-				elseif (value >= 1e6) then
-					valueDisplay = format("%1.1f M",value/m);
-				end
-				if (valueMax < 1e3) then
-					valueMaxDisplay = format(valueMaxDisplay);
-				elseif (valueMax >= 1e3) and (valueMax < 1e5) then
-					valueMaxDisplay = format("%1.3f",valueMaxDisplay/k);
-				elseif (valueMax >= 1e5) and (valueMax < 1e6) then
-					valueMaxDisplay = format("%1.0f K",valueMaxDisplay/k);
-				elseif (valueMax >= 1e6) then
-					valueMaxDisplay = format("%1.1f M",valueMaxDisplay/m);
-				end
-				if (value == 0) then
-					textString:SetText("");
-				elseif (value ~= 0) then
-					textString:SetText(valueDisplay.." / "..valueMaxDisplay);
-				end
-			end
-		end
-	else
-		textString:Hide();
-		textString:SetText("");
-		if ( not statusFrame.alwaysShow ) then
-			statusFrame:Hide();
-		else
-			statusFrame:SetValue(0);
+		m=k*k
+		self.RightText:SetText((value>1e3 and value<1e5 and format("%1.3f",value/k)) or (value>=1e5 and value<1e6 and format("%1.0f K",value/k)) or (value>=1e6 and value<1e9 and format("%1.1f M",value/m)) or (value>=1e9 and format("%1.1f M",value/m)) or value )
+		if value == 0 then
+			self.RightText:SetText(" ");
 		end
 	end
-end
-hooksecurefunc("TextStatusBar_UpdateTextStringWithValues",whoaTextFormat)
+	if self.LeftText and value and maxValue > 0 and not self.showPercentage and GetCVar("statusTextDisplay")=="BOTH" then
+		-- local k,m=1e3 
+		-- m=k*k
+		-- self.RightText:SetText((value>1e3 and value<1e5 and format("%1.3f",value/k)) or (value>=1e5 and value<1e6 and format("%1.0f K",value/k)) or (value>=1e6 and value<1e9 and format("%1.1f M",value/m)) or (value>=1e9 and format("%1.1f M",value/m)) or value )
+		if value == 0 then
+			self.LeftText:SetText(" ");
+		end
+	end
+end)
 
 --[[	Player frame dead / ghost text.
 hooksecurefunc("TextStatusBar_UpdateTextStringWithValues",function(self)
 	local deadText = DEAD;
-	local ghostText = "Ghost";
+	-- local ghostText = "Ghost";
 	
 	if UnitIsDead("player") or UnitIsGhost("player") then
-		PlayerFrameHealthBar.TextString:SetFontObject(GameFontNormalSmall);
+		PlayerFrameHealthBar.TextString:SetFontObject(SystemFont_Small);
 		PlayerFrameHealthBar.TextString:SetTextColor(1.0,0.82,0,1);
 		for i, v in pairs({	PlayerFrameHealthBar.LeftText, PlayerFrameHealthBar.RightText, PlayerFrameManaBar.LeftText, PlayerFrameManaBar.RightText, PlayerFrameManaBar.TextString, PlayerFrameManaBar }) do v:SetAlpha(0); end
 		PlayerFrameHealthBar.TextString:Show();
 	else
-		
 		PlayerFrameHealthBar.TextString:SetTextColor(1,1,1,1);
 		for i, v in pairs({	PlayerFrameHealthBar.LeftText, PlayerFrameHealthBar.RightText, PlayerFrameManaBar.LeftText, PlayerFrameManaBar.RightText, PlayerFrameManaBar.TextString, PlayerFrameManaBar }) do v:SetAlpha(1); end
-		-- if cfg.styleFont then
-			-- PlayerFrameHealthBar.TextString:SetFontObject(SystemFont_Outline_Small);
-		-- end
 	end
 	if UnitIsDead("player") then
 		PlayerFrameHealthBar.TextString:SetText(deadText);
@@ -213,10 +228,7 @@ hooksecurefunc("TextStatusBar_UpdateTextStringWithValues",function(self)
 		PlayerFrameHealthBar.TextString:SetText(ghostText);
 	-- end
 	elseif not UnitIsDead("player") and not UnitIsGhost("player") then
-			PlayerFrameHealthBar.TextString:SetFontObject(SystemFont_Outline_Small);
-		-- PlayerFrameHealthBar.TextString:SetFontObject(SystemFont_Outline_Small);
-		-- PlayerFrameHealthBar.TextString:SetTextColor(1,1,1,1);
-		-- for i, v in pairs({	PlayerFrameHealthBar.LeftText, PlayerFrameHealthBar.RightText, PlayerFrameManaBar.LeftText, PlayerFrameManaBar.RightText, PlayerFrameManaBar.TextString, PlayerFrameManaBar }) do v:SetAlpha(1); end
+		PlayerFrameHealthBar.TextString:SetFontObject(SystemFont_Outline_Small);
 	end
 	
 	if UnitIsDead("target") or UnitIsGhost("target") then
@@ -229,10 +241,17 @@ hooksecurefunc("TextStatusBar_UpdateTextStringWithValues",function(self)
 	elseif UnitIsGhost("target") then
 		TargetFrame.deadText:Show();
 		TargetFrame.deadText:SetText(ghostText);
-	-- elseif not UnitIsDead("target") and not UnitIsGhost("target") then
-		-- PlayerFrameHealthBar.TextString:SetFontObject(SystemFont_Outline_Small);
-		-- PlayerFrameHealthBar.TextString:SetTextColor(1,1,1,1);
-		-- for i, v in pairs({	PlayerFrameHealthBar.LeftText, PlayerFrameHealthBar.RightText, PlayerFrameManaBar.LeftText, PlayerFrameManaBar.RightText, PlayerFrameManaBar.TextString, PlayerFrameManaBar }) do v:SetAlpha(1); end
+	end
+	if UnitIsDead("target") or UnitIsGhost("target") then
+		for i, v in pairs({	TargetFrameHealthBar.LeftText, TargetFrameHealthBar.RightText, TargetFrameHealthBar.TextString, TargetFrameManaBar.LeftText, TargetFrameManaBar.RightText, TargetFrameManaBar.TextString, TargetFrameManaBar }) do v:SetAlpha(0); end
+	else
+		for i, v in pairs({	TargetFrameHealthBar.LeftText, TargetFrameHealthBar.RightText, TargetFrameHealthBar.TextString, TargetFrameManaBar.LeftText, TargetFrameManaBar.RightText, TargetFrameManaBar.TextString, TargetFrameManaBar }) do v:SetAlpha(1); end
+	end
+	
+	if UnitIsDead("pet") then
+		for i, v in pairs({	PetFrameHealthBar.LeftText, PetFrameHealthBar.RightText, PetFrameManaBar.LeftText, PetFrameManaBar.RightText, PetFrameManaBar.TextString, PetFrameManaBar }) do v:SetAlpha(0); end
+	elseif not UnitIsDead("pet") then
+		for i, v in pairs({	PetFrameHealthBar.LeftText, PetFrameHealthBar.RightText, PetFrameManaBar.LeftText, PetFrameManaBar.RightText, PetFrameManaBar.TextString, PetFrameManaBar }) do v:SetAlpha(1); end	
 	end
 end)]]
 --	Player frame.
@@ -255,17 +274,17 @@ hooksecurefunc("PlayerFrame_ToPlayerArt", function(self)
 		self.manabar.RightText:ClearAllPoints();
 		self.manabar.RightText:SetPoint("RIGHT",self.manabar,"RIGHT",-5,0);
 		self.manabar.TextString:SetPoint("CENTER",self.manabar,"CENTER",0,0);
-		self.healthbar.LeftText:SetFontObject(SystemFont_Outline_Small);
-		self.healthbar.RightText:SetFontObject(SystemFont_Outline_Small);
-		self.manabar.LeftText:SetFontObject(SystemFont_Outline_Small);
-		self.manabar.RightText:SetFontObject(SystemFont_Outline_Small);
-		-- self.healthbar.TextString:SetFontObject(SystemFont_Outline_Small);
-		self.manabar.TextString:SetFontObject(SystemFont_Outline_Small);
 		--PlayerFrameGroupIndicatorText:ClearAllPoints();
 		--PlayerFrameGroupIndicatorText:SetPoint("BOTTOMLEFT", PlayerFrame,"TOP",0,-20);
 		PlayerFrameGroupIndicatorLeft:Hide();
 		PlayerFrameGroupIndicatorMiddle:Hide();
 		PlayerFrameGroupIndicatorRight:Hide();
+		self.healthbar.LeftText:SetFontObject(SystemFont_Outline_Small);
+		self.healthbar.RightText:SetFontObject(SystemFont_Outline_Small);
+		self.manabar.TextString:SetFontObject(SystemFont_Outline_Small);
+		self.manabar.LeftText:SetFontObject(SystemFont_Outline_Small);
+		self.manabar.RightText:SetFontObject(SystemFont_Outline_Small);
+
 end)
 --	Player vehicle frame.
 hooksecurefunc("PlayerFrame_ToVehicleArt", function(self, vehicleType)
@@ -290,19 +309,17 @@ hooksecurefunc("PlayerFrame_ToVehicleArt", function(self, vehicleType)
 	PlayerFrameBackground:SetWidth(114);
 end)
 hooksecurefunc("PlayerFrame_ToPlayerArt", function()
-	-- PetFrameHealthBarTextLeft:ClearAllPoints();
 	PetFrameHealthBarTextLeft:SetPoint("LEFT",PetFrameHealthBar,"LEFT",0,0);
-	-- PetFrameHealthBarTextRight:ClearAllPoints();
 	PetFrameHealthBarTextRight:SetPoint("RIGHT",PetFrameHealthBar,"RIGHT",0,0);
-	-- PetFrameManaBarTextLeft:ClearAllPoints();
-	PetFrameManaBarTextLeft:SetPoint("LEFT",PetFrameManaBar,"LEFT",0,-2);
-	PetFrameManaBarTextRight:SetPoint("RIGHT",PetFrameManaBar,"RIGHT",0,-2);
+		PetFrameManaBarText:SetPoint("CENTER",PetFrameManaBar,"CENTER",0,-3);
+		PetFrameManaBarTextLeft:SetPoint("LEFT",PetFrameManaBar,"LEFT",0,-3);
+		PetFrameManaBarTextRight:SetPoint("RIGHT",PetFrameManaBar,"RIGHT",0,-3);
 		PetFrameHealthBarText:SetFontObject(SystemFont_Outline_Small);
-	PetFrameHealthBarTextLeft:SetFontObject(SystemFont_Outline_Small);
-	PetFrameHealthBarTextRight:SetFontObject(SystemFont_Outline_Small);
+		PetFrameHealthBarTextLeft:SetFontObject(SystemFont_Outline_Small);
+		PetFrameHealthBarTextRight:SetFontObject(SystemFont_Outline_Small);
 		PetFrameManaBarText:SetFontObject(SystemFont_Outline_Small);
-	PetFrameManaBarTextLeft:SetFontObject(SystemFont_Outline_Small);
-	PetFrameManaBarTextRight:SetFontObject(SystemFont_Outline_Small);
+		PetFrameManaBarTextLeft:SetFontObject(SystemFont_Outline_Small);
+		PetFrameManaBarTextRight:SetFontObject(SystemFont_Outline_Small);
 end)
 
 hooksecurefunc("PetFrame_Update", function(self, override)
@@ -318,7 +335,7 @@ hooksecurefunc("PetFrame_Update", function(self, override)
 	end
 end)
 
-function whoaPetFrameBg()
+local function whoaPetFrameBg()
 	local f = CreateFrame("Frame",nil,PetFrame)
 	f:SetFrameStrata("BACKGROUND")
 	f:SetSize(70,18);
