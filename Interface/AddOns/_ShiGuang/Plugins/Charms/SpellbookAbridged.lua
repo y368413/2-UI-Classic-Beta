@@ -17,6 +17,7 @@ function SpellBookAbridged_OnLoad(self)
 	self:RegisterEvent("PLAYER_LOGIN");
 	self:RegisterEvent("ADDON_LOADED");
 	self:RegisterEvent("PLAYER_LOGOUT");
+	self:RegisterEvent("UPDATE_SHAPESHIFT_FORM");
 	
 	-- These are the events SpellBookFrame watches.
 	self:RegisterEvent("SPELLS_CHANGED");
@@ -46,6 +47,8 @@ function SpellBookAbridged_OnLoad(self)
 	SBA_SpellButton10 = CreateFrame("CheckButton", "SBA_SpellButton10", SpellButton10, "SBA_SpellButtonTemplate");
 	SBA_SpellButton11 = CreateFrame("CheckButton", "SBA_SpellButton11", SpellButton11, "SBA_SpellButtonTemplate");
 	SBA_SpellButton12 = CreateFrame("CheckButton", "SBA_SpellButton12", SpellButton12, "SBA_SpellButtonTemplate");
+	-- Fixes Blizzard's Oversight.
+	SpellBookFrame:HookScript("OnHide", MultiActionBar_UpdateGridVisibility);
 end
 
 function SpellBookAbridged_OnEvent(self, event, ...)
@@ -237,7 +240,7 @@ function SpellBookAbridged_CreateSpellList()
 		SBA_SkillLines[i] = {SBA_offset, newTotal};
 	end
 
-	SpellBookList = nil;
+	wipe(SpellBookList);  --clear old list, because some "spells" can be unlearned
 	SpellBookList = spellList;
 
 end

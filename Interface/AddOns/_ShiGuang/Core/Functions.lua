@@ -306,6 +306,10 @@ function M.Numb(n)
 	end
 end
 
+function M:Round(number)
+	return floor(number + .5)
+end
+
 -- Color code
 function M.HexRGB(r, g, b)
 	if r then

@@ -19,6 +19,7 @@ local BlzFrames = {
 	["GossipFrame"] = false,
 	["GuildRegistrarFrame"] = false,
 	["HelpFrame"] = false,
+	["HonorFrame"] = true,
 	["InterfaceOptionsFrame"] = false,
 	["ItemTextFrame"] = false,
 	["LootFrame"] = false,
@@ -50,7 +51,7 @@ local BlzFrames = {
 -- Frame Existing Check
 local function IsFrameExists()
 	for k in pairs(BlzFrames) do
-		if not _G[k] then print("XXX:", k) end
+		if not _G[k] and I.isDeveloper then print("XXX:", k) end
 	end
 end
 

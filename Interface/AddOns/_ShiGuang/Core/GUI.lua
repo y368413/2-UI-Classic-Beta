@@ -145,6 +145,8 @@ local defaultSettings = {
 		Rematch = true,
 		QuestLogEx = true,
 		QuestTracker = true,
+		Recount = true,
+		ResetRecount = true,
 	},
 	Tooltip = {
 		CombatHide = true,

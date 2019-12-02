@@ -109,7 +109,6 @@ info.onMouseUp = function(self, btn)
 		MaoRUIDB["RepairType"] = mod(MaoRUIDB["RepairType"] + 1, 2)
 		self:onEnter()
 	else
-		if InCombatLockdown() then UIErrorsFrame:AddMessage(I.InfoColor..ERR_NOT_IN_COMBAT) return end
 		ToggleCharacter("PaperDollFrame")
 	end
 end
@@ -144,7 +143,7 @@ info.onEnter = function(self)
 	end
 
 	GameTooltip:AddDoubleLine(" ", I.LineString)
-	GameTooltip:AddDoubleLine(" ", U["AutoRepair"]..": "..repairlist[MaoRUIDB["RepairType"]].." ", 1,1,1, .6,.8,1)
+	GameTooltip:AddDoubleLine(" ", U["Auto Repair"]..": "..repairlist[MaoRUIDB["RepairType"]].." ", 1,1,1, .6,.8,1)
 	GameTooltip:Show()
 end
 
