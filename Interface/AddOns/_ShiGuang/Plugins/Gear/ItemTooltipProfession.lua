@@ -1,16 +1,16 @@
---## Version: 1.1.3 ## Author: Bytespire
+--## Version: 1.1.4 ## Author: Bytespire
 local ItemProfConstants = {}
 
-local COOK = 1
-local FAID = 2
-local ALC = 4
-local BS = 8
-local ENC = 16
-local ENG = 32
-local LW = 64
-local TAIL = 128
+local COOK =    0x001
+local FAID =    0x002
+local ALC =     0x004
+local BS =      0x008
+local ENC =     0x010
+local ENG =     0x020
+local LW =      0x040
+local TAIL =    0x080
 local VENDOR =	0x100
-local Q = 		0x200	-- Normal quests
+local Q = 		0x200	-- Neutral quests
 local ALLI = 	0x400	-- Alliance only
 local HORDE = 	0x800	-- Horde only
 local DRUID = 	0x1000
@@ -30,7 +30,11 @@ local ENC_Q = 	0x2000000
 local ENG_Q = 	0x4000000
 local LW_Q =	0x8000000
 local TAIL_Q =	0x10000000
+local DMF =		0x20000000
 
+ItemProfConstants_VENDOR_ITEM_FLAG = VENDOR
+ItemProfConstants_DMF_ITEM_FLAG = DMF
+ItemProfConstants_QUEST_FLAG = Q
 ItemProfConstants_NUM_PROF_FLAGS = 8	-- Num professions tracked
 
 ItemProfConstants_PROF_TEXTURES = {
@@ -42,7 +46,8 @@ ItemProfConstants_PROF_TEXTURES = {
 [ ENG ] = GetSpellTexture( 4036 ),
 [ LW ] = GetSpellTexture( 2108 ),
 [ TAIL ] = GetSpellTexture( 3908 ),
-[ Q ] = "Interface\\GossipFrame\\AvailableQuestIcon"
+[ Q ] = "Interface\\GossipFrame\\AvailableQuestIcon",
+[ DMF ] = "134481"
 }
 
 -- Mapping the item IDs to texture indices
@@ -77,9 +82,10 @@ ItemProfConstants_ITEM_PROF_FLAGS = {
 [ 1705 ] = BS + ENG,
 [ 2251 ] = COOK + ALLI,	--q
 [ 2296 ] = Q,
-[ 2309 ] = ALLI + LW_Q,			--q LW ALLIANCE
+[ 2309 ] = ALLI + LW_Q + DMF,	--q LW ALLIANCE
 [ 2310 ] = ALLI + LW_Q,			--q LW ALLIANCE
 [ 2312 ] = LW,
+[ 2314 ] = DMF,
 [ 2318 ] = BS + ENG + LW + TAIL,		--q HORDE LW/SKINNING ?????
 [ 2319 ] = BS + ENG + LW + TAIL,
 [ 2320 ] = LW + TAIL + VENDOR + HORDE,			--q VENDOR
@@ -150,6 +156,7 @@ ItemProfConstants_ITEM_PROF_FLAGS = {
 [ 3173 ] = COOK + ALLI,		--q
 [ 3174 ] = COOK + ALLI,		--q
 [ 3182 ] = LW + TAIL,
+[ 3240 ] = DMF,
 [ 3340 ] = ALLI,
 [ 3355 ] = ALC,
 [ 3356 ] = ALC + ENC + LW,
@@ -169,7 +176,7 @@ ItemProfConstants_ITEM_PROF_FLAGS = {
 [ 3478 ] = BS,
 [ 3482 ] = HORDE + BS_Q,			--q BS
 [ 3483 ] = HORDE + BS_Q,			--q BS
-[ 3486 ] = BS,
+[ 3486 ] = BS + DMF,
 [ 3575 ] = ALC + BS + ENG + HORDE + BS_Q + WARRIOR,	--q WARRIOR BS	****
 [ 3577 ] = BS + ENG + TAIL + WARLOCK,				--q WARLOCK SMELTING ****
 [ 3667 ] = COOK,
@@ -189,7 +196,7 @@ ItemProfConstants_ITEM_PROF_FLAGS = {
 [ 3825 ] = ALLI,					--q ALLIANCE
 [ 3827 ] = TAIL + ALLI,			--q ULDAMAN
 [ 3829 ] = BS + ENC + ENG + TAIL + Q,	--q
-[ 3835 ] = HORDE + BS_Q,			--q BS HORDE
+[ 3835 ] = HORDE + BS_Q + DMF,		--q BS HORDE
 [ 3836 ] = HORDE + BS_Q,			--q BS HORDE
 [ 3842 ] = HORDE + BS_Q,			--q BS HORDE
 [ 3851 ] = HORDE + BS_Q,			--q BS
@@ -225,12 +232,12 @@ ItemProfConstants_ITEM_PROF_FLAGS = {
 [ 4357 ] = ENG,
 [ 4359 ] = ENG,
 [ 4361 ] = ENG,
-[ 4363 ] = ENG,
+[ 4363 ] = ENG + DMF,
 [ 4364 ] = ENG,
 [ 4368 ] = ENG,
 [ 4369 ] = HORDE,
 [ 4371 ] = ENG + ALLI + ROGUE,		--q
-[ 4375 ] = ENG,
+[ 4375 ] = ENG + DMF,
 [ 4377 ] = ENG,
 [ 4382 ] = ENG,
 [ 4384 ] = ENG_Q,			--q ENG
@@ -251,6 +258,7 @@ ItemProfConstants_ITEM_PROF_FLAGS = {
 [ 4480 ] = WARRIOR,			--q WARRIOR
 [ 4481 ] = WARRIOR,			--q WARRIOR
 [ 4536 ] = COOK + VENDOR,
+[ 4582 ] = DMF,
 [ 4589 ] = TAIL + HORDE,	--q HORDE
 [ 4595 ] = VENDOR + Q,			--q VENDOR
 [ 4603 ] = COOK,
@@ -261,6 +269,8 @@ ItemProfConstants_ITEM_PROF_FLAGS = {
 [ 5075 ] = HORDE,			--q HORDE
 [ 5082 ] = LW,
 [ 5116 ] = LW,
+[ 5117 ] = DMF,
+[ 5134 ] = DMF,
 [ 5373 ] = LW,
 [ 5465 ] = COOK + ALLI,	--q
 [ 5466 ] = COOK,
@@ -276,6 +286,7 @@ ItemProfConstants_ITEM_PROF_FLAGS = {
 [ 5633 ] = LW,
 [ 5635 ] = ALC + BS + HORDE + BS_Q,	--q BS HORDE?
 [ 5637 ] = ALC + BS + ENC + LW,
+[ 5739 ] = DMF,
 [ 5770 ] = WARLOCK,			--q WARLOCK
 [ 5784 ] = LW,
 [ 5785 ] = LW,
@@ -340,7 +351,7 @@ ItemProfConstants_ITEM_PROF_FLAGS = {
 [ 7936 ] = BS_Q,			--q BS
 [ 7937 ] = BS_Q,			--q BS
 [ 7941 ] = BS_Q,			--q BS
-[ 7945 ] = BS_Q,			--q BS
+[ 7945 ] = BS_Q + DMF,		--q BS
 [ 7956 ] = HORDE + BS_Q,			--q BS HORDE
 [ 7957 ] = HORDE + BS_Q,			--q BS HORDE
 [ 7958 ] = HORDE + BS_Q,			--q BS HORDE
@@ -365,6 +376,7 @@ ItemProfConstants_ITEM_PROF_FLAGS = {
 [ 8173 ] = LW_Q,		--q LW
 [ 8175 ] = LW_Q,		--q LW
 [ 8176 ] = LW_Q,		--q LW
+[ 8185 ] = DMF,
 [ 8187 ] = LW_Q,		--q LW
 [ 8189 ] = LW_Q,		--q LW
 [ 8191 ] = LW_Q,		--q LW
@@ -405,6 +417,7 @@ ItemProfConstants_ITEM_PROF_FLAGS = {
 [ 9259 ] = ALLI,			--q ALLIANCE
 [ 9264 ] = WARLOCK,			--q WARLOCK MOUNT
 [ 9308 ] = Q,			--q ALLIANCE
+[ 9313 ] = DMF,
 [ 10026 ] = ENG,
 [ 10285 ] = ENG + TAIL,
 [ 10286 ] = ALC + ENG + TAIL,
@@ -460,11 +473,14 @@ ItemProfConstants_ITEM_PROF_FLAGS = {
 [ 11370 ] = WARLOCK,	-- MOUNT QUEST
 [ 11371 ] = BS + ENG,
 [ 11382 ] = BS + ENC,
+[ 11404 ] = DMF,
+[ 11407 ] = DMF,
 [ 11477 ] = HORDE,			--q HORDE
 [ 11516 ] = Q,
 [ 11563 ] = Q,
 [ 11564 ] = Q,
 [ 11567 ] = Q,
+[ 11590 ] = DMF,
 [ 11732 ] = Q,				-- q LIBRAM
 [ 11733 ] = Q,				-- q LIBRAM
 [ 11734 ] = Q,				-- q LIBRAM
@@ -500,7 +516,7 @@ ItemProfConstants_ITEM_PROF_FLAGS = {
 [ 12435 ] = Q,			--q NO EXP
 [ 12436 ] = Q,			--q NO EXP
 [ 12607 ] = LW,
-[ 12644 ] = BS,
+[ 12644 ] = BS + DMF,
 [ 12655 ] = BS + ENG,
 [ 12662 ] = BS + TAIL,
 [ 12735 ] = Q,
@@ -560,8 +576,9 @@ ItemProfConstants_ITEM_PROF_FLAGS = {
 [ 15420 ] = LW,
 [ 15422 ] = LW,
 [ 15423 ] = LW,
+[ 15564 ] = DMF,
 [ 15992 ] = ENG,
-[ 15994 ] = ENG + Q,
+[ 15994 ] = ENG + Q + DMF,
 [ 16000 ] = ENG,
 [ 16006 ] = ENG,
 [ 16202 ] = ENC,
@@ -591,6 +608,7 @@ ItemProfConstants_ITEM_PROF_FLAGS = {
 [ 19767 ] = LW,
 [ 19768 ] = LW,
 [ 19774 ] = BS + ENG,
+[ 19933 ] = DMF,
 [ 20381 ] = LW,
 [ 20424 ] = COOK,
 [ 20498 ] = LW,
@@ -610,7 +628,10 @@ local previousItemID = -1
 local itemIcons = ""
 local iconSize
 
+local ITEM_VENDOR_FLAG = ItemProfConstants_VENDOR_ITEM_FLAG
+local ITEM_DMF_FLAG = ItemProfConstants_DMF_ITEM_FLAG
 local ITEM_PROF_FLAGS = ItemProfConstants_ITEM_PROF_FLAGS
+local QUEST_FLAG = ItemProfConstants_QUEST_FLAG
 local NUM_PROFS_TRACKED = ItemProfConstants_NUM_PROF_FLAGS
 local PROF_TEXTURES = ItemProfConstants_PROF_TEXTURES
 
@@ -619,6 +640,7 @@ local showQuests
 local profFilter
 local questFilter
 local includeVendor
+local showDMF
 
 ItemProfConstants_configTooltipIconsRealm = GetRealmName()
 ItemProfConstants_configTooltipIconsChar = UnitName( "player" )
@@ -626,7 +648,7 @@ ItemProfConstants_configTooltipIconsChar = UnitName( "player" )
 local function CreateItemIcons( itemFlags )
 	if not includeVendor then
 		-- Return if the item has the vendor flag
-		local isVendor = bit.band( itemFlags, 0x100 )
+		local isVendor = bit.band( itemFlags, ITEM_VENDOR_FLAG )
 		if isVendor ~= 0 then
 			return nil
 		end
@@ -646,8 +668,21 @@ local function CreateItemIcons( itemFlags )
 			end
 		end
 	end
+	
+	if showDMF then
+	
+		local isTicketItem = bit.band( itemFlags, ITEM_DMF_FLAG )
+		if isTicketItem ~= 0 then
+			t[ #t+1 ] = "|T"
+			t[ #t+1 ] = PROF_TEXTURES[ ITEM_DMF_FLAG ]
+			t[ #t+1 ] = ":"
+			t[ #t+1 ] = iconSize
+			t[ #t+1 ] = "|t "
+		end
+	end
+	
 	if showQuests then
-		-- Quest filter flags start at 0x200, shift to 0 will align with config filter
+		-- Quest filter flags start at 0x200, shift to bit 0 will align with config filter
 		local questFlags = bit.rshift( itemFlags, 9 )
 		local isSet = bit.band( questFlags, questFilter )
 		
@@ -669,7 +704,7 @@ local function CreateItemIcons( itemFlags )
 		
 		if isSet ~= 0 then
 			t[ #t+1 ] = "|T"
-			t[ #t+1 ] = PROF_TEXTURES[ 0x200 ]
+			t[ #t+1 ] = PROF_TEXTURES[ QUEST_FLAG ]
 			t[ #t+1 ] = ":"
 			t[ #t+1 ] = iconSize
 			t[ #t+1 ] = "|t "
@@ -688,7 +723,11 @@ local function ModifyItemTooltip( tt )
 	
 	if itemID == nil then
 		-- Extract ID from link: GetItemInfoInstant unreliable with AH items (uncached on client?)
-		itemID = tonumber( string.match( itemLink, ":?(%d+):" ) )
+		itemID = tonumber( string.match( itemLink, "item:?(%d+):" ) )
+		if itemID == nil then
+			-- The item link doesn't contain the item ID field
+			return
+		end
 	end
 	
 	-- Reuse the texture state if the item hasn't changed
@@ -698,7 +737,7 @@ local function ModifyItemTooltip( tt )
 	end
 	
 	-- Check if the item is a profession reagent
-	local itemFlags = ITEM_PROF_FLAGS[ itemID ];
+	local itemFlags = ITEM_PROF_FLAGS[ itemID ]
 	if itemFlags == nil then
 		-- Don't modify the tooltip
 		return
@@ -720,22 +759,27 @@ function ItemProfConstants:ConfigChanged()
 	questFilter = ShiGuangDB[ ItemProfConstants_configTooltipIconsRealm ][ ItemProfConstants_configTooltipIconsChar ].questFlags
 	includeVendor = ShiGuangDB[ ItemProfConstants_configTooltipIconsRealm ][ ItemProfConstants_configTooltipIconsChar ].includeVendor
 	iconSize = ShiGuangDB[ ItemProfConstants_configTooltipIconsRealm ][ ItemProfConstants_configTooltipIconsChar ].iconSize
+	showDMF = ShiGuangDB[ ItemProfConstants_configTooltipIconsRealm ][ ItemProfConstants_configTooltipIconsChar ].showDMF
 	
 	previousItemID = -1		-- Reset line
 end
 
 local function InitFrame()
 	GameTooltip:HookScript("OnTooltipSetItem", ModifyItemTooltip )
-	ItemRefTooltip:HookScript( "OnTooltipSetItem", ModifyItemTooltip )
+	--ItemRefTooltip:HookScript( "OnTooltipSetItem", ModifyItemTooltip )
 end
 InitFrame()
 
 local frame = CreateFrame( "Frame" )
 frame.name = ITEMTOOLTIPPROFESSION_TITLE
+local NUM_PROFS_TRACKED = ItemProfConstants_NUM_PROF_FLAGS
 
 local profsCheck
 local questCheck
 local vendorCheck
+local dmfCheck
+local classQuestLabel
+local profQuestLabel
 local iconSizeSlider
 local iconSizeLabel
 local iconDemoTexture
@@ -746,9 +790,10 @@ local QUEST_CHECK = {}
 local configDefaultShowProfs = true
 local configDefaultShowQuests = true
 local configDefaultProfFlags = 0xFF
-local configDefaultQuestFlags = 0x1FFFFF
+local configDefaultQuestFlags = 0xFFFFF
 local configDefaultIncludeVendor = false
-local configDefaultIconSize = 14
+local configDefaultIconSize = 16
+local configDefaultShowDMF = true
 
 local userVariables
 
@@ -758,7 +803,7 @@ local function SaveAndQuit()
 
 	local profFlags = 0
 	-- Ignore the profession flags if master profession checkbox is unchecked
-	for i=0, 7 do
+	for i=0, NUM_PROFS_TRACKED-1 do
 		local bitMask = bit.lshift( 1, i )
 		local isChecked = PROF_CHECK[ bitMask ]:GetChecked()
 		if isChecked then
@@ -782,6 +827,7 @@ local function SaveAndQuit()
 	userVariables.questFlags = questFlags
 	userVariables.includeVendor = vendorCheck:GetChecked()
 	userVariables.iconSize = iconSizeSlider:GetValue()
+	userVariables.showDMF = dmfCheck:GetChecked()
 
 	ItemProfConstants:ConfigChanged()
 end
@@ -825,12 +871,13 @@ local function RefreshWidgets()
 	profsCheck:SetChecked( userVariables.showProfs )
 	questCheck:SetChecked( userVariables.showQuests )
 	vendorCheck:SetChecked( userVariables.includeVendor )
+	dmfCheck:SetChecked( userVariables.showDMF )
 	local profFlags = userVariables.profFlags
 	local questFlags = userVariables.questFlags
 	iconSizeSlider:SetValue( userVariables.iconSize )
 	
 	-- Update the profession checkboxes
-	for i=0, 7 do
+	for i=0, NUM_PROFS_TRACKED-1 do
 		local bitMask = bit.lshift( 1, i )
 		local isSet = bit.band( profFlags, bitMask )
 		PROF_CHECK[ bitMask ]:SetChecked( isSet ~= 0 )
@@ -896,6 +943,10 @@ local function InitVariables()
 		userVariables.iconSize = configDefaultIconSize
 	end
 	
+	if userVariables.showDMF == nil then
+		userVariables.showDMF = configDefaultShowDMF
+	end
+	
 	
 	RefreshWidgets()
 	ItemProfConstants:ConfigChanged()
@@ -913,88 +964,100 @@ local function CreateCheckbox( name, x, y, label, tooltip )
 end
 
 
+local function CreateProfessionWidgets() 
+
+	profsCheck = CreateCheckbox( "ItemTooltipIconsConfigCheck0", 20, -50, " Enable Profession Icons", "If enabled profession icons will be displayed on items that are crafting materials" )
+	profsCheck:SetScript( "OnClick", ToggleProfCheckbox )
+
+	PROF_CHECK[ 1 ] = CreateCheckbox( "ItemTooltipIconsConfigCheck0a", 45, -70, " Cooking", nil )
+	PROF_CHECK[ 2 ] = CreateCheckbox( "ItemTooltipIconsConfigCheck0b", 45, -90, " First Aid", nil )
+	PROF_CHECK[ 4 ] = CreateCheckbox( "ItemTooltipIconsConfigCheck0c", 45, -110, " Alchemy", nil )
+	PROF_CHECK[ 8 ] = CreateCheckbox( "ItemTooltipIconsConfigCheck0d", 45, -130, " Blacksmithing", nil )
+	PROF_CHECK[ 16 ] = CreateCheckbox( "ItemTooltipIconsConfigCheck0e", 245, -70, " Enchanting", nil )
+	PROF_CHECK[ 32 ] = CreateCheckbox( "ItemTooltipIconsConfigCheck0f", 245, -90, " Engineering", nil )
+	PROF_CHECK[ 64 ] = CreateCheckbox( "ItemTooltipIconsConfigCheck0g", 245, -110, " Leatherworking", nil )
+	PROF_CHECK[ 128 ] = CreateCheckbox( "ItemTooltipIconsConfigCheck0h", 245, -130, " Tailoring", nil )
+end
+
+local function CreateQuestWidgets() 
+	
+	questCheck = CreateCheckbox( "ItemTooltipIconsConfigCheck1", 20, -180, " Enable Quest Icons", "If enabled quest icons will be displayed on items that are needed by quests" )
+	questCheck:SetScript( "OnClick", ToggleQuestCheckbox )
+
+	QUEST_CHECK[ 0x00002 ] = CreateCheckbox( "ItemTooltipIconsConfigCheck1b", 45, -200, " Alliance", nil )
+	QUEST_CHECK[ 0x00004 ] = CreateCheckbox( "ItemTooltipIconsConfigCheck1c", 45, -220, " Horde", nil )
+
+
+	classQuestLabel = frame:CreateFontString( "ClassQuestLabel", "OVERLAY", "GameTooltipText" )
+	classQuestLabel:SetFont( "Fonts\\FRIZQT__.TTF", 14, "THINOUTLINE" )
+	classQuestLabel:SetPoint( "TOPLEFT", 45, -255 )
+	classQuestLabel:SetTextColor( 1, 0.85, 0.15 )
+	classQuestLabel:SetText( "Class Quests" )
+
+	QUEST_CHECK[ 0x00008 ] = CreateCheckbox( "ItemTooltipIconsConfigCheck1d1", 45, -270, " Druid", nil )
+	QUEST_CHECK[ 0x00010 ] = CreateCheckbox( "ItemTooltipIconsConfigCheck1d2", 45, -290, " Hunter", nil )
+	QUEST_CHECK[ 0x00020 ] = CreateCheckbox( "ItemTooltipIconsConfigCheck1d3", 45, -310, " Mage", nil )
+	QUEST_CHECK[ 0x00040 ] = CreateCheckbox( "ItemTooltipIconsConfigCheck1d4", 245, -270, " Paladin", nil )
+	QUEST_CHECK[ 0x00080 ] = CreateCheckbox( "ItemTooltipIconsConfigCheck1d5", 245, -290, " Priest", nil )
+	QUEST_CHECK[ 0x00100 ] = CreateCheckbox( "ItemTooltipIconsConfigCheck1d6", 245, -310, " Rogue", nil )
+	QUEST_CHECK[ 0x00200 ] = CreateCheckbox( "ItemTooltipIconsConfigCheck1d7", 445, -270, " Shaman", nil )
+	QUEST_CHECK[ 0x00400 ] = CreateCheckbox( "ItemTooltipIconsConfigCheck1d8", 445, -290, " Warlock", nil )
+	QUEST_CHECK[ 0x00800 ] = CreateCheckbox( "ItemTooltipIconsConfigCheck1d9", 445, -310, " Warrior", nil )
+
+
+
+	profQuestLabel = frame:CreateFontString( "ProfQuestLabel", "OVERLAY", "GameTooltipText" )
+	profQuestLabel:SetFont( "Fonts\\FRIZQT__.TTF", 14, "THINOUTLINE" )
+	profQuestLabel:SetPoint( "TOPLEFT", 45, -345 )
+	profQuestLabel:SetTextColor( 1, 0.85, 0.15 )
+	profQuestLabel:SetText( "Profession Quests" )
+
+	QUEST_CHECK[ 0x01000 ] = CreateCheckbox( "ItemTooltipIconsConfigCheck1e1", 45, -360, " Cooking", nil )
+	QUEST_CHECK[ 0x02000 ] = CreateCheckbox( "ItemTooltipIconsConfigCheck1e2", 45, -380, " First Aid", nil )
+	QUEST_CHECK[ 0x04000 ] = CreateCheckbox( "ItemTooltipIconsConfigCheck1e3", 45, -400, " Alchemy", nil )
+	QUEST_CHECK[ 0x08000 ] = CreateCheckbox( "ItemTooltipIconsConfigCheck1e4", 45, -420, " Blacksmithing", nil )
+	QUEST_CHECK[ 0x10000 ] = CreateCheckbox( "ItemTooltipIconsConfigCheck1e5", 245, -360, " Enchanting", nil )
+	QUEST_CHECK[ 0x20000 ] = CreateCheckbox( "ItemTooltipIconsConfigCheck1e6", 245, -380, " Engineering", nil )
+	QUEST_CHECK[ 0x40000 ] = CreateCheckbox( "ItemTooltipIconsConfigCheck1e7", 245, -400, " Leatherworking", nil )
+	QUEST_CHECK[ 0x80000 ] = CreateCheckbox( "ItemTooltipIconsConfigCheck1e8", 245, -420, " Tailoring", nil )
+end
+
+local function CreateIconResizeWidgets()
+
+	iconSizeSlider = CreateFrame( "Slider", "ItemTooltipIconsConfigSlider0", frame, "OptionsSliderTemplate" )
+	iconSizeSlider:SetPoint( "TOPLEFT", 20, -540 )
+	iconSizeSlider:SetMinMaxValues( 8, 32 )
+	iconSizeSlider:SetValueStep( 1 )
+	iconSizeSlider:SetStepsPerPage( 1 )
+	iconSizeSlider:SetWidth( 200 )
+	iconSizeSlider:SetObeyStepOnDrag( true )
+	iconSizeSlider:SetScript( "OnValueChanged", IconSizeChanged )
+	_G[ "ItemTooltipIconsConfigSlider0Text" ]:SetText( "Icon Size" )
+	_G[ "ItemTooltipIconsConfigSlider0Low" ]:SetText( nil )
+	_G[ "ItemTooltipIconsConfigSlider0High" ]:SetText( nil )
+
+	iconSizeLabel = frame:CreateFontString( nil, "OVERLAY", "GameTooltipText" )
+	iconSizeLabel:SetFont( "Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE" )
+	iconSizeLabel:SetPoint( "TOPLEFT", 225, -542 )
+
+	iconDemoTexture = frame:CreateTexture( nil, "OVERLAY" )
+	iconDemoTexture:SetPoint( "TOPLEFT", 300, -540 )
+	iconDemoTexture:SetTexture( GetSpellTexture( 4036 ) )
+end
+
+
 local dialogHeader = frame:CreateFontString( nil, "OVERLAY", "GameTooltipText" )
 dialogHeader:SetFont( "Fonts\\FRIZQT__.TTF", 10, "THINOUTLINE" )
 dialogHeader:SetPoint( "TOPLEFT", 20, -20 )
 dialogHeader:SetText( "These options allow you control which icons are displayed on the item tooltips.\nThe quest icon can be filtered to display on items needed for quests of specific class/profession." )
 
 
-profsCheck = CreateCheckbox( "ItemTooltipIconsConfigCheck0", 20, -50, " Enable Profession Icons", "If enabled profession icons will be displayed on items that are crafting materials" )
-profsCheck:SetScript( "OnClick", ToggleProfCheckbox )
-
-PROF_CHECK[ 1 ] = CreateCheckbox( "ItemTooltipIconsConfigCheck0a", 45, -70, " Cooking", nil )
-PROF_CHECK[ 2 ] = CreateCheckbox( "ItemTooltipIconsConfigCheck0b", 45, -90, " First Aid", nil )
-PROF_CHECK[ 4 ] = CreateCheckbox( "ItemTooltipIconsConfigCheck0c", 45, -110, " Alchemy", nil )
-PROF_CHECK[ 8 ] = CreateCheckbox( "ItemTooltipIconsConfigCheck0d", 45, -130, " Blacksmithing", nil )
-PROF_CHECK[ 16 ] = CreateCheckbox( "ItemTooltipIconsConfigCheck0e", 245, -70, " Enchanting", nil )
-PROF_CHECK[ 32 ] = CreateCheckbox( "ItemTooltipIconsConfigCheck0f", 245, -90, " Engineering", nil )
-PROF_CHECK[ 64 ] = CreateCheckbox( "ItemTooltipIconsConfigCheck0g", 245, -110, " Leatherworking", nil )
-PROF_CHECK[ 128 ] = CreateCheckbox( "ItemTooltipIconsConfigCheck0h", 245, -130, " Tailoring", nil )
-
-
-questCheck = CreateCheckbox( "ItemTooltipIconsConfigCheck1", 20, -180, " Enable Quest Icons", "If enabled quest icons will be displayed on items that are needed by quests" )
-questCheck:SetScript( "OnClick", ToggleQuestCheckbox )
-
-QUEST_CHECK[ 0x00002 ] = CreateCheckbox( "ItemTooltipIconsConfigCheck1b", 45, -200, " Alliance", nil )
-QUEST_CHECK[ 0x00004 ] = CreateCheckbox( "ItemTooltipIconsConfigCheck1c", 45, -220, " Horde", nil )
-
-
-local classQuestLabel = frame:CreateFontString( "ClassQuestLabel", "OVERLAY", "GameTooltipText" )
-classQuestLabel:SetFont( "Fonts\\FRIZQT__.TTF", 14, "THINOUTLINE" )
-classQuestLabel:SetPoint( "TOPLEFT", 45, -255 )
-classQuestLabel:SetTextColor( 1, 0.85, 0.15 )
-classQuestLabel:SetText( "Class Quests" )
-
-QUEST_CHECK[ 0x00008 ] = CreateCheckbox( "ItemTooltipIconsConfigCheck1d1", 45, -270, " Druid", nil )
-QUEST_CHECK[ 0x00010 ] = CreateCheckbox( "ItemTooltipIconsConfigCheck1d2", 45, -290, " Hunter", nil )
-QUEST_CHECK[ 0x00020 ] = CreateCheckbox( "ItemTooltipIconsConfigCheck1d3", 45, -310, " Mage", nil )
-QUEST_CHECK[ 0x00040 ] = CreateCheckbox( "ItemTooltipIconsConfigCheck1d4", 245, -270, " Paladin", nil )
-QUEST_CHECK[ 0x00080 ] = CreateCheckbox( "ItemTooltipIconsConfigCheck1d5", 245, -290, " Priest", nil )
-QUEST_CHECK[ 0x00100 ] = CreateCheckbox( "ItemTooltipIconsConfigCheck1d6", 245, -310, " Rogue", nil )
-QUEST_CHECK[ 0x00200 ] = CreateCheckbox( "ItemTooltipIconsConfigCheck1d7", 445, -270, " Shaman", nil )
-QUEST_CHECK[ 0x00400 ] = CreateCheckbox( "ItemTooltipIconsConfigCheck1d8", 445, -290, " Warlock", nil )
-QUEST_CHECK[ 0x00800 ] = CreateCheckbox( "ItemTooltipIconsConfigCheck1d9", 445, -310, " Warrior", nil )
-
-
-
-local profQuestLabel = frame:CreateFontString( "ProfQuestLabel", "OVERLAY", "GameTooltipText" )
-profQuestLabel:SetFont( "Fonts\\FRIZQT__.TTF", 14, "THINOUTLINE" )
-profQuestLabel:SetPoint( "TOPLEFT", 45, -345 )
-profQuestLabel:SetTextColor( 1, 0.85, 0.15 )
-profQuestLabel:SetText( "Profession Quests" )
-
-QUEST_CHECK[ 0x01000 ] = CreateCheckbox( "ItemTooltipIconsConfigCheck1e1", 45, -360, " Cooking", nil )
-QUEST_CHECK[ 0x02000 ] = CreateCheckbox( "ItemTooltipIconsConfigCheck1e2", 45, -380, " First Aid", nil )
-QUEST_CHECK[ 0x04000 ] = CreateCheckbox( "ItemTooltipIconsConfigCheck1e3", 45, -400, " Alchemy", nil )
-QUEST_CHECK[ 0x08000 ] = CreateCheckbox( "ItemTooltipIconsConfigCheck1e4", 45, -420, " Blacksmithing", nil )
-QUEST_CHECK[ 0x10000 ] = CreateCheckbox( "ItemTooltipIconsConfigCheck1e5", 245, -360, " Enchanting", nil )
-QUEST_CHECK[ 0x20000 ] = CreateCheckbox( "ItemTooltipIconsConfigCheck1e6", 245, -380, " Engineering", nil )
-QUEST_CHECK[ 0x40000 ] = CreateCheckbox( "ItemTooltipIconsConfigCheck1e7", 245, -400, " Leatherworking", nil )
-QUEST_CHECK[ 0x80000 ] = CreateCheckbox( "ItemTooltipIconsConfigCheck1e8", 245, -420, " Tailoring", nil )
-
-
+CreateProfessionWidgets()
+CreateQuestWidgets()
 vendorCheck = CreateCheckbox( "ItemTooltipIconsConfigCheck2", 20, -470, " Vendor Items", "Display icons on items sold by vendors" )
+dmfCheck = CreateCheckbox( "ItemTooltipIconsConfigCheck3", 20, -490, " Darkmoon Faire Ticket Items", "Display a ticket icon if the item can be exchanged for Darkmoon Faire tickets" )
+CreateIconResizeWidgets()
 
-
-iconSizeSlider = CreateFrame( "Slider", "ItemTooltipIconsConfigSlider0", frame, "OptionsSliderTemplate" )
-iconSizeSlider:SetPoint( "TOPLEFT", 20, -520 )
-iconSizeSlider:SetMinMaxValues( 8, 32 )
-iconSizeSlider:SetValueStep( 1 )
-iconSizeSlider:SetStepsPerPage( 1 )
-iconSizeSlider:SetWidth( 200 )
-iconSizeSlider:SetObeyStepOnDrag( true )
-iconSizeSlider:SetScript( "OnValueChanged", IconSizeChanged )
-_G[ "ItemTooltipIconsConfigSlider0Text" ]:SetText( "Icon Size" )
-_G[ "ItemTooltipIconsConfigSlider0Low" ]:SetText( nil )
-_G[ "ItemTooltipIconsConfigSlider0High" ]:SetText( nil )
-
-iconSizeLabel = frame:CreateFontString( nil, "OVERLAY", "GameTooltipText" )
-iconSizeLabel:SetFont( "Fonts\\FRIZQT__.TTF", 12, "THINOUTLINE" )
-iconSizeLabel:SetPoint( "TOPLEFT", 225, -522 )
-
-iconDemoTexture = frame:CreateTexture( nil, "OVERLAY" )
-iconDemoTexture:SetPoint( "TOPLEFT", 300, -520 )
-iconDemoTexture:SetTexture( GetSpellTexture( 4036 ) )
 
 
 frame.okay = SaveAndQuit
