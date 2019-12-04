@@ -29,34 +29,28 @@ end
 
 function SortButton:OnClick(button)
 	self:SetChecked(nil)
-	local PickupContainerItem = _G.PickupContainerItem   
-	local function ReverseSort()
-		C_Timer.After(.5, function()
+	if IsControlKeyDown() and DepositReagentBank then return DepositReagentBank() end
+	local frame = self:GetParent()
+	if not frame:IsCached() then
+		---------------Thanks Siweia  么么哒·~~~~
+		if button == 'RightButton' then
+		  SetSortBagsRightToLeft(false)      --整理向左边背包移动
+		  --SetInsertItemsLeftToRight(false)  --新增物品自动进入最右边背包
+			frame:SortItems()  --SortBags()
+		  C_Timer.After(.3, function()
 			for bag = 0, 4 do
-				local numSlots = GetContainerNumSlots(bag)
-				for slot = 1, numSlots do
+				for slot = 1, GetContainerNumSlots(bag) do
 					local texture, _, locked = GetContainerItemInfo(bag, slot)
 					if texture and not locked then
-						PickupContainerItem(bag, slot)
-						PickupContainerItem(bag, numSlots+1 - slot)
+						_G.PickupContainerItem(bag, slot)
+						_G.PickupContainerItem(bag, GetContainerNumSlots(bag)+1 - slot)
 					end
 				end
 			end
-		end)
-	end 
-	if IsControlKeyDown() and DepositReagentBank then     ---------------Thanks Siweia  么么哒·~~~~
-		return DepositReagentBank()
-	end
-	local frame = self:GetParent()
-	if not frame:IsCached() then
-		if button == 'RightButton' then
-		  SetSortBagsRightToLeft(false)      --整理向左边背包移动
-		  SetInsertItemsLeftToRight(false)   --新增物品自动进入最右边背包 
-			frame:SortItems()  --SortBags()
-			ReverseSort()
+		  end)
 		else
 		  SetSortBagsRightToLeft(true)      --整理向左边背包移动
-		  SetInsertItemsLeftToRight(false)  --新增物品自动进入最右边背包
+		  --SetInsertItemsLeftToRight(true)  --新增物品自动进入最左边背包
 		  frame:SortItems()   --SortBags()
 		end
 	end
