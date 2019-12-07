@@ -382,6 +382,7 @@ hooksecurefunc("TargetFrame_CheckClassification", function(self, forceNormalText
 	self.healthbar.lockColor = true;
 end)
 local function targetFrameSelector (self, forceNormalTexture)
+	local classification = UnitClassification(self.unit);
 	if ( forceNormalTexture ) then
 		self.borderTexture:SetTexture("Interface\\TargetingFrame\\UI-TargetingFrame");
 	elseif ( classification == "minus" ) then
