@@ -380,9 +380,6 @@ hooksecurefunc("TargetFrame_CheckClassification", function(self, forceNormalText
 		end		
 	end
 	self.healthbar.lockColor = true;
-end)
-local function targetFrameSelector (self, forceNormalTexture)
-	local classification = UnitClassification(self.unit);
 	if ( forceNormalTexture ) then
 		self.borderTexture:SetTexture("Interface\\TargetingFrame\\UI-TargetingFrame");
 	elseif ( classification == "minus" ) then
@@ -406,8 +403,7 @@ local function targetFrameSelector (self, forceNormalTexture)
 				self.pvpIcon:SetTexture("Interface\\TargetingFrame\\UI-PVP-"..factionGroup);
 		end
 	end
-end
-hooksecurefunc("TargetFrame_CheckClassification", targetFrameSelector)
+end)
 
 local function targetFontStyle (self)
 	if not mi2addon then

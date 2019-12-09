@@ -72847,7 +72847,7 @@ local defaults = {
 		show = true, -- Controls visibility of all nodes
 		mapButton = true,
 		minimapButton = { -- for LibDBIcon
-			hide = false,
+			hide = true,
 		},
 		button = {
 			x = -40,
