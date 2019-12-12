@@ -165,7 +165,7 @@ function S:EnhancedQuestTracker()
 	local header = CreateFrame("Frame", nil, frame)
 	header:SetAllPoints()
 	header:SetParent(QuestWatchFrame)
-	header.Text = M.CreateFS(header, 16, QUEST_LOG, true, "TOPLEFT", 0, 15)
+	header.Text = M.CreateFS(header, 16, "", true, "TOPLEFT", 0, 15)
 
 	local bg = header:CreateTexture(nil, "ARTWORK")
 	bg:SetTexture("Interface\\LFGFrame\\UI-LFG-SEPARATOR")

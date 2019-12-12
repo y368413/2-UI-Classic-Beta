@@ -1,5 +1,118 @@
---## Author: Wardz ## Version: v1.1.7
+--## Author: Wardz ## Version: v1.2.0-hotfix
 local ClassicCastbars = {}
+local tinsert = _G.table.insert
+local tremove = _G.table.remove
+local FADEFRAMES = {};
+
+-- Frame fading and flashing --
+
+local frameFadeManager = CreateFrame("FRAME");
+
+ local function UIFrameFade_OnUpdate(self, elapsed)
+    local index = 1;
+    local frame, fadeInfo;
+    while FADEFRAMES[index] do
+        frame = FADEFRAMES[index];
+        fadeInfo = FADEFRAMES[index].fadeInfo;
+        -- Reset the timer if there isn't one, this is just an internal counter
+        if ( not fadeInfo.fadeTimer ) then
+            fadeInfo.fadeTimer = 0;
+        end
+        fadeInfo.fadeTimer = fadeInfo.fadeTimer + elapsed;
+
+        -- If the fadeTimer is less then the desired fade time then set the alpha otherwise hold the fade state, call the finished function, or just finish the fade
+        if ( fadeInfo.fadeTimer < fadeInfo.timeToFade ) then
+            if ( fadeInfo.mode == "IN" ) then
+                frame:SetAlpha((fadeInfo.fadeTimer / fadeInfo.timeToFade) * (fadeInfo.endAlpha - fadeInfo.startAlpha) + fadeInfo.startAlpha);
+            elseif ( fadeInfo.mode == "OUT" ) then
+                frame:SetAlpha(((fadeInfo.timeToFade - fadeInfo.fadeTimer) / fadeInfo.timeToFade) * (fadeInfo.startAlpha - fadeInfo.endAlpha)  + fadeInfo.endAlpha);
+            end
+        else
+            frame:SetAlpha(fadeInfo.endAlpha);
+            -- If there is a fadeHoldTime then wait until its passed to continue on
+            if ( fadeInfo.fadeHoldTime and fadeInfo.fadeHoldTime > 0  ) then
+                fadeInfo.fadeHoldTime = fadeInfo.fadeHoldTime - elapsed;
+            else
+                -- Complete the fade and call the finished function if there is one
+                ClassicCastbars:UIFrameFadeRemoveFrame(frame);
+                if ( fadeInfo.finishedFunc ) then
+                    fadeInfo.finishedFunc(fadeInfo.finishedArg1, fadeInfo.finishedArg2, fadeInfo.finishedArg3, fadeInfo.finishedArg4);
+                    fadeInfo.finishedFunc = nil;
+                end
+            end
+        end
+
+        index = index + 1;
+    end
+
+    if ( #FADEFRAMES == 0 ) then
+        self:SetScript("OnUpdate", nil);
+    end
+end
+
+-- Generic fade function
+function ClassicCastbars:UIFrameFade(frame, fadeInfo)
+    if (not frame) then
+        return;
+    end
+    if ( not fadeInfo.mode ) then
+        fadeInfo.mode = "IN";
+    end
+    --local alpha;
+    if ( fadeInfo.mode == "IN" ) then
+        if ( not fadeInfo.startAlpha ) then
+            fadeInfo.startAlpha = 0;
+        end
+        if ( not fadeInfo.endAlpha ) then
+            fadeInfo.endAlpha = 1.0;
+        end
+        --alpha = 0;
+    elseif ( fadeInfo.mode == "OUT" ) then
+        if ( not fadeInfo.startAlpha ) then
+            fadeInfo.startAlpha = 1.0;
+        end
+        if ( not fadeInfo.endAlpha ) then
+            fadeInfo.endAlpha = 0;
+        end
+        --alpha = 1.0;
+    end
+    frame:SetAlpha(fadeInfo.startAlpha);
+
+    frame.fadeInfo = fadeInfo;
+    frame:Show();
+
+    local index = 1;
+    while FADEFRAMES[index] do
+        -- If frame is already set to fade then return
+        if ( FADEFRAMES[index] == frame ) then
+            return;
+        end
+        index = index + 1;
+    end
+    tinsert(FADEFRAMES, frame);
+    frameFadeManager:SetScript("OnUpdate", UIFrameFade_OnUpdate);
+end
+
+-- Convenience function to do a simple fade out
+function ClassicCastbars:UIFrameFadeOut(frame, timeToFade, startAlpha, endAlpha)
+    local fadeInfo = {};
+    fadeInfo.mode = "OUT";
+    fadeInfo.timeToFade = timeToFade;
+    fadeInfo.startAlpha = startAlpha;
+    fadeInfo.endAlpha = endAlpha;
+    ClassicCastbars:UIFrameFade(frame, fadeInfo);
+end
+
+function ClassicCastbars:UIFrameFadeRemoveFrame(frame)
+    local index = 1;
+    while FADEFRAMES[index] do
+        if ( frame == FADEFRAMES[index] ) then
+            tremove(FADEFRAMES, index);
+        else
+            index = index + 1;
+        end
+    end
+end
 local PoolManager = {}
 ClassicCastbars.PoolManager = PoolManager
 
@@ -124,8 +237,9 @@ local anchors = {
 
 local cache = {}
 local _G = _G
-local strmatch = _G.strmatch
+local strmatch = _G.string.match
 local strfind = _G.string.find
+local gsub = _G.string.gsub
 local UnitGUID = _G.UnitGUID
 local GetNamePlateForUnit = _G.C_NamePlate.GetNamePlateForUnit
 
@@ -187,7 +301,7 @@ function AnchorManager:GetAnchor(unitID)
         return UIParent
     end
 
-    local unitType, count = unitID:gsub("%d", "") -- party1 -> party etc
+    local unitType, count = gsub(unitID, "%d", "") -- party1 -> party etc
 
     local frame
     if unitID == "nameplate-testmode" then
@@ -1775,6 +1889,138 @@ ClassicCastbars.stopCastOnDamageList = {
     -- First Aid not included here since we track aura removed
 }
 
+ClassicCastbars.unaffectedCastModsSpells = {
+    -- Player Spells
+    [11605] = 1, -- Slam
+    [6651] = 1, -- Instant Toxin
+    [1842] = 1, -- Disarm Trap
+    [6461] = 1, -- Pick Lock
+    [20904] = 1, -- Aimed Shot
+    [2641] = 1, -- Dismiss Pet
+    [2480] = 1, -- Shoot Bow
+    [7918] = 1, -- Shoot Gun
+    [20549] = 1, -- War Stomp
+    [20589] = 1, -- Escape Artist
+    [22027] = 1, -- Remove Insignia
+    [6510] = 1, -- Blinding Powder
+    [7355] = 1, -- Stuck
+
+    -- NPCs and Others
+    [2835] = 1, -- Deadly Poison
+    [3131] = 1, -- Frost Breath
+    [15664] = 1, -- Venom Spit
+    [7068] = 1, -- Veil of Shadow
+    [16247] = 1, -- Curse of Thorns
+    [14030] = 1, -- Hooked Net
+    [20716] = 1, -- Sand Breath
+    [8275] = 1, -- Poisoned Shot
+    [1980] = 1, -- Bombard
+    [3015] = 1, -- Bombard II
+    [1536] = 1, -- Longshot II
+    [3007] = 1, -- Longshot III
+    [1540] = 1, -- Volley
+    [3013] = 1, -- Volley II
+    [4164] = 1, -- Throw Rock
+    [4165] = 1, -- Throw Rock II
+    [3537] = 1, -- Minions of Malathrom
+    [5567] = 1, -- Miring Mud
+    [28352] = 1, -- Breath of Sargeras
+    [7106] = 1, -- Dark Restore
+    [4075] = 1, -- Large Seaforium Charge
+    [5106] = 1, -- Crystal Flash
+    [22979] = 1, -- Shadow Flame
+    [3611] = 1, -- Minion of Morganth
+    [27794] = 1, -- Cleave
+    [25247] = 1, -- Longsight
+    [5208] = 1, -- Poisoned Harpoon
+    [14532] = 1, -- Creeper Venom
+    [3132] = 1, -- Chilling Breath
+    [3650] = 1, -- Sling Mud
+    [3651] = 1, -- Shield of Reflection
+    [3143] = 1, -- Glacial Roar
+    [6296] = 1, -- Enchant: Fiery Blaze
+    [24194] = 1, -- Uther's Tribute
+    [7364] = 1, -- Light Torch
+    [12684] = 1, -- Kadrak's Flag
+    [7919] = 1, -- Shoot Crossbow
+    [6907] = 1, -- Diseased Slime
+    [3204] = 1, -- Sapper Explode
+    [26234] = 1, -- Submerge Visual
+    [26063] = 1, -- Ouro Submerge Visual
+    [6925] = 1, -- Gift of the Xavian
+    [7951] = 1, -- Toxic Spit
+    [24195] = 1, -- Grom's Tribute
+    [16554] = 1, -- Toxic Bolt
+    [15495] = 1, -- Explosive Shot
+    [6530] = 1, -- Sling Dirt
+    [26072] = 1, -- Dust Cloud
+    [5514] = 1, -- Darken Vision
+    [11016] = 1, -- Soul Bite
+    [21050] = 1, -- Melodious Rapture
+    [4520] = 1, -- Wide Sweep
+    [4526] = 1, -- Mass Dispell
+    [6576] = 1, -- Intimidating Growl
+    [20627] = 1, -- Lightning Breath
+    [25793] = 1, -- Demon Summoning Torch
+    [23254] = 1, -- Redeeming the Soul
+    [18711] = 1, -- Forging
+    [12198] = 1, -- Marksman Hit
+    [8153] = 1, -- Owl Form
+    [6626] = 1, -- Set NG-5 Charge (Blue)
+    [6630] = 1, -- Set NG-5 Charge (Red)
+    [30081] = 1, -- Retching Plague
+    [6656] = 1, -- Remote Detonate
+    [10254] = 1, -- Stone Dwarf Awaken Visual
+    [3359] = 1, -- Drink Potion
+    [17618] = 1, -- Summon Risen Lackey
+    [8286] = 1, -- Summon Boar Spirit
+    [17235] = 1, -- Raise Undead Scarab
+    [8386] = 1, -- Attacking
+    [28311] = 1, -- Slime Bolt
+    [1698] = 1, -- Shockwave
+    [23008] = 1, -- Powerful Seaforium Charge
+    [6951] = 1, -- Decayed Strength
+    [28732] = 1, -- Widow's Embrace
+    [28995] = 1, -- Stoneskin
+    [24706] = 1, -- Toss Stink Bomb
+    [6257] = 1, -- Torch Toss
+    [7359] = 1, -- Bright Campfire
+    [16590] = 1, -- Summon Zombie
+    [9612] = 1, -- Ink Spray
+    [3436] = 1, -- Wandering Plague
+    [9636] = 1, -- Summon Swamp Spirit
+    [17204] = 1, -- Summon Skeleton
+    [7896] = 1, -- Exploding Shot
+    [23392] = 1, -- Boulder
+    [7920] = 1, -- Mebok Smart Drink
+    [8682] = 1, -- Fake Shot
+    [28614] = 1, -- Pointy Spike
+    [8016] = 1, -- Spirit Decay
+    [26102] = 1, -- Sand Blast
+    [3477] = 1, -- Spirit Steal
+    [5395] = 1, -- Death Capsule
+    [5159] = 1, -- Melt Ore
+    [5403] = 1, -- Crash of Waves
+    [8256] = 1, -- Lethal Toxin
+    [6441] = 1, -- Explosive Shells
+    [10850] = 1, -- Powerful Smelling Salts
+    [3488] = 1, -- Felstrom Resurrection
+    [10346] = 1, -- Machine Gun
+    [12740] = 1, -- Summon Infernal Servant
+    [6469] = 1, -- Skeletal Miner Explode
+    [11397] = 1, -- Diseased Shot
+    [4950] = 1, -- Summon Helcular's Puppets
+    [8363] = 1, -- Parasite
+    [16531] = 1, -- Summon Frail Skeleton
+    [16072] = 1, -- Purify and Place Food
+    [20629] = 1, -- Corrosive Venom Spit
+    [28615] = 1, -- Spike Volley
+    [19566] = 1, -- Salt Shaker
+    [7901] = 1, -- Decayed Agility
+    [7054] = 1, -- Forsaken Skills
+    [24189] = 1, -- Force Punch
+}
+
 -- Addon Savedvariables
 ClassicCastbars.defaultConfig = {
     version = "14", -- settings version
@@ -1928,6 +2174,7 @@ local GetUnitSpeed = _G.GetUnitSpeed
 local CastingInfo = _G.CastingInfo
 local castTimeIncreases = ClassicCastbars.castTimeIncreases
 local pushbackBlacklist = ClassicCastbars.pushbackBlacklist
+local unaffectedCastModsSpells = ClassicCastbars.unaffectedCastModsSpells
 
 local BARKSKIN = GetSpellInfo(22812)
 local FOCUSED_CASTING = GetSpellInfo(14743)
@@ -1939,6 +2186,7 @@ local BERSERKING = GetSpellInfo(20554)
 function addon:CheckCastModifier(unitID, cast)
     if not self.db.pushbackDetect or not cast then return end
     if cast.unitGUID == self.PLAYER_GUID then return end -- modifiers already taken into account with CastingInfo()
+    if unaffectedCastModsSpells[cast.spellID] then return end
 
     -- Debuffs
     if not cast.isChanneled and not cast.hasCastSlowModified and not cast.skipCastSlowModifier then
@@ -2029,7 +2277,7 @@ function addon:StopAllCasts(unitGUID, noFadeOut)
 end
 
 -- Store new cast data for unit, and start castbar(s)
-function addon:StoreCast(unitGUID, spellName, iconTexturePath, castTime, isPlayer, isChanneled)
+function addon:StoreCast(unitGUID, spellName, spellID, iconTexturePath, castTime, isPlayer, isChanneled)
     local currTime = GetTime()
 
     if not activeTimers[unitGUID] then
@@ -2038,6 +2286,7 @@ function addon:StoreCast(unitGUID, spellName, iconTexturePath, castTime, isPlaye
 
     local cast = activeTimers[unitGUID]
     cast.spellName = spellName
+    cast.spellID = spellID
     cast.icon = iconTexturePath
     cast.maxValue = castTime / 1000
     cast.endTime = currTime + (castTime / 1000)
@@ -2098,17 +2347,15 @@ function addon:CastPushback(unitGUID)
     end
 end
 
-local IsSpellKnown = _G.IsSpellKnown
-local function GetSpellCastTime(spellID)
+local function GetSpellCastInfo(spellID)
     local _, _, icon, castTime = GetSpellInfo(spellID)
     if not castTime then return end
 
-    if IsSpellKnown(spellID) then
+    if not unaffectedCastModsSpells[spellID] then
         local _, _, _, hCastTime = GetSpellInfo(8690) -- Hearthstone, normal cast time 10s
-        if hCastTime and hCastTime ~= 10000 then -- If current cast time is not 10s it means the player has a casting speed modifier debuff applied on himself.
-            -- Since the return values by GetSpellInfo() from spells that the player has learned in their spellbook are affected by the slow,
-            -- we need to remove so it doesn't give slow modified casttimes for other peoples casts.
-            return floor(castTime * (hCastTime / 10000)), icon
+        if hCastTime and hCastTime ~= 10000 and hCastTime ~= 0 then -- If current cast time is not 10s it means the player has a casting speed modifier debuff applied on himself.
+            -- Since the return values by GetSpellInfo() are affected by the modifier, we need to remove so it doesn't give modified casttimes for other peoples casts.
+            return floor(castTime * 10000 / hCastTime), icon
         end
     end
 
@@ -2287,7 +2534,6 @@ function addon:GROUP_ROSTER_UPDATE()
         end
     end
 end
-addon.GROUP_LEFT = addon.GROUP_ROSTER_UPDATE
 addon.GROUP_JOINED = addon.GROUP_ROSTER_UPDATE
 
 local bit_band = _G.bit.band
@@ -2307,7 +2553,7 @@ function addon:COMBAT_LOG_EVENT_UNFILTERED()
         local spellID = castedSpells[spellName]
         if not spellID then return end
 
-        local castTime, icon = GetSpellCastTime(spellID)
+        local castTime, icon = GetSpellCastInfo(spellID)
         if not castTime then return end
 
         -- is player or player pet or mind controlled
@@ -2339,13 +2585,13 @@ function addon:COMBAT_LOG_EVENT_UNFILTERED()
         end
 
         -- Note: using return here will make the next function (StoreCast) reuse the current stack frame which is slightly more performant
-        return self:StoreCast(srcGUID, spellName, icon, castTime, isPlayer)
+        return self:StoreCast(srcGUID, spellName, spellID, icon, castTime, isPlayer)
     elseif eventType == "SPELL_CAST_SUCCESS" then
         local channelCast = channeledSpells[spellName]
         local spellID = castedSpells[spellName]
         if not channelCast and not spellID then
             -- Stop cast on new ability used while castbar is shown
-            if activeTimers[srcGUID] and GetTime() - activeTimers[srcGUID].timeStart > 0.2 then
+            if activeTimers[srcGUID] and GetTime() - activeTimers[srcGUID].timeStart > 0.25 then
                 return self:StopAllCasts(srcGUID)
             end
             return
@@ -2365,7 +2611,7 @@ function addon:COMBAT_LOG_EVENT_UNFILTERED()
                             local castTime = (GetTime() - restoredStartTime) * 1000
                             local origCastTime = 0
                             if spellID then
-                                local cTime = GetSpellCastTime(spellID)
+                                local cTime = GetSpellCastInfo(spellID)
                                 origCastTime = cTime or 0
                             end
 
@@ -2385,7 +2631,7 @@ function addon:COMBAT_LOG_EVENT_UNFILTERED()
             -- Arcane Missiles triggers this event for every tick so ignore after first tick has been detected
             if spellName == ARCANE_MISSILES and activeTimers[srcGUID] and activeTimers[srcGUID].spellName == ARCANE_MISSILES then return end
 
-            return self:StoreCast(srcGUID, spellName, GetSpellTexture(spellID), channelCast, isPlayer, true)
+            return self:StoreCast(srcGUID, spellName, spellID, GetSpellTexture(spellID), channelCast, isPlayer, true)
         end
 
         -- non-channeled spell, finish it.
@@ -2433,6 +2679,7 @@ local castStopBlacklist = {
     [GetSpellInfo(4068)] = 1,       -- Iron Grenade
     [GetSpellInfo(19769)] = 1,      -- Thorium Grenade
     [GetSpellInfo(13808)] = 1,      -- M73 Frag Grenade
+    [GetSpellInfo(6405)] = 1,       -- Furgbolg Form
 }
 
 local refresh = 0
@@ -2509,8 +2756,6 @@ local min = _G.math.min
 local max = _G.math.max
 local ceil = _G.math.ceil
 local UnitExists = _G.UnitExists
-local UIFrameFadeOut = _G.UIFrameFadeOut
-local UIFrameFadeRemoveFrame = _G.UIFrameFadeRemoveFrame
 
 function addon:GetCastbarFrame(unitID)
     -- PoolManager:DebugInfo()
@@ -2600,7 +2845,7 @@ function addon:SetCastbarStyle(castbar, cast, db)
         -- Update border to match castbar size
         local width, height = ceil(castbar:GetWidth() * 1.16), ceil(castbar:GetHeight() * 1.16)
         castbar.Border:ClearAllPoints()
-        castbar.Border:SetPoint("TOPLEFT", width, height)
+        castbar.Border:SetPoint("TOPLEFT", width, height+1)
         castbar.Border:SetPoint("BOTTOMRIGHT", -width, -height)
     else
         -- Using border sat by LibSharedMedia
@@ -2622,13 +2867,14 @@ function addon:SetLSMBorders(castbar, cast, db)
     end
 
     -- Apply backdrop if it isn't already active
-    if castbar.BorderFrame.currentTexture ~= db.castBorder then
+    if castbar.BorderFrame.currentTexture ~= db.castBorder or castbar:GetHeight() ~= castbar.BorderFrame.currentHeight then
         castbar.BorderFrame:SetBackdrop({
             edgeFile = db.castBorder,
             tile = false, tileSize = 0,
             edgeSize = castbar:GetHeight(),
         })
         castbar.BorderFrame.currentTexture = db.castBorder
+        castbar.BorderFrame.currentHeight = castbar:GetHeight()
     end
 
     castbar.Border:SetAlpha(0) -- hide default border
@@ -2673,7 +2919,7 @@ function addon:DisplayCastbar(castbar, unitID)
 
     if castbar.fadeInfo then
         -- need to remove frame if it's currently fading so alpha doesn't get changed after re-displaying castbar
-        UIFrameFadeRemoveFrame(castbar)
+        ClassicCastbars:UIFrameFadeRemoveFrame(castbar)
         castbar.fadeInfo.finishedFunc = nil
     end
 
@@ -2751,7 +2997,7 @@ function addon:HideCastbar(castbar, noFadeOut)
     end
 
     if castbar:GetAlpha() > 0 then
-        UIFrameFadeOut(castbar, cast and cast.isInterrupted and 1.5 or 0.2, 1, 0)
+        ClassicCastbars:UIFrameFadeOut(castbar, cast and cast.isInterrupted and 1.5 or 0.2, 1, 0)
     end
 end
 

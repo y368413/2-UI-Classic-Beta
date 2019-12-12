@@ -1,10 +1,11 @@
-﻿--## Author: Peter Getov  ## Version: 2.7
+﻿--## Author: Peter Getov  ## Version: 2.8
 -- core - table (namespace) shared between every lua file
 local CharacterStatsClassic_UIConfig = {};
 
 -- Defaults
 local UISettingsGlobal = {
     shouldAddWeaponSkillToHit = false;
+    useBlizzardBlockValue = false;
 }
 
 local UISettingsCharacter = {
@@ -982,7 +983,12 @@ function CSC_PaperDollFrame_SetBlock(statFrame, unit)
 	CSC_PaperDollFrame_SetLabelAndText(statFrame, STAT_BLOCK, blockChance, true, blockChance);
 
 	statFrame.blockChance = string.format("%.2F", blockChance).."%";
-	statFrame.blockValue = CSC_GetBlockValue(unit);
+	if UISettingsGlobal.useBlizzardBlockValue then
+		statFrame.blockValue = GetShieldBlock();
+	else
+		statFrame.blockValue = CSC_GetBlockValue(unit);
+	end
+
 	statFrame:Show();
 end
 

@@ -69,7 +69,7 @@ function TT:AddLineForID(id, linkType, noadd)
 			if bagCount > 0 then
 				if bankCount > 0 then
 				self:AddDoubleLine(BAGSLOT.."/"..BANK..":", I.InfoColor..bagCount.."/"..bankCount)
-				else
+				elseif bagCount > 0 then
 				self:AddDoubleLine(BAGSLOT..":", I.InfoColor..bagCount)
 				end
 			end

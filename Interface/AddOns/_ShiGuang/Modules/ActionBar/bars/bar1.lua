@@ -3,6 +3,26 @@ local M, R, U, I = unpack(ns)
 local Bar = M:RegisterModule("Actionbar")
 local cfg = R.bars.bar1
 
+local function UpdateActionbarScale(bar)
+	local frame = _G["NDui_Action"..bar]
+	frame:SetScale(MaoRUISettingDB["Actionbar"]["Scale"])
+	frame.mover:SetScale(MaoRUISettingDB["Actionbar"]["Scale"])
+end
+
+function Bar:UpdateAllScale()
+	if not MaoRUISettingDB["Actionbar"]["Enable"] then return end
+
+	UpdateActionbarScale("Bar1")
+	UpdateActionbarScale("Bar2")
+	UpdateActionbarScale("Bar3")
+	UpdateActionbarScale("Bar4")
+	UpdateActionbarScale("Bar5")
+
+	UpdateActionbarScale("BarExit")
+	UpdateActionbarScale("BarPet")
+	UpdateActionbarScale("BarStance")
+end
+
 function Bar:OnLogin()
 	if not MaoRUISettingDB["Actionbar"]["Enable"] then return end
 
@@ -28,7 +48,6 @@ function Bar:OnLogin()
 	else
 		frame.Pos = {"BOTTOM", UIParent, "BOTTOM", 0, 2}
 	end
-	frame:SetScale(MaoRUISettingDB["Actionbar"]["Scale"])
 
 	for i = 1, num do
 		local button = _G["ActionButton"..i]
@@ -110,8 +129,7 @@ function Bar:OnLogin()
 
 	--create drag frame and drag functionality
 	if R.bars.userplaced then
-		local mover = M.Mover(frame, U["Main Actionbar"], "Bar1", frame.Pos)
-		mover:SetScale(MaoRUISettingDB["Actionbar"]["Scale"])
+		frame.mover = M.Mover(frame, U["Main Actionbar"], "Bar1", frame.Pos)
 	end
 
 	--create the mouseover functionality
@@ -145,10 +163,10 @@ function Bar:OnLogin()
 	self:CreateBar3()
 	self:CreateBar4()
 	self:CreateBar5()
-	--self:CreateExtrabar()
 	self:CreateLeaveVehicle()
 	self:CreatePetbar()
 	self:CreateStancebar()
 	self:HideBlizz()
 	self:ReskinBars()
+	self:UpdateAllScale()
 end

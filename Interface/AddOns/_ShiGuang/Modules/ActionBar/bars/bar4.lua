@@ -33,7 +33,6 @@ function Bar:CreateBar4()
 	else
 		frame.Pos = {"RIGHT", UIParent, "RIGHT", -1, -88}
 	end
-	frame:SetScale(MaoRUISettingDB["Actionbar"]["Scale"])
 
 	--move the buttons into position and reparent them
 	MultiBarRight:SetParent(frame)
@@ -124,8 +123,7 @@ function Bar:CreateBar4()
 
 	--create drag frame and drag functionality
 	if R.bars.userplaced then
-		local mover = M.Mover(frame, SHOW_MULTIBAR3_TEXT, "Bar4", frame.Pos)
-		mover:SetScale(MaoRUISettingDB["Actionbar"]["Scale"])
+		frame.mover = M.Mover(frame, SHOW_MULTIBAR3_TEXT, "Bar4", frame.Pos)
 	end
 
 	--create the mouseover functionality

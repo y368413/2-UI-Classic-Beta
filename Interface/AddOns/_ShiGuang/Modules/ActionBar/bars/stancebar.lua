@@ -10,7 +10,7 @@ function Bar:CreateStancebar()
 	local buttonList = {}
 
 	--make a frame that fits the size of all microbuttons
-	local frame = CreateFrame("Frame", "NDui_StanceBar", UIParent, "SecureHandlerStateTemplate")
+	local frame = CreateFrame("Frame", "NDui_ActionBarStance", UIParent, "SecureHandlerStateTemplate")
 	frame:SetWidth(num*cfg.size + (num-1)*margin + 2*padding)
 	frame:SetHeight(cfg.size + 2*padding)
 	if (MaoRUISettingDB["Actionbar"]["Style"] == 7) or (MaoRUISettingDB["Actionbar"]["Style"] == 6) or (MaoRUISettingDB["Actionbar"]["Style"] == 10) then
@@ -22,7 +22,6 @@ function Bar:CreateStancebar()
 	else
 		frame.Pos = {"BOTTOM", UIParent, "BOTTOM", -62, 85}
 	end
-	frame:SetScale(MaoRUISettingDB["Actionbar"]["Scale"])
 
 	--STANCE BAR
 
@@ -52,8 +51,7 @@ function Bar:CreateStancebar()
 
 	--create drag frame and drag functionality
 	if R.bars.userplaced then
-		local mover = M.Mover(frame, U["StanceBar"], "StanceBar", frame.Pos)
-		mover:SetScale(MaoRUISettingDB["Actionbar"]["Scale"])
+		frame.mover = M.Mover(frame, U["StanceBar"], "StanceBar", frame.Pos)
 	end
 
 	--create the mouseover functionality

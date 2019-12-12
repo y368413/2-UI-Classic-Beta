@@ -47,6 +47,7 @@ local defaultSettings = {
 		FavouriteItems = {},
 		GatherEmpty = false,
 		SpecialBagsColor = true,
+		ShowNewItem = true,
 	},
 	Auras = {
 		Reminder = true,

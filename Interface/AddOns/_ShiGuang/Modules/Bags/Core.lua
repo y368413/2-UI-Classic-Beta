@@ -13,6 +13,8 @@ local C_NewItems_IsNewItem, C_NewItems_RemoveNewItem, C_Timer_After = C_NewItems
 local IsControlKeyDown, IsAltKeyDown, DeleteCursorItem = IsControlKeyDown, IsAltKeyDown, DeleteCursorItem
 local SortBankBags, SortBags, InCombatLockdown, ClearCursor = SortBankBags, SortBags, InCombatLockdown, ClearCursor
 local GetContainerItemID, GetContainerNumFreeSlots = GetContainerItemID, GetContainerNumFreeSlots
+local NUM_BAG_SLOTS = NUM_BAG_SLOTS or 4
+local NUM_BANKBAGSLOTS = NUM_BANKBAGSLOTS or 6
 
 function module:UpdateAnchors(parent, bags)
 	local anchor = parent
@@ -225,7 +227,7 @@ end
 
 function module:GetEmptySlot(name)
 	if name == "Main" then
-		for bagID = 0, 4 do
+		for bagID = 0, NUM_BAG_SLOTS do
 			local slotID = module:GetContainerEmptySlot(bagID)
 			if slotID then
 				return bagID, slotID
@@ -236,7 +238,7 @@ function module:GetEmptySlot(name)
 		if slotID then
 			return -1, slotID
 		end
-		for bagID = 5, 11 do
+		for bagID = NUM_BAG_SLOTS+1, NUM_BAG_SLOTS+NUM_BANKBAGSLOTS do
 			local slotID = module:GetContainerEmptySlot(bagID)
 			if slotID then
 				return bagID, slotID
@@ -291,6 +293,7 @@ function module:OnLogin()
 	local iconSize = MaoRUISettingDB["Bags"]["IconSize"]
 	local showItemLevel = MaoRUISettingDB["Bags"]["BagsiLvl"]
 	local deleteButton = MaoRUISettingDB["Bags"]["DeleteButton"]
+	local showNewItem = MaoRUISettingDB["Bags"]["ShowNewItem"]
 	--local itemSetFilter = MaoRUISettingDB["Bags"]["ItemSetFilter"]
 
 	-- Init
@@ -398,8 +401,10 @@ function module:OnLogin()
 			self.iLvl = M.CreateFS(self, 12, "", false, "BOTTOMLEFT", 1, 1)
 		end
 
-		self.glowFrame = M.CreateBG(self, 4)
-		self.glowFrame:SetSize(iconSize+8, iconSize+8)
+		if showNewItem then
+			self.glowFrame = M.CreateBG(self, 4)
+			self.glowFrame:SetSize(iconSize+8, iconSize+8)
+		end
 
 		self:HookScript("OnClick", module.ButtonOnClick)
 	end
@@ -556,14 +561,14 @@ function module:OnLogin()
 		local buttons = {}
 		buttons[1] = module.CreateCloseButton(self)
 		if name == "Main" then
-			module.CreateBagBar(self, settings, 4)
+			module.CreateBagBar(self, settings, NUM_BAG_SLOTS)
 			buttons[2] = module.CreateRestoreButton(self, f)
 			buttons[3] = module.CreateBagToggle(self)
 			buttons[4] = module.CreateSortButton(self, name)
 			buttons[5] = module.CreateFavouriteButton(self)
 			if deleteButton then buttons[6] = module.CreateDeleteButton(self) end
 		elseif name == "Bank" then
-			module.CreateBagBar(self, settings, 7)
+			module.CreateBagBar(self, settings, NUM_BANKBAGSLOTS)
 			buttons[2] = module.CreateBagToggle(self)
 			buttons[3] = module.CreateSortButton(self, name)
 		end

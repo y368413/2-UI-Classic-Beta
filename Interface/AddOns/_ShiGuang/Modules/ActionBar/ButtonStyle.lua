@@ -416,7 +416,7 @@ end
 
 local HotSpotMicroMenu = CreateFrame("Frame","MicroMenuHolder",UIParent)
 local MicroButtons = {
-CharacterMicroButton, SpellbookMicroButton, TalentMicroButton, QuestLogMicroButton, SocialsMicroButton, WorldMapMicroButton, MainMenuMicroButton, HelpMicroButton, GuildMicroButton, LFDMicroButton, CollectionsMicroButton, EJMicroButton, StoreMicroButton} --, PVPMicroButton, SocialsMicroButton
+CharacterMicroButton, SpellbookMicroButton, TalentMicroButton, QuestLogMicroButton, SocialsMicroButton, WorldMapMicroButton, MainMenuMicroButton, HelpMicroButton, GuildMicroButton, LFDMicroButton, CollectionsMicroButton, EJMicroButton, StoreMicroButton, KeyRingButton} --, PVPMicroButton, SocialsMicroButton
 local function MoveMicroButtons()
 	for _, menu in pairs(MicroButtons) do
 		menu:SetParent(HotSpotMicroMenu)
@@ -424,6 +424,7 @@ local function MoveMicroButtons()
 		menu:SetScale(0.75)
 	end
 	CharacterMicroButton:SetPoint("BOTTOMRIGHT", Minimap, "BOTTOMLEFT", 3, -8)
+	KeyRingButton:SetPoint("BOTTOMLEFT", CharacterMicroButton, "TOPRIGHT", 0, 0) 
 	SpellbookMicroButton:SetPoint("BOTTOMRIGHT", CharacterMicroButton, "TOPRIGHT", 0, -21)
 	if UnitLevel("player") >= 10 then
 	  TalentMicroButton:SetPoint("BOTTOMRIGHT", SpellbookMicroButton, "TOPRIGHT", 0, -21)
@@ -435,7 +436,6 @@ local function MoveMicroButtons()
 	WorldMapMicroButton:SetPoint("BOTTOMRIGHT", SocialsMicroButton, "TOPRIGHT", 0, -21) 
 	MainMenuMicroButton:SetPoint("BOTTOMRIGHT", WorldMapMicroButton, "TOPRIGHT", 0, -21)
 	HelpMicroButton:SetPoint("BOTTOMRIGHT", MainMenuMicroButton, "TOPRIGHT", 0, -21) 
-	--LFDMicroButton:SetPoint("BOTTOMRIGHT", TalentMicroButton, "TOPRIGHT", 0, -4) 
 	--AchievementMicroButton:SetPoint("BOTTOMRIGHT", LFDMicroButton, "TOPRIGHT", 0, -4)
 	--StoreMicroButton:SetPoint("BOTTOMRIGHT", QuestLogMicroButton, "TOPRIGHT", 0, -4)
 end

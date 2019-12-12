@@ -47,7 +47,7 @@ R.bars = {
     },
     -- PETBAR 宠物动作条
     petbar = {
-		size	            = 22,		-- 动作条大小
+		size	            = 21,		-- 动作条大小
 		fader				= nil,		-- 鼠标悬停显隐
     },
     -- STANCE + POSSESSBAR 姿态条
@@ -62,7 +62,7 @@ R.bars = {
     },
     -- VEHICLE EXIT 离开载具按钮
     leave_vehicle 			= {
-		size          		= 36,		-- 动作条大小
+		size          		= 32,		-- 动作条大小
 		fader				= nil,		-- 鼠标悬停显隐
     },
 }

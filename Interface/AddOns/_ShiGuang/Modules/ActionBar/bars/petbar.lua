@@ -9,7 +9,7 @@ function Bar:CreatePetbar()
 	local buttonList = {}
 
 	--create the frame to hold the buttons
-	local frame = CreateFrame("Frame", "NDui_PetActionBar", UIParent, "SecureHandlerStateTemplate")
+	local frame = CreateFrame("Frame", "NDui_ActionBarPet", UIParent, "SecureHandlerStateTemplate")
 	frame:SetWidth(num*cfg.size + (num-1)*margin + 2*padding)
 	frame:SetHeight(cfg.size + 2*padding)
 	if MaoRUISettingDB["Actionbar"]["Style"] == 3 then
@@ -19,7 +19,6 @@ function Bar:CreatePetbar()
 	else
 		frame.Pos = {"BOTTOM", UIParent, "BOTTOM", 100, 90}
 	end
-	frame:SetScale(MaoRUISettingDB["Actionbar"]["Scale"])
 
 	--move the buttons into position and reparent them
 	PetActionBarFrame:SetParent(frame)
@@ -49,8 +48,7 @@ function Bar:CreatePetbar()
 
 	--create drag frame and drag functionality
 	if R.bars.userplaced then
-		local mover = M.Mover(frame, U["Pet Actionbar"], "PetBar", frame.Pos)
-		mover:SetScale(MaoRUISettingDB["Actionbar"]["Scale"])
+		frame.mover = M.Mover(frame, U["Pet Actionbar"], "PetBar", frame.Pos)
 	end
 
 	--create the mouseover functionality
