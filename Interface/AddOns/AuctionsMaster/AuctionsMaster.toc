@@ -1,4 +1,4 @@
-## Interface: 11302
+## Interface: 11303
 ## Title: AuctionLite
 ## Title-zhCN: |cff69ccf0[拍卖]|r购售助手
 ## Title-zhTW: |cff69ccf0[拍卖]|r购售助手
