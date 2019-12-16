@@ -1,0 +1,1 @@
+if select(2, UnitClass("player")) ~= "PRIEST" then return end

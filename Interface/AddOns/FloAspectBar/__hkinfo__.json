@@ -1,0 +1,14 @@
+{
+    "target": "curse",
+    "searchName": "FloAspectBar",
+    "localName": "FloAspectBar",
+    "version": "1.13.24-classic",
+    "fileName": "flo-aspect-bar",
+    "addonsMap": [
+        "FloAspectBar"
+    ],
+    "interfaceMap": [],
+    "children": [],
+    "name": "FloAspectBar",
+    "gameVersion": ""
+}

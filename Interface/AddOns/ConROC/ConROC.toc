@@ -1,0 +1,21 @@
+﻿## Interface: 11302
+## Version: 1.13.34
+## Author: Vae
+## Title:-|cffFFFFFFConROC|r- Conflict Rotation Optimizer Classic
+## Title-zhCN:|CFFD74DE1[输出]|r-|cffFFFFFFConROC|r-
+## Title-zhTW:|CFFD74DE1[输出]|r-|cffFFFFFFConROC|r-
+## Notes: Rotation helper framework.
+## Notes-zhCN: 输出循环提示助手(包括职业Buff、打断、吃喝)。
+## Notes-zhTW: 輸出迴圈提示助手(包括职业Buff、打断、吃喝)。
+## SavedVariables: ConROCPreferences
+## SavedVariablesPerCharacter: ConROCMageSpells, ConROCWarriorSpells, ConROCWarlockSpells, ConROCPaladinSpells, ConROCRogueSpells, ConROCHunterSpells
+## OptionalDependencies: Bartender4, ElvUI, ButtonForge
+## Dependencies: _ShiGuang
+
+## X-Repple: 2 UI
+
+core.lua
+buttons.lua
+helper.lua
+
+Modules\Roles.xml

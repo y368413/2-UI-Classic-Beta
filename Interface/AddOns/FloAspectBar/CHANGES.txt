@@ -1,0 +1,30 @@
+tag d80754187f50c07981c1cec28458b945e99bb96f 1.13.24-classic
+Author:	Floraline <floraline@ophiuchus.org>
+Date:	Tue Sep 17 21:58:08 2019 +0200
+
+Tagging for release
+
+commit 60af15b5729d3161518629d564ca10c8a162441e
+Author: Floraline <floraline@ophiuchus.org>
+Date:   Tue Sep 17 21:37:55 2019 +0200
+
+    Bump version
+
+commit 57848b349894815f723bca1f0f275eb4f75b0c7b
+Author: Floraline <floraline@ophiuchus.org>
+Date:   Tue Sep 17 21:34:34 2019 +0200
+
+    Add aspect of the pack
+
+commit 6d644e407c261a2c2b66c573e4f1e39518632f50
+Author: Floraline <floraline@ophiuchus.org>
+Date:   Tue Sep 17 21:32:45 2019 +0200
+
+    Remove unused field
+
+commit 85ca3024bfcf752744f6a799038a7840d7f0b963
+Author: Floraline <floraline@ophiuchus.org>
+Date:   Tue Sep 17 21:29:18 2019 +0200
+
+    Fix the tooltip to show the max rank known
+

@@ -1,0 +1,27 @@
+<Bindings>
+	<Binding name="CONROCUNLOCK" header="ConROC">
+		if not ConROC.db.profile.unlockWindow then
+			ConROC.db.profile.unlockWindow = true;
+		else
+			ConROC.db.profile.unlockWindow = false;
+		end
+		
+		ConROCWindow:EnableMouse(ConROC.db.profile.unlockWindow);
+		ConROCDefenseWindow:EnableMouse(ConROC.db.profile.unlockWindow);
+		ConROCInterruptWindow:EnableMouse(ConROC.db.profile.unlockWindow);
+		ConROCPurgeWindow:EnableMouse(ConROC.db.profile.unlockWindow);
+		ConROCDefenseWindow:SetMovable(ConROC.db.profile.unlockWindow);
+		ConROCInterruptWindow:SetMovable(ConROC.db.profile.unlockWindow);
+		ConROCPurgeWindow:SetMovable(ConROC.db.profile.unlockWindow);
+		if ConROC.db.profile.unlockWindow and ConROC.db.profile.enableInterruptWindow == true then
+			ConROCInterruptWindow:Show();				
+		else
+			ConROCInterruptWindow:Hide();				
+		end	
+		if ConROC.db.profile.unlockWindow and ConROC.db.profile.enablePurgeWindow == true then
+			ConROCPurgeWindow:Show();					
+		else
+			ConROCPurgeWindow:Hide();					
+		end	
+	</Binding>
+</Bindings>

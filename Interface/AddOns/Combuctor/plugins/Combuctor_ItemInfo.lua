@@ -252,8 +252,6 @@ local Update = function(self)
 		-- ItemLevel
 		---------------------------------------------------
 		if (itemEquipLoc == "INVTYPE_BAG") then 
-			
-
 			local scannedSlots
 			local line = _G[ScannerTipName.."TextLeft3"]
 			if line then

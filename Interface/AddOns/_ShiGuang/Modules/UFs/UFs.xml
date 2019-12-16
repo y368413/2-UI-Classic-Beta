@@ -1,4 +1,5 @@
 <Ui xmlns="http://www.blizzard.com/wow/ui/">
 	<Script file="Nameplates.lua"/>
+	<Script file="OverheadCombo.lua"/>
 	<Script file="BlinkHealthText.lua"/>
 </Ui>

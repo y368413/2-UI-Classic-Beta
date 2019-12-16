@@ -1,0 +1,12 @@
+## Interface: 11303
+## Version: 113r.191212
+## Title: alaGearMan
+## Title-zhCN: |cff880303[有爱]|r 一键换装
+## Title-zhTW: |cff880303[有爱]|r 一键换装
+## Author: |cff00ff00ALA|r @ |cffff0000163UI|r
+## Notes: alaGearMan
+## SavedVariables: alaGearManSV
+
+
+alaGearMan.lua
+

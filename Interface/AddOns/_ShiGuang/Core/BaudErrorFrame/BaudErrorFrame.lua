@@ -13,6 +13,7 @@ end
 
 function BaudErrorFrame_OnLoad(self)
 	self:RegisterEvent("VARIABLES_LOADED")
+		RegisterTaintEvents(self)  --enableTaint
 
 	UIParent:UnregisterEvent("MACRO_ACTION_BLOCKED")
 	UIParent:UnregisterEvent("ADDON_ACTION_BLOCKED")
