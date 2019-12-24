@@ -1,4 +1,4 @@
---## Version: 1.1.4 ## Author: Bytespire
+--## Version: 1.1.5 ## Author: Bytespire
 local ItemProfConstants = {}
 
 local COOK =    0x001

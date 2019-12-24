@@ -1,6 +1,7 @@
 ﻿<Ui xmlns="http://www.blizzard.com/wow/ui/">
 	<Script file="iFrame.lua"/>
 	<Script file="iBuffs.lua"/>
+	<Script file="IconMarks.lua"/>
 	<Script file="PartyTarget.lua"/>
 	<Script file="PowerSpark.lua"/>
 	<!--Script file="PartyCastbar.lua"/>

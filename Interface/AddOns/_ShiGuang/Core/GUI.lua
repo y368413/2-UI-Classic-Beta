@@ -348,6 +348,10 @@ local function updateErrorBlocker()
 	M:GetModule("Misc"):UpdateErrorBlocker()
 end
 
+local function updateActionbarScale()
+	M:GetModule("Actionbar"):UpdateAllScale()
+end
+
 local function updateReminder()
 	M:GetModule("Auras"):InitReminder()
 end
@@ -434,7 +438,6 @@ local optionList = {		-- type, key, value, name, horizon, horizon2, doubleline
 		{1, "Misc", "AutoQuest", "|cff00cc4c"..U["Auto Quest"]},
 		{},--blank
 	  {1, "Misc", "ShowItemLevel", "|cff00cc4c"..U["Show ItemLevel"]},
-		{1, "Misc", "GemNEnchant", U["Show GemNEnchant"].."*", true},
 	  {1, "Skins", "InfobarLine", U["Bar Line"]},
 	  {1, "Misc", "xMerchant", U["xMerchant"], true},
 	  {1, "Misc", "WallpaperKit", U["WallpaperKit"], true, true},
@@ -502,7 +505,7 @@ local optionList = {		-- type, key, value, name, horizon, horizon2, doubleline
 		{},--blank
 		{1, "ACCOUNT", "LockUIScale", "|cff00cc4c"..U["Lock UIScale"]},
 		{3, "ACCOUNT", "UIScale", U["Setup UIScale"], true, false, {.4, 1.15, 1}},
-		{3, "Actionbar", "Scale", U["Actionbar Scale"], true, true, {.8, 1.5, 1}},
+		{3, "Actionbar", "Scale", U["Actionbar Scale"], true, true, {.8, 1.5, 1}, updateActionbarScale},
 		{},--blank
 		{3, "UFs", "PlayerFrameScale", U["PlayerFrame Scale"], false, false, {0.6, 1.2, 1}},
 		{3, "Tooltip", "Scale", U["Tooltip Scale"], true, false, {.5, 1.5, 1}},

@@ -197,7 +197,7 @@ tipFrame:SetScript("OnClick", function(self)
 	WhisperPop:ToggleFrame()
 end)
 
-tipFrame:SetScript("OnEnter", function(self)
+--[[tipFrame:SetScript("OnEnter", function(self)
 	GameTooltip:SetOwner(self, "ANCHOR_LEFT")
 	GameTooltip:ClearLines()
 	GameTooltip:AddLine(CHAT_WHISPERPOP_TITLE)
@@ -207,7 +207,7 @@ end)
 
 tipFrame:SetScript("OnLeave", function(self)
 	GameTooltip:Hide()
-end)
+end)]]
 
 --tipFrame:SetTip("Test")
 

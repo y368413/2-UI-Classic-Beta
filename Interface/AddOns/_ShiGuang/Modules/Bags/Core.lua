@@ -57,7 +57,7 @@ function module:CreateInfoFrame()
 
 	local tag = self:SpawnPlugin("TagDisplay", "[money]", infoFrame)
 	tag:SetFont(unpack(I.Font))
-	tag:SetPoint("RIGHT", -5, 0)
+	tag:SetPoint("LEFT", icon, "RIGHT", 5, 0)
 end
 
 function module:CreateBagBar(settings, columns)
@@ -106,6 +106,7 @@ function module:CreateBagToggle()
 		if self.BagBar:IsShown() then
 			bu:SetBackdropBorderColor(1, .8, 0)
 			PlaySound(SOUNDKIT.IG_BACKPACK_OPEN)
+			if self.keyring and self.keyring:IsShown() then self.keyToggle:Click() end
 		else
 			bu:SetBackdropBorderColor(0, 0, 0)
 			PlaySound(SOUNDKIT.IG_BACKPACK_CLOSE)
@@ -113,12 +114,33 @@ function module:CreateBagToggle()
 	end)
 	bu.title = BACKPACK_TOOLTIP
 	M.AddTooltip(bu, "ANCHOR_TOP")
+	self.bagToggle = bu
+
+	return bu
+end
+
+function module:CreateKeyToggle()
+	local bu = M.CreateButton(self, 24, 24, true, "Interface\\ICONS\\INV_Misc_Key_12")
+	bu:SetScript("OnClick", function()
+		ToggleFrame(self.keyring)
+		if self.keyring:IsShown() then
+			bu:SetBackdropBorderColor(1, .8, 0)
+			PlaySound(SOUNDKIT.KEY_RING_OPEN)
+			if self.BagBar and self.BagBar:IsShown() then self.bagToggle:Click() end
+		else
+			bu:SetBackdropBorderColor(0, 0, 0)
+			PlaySound(SOUNDKIT.KEY_RING_CLOSE)
+		end
+	end)
+	bu.title = KEYRING
+	M.AddTooltip(bu, "ANCHOR_TOP")
+	self.keyToggle = bu
 
 	return bu
 end
 
 function module:CreateSortButton(name)
-	local bu = M.CreateButton(self, 24, 24, true, "Interface\\Icons\\ABILITY_SEAL")
+	local bu = M.CreateButton(self, 24, 24, true, I.sortTex)
 	bu:SetScript("OnClick", function()
 		if InCombatLockdown() then
 			UIErrorsFrame:AddMessage(I.InfoColor..ERR_NOT_IN_COMBAT)
@@ -308,7 +330,7 @@ function module:OnLogin()
 	module.BagsType[-1] = 0
 
 	local f = {}
-	local onlyBags, bagAmmo, bagEquipment, bagConsumble, bagsJunk, onlyBank, bankAmmo, bankLegendary, bankEquipment, bankConsumble, onlyReagent, bagFavourite, bankFavourite = self:GetFilters()
+	local onlyBags, bagAmmo, bagEquipment, bagConsumble, bagsJunk, onlyBank, bankAmmo, bankLegendary, bankEquipment, bankConsumble, onlyReagent, bagFavourite, bankFavourite, onlyKeyring = self:GetFilters()
 
 	function Backpack:OnInit()
 		local MyContainer = self:GetContainerClass()
@@ -331,6 +353,12 @@ function module:OnLogin()
 
 		f.consumble = MyContainer:New("Consumble", {Columns = bagsWidth, Parent = f.main})
 		f.consumble:SetFilter(bagConsumble, true)
+
+		local keyring = MyContainer:New("Keyring", {Columns = bagsWidth, Parent = f.main})
+		keyring:SetFilter(onlyKeyring, true)
+		keyring:SetPoint("TOPRIGHT", f.main, "BOTTOMRIGHT", 0, -5)
+		keyring:Hide()
+		f.main.keyring = keyring
 
 		f.bank = MyContainer:New("Bank", {Columns = bankWidth, Bags = "bank"})
 		f.bank:SetFilter(onlyBank, true)
@@ -499,7 +527,8 @@ function module:OnLogin()
 		local spacing = 5
 		local xOffset = 5
 		local yOffset = -offset + spacing
-		local width, height = self:LayoutButtons("grid", columns, spacing, xOffset, yOffset)
+		local _, height = self:LayoutButtons("grid", columns, spacing, xOffset, yOffset)
+		local width = columns * (iconSize+spacing)-spacing
 		if self.freeSlot then
 			if MaoRUISettingDB["Bags"]["GatherEmpty"] then
 				local numSlots = #self.buttons + 1
@@ -514,7 +543,7 @@ function module:OnLogin()
 				self.freeSlot:Show()
 
 				if height < 0 then
-					width, height = columns * (iconSize+spacing)-spacing, iconSize
+					height = iconSize
 				elseif col == 1 then
 					height = height + iconSize + spacing
 				end
@@ -553,6 +582,8 @@ function module:OnLogin()
 			label = BAG_FILTER_JUNK
 		elseif strmatch(name, "Favourite") then
 			label = PREFERENCES
+		elseif name == "Keyring" then
+			label = KEYRING
 		end
 		if label then M.CreateFS(self, 14, label, true, "TOPLEFT", 5, -8) return end
 
@@ -564,16 +595,17 @@ function module:OnLogin()
 			module.CreateBagBar(self, settings, NUM_BAG_SLOTS)
 			buttons[2] = module.CreateRestoreButton(self, f)
 			buttons[3] = module.CreateBagToggle(self)
-			buttons[4] = module.CreateSortButton(self, name)
-			buttons[5] = module.CreateFavouriteButton(self)
-			if deleteButton then buttons[6] = module.CreateDeleteButton(self) end
+			buttons[4] = module.CreateKeyToggle(self)
+			buttons[5] = module.CreateSortButton(self, name)
+			buttons[6] = module.CreateFavouriteButton(self)
+			if deleteButton then buttons[7] = module.CreateDeleteButton(self) end
 		elseif name == "Bank" then
 			module.CreateBagBar(self, settings, NUM_BANKBAGSLOTS)
 			buttons[2] = module.CreateBagToggle(self)
 			buttons[3] = module.CreateSortButton(self, name)
 		end
 
-		for i = 1, 6 do
+		for i = 1, #buttons do
 			local bu = buttons[i]
 			if not bu then break end
 			if i == 1 then
@@ -628,9 +660,12 @@ function module:OnLogin()
 	-- Fixes
 	ToggleAllBags()
 	ToggleAllBags()
+	module.initComplete = true
+
 	BankFrame.GetRight = function() return f.bank:GetRight() end
 	BankFrameItemButton_Update = M.Dummy
 
+	-- Sort order
 	SetSortBagsRightToLeft(not MaoRUISettingDB["Bags"]["ReverseSort"])
 	SetInsertItemsLeftToRight(false)
 end

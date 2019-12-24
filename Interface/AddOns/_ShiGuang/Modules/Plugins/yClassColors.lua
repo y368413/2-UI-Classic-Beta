@@ -2,7 +2,7 @@ local _, ns = ...
 local M, R, U, I = unpack(ns)
 
 ------------------------------ yClassColors, by yleaf-- NDui MOD----------------------------
-local format, ipairs, tinsert = string.format, ipairs, table.insert
+local format, ipairs, tinsert, strsplit = string.format, ipairs, table.insert, string.split
 
 -- Colors
 local function classColor(class, showRGB)
@@ -166,6 +166,32 @@ hooksecurefunc("WhoList_Update", function()
 			nameText:SetTextColor(classColor(class, true))
 			levelText:SetText(diffColor(level)..level)
 			variableText:SetText(columnTable[UIDropDownMenu_GetSelectedID(WhoFrameDropDown)])
+		end
+	end
+end)
+-- Battlefield board
+local MAX_SCORE_BUTTONS = MAX_SCORE_BUTTONS or 22
+
+hooksecurefunc("WorldStateScoreFrame_Update", function()
+	local offset = FauxScrollFrame_GetOffset(WorldStateScoreScrollFrame)
+
+	for i = 1, MAX_SCORE_BUTTONS do
+		local index = offset + i
+		local fullName, _, _, _, _, faction, _, _, class = GetBattlefieldScore(index)
+		if fullName then
+			local name, realm = strsplit(" - ", fullName)
+			name = classColor(class)..name.."|r"
+			if fullName == I.MyName then name = "> "..name.." <" end
+
+			if realm then
+				local color = "|cffff1919"
+				if faction == 1 then color = "|cff00adf0" end
+				realm = color..realm.."|r"
+				name = name.." - "..realm
+			end
+
+			local button = _G["WorldStateScoreButton"..i]
+			button.name.text:SetText(name)
 		end
 	end
 end)

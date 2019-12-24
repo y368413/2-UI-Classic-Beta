@@ -143,7 +143,7 @@ daftAuction:SetScript("OnEvent", function(self, event)
 						MoneyInputFrame_SetCopper(BuyoutPrice, myBuyoutPrice);
 					end;
 					--if UIDropDownMenu_GetSelectedValue(DurationDropDown) ~= 3 then 
-						--UIDropDownMenu_GetSelectedValue(DurationDropDown, 3); -- set duration to 3 (48h)
+						--UIDropDownMenu_SetSelectedValue(DurationDropDown, 3); -- set duration to 3 (48h)
 						--DurationDropDownText:SetText("48 H"); -- set duration text since it keeps bugging to "Custom"  48 Hours
 					--end;
 				end;

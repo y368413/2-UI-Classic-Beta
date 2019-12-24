@@ -76,7 +76,6 @@ local emotes = {
     { key = "rt8",    zhTW="rt8",        zhCN="rt8",    texture = "Interface\\TargetingFrame\\UI-RaidTargetingIcon_8" },
 }
 
-
 local function ReplaceEmote(value)
     local emote = value:gsub("[%{%}]", "")
     for _, v in ipairs(emotes) do
@@ -87,35 +86,25 @@ local function ReplaceEmote(value)
     return value
 end
 
-local function filter(self, event, msg, ...)
+local function Chatemotefilter(self, event, msg, ...)
     msg = msg:gsub("%{.-%}", ReplaceEmote)
     return false, msg, ...
 end
 
-ChatFrame_AddMessageEventFilter("CHAT_MSG_CHANNEL", filter)
-ChatFrame_AddMessageEventFilter("CHAT_MSG_SAY", filter)
-ChatFrame_AddMessageEventFilter("CHAT_MSG_YELL", filter)
-ChatFrame_AddMessageEventFilter("CHAT_MSG_WHISPER", filter)
-ChatFrame_AddMessageEventFilter("CHAT_MSG_WHISPER_INFORM", filter)
-ChatFrame_AddMessageEventFilter("CHAT_MSG_RAID", filter)
-ChatFrame_AddMessageEventFilter("CHAT_MSG_RAID_LEADER", filter)
-ChatFrame_AddMessageEventFilter("CHAT_MSG_PARTY", filter)
-ChatFrame_AddMessageEventFilter("CHAT_MSG_PARTY_LEADER", filter)
-ChatFrame_AddMessageEventFilter("CHAT_MSG_GUILD", filter)
-ChatFrame_AddMessageEventFilter("CHAT_MSG_BATTLEGROUND", filter)
-ChatFrame_AddMessageEventFilter("CHAT_MSG_EMOTE", filter)
-
- --------------------------------------- 聊天表情-- Author:M  end -------------------------------------
- 
-function module:Chatbar()
-	if not MaoRUISettingDB["Chat"]["Chatbar"] then return end
-	local chatFrame = SELECTED_DOCK_FRAME
-	local editBox = chatFrame.editBox
-	local width, height, padding, buttonList = 16, 18, 6, {}
-	local tinsert, pairs = table.insert, pairs
-	local Chatbar = CreateFrame("Frame", nil, UIParent)
-	Chatbar:SetSize(width, height)
-	Chatbar:SetPoint("TOPLEFT", _G.ChatFrame1, "BOTTOMLEFT", 0, 0)
+local function ChatFrameFilter()
+	ChatFrame_AddMessageEventFilter("CHAT_MSG_CHANNEL", Chatemotefilter)
+	ChatFrame_AddMessageEventFilter("CHAT_MSG_SAY", Chatemotefilter)
+	ChatFrame_AddMessageEventFilter("CHAT_MSG_YELL", Chatemotefilter)
+	ChatFrame_AddMessageEventFilter("CHAT_MSG_WHISPER", Chatemotefilter)
+	ChatFrame_AddMessageEventFilter("CHAT_MSG_WHISPER_INFORM", Chatemotefilter)
+	ChatFrame_AddMessageEventFilter("CHAT_MSG_RAID", Chatemotefilter)
+	ChatFrame_AddMessageEventFilter("CHAT_MSG_RAID_LEADER", Chatemotefilter)
+	ChatFrame_AddMessageEventFilter("CHAT_MSG_PARTY", Chatemotefilter)
+	ChatFrame_AddMessageEventFilter("CHAT_MSG_PARTY_LEADER", Chatemotefilter)
+	ChatFrame_AddMessageEventFilter("CHAT_MSG_GUILD", Chatemotefilter)
+	ChatFrame_AddMessageEventFilter("CHAT_MSG_BATTLEGROUND", Chatemotefilter)
+	ChatFrame_AddMessageEventFilter("CHAT_MSG_EMOTE", Chatemotefilter)
+end
 
   ------------------------聊天表情--以下是界面部分------------------------
   local function EmoteButton_OnClick(self, button)
@@ -124,7 +113,19 @@ function module:Chatbar()
     editBox:SetText(editBox:GetText():gsub("{$","") .. self.emote)
     if (button == "LeftButton") then self:GetParent():Hide() end
   end
-
+ --------------------------------------- 聊天表情-- Author:M  end -------------------------------------
+ 
+function module:Chatbar()
+	if not MaoRUISettingDB["Chat"]["Chatbar"] then return end
+	ChatFrameFilter()
+	
+	local chatFrame = SELECTED_DOCK_FRAME
+	local editBox = chatFrame.editBox
+	local width, height, padding, buttonList = 16, 18, 6, {}
+	local tinsert, pairs = table.insert, pairs
+	local Chatbar = CreateFrame("Frame", nil, UIParent)
+	Chatbar:SetSize(width, height)
+	Chatbar:SetPoint("TOPLEFT", _G.ChatFrame1, "BOTTOMLEFT", 0, 0)
 	Emote_CallButton=CreateFrame("Button","Emote_CallButton",Chatbar)
  	Emote_CallButton:SetSize(18, 18)
  	Emote_CallButton:SetPoint("LEFT", Chatbar, "LEFT", 0, 0)
@@ -152,19 +153,19 @@ function module:Chatbar()
     Emote_IconPanel:SetFrameStrata("DIALOG")
     Emote_IconPanel:SetPoint("BOTTOMLEFT",Emote_CallButton,"TOPLEFT",-23,0)
     for _, v in ipairs(emotes) do
-        button = CreateFrame("Button", nil, Emote_IconPanel)
-        button.emote = "{" .. (v[GetLocale()] or v.key) .. "}"
-        button:SetSize(Emote_width, Emote_height)
+        Emote_button = CreateFrame("Button", nil, Emote_IconPanel)
+        Emote_button.emote = "{" .. (v[GetLocale()] or v.key) .. "}"
+        Emote_button:SetSize(Emote_width, Emote_height)
         if (v.texture) then
-            button:SetNormalTexture(v.texture)
+            Emote_button:SetNormalTexture(v.texture)
         else
-            button:SetNormalTexture("Interface\\AddOns\\_ShiGuang\\Media\\Emotes\\" .. v.key)
+            Emote_button:SetNormalTexture("Interface\\AddOns\\_ShiGuang\\Media\\Emotes\\" .. v.key)
         end
-        button:SetHighlightTexture("Interface\\Buttons\\UI-Common-MouseHilight", "ADD")
-        button:SetPoint("TOPLEFT", 8+(index%column)*(Emote_width+space), -8 - floor(index/column)*(Emote_height+space))
-        button:SetScript("OnMouseUp", EmoteButton_OnClick)
-        button:SetScript("OnEnter", EmoteButton_OnEnter)
-        button:SetScript("OnLeave", EmoteButton_OnLeave)
+        Emote_button:SetHighlightTexture("Interface\\Buttons\\UI-Common-MouseHilight", "ADD")
+        Emote_button:SetPoint("TOPLEFT", 8+(index%column)*(Emote_width+space), -8 - floor(index/column)*(Emote_height+space))
+        Emote_button:SetScript("OnMouseUp", EmoteButton_OnClick)
+        --Emote_button:SetScript("OnEnter", EmoteButton_OnEnter)
+        --Emote_button:SetScript("OnLeave", EmoteButton_OnLeave)
         index = index + 1
     end
     Emote_IconPanel:SetHeight(ceil(index/column)*(Emote_height+space) +8)

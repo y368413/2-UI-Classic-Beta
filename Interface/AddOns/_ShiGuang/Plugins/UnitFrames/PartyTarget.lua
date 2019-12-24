@@ -46,24 +46,6 @@ local function PartyTarget_UpdateAlpha(self, unit)
     end
 end
 
---隊友目標框架更新
-local function PartyTarget_OnUpdate(self, elapsed)
-	self.timer = (self.timer or 0) + elapsed
-	if (self.timer >= 0.2) then
-        self.timer = 0
-        local unit = "party" .. self:GetID() .."target"
-        local frame = _G["PartyTargetFrame"..self:GetID()]
-		if UnitExists(unit) then
-            PartyTarget_UpdateName(frame, unit)
-            PartyTarget_UpdateHealth(frame, unit)
-            PartyTarget_UpdateColor(frame, unit)
-            PartyTarget_UpdateAlpha(frame, unit)
-		else
-			frame:SetAlpha(0)
-		end
-	end
-end
-
 --創建隊友目標框架
 local function PartyTarget_CreateButton(index)
     local parent = _G["PartyMemberFrame"..index]
@@ -101,6 +83,22 @@ local function PartyTarget_CreateButton(index)
     button:SetAlpha(0)    
     return button
 end
-
 for i = 1, MAX_PARTY_MEMBERS do PartyTarget_CreateButton(i) end
-hooksecurefunc("PartyMemberFrame_OnUpdate", PartyTarget_OnUpdate)
+
+--隊友目標框架更新
+hooksecurefunc("PartyMemberFrame_OnUpdate", function(self, elapsed)
+	self.timer = (self.timer or 0) + elapsed
+	if (self.timer >= 0.2) then
+        self.timer = 0
+        local unit = "party" .. self:GetID() .."target"
+        local frame = _G["PartyTargetFrame"..self:GetID()]
+		if UnitExists(unit) then
+            PartyTarget_UpdateName(frame, unit)
+            PartyTarget_UpdateHealth(frame, unit)
+            PartyTarget_UpdateColor(frame, unit)
+            PartyTarget_UpdateAlpha(frame, unit)
+		else
+			frame:SetAlpha(0)
+		end
+	end
+end)

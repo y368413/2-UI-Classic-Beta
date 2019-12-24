@@ -50,6 +50,7 @@ I.flatTex = Media.."flatTex"
 I.bgTex = Media.."bgTex"
 I.EnergyTex = Media.."Skullflower3"
 I.arrowTex = Media.."Modules\\Raid\\textureArrowAbove"
+I.sortTex = Media.."SortIcon"
 I.mailTex = "Interface\\Minimap\\Tracking\\Mailbox"
 I.gearTex = Media.."arrow-down-active"  --Media.."Modules\\Raid\\ArrowLarge"
 I.eyeTex = "Interface\\Minimap\\Raid_Icon"		-- blue: \\Dungeon_Icon

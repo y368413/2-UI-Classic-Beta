@@ -1,5 +1,5 @@
 <Ui xmlns="http://www.blizzard.com/wow/ui/">
-	<Script file="TrackingEye.lua"/>
+	<!--Script file="TrackingEye.lua"/-->
   <Script file="ManaPerc.lua"/>
   <Script file="Castbars.lua"/>
   <Script file="DialogKey.lua"/>

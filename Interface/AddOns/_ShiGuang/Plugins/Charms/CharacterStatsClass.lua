@@ -1,4 +1,4 @@
-﻿--## Author: Peter Getov  ## Version: 2.8
+﻿--## Author: Peter Getov  ## Version: 2.8.1
 -- core - table (namespace) shared between every lua file
 local CharacterStatsClassic_UIConfig = {};
 

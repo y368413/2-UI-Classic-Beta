@@ -1,6 +1,28 @@
 local rmhAddon = IsAddOnLoaded("RealMobHealth");
 local mi2addon = IsAddOnLoaded("MobInfo2-Classic");
 
+function CreateBarPctText(frame, ap, rp, x, y, font, fontsize)
+	local bar = frame.healthbar 
+	if bar then
+		if bar.pctText then
+			bar.pctText:ClearAllPoints()
+			bar.pctText:SetPoint(ap, bar, rp, x, y)
+		else
+			bar.pctText = frame:CreateFontString(nil, "OVERLAY", font)
+			bar.pctText:SetPoint(ap, bar, rp, x, y)
+			bar.pctText:SetFont("Interface\\addons\\_ShiGuang\\Media\\Fonts\\Pixel.TTF", fontsize, "OUTLINE")
+			bar.pctText:SetShadowColor(0, 0, 0)
+		end
+	end
+end
+CreateBarPctText(PlayerFrame, "RIGHT", "LEFT", -80, -8, "NumberFontNormalLarge", 36)
+CreateBarPctText(TargetFrame, "LEFT", "RIGHT", 80, -8, "NumberFontNormalLarge", 36)
+--CreateBarPctText(TargetFrameToT, "BOTTOMLEFT", "TOPRIGHT", 0, 5)
+--CreateBarPctText(FocusFrame, "RIGHT", "LEFT", -3, -8, "NumberFontNormalLarge")
+--CreateBarPctText(FocusFrameToT, "BOTTOMLEFT", "TOP", 24, 10)
+for i = 1, 4 do CreateBarPctText(_G["PartyMemberFrame"..i], "LEFT", "RIGHT", 6, 0, "NumberFontNormal", 16) end
+--for i = 1, MAX_BOSS_FRAMES do CreateBarPctText(_G["Boss"..i.."TargetFrame"], "LEFT", "RIGHT", 8, 30, "NumberFontNormal", 36) end	
+
 --	Player class colors HP.
 local function unitClassColors(healthbar, unit)
 	if UnitIsPlayer(unit) and UnitClass(unit) then
@@ -33,10 +55,14 @@ hooksecurefunc("TargetFrame_CheckFaction", npcReactionBrightColors)
 --	Whoa¡äs customs target unit reactions HP colors.
 local function npcReactionColors(healthbar, unit)
 		if UnitExists(unit) and (not UnitIsPlayer(unit)) then
-			local reaction = FACTION_BAR_COLORS[UnitReaction(unit,"player")];
-				healthbar:SetStatusBarColor(reaction.r, reaction.g, reaction.b);
 			if (UnitIsTapDenied(unit)) then
 				healthbar:SetStatusBarColor(0.5, 0.5, 0.5)
+			end
+			local reaction = FACTION_BAR_COLORS[UnitReaction(unit,"player")];
+			if reaction then
+				healthbar:SetStatusBarColor(reaction.r, reaction.g, reaction.b);
+			else
+				healthbar:SetStatusBarColor(0,0.6,0.1)
 			end
 		end
 end
@@ -382,18 +408,24 @@ hooksecurefunc("TargetFrame_CheckClassification", function(self, forceNormalText
 	self.healthbar.lockColor = true;
 	if ( forceNormalTexture ) then
 		self.borderTexture:SetTexture("Interface\\TargetingFrame\\UI-TargetingFrame");
+		CreateBarPctText(TargetFrame, "LEFT", "RIGHT", 88, -8, "NumberFontNormalLarge", 36)
 	elseif ( classification == "minus" ) then
 		self.borderTexture:SetTexture("Interface\\TargetingFrame\\UI-TargetingFrame-Minus");
 		forceNormalTexture = true;
+		CreateBarPctText(TargetFrame, "LEFT", "RIGHT", 66, 0, "NumberFontNormalLarge", 36)
 	elseif ( classification == "worldboss" or classification == "elite" ) then
 		self.borderTexture:SetTexture("Interface\\Addons\\_ShiGuang\\Media\\Modules\\UFs\\UI-TargetingFrame-Elite");
+		CreateBarPctText(TargetFrame, "LEFT", "RIGHT", 102, -8, "NumberFontNormalLarge", 36)
 	elseif ( classification == "rareelite" ) then
 		self.borderTexture:SetTexture("Interface\\Addons\\_ShiGuang\\Media\\Modules\\UFs\\UI-TargetingFrame-Rare-Elite");
+		CreateBarPctText(TargetFrame, "LEFT", "RIGHT", 102, -8, "NumberFontNormalLarge", 36)
 	elseif ( classification == "rare" ) then
 		self.borderTexture:SetTexture("Interface\\Addons\\_ShiGuang\\Media\\Modules\\UFs\\UI-TargetingFrame-Rare");
+		CreateBarPctText(TargetFrame, "LEFT", "RIGHT", 102, -8, "NumberFontNormalLarge", 36)
 	else
 		self.borderTexture:SetTexture("Interface\\Addons\\_ShiGuang\\Media\\Modules\\UFs\\UI-TargetingFrame");
 		forceNormalTexture = true;
+		CreateBarPctText(TargetFrame, "LEFT", "RIGHT", 88, -8, "NumberFontNormalLarge", 36)
 	end
 	if ( self.showPVP ) then
 		local factionGroup = UnitFactionGroup(self.unit);

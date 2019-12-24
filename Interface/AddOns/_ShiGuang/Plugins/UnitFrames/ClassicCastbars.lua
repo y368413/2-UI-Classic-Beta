@@ -1,118 +1,5 @@
---## Author: Wardz ## Version: v1.2.0-hotfix
+--## Author: Wardz ## Version: v1.2.1
 local ClassicCastbars = {}
-local tinsert = _G.table.insert
-local tremove = _G.table.remove
-local FADEFRAMES = {};
-
--- Frame fading and flashing --
-
-local frameFadeManager = CreateFrame("FRAME");
-
- local function UIFrameFade_OnUpdate(self, elapsed)
-    local index = 1;
-    local frame, fadeInfo;
-    while FADEFRAMES[index] do
-        frame = FADEFRAMES[index];
-        fadeInfo = FADEFRAMES[index].fadeInfo;
-        -- Reset the timer if there isn't one, this is just an internal counter
-        if ( not fadeInfo.fadeTimer ) then
-            fadeInfo.fadeTimer = 0;
-        end
-        fadeInfo.fadeTimer = fadeInfo.fadeTimer + elapsed;
-
-        -- If the fadeTimer is less then the desired fade time then set the alpha otherwise hold the fade state, call the finished function, or just finish the fade
-        if ( fadeInfo.fadeTimer < fadeInfo.timeToFade ) then
-            if ( fadeInfo.mode == "IN" ) then
-                frame:SetAlpha((fadeInfo.fadeTimer / fadeInfo.timeToFade) * (fadeInfo.endAlpha - fadeInfo.startAlpha) + fadeInfo.startAlpha);
-            elseif ( fadeInfo.mode == "OUT" ) then
-                frame:SetAlpha(((fadeInfo.timeToFade - fadeInfo.fadeTimer) / fadeInfo.timeToFade) * (fadeInfo.startAlpha - fadeInfo.endAlpha)  + fadeInfo.endAlpha);
-            end
-        else
-            frame:SetAlpha(fadeInfo.endAlpha);
-            -- If there is a fadeHoldTime then wait until its passed to continue on
-            if ( fadeInfo.fadeHoldTime and fadeInfo.fadeHoldTime > 0  ) then
-                fadeInfo.fadeHoldTime = fadeInfo.fadeHoldTime - elapsed;
-            else
-                -- Complete the fade and call the finished function if there is one
-                ClassicCastbars:UIFrameFadeRemoveFrame(frame);
-                if ( fadeInfo.finishedFunc ) then
-                    fadeInfo.finishedFunc(fadeInfo.finishedArg1, fadeInfo.finishedArg2, fadeInfo.finishedArg3, fadeInfo.finishedArg4);
-                    fadeInfo.finishedFunc = nil;
-                end
-            end
-        end
-
-        index = index + 1;
-    end
-
-    if ( #FADEFRAMES == 0 ) then
-        self:SetScript("OnUpdate", nil);
-    end
-end
-
--- Generic fade function
-function ClassicCastbars:UIFrameFade(frame, fadeInfo)
-    if (not frame) then
-        return;
-    end
-    if ( not fadeInfo.mode ) then
-        fadeInfo.mode = "IN";
-    end
-    --local alpha;
-    if ( fadeInfo.mode == "IN" ) then
-        if ( not fadeInfo.startAlpha ) then
-            fadeInfo.startAlpha = 0;
-        end
-        if ( not fadeInfo.endAlpha ) then
-            fadeInfo.endAlpha = 1.0;
-        end
-        --alpha = 0;
-    elseif ( fadeInfo.mode == "OUT" ) then
-        if ( not fadeInfo.startAlpha ) then
-            fadeInfo.startAlpha = 1.0;
-        end
-        if ( not fadeInfo.endAlpha ) then
-            fadeInfo.endAlpha = 0;
-        end
-        --alpha = 1.0;
-    end
-    frame:SetAlpha(fadeInfo.startAlpha);
-
-    frame.fadeInfo = fadeInfo;
-    frame:Show();
-
-    local index = 1;
-    while FADEFRAMES[index] do
-        -- If frame is already set to fade then return
-        if ( FADEFRAMES[index] == frame ) then
-            return;
-        end
-        index = index + 1;
-    end
-    tinsert(FADEFRAMES, frame);
-    frameFadeManager:SetScript("OnUpdate", UIFrameFade_OnUpdate);
-end
-
--- Convenience function to do a simple fade out
-function ClassicCastbars:UIFrameFadeOut(frame, timeToFade, startAlpha, endAlpha)
-    local fadeInfo = {};
-    fadeInfo.mode = "OUT";
-    fadeInfo.timeToFade = timeToFade;
-    fadeInfo.startAlpha = startAlpha;
-    fadeInfo.endAlpha = endAlpha;
-    ClassicCastbars:UIFrameFade(frame, fadeInfo);
-end
-
-function ClassicCastbars:UIFrameFadeRemoveFrame(frame)
-    local index = 1;
-    while FADEFRAMES[index] do
-        if ( frame == FADEFRAMES[index] ) then
-            tremove(FADEFRAMES, index);
-        else
-            index = index + 1;
-        end
-    end
-end
 local PoolManager = {}
 ClassicCastbars.PoolManager = PoolManager
 
@@ -1711,6 +1598,7 @@ ClassicCastbars.crowdControls = {
     [GetSpellInfo(710)] = 1,        -- Banish
 
     -- ITEMS
+    [GetSpellInfo(21167)] = 1,      -- Snowball
     [GetSpellInfo(13327)] = 1,      -- Reckless Charge
     [GetSpellInfo(1090)] = 1,       -- Sleep
     [GetSpellInfo(5134)] = 1,       -- Flash Bomb Fear
@@ -1732,6 +1620,7 @@ ClassicCastbars.crowdControls = {
     [GetSpellInfo(12562)] = 1,      -- The Big One
     [GetSpellInfo(15283)] = 1,      -- Stunning Blow (Weapon Proc)
     [GetSpellInfo(56)] = 1,         -- Stun (Weapon Proc)
+    [GetSpellInfo(21152)] = 1,      -- Earthshaker (Weapon Proc)
     [GetSpellInfo(26108)] = 1,      -- Glimpse of Madness
     [GetSpellInfo(8345)] = 1,       -- Control Machine (Gnomish Universal Remote trinket)
     [GetSpellInfo(13235)] = 1,      -- Forcefield Collapse (Gnomish Harm Prevention Belt)
@@ -1886,6 +1775,15 @@ ClassicCastbars.stopCastOnDamageList = {
     [GetSpellInfo(2008)] = 1, -- Ancestral Spirit
     [GetSpellInfo(7328)] = 1, -- Redemption
     [GetSpellInfo(22999)] = 1, -- Defibrillate
+    [GetSpellInfo(3565)] = 1, -- Teleport: Darnassus
+    [GetSpellInfo(3562)] = 1, -- Teleport: Ironforge
+    [GetSpellInfo(18960)] = 1, -- Teleport: Moonglade
+    [GetSpellInfo(3567)] = 1, -- Teleport: Orgrimmar
+    [GetSpellInfo(3561)] = 1, -- Teleport: Stormwind
+    [GetSpellInfo(3566)] = 1, -- Teleport: Thunder Bluff
+    [GetSpellInfo(3563)] = 1, -- Teleport: Undercity
+    [GetSpellInfo(556)] = 1, -- Astrall Recall
+    [GetSpellInfo(22563)] = 1, -- Recall
     -- First Aid not included here since we track aura removed
 }
 
@@ -2736,7 +2634,7 @@ addon:SetScript("OnUpdate", function(self, elapsed)
             else
                 if castTime <= -0.25 then -- wait atleast 0.25s before deleting incase CLEU stop event is happening at same time
                     -- Delete cast incase stop event wasn't detected in CLEU
-                    self:DeleteCast(cast.unitGUID, false, true, false, true)
+                    self:DeleteCast(cast.unitGUID, false, true, false, (currTime - cast.timeStart) > cast.maxValue + 0.25)
                 end
             end
         end
@@ -2917,11 +2815,16 @@ function addon:DisplayCastbar(castbar, unitID)
         db = self.db.party
     end
 
-    if castbar.fadeInfo then
-        -- need to remove frame if it's currently fading so alpha doesn't get changed after re-displaying castbar
-        ClassicCastbars:UIFrameFadeRemoveFrame(castbar)
-        castbar.fadeInfo.finishedFunc = nil
+    if not castbar.animationGroup then
+        castbar.animationGroup = castbar:CreateAnimationGroup()
+        castbar.animationGroup:SetToFinalAlpha(true)
+        castbar.fade = castbar.animationGroup:CreateAnimation("Alpha")
+        castbar.fade:SetOrder(1)
+        castbar.fade:SetFromAlpha(1)
+        castbar.fade:SetToAlpha(0)
+        castbar.fade:SetSmoothing("OUT")
     end
+    castbar.animationGroup:Stop()
 
     if not castbar.Background then
         castbar.Background = GetStatusBarBackgroundTexture(castbar)
@@ -2997,7 +2900,8 @@ function addon:HideCastbar(castbar, noFadeOut)
     end
 
     if castbar:GetAlpha() > 0 then
-        ClassicCastbars:UIFrameFadeOut(castbar, cast and cast.isInterrupted and 1.5 or 0.2, 1, 0)
+        castbar.fade:SetDuration(cast and cast.isInterrupted and 1.5 or 0.3)
+        castbar.animationGroup:Play()
     end
 end
 
@@ -3040,10 +2944,11 @@ function addon:SkinPlayerCastbar()
     end
 
     if db.castBorder == "Interface\\CastingBar\\UI-CastingBar-Border" or db.castBorder == "Interface\\CastingBar\\UI-CastingBar-Border-Small" then
+        CastingBarFrame.Flash:SetTexture("Interface\\CastingBar\\UI-CastingBar-Flash")
         CastingBarFrame.Flash:SetSize(db.width + 61, db.height + 51)
         CastingBarFrame.Flash:SetPoint("TOP", 0, 26)
     else
-        CastingBarFrame.Flash:SetSize(0.01, 0.01) -- hide it using size, SetAlpha() or Hide() wont work without messing with blizz code
+        CastingBarFrame.Flash:SetTexture(nil) -- hide it by deleting texture, SetAlpha() or Hide() wont work without messing with blizz code
     end
 
     CastingBarFrame_SetStartCastColor(CastingBarFrame, unpack(db.statusColor))

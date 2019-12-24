@@ -1,4 +1,4 @@
---## Author: Viliger  ## Version: 1.0.1
+--## Author: Viliger  ## Version: 1.0.2
 local COMBO_POINT_SIZE = 12 -- size of a single point
 local COMBO_POINT_SPACING = 3 -- spacing between points
 local OverheadCombo_ComboPointsTable = {}
@@ -110,7 +110,7 @@ end
 -- updates maximum combo points of unit and generally initilazes everything we need at the login
 local function OverheadCombo_UpdateMax()
 	OCFrame.maxComboPoints = UnitPowerMax("player", Enum.PowerType.ComboPoints)
-	print(OCFrame.maxComboPoints)
+
 	OverheadCombo_HideComboPoints()
 	OverheadCombo_updateComboPoints()
 end

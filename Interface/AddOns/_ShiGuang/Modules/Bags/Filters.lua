@@ -71,7 +71,11 @@ end
 
 local function isEmptySlot(item)
 	if not MaoRUISettingDB["Bags"]["GatherEmpty"] then return end
-	return not item.texture and module.BagsType[item.bagID] == 0
+	return module.initComplete and not item.texture and module.BagsType[item.bagID] == 0
+end
+
+local function isItemKeyRing(item)
+	return item.bagID == -2
 end
 
 function module:GetFilters()
@@ -88,6 +92,7 @@ function module:GetFilters()
 	local onlyReagent = function(item) return item.bagID == -3 end
 	local bagFavourite = function(item) return isItemInBag(item) and isItemFavourite(item) end
 	local bankFavourite = function(item) return isItemInBank(item) and isItemFavourite(item) end
+	local onlyKeyring = function(item) return isItemKeyRing(item) end
 
-	return onlyBags, bagAmmo, bagEquipment, bagConsumble, bagsJunk, onlyBank, bankAmmo, bankLegendary, bankEquipment, bankConsumble, onlyReagent, bagFavourite, bankFavourite
+	return onlyBags, bagAmmo, bagEquipment, bagConsumble, bagsJunk, onlyBank, bankAmmo, bankLegendary, bankEquipment, bankConsumble, onlyReagent, bagFavourite, bankFavourite, onlyKeyring
 end

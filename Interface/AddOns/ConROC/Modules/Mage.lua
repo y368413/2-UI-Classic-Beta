@@ -19,6 +19,7 @@ local ConROC_Mage, ids = ...;
 		AmplifyMagicRank2 = 8455,
 		AmplifyMagicRank3 = 10169,
 		AmplifyMagicRank4 = 10170,
+		ArcaneBrilliance = 23028,
 		ArcaneExplosionRank1 = 1449,
 		ArcaneExplosionRank2 = 8437,
 		ArcaneExplosionRank3 = 8438,
@@ -1539,6 +1540,7 @@ function ConROC.Mage.Damage(_, timeShift, currentSpell, gcd)
 	local aExpRDY											= ConROC:AbilityReady(_ArcaneExplosion, timeShift);
 	local aIntRDY											= ConROC:AbilityReady(_ArcaneIntellect, timeShift);
 		local aIntBUFF											= ConROC:Buff(_ArcaneIntellect, timeShift);
+		local aBriBUFF											= ConROC:Buff(Arc_Ability.ArcaneBrilliance, timeShift);
 	local aMissRDY											= ConROC:AbilityReady(_ArcaneMissiles, timeShift);
 	local aPowerRDY											= ConROC:AbilityReady(Arc_Ability.ArcanePower, timeShift);
 	local blinkRDY											= ConROC:AbilityReady(Arc_Ability.Blink, timeShift);
@@ -1588,7 +1590,7 @@ function ConROC.Mage.Damage(_, timeShift, currentSpell, gcd)
 	ConROC:AbilityBurst(Arc_Ability.ArcanePower, aPowerRDY and incombat and (not ConROC:TalentChosen(Spec.Frost, Frost_Talent.WintersChill) or (ConROC:TalentChosen(Spec.Frost, Frost_Talent.WintersChill) and wChillCount == 5))) ;	
 	ConROC:AbilityBurst(Fire_Ability.Combustion, combRDY and incombat and (not ConROC:TalentChosen(Spec.Fire, Fire_Talent.ImprovedScorch) or (ConROC:TalentChosen(Spec.Fire, Fire_Talent.ImprovedScorch) and fVuCount == 5)));
 
-	ConROC:AbilityRaidBuffs(_ArcaneIntellect, aIntRDY and not aIntBUFF);
+	ConROC:AbilityRaidBuffs(_ArcaneIntellect, aIntRDY and not (aIntBUFF or aBriBUFF));
 	
 --Warnings	
 	

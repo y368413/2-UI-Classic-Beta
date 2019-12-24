@@ -4,6 +4,8 @@ local module = M:GetModule("Maps")
 
 local strmatch, strfind, strupper = string.match, string.find, string.upper
 local select, pairs, ipairs, unpack = select, pairs, ipairs, unpack
+local IsPlayerSpell, GetSpellInfo, GetSpellTexture = IsPlayerSpell, GetSpellInfo, GetSpellTexture
+local CastSpellByID, GetTrackingTexture = CastSpellByID, GetTrackingTexture
 local cr, cg, cb = I.r, I.g, I.b
 
 function module:CreatePulse()
@@ -62,10 +64,38 @@ function module:ReskinRegions()
 	MiniMapMailBorder:Hide()
 	--MiniMapMailIcon:SetSize(21, 21)
 	--MiniMapMailIcon:SetVertexColor(1, 1, 0)
+
+	-- Battlefield
+	MiniMapBattlefieldFrame:ClearAllPoints()
+	MiniMapBattlefieldFrame:SetPoint("BOTTOMLEFT", Minimap, "BOTTOMLEFT", -5, -5)
+	MiniMapBattlefieldBorder:Hide()
+	MiniMapBattlefieldIcon:SetAlpha(0)
+	BattlegroundShine:SetTexture(nil)
+
+	local queueIcon = Minimap:CreateTexture(nil, "ARTWORK")
+	queueIcon:SetPoint("CENTER", MiniMapBattlefieldFrame)
+	queueIcon:SetSize(50, 50)
+	queueIcon:SetTexture(I.eyeTex)
+	queueIcon:Hide()
+	local anim = queueIcon:CreateAnimationGroup()
+	anim:SetLooping("REPEAT")
+	anim.rota = anim:CreateAnimation("Rotation")
+	anim.rota:SetDuration(2)
+	anim.rota:SetDegrees(360)
+
+	hooksecurefunc("BattlefieldFrame_UpdateStatus", function()
+		queueIcon:SetShown(MiniMapBattlefieldFrame:IsShown())
+
+		anim:Play()
+		for i = 1, MAX_BATTLEFIELD_QUEUES do
+			local status = GetBattlefieldStatus(i)
+			if status == "confirm" then
+				anim:Stop()
+				break
+			end
+		end
+	end)
 end
-
-
-
 ----------------------------------------------------------------------------	右键菜单--------------------------------------------------------------------------
 --动作条样式
 local SetMrbarMenuFrame = CreateFrame("Frame", "ClickMenu", UIParent, "UIDropDownMenuTemplate")
@@ -283,6 +313,7 @@ function module:SetupMinimap()
 	MinimapCluster:EnableMouse(false)
 
 	-- Add Elements
+	self:CreatePulse()
 	self:ReskinRegions()
 	self:WhoPingsMyMap()
 
