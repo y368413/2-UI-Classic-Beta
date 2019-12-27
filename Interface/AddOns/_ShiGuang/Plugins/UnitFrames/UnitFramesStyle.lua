@@ -124,7 +124,7 @@ hooksecurefunc("TargetFrame_Update", function()
 		targeticon:Hide()
 	end
 end)
-hooksecurefunc("ActionButton_UpdateCount", function(actionButton)
+--[[hooksecurefunc("ActionButton_UpdateCount", function(actionButton)
     local text = actionButton.Count
     local action = actionButton.action
     if not IsItemAction(action) and GetActionCount(action) > 0 then
@@ -136,4 +136,4 @@ hooksecurefunc("ActionButton_UpdateCount", function(actionButton)
             -- print(GetActionInfo(action))
         end
     end
-end)
+end)]]

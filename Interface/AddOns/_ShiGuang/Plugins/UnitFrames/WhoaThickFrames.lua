@@ -37,7 +37,7 @@ end
 hooksecurefunc("UnitFrameHealthBar_Update", unitClassColors)
 hooksecurefunc("HealthBar_OnValueChanged", function(self) unitClassColors(self, self.unit) end)
 
-	--	Blizzard¡äs target unit reactions HP color
+	--	Blizzard's target unit reactions HP color
 local function npcReactionBrightColors()
 		FACTION_BAR_COLORS = {
 			[1] = {r =  0.9, g = 0.0, b = 0.0},
@@ -52,7 +52,7 @@ local function npcReactionBrightColors()
 end
 hooksecurefunc("TargetFrame_CheckFaction", npcReactionBrightColors)
   
---	Whoa¡äs customs target unit reactions HP colors.
+--	Whoa's customs target unit reactions HP colors.
 local function npcReactionColors(healthbar, unit)
 		if UnitExists(unit) and (not UnitIsPlayer(unit)) then
 			if (UnitIsTapDenied(unit)) then
