@@ -106,15 +106,7 @@ function MISC:SetupScript(bar)
 	bar:SetScript("OnEnter", MISC.ExpBar_UpdateTooltip)
 	bar:SetScript("OnLeave", M.HideTooltip)
 	bar:SetScript("OnMouseUp", function(_, btn)
-	  if btn == "LeftButton" then
-		if HasArtifactEquipped() then
-		   if not ArtifactFrame or not ArtifactFrame:IsShown() then SocketInventoryItem(16)
-		   else ToggleFrame(ArtifactFrame)
-		   end
-		end
-	  elseif btn == "RightButton" then
         if (UnitLevel("player") ~= MAX_PLAYER_LEVEL) then sendReports() else return end
-      end
 	end)
 end
 

@@ -136,6 +136,8 @@ end
 -- Faster Looting
 local lootDelay = 0
 function MISC:DoFasterLoot()
+	if GetLootMethod() == "master" then return end
+
 	if GetTime() - lootDelay >= .3 then
 		lootDelay = GetTime()
 		if GetCVarBool("autoLootDefault") ~= IsModifiedClick("AUTOLOOTTOGGLE") then

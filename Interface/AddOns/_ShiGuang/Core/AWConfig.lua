@@ -214,7 +214,7 @@ local function CreatePanel()
 			texture = GetInventoryItemTexture("player", spellID)
 			name = slotIndex[spellID]
 		elseif typeID == "TotemID" then
-			texture = "Interface\\ICONS\\Spell_Shaman_TotemRecall"
+			texture = "Interface\\ICONS\\Spell_Totem_WardOfDraining"
 			name = U["TotemSlot"]..spellID
 		end
 

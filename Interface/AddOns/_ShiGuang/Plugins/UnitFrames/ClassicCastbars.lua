@@ -1,4 +1,4 @@
---## Author: Wardz ## Version: v1.2.1
+--## Author: Wardz ## Version: v1.2.2
 local ClassicCastbars = {}
 local PoolManager = {}
 ClassicCastbars.PoolManager = PoolManager
@@ -64,11 +64,6 @@ end
 
 function PoolManager:GetFramePool()
     return framePool
-end
-
-function PoolManager:DebugInfo()
-    print(format("Created %d frames in total.", framesCreated))
-    print(format("Currently active frames: %d.", framesActive))
 end
 
 if date("%d.%m") == "01.04" then -- April Fools :)
@@ -161,14 +156,15 @@ local function GetPartyFrameForUnit(unitID)
     local guid = UnitGUID(unitID)
     if not guid then return end
 
-    local compact = GetCVarBool("useCompactPartyFrames")
+    local useCompact = GetCVarBool("useCompactPartyFrames")
 
     -- raid frames are recycled so frame10 might be party2 and so on, so we need
-    -- to loop through them all and check if the unit matches
+    -- to loop through them all and check if the unit matches. Same thing with party
+    -- frames for custom addons
     for i = 1, 40 do
         local frame, frameName = GetUnitFrameForUnit("party", "party"..i, true)
         if frame and frame.unit and UnitGUID(frame.unit) == guid and frame:IsVisible() then
-            if compact then
+            if useCompact then
                 if strfind(frameName, "PartyMemberFrame") == nil then
                     return frame
                 end
@@ -185,6 +181,7 @@ function AnchorManager:GetAnchor(unitID)
     end
 
     if unitID == "player" then
+        -- special case for player casting bar
         return UIParent
     end
 
@@ -1351,7 +1348,7 @@ local castSpellIDs = {
     24422, -- Zandalar Signet of Might
     24421, -- Zandalar Signet of Mojo
     24420, -- Zandalar Signet of Serenity
-    1050, -- Sacrific
+    1050, -- Sacrifice
     22651, -- Sacrifice 2 (On German client this is named Opfern but other Sacrifice is named Opferung)
     10181, -- Frostbolt (needs to be last for chinese clients, see issue #16)
 
@@ -1513,7 +1510,7 @@ ClassicCastbars.castTimeIncreases = {
 }
 
 -- Store both spellID and spell name in this table since UnitAura returns spellIDs but combat log doesn't.
-C_Timer.After(10, function()
+C_Timer.After(15, function()
     for spellID, slowPercentage in pairs(ClassicCastbars.castTimeIncreases) do
         if GetSpellInfo(spellID) then
             ClassicCastbars.castTimeIncreases[GetSpellInfo(spellID)] = slowPercentage
@@ -1550,197 +1547,208 @@ ClassicCastbars.castTimeTalentDecreases = {
 -- List of crowd controls.
 -- We want to stop the castbar when these auras are detected
 -- as SPELL_CAST_FAILED is not triggered when an unit gets CC'ed.
-ClassicCastbars.crowdControls = {
-    [GetSpellInfo(5211)] = 1,       -- Bash
-    [GetSpellInfo(24394)] = 1,      -- Intimidation
-    [GetSpellInfo(853)] = 1,        -- Hammer of Justice
-    [GetSpellInfo(22703)] = 1,      -- Inferno Effect (Summon Infernal)
-    [GetSpellInfo(408)] = 1,        -- Kidney Shot
-    [GetSpellInfo(12809)] = 1,      -- Concussion Blow
-    [GetSpellInfo(20253)] = 1,      -- Intercept Stun
-    [GetSpellInfo(20549)] = 1,      -- War Stomp
-    [GetSpellInfo(2637)] = 1,       -- Hibernate
-    [GetSpellInfo(3355)] = 1,       -- Freezing Trap
-    [GetSpellInfo(19386)] = 1,      -- Wyvern Sting
-    [GetSpellInfo(118)] = 1,        -- Polymorph
-    [GetSpellInfo(28271)] = 1,      -- Polymorph: Turtle
-    [GetSpellInfo(28272)] = 1,      -- Polymorph: Pig
-    [GetSpellInfo(20066)] = 1,      -- Repentance
-    [GetSpellInfo(1776)] = 1,       -- Gouge
-    [GetSpellInfo(6770)] = 1,       -- Sap
-    [GetSpellInfo(1513)] = 1,       -- Scare Beast
-    [GetSpellInfo(8122)] = 1,       -- Psychic Scream
-    [GetSpellInfo(2094)] = 1,       -- Blind
-    [GetSpellInfo(5782)] = 1,       -- Fear
-    [GetSpellInfo(5484)] = 1,       -- Howl of Terror
-    [GetSpellInfo(6358)] = 1,       -- Seduction
-    [GetSpellInfo(5246)] = 1,       -- Intimidating Shout
-    [GetSpellInfo(6789)] = 1,       -- Death Coil
-    [GetSpellInfo(9005)] = 1,       -- Pounce
-    [GetSpellInfo(1833)] = 1,       -- Cheap Shot
-    [GetSpellInfo(16922)] = 1,      -- Improved Starfire
-    [GetSpellInfo(19410)] = 1,      -- Improved Concussive Shot
-    [GetSpellInfo(12355)] = 1,      -- Impact
-    [GetSpellInfo(20170)] = 1,      -- Seal of Justice Stun
-    [GetSpellInfo(15269)] = 1,      -- Blackout
-    [GetSpellInfo(18093)] = 1,      -- Pyroclasm
-    [GetSpellInfo(12798)] = 1,      -- Revenge Stun
-    [GetSpellInfo(5530)] = 1,       -- Mace Stun
-    [GetSpellInfo(19503)] = 1,      -- Scatter Shot
-    [GetSpellInfo(605)] = 1,        -- Mind Control
-    [GetSpellInfo(7922)] = 1,       -- Charge Stun
-    [GetSpellInfo(18469)] = 1,      -- Counterspell - Silenced
-    [GetSpellInfo(15487)] = 1,      -- Silence
-    [GetSpellInfo(18425)] = 1,      -- Kick - Silenced
-    [GetSpellInfo(24259)] = 1,      -- Spell Lock
-    [GetSpellInfo(18498)] = 1,      -- Shield Bash - Silenced
-    [GetSpellInfo(2878)] = 1,       -- Turn Undead
-    [GetSpellInfo(710)] = 1,        -- Banish
+ClassicCastbars.crowdControls = {}
+local crowdControls = {
+    5211,       -- Bash
+    24394,      -- Intimidation
+    853,        -- Hammer of Justice
+    22703,      -- Inferno Effect (Summon Infernal)
+    408,        -- Kidney Shot
+    12809,      -- Concussion Blow
+    20253,      -- Intercept Stun
+    20549,      -- War Stomp
+    2637,       -- Hibernate
+    3355,       -- Freezing Trap
+    19386,      -- Wyvern Sting
+    118,        -- Polymorph
+    28271,      -- Polymorph: Turtle
+    28272,      -- Polymorph: Pig
+    20066,      -- Repentance
+    1776,       -- Gouge
+    6770,       -- Sap
+    1513,       -- Scare Beast
+    8122,       -- Psychic Scream
+    2094,       -- Blind
+    5782,       -- Fear
+    5484,       -- Howl of Terror
+    6358,       -- Seduction
+    5246,       -- Intimidating Shout
+    6789,       -- Death Coil
+    9005,       -- Pounce
+    1833,       -- Cheap Shot
+    16922,      -- Improved Starfire
+    19410,      -- Improved Concussive Shot
+    12355,      -- Impact
+    20170,      -- Seal of Justice Stun
+    15269,      -- Blackout
+    18093,      -- Pyroclasm
+    12798,      -- Revenge Stun
+    5530,       -- Mace Stun
+    19503,      -- Scatter Shot
+    605,        -- Mind Control
+    7922,       -- Charge Stun
+    18469,      -- Counterspell - Silenced
+    15487,      -- Silence
+    18425,      -- Kick - Silenced
+    24259,      -- Spell Lock
+    18498,      -- Shield Bash - Silenced
+    2878,       -- Turn Undead
+    710,        -- Banish
 
     -- ITEMS
-    [GetSpellInfo(21167)] = 1,      -- Snowball
-    [GetSpellInfo(13327)] = 1,      -- Reckless Charge
-    [GetSpellInfo(1090)] = 1,       -- Sleep
-    [GetSpellInfo(5134)] = 1,       -- Flash Bomb Fear
-    [GetSpellInfo(19821)] = 1,      -- Arcane Bomb Silence
-    [GetSpellInfo(4068)] = 1,       -- Iron Grenade
-    [GetSpellInfo(19769)] = 1,      -- Thorium Grenade
-    [GetSpellInfo(13808)] = 1,      -- M73 Frag Grenade
-    [GetSpellInfo(4069)] = 1,       -- Big Iron Bomb
-    [GetSpellInfo(12543)] = 1,      -- Hi-Explosive Bomb
-    [GetSpellInfo(4064)] = 1,       -- Rough Copper Bomb
-    [GetSpellInfo(12421)] = 1,      -- Mithril Frag Bomb
-    [GetSpellInfo(19784)] = 1,      -- Dark Iron Bomb
-    [GetSpellInfo(4067)] = 1,       -- Big Bronze Bomb
-    [GetSpellInfo(4066)] = 1,       -- Small Bronze Bomb
-    [GetSpellInfo(4065)] = 1,       -- Large Copper Bomb
-    [GetSpellInfo(13237)] = 1,      -- Goblin Mortar
-    [GetSpellInfo(835)] = 1,        -- Tidal Charm
-    [GetSpellInfo(13181)] = 1,      -- Gnomish Mind Control Cap
-    [GetSpellInfo(12562)] = 1,      -- The Big One
-    [GetSpellInfo(15283)] = 1,      -- Stunning Blow (Weapon Proc)
-    [GetSpellInfo(56)] = 1,         -- Stun (Weapon Proc)
-    [GetSpellInfo(21152)] = 1,      -- Earthshaker (Weapon Proc)
-    [GetSpellInfo(26108)] = 1,      -- Glimpse of Madness
-    [GetSpellInfo(8345)] = 1,       -- Control Machine (Gnomish Universal Remote trinket)
-    [GetSpellInfo(13235)] = 1,      -- Forcefield Collapse (Gnomish Harm Prevention Belt)
-    [GetSpellInfo(15753)] = 1,      -- Linken's Boomerang (trinket)
-    [GetSpellInfo(15535)] = 1,      -- Enveloping Winds (Six Demon Bag trinket)
-    [GetSpellInfo(28406)] = 1,      -- Polymorph Backfire
-    [GetSpellInfo(16600)] = 1,      -- Might of Shahram (Blackblade of Shahram sword)
-    [GetSpellInfo(13907)] = 1,      -- Smite Demon (Enchant Weapon - Demonslaying)
-    [GetSpellInfo(15822)] = 1,      -- Dreamless Sleep Potion
-    [GetSpellInfo(16053)] = 1,      -- Dominion of Soul (Orb of Draconic Energy)
-    [GetSpellInfo(21330)] = 1,      -- Corrupted Fear (Deathmist Raiment set)
+    21167,      -- Snowball
+    13327,      -- Reckless Charge
+    1090,       -- Sleep
+    5134,       -- Flash Bomb Fear
+    19821,      -- Arcane Bomb Silence
+    4068,       -- Iron Grenade
+    19769,      -- Thorium Grenade
+    13808,      -- M73 Frag Grenade
+    4069,       -- Big Iron Bomb
+    12543,      -- Hi-Explosive Bomb
+    4064,       -- Rough Copper Bomb
+    12421,      -- Mithril Frag Bomb
+    19784,      -- Dark Iron Bomb
+    4067,       -- Big Bronze Bomb
+    4066,       -- Small Bronze Bomb
+    4065,       -- Large Copper Bomb
+    13237,      -- Goblin Mortar
+    835,        -- Tidal Charm
+    13181,      -- Gnomish Mind Control Cap
+    12562,      -- The Big One
+    15283,      -- Stunning Blow (Weapon Proc)
+    56,         -- Stun (Weapon Proc)
+    21152,      -- Earthshaker (Weapon Proc)
+    26108,      -- Glimpse of Madness
+    8345,       -- Control Machine (Gnomish Universal Remote trinket)
+    13235,      -- Forcefield Collapse (Gnomish Harm Prevention Belt)
+    15753,      -- Linken's Boomerang (trinket)
+    15535,      -- Enveloping Winds (Six Demon Bag trinket)
+    28406,      -- Polymorph Backfire
+    16600,      -- Might of Shahram (Blackblade of Shahram sword)
+    13907,      -- Smite Demon (Enchant Weapon - Demonslaying)
+    15822,      -- Dreamless Sleep Potion
+    16053,      -- Dominion of Soul (Orb of Draconic Energy)
+    21330,      -- Corrupted Fear (Deathmist Raiment set)
 
     -- NPCS
-    [GetSpellInfo(3242)] = 1,       -- Ravage
-    [GetSpellInfo(3271)] = 1,       -- Fatigued
-    [GetSpellInfo(5708)] = 1,       -- Swoop
-    [GetSpellInfo(11430)] = 1,      -- Slam
-    [GetSpellInfo(17276)] = 1,      -- Scald
-    [GetSpellInfo(18812)] = 1,      -- Knockdown
-    [GetSpellInfo(3442)] = 1,       -- Enslave
-    [GetSpellInfo(20683)] = 1,      -- Highlord's Justice
-    [GetSpellInfo(17286)] = 1,      -- Crusader's Hammer
-    [GetSpellInfo(3109)] = 1,       -- Presence of Death
-    [GetSpellInfo(3143)] = 1,       -- Glacial Roar
-    [GetSpellInfo(3263)] = 1,       -- Touch of Ravenclaw
-    [GetSpellInfo(5106)] = 1,       -- Crystal Flash
-    [GetSpellInfo(6266)] = 1,       -- Kodo Stomp
-    [GetSpellInfo(6730)] = 1,       -- Head Butt
-    [GetSpellInfo(6982)] = 1,       -- Gust of Wind
-    [GetSpellInfo(7961)] = 1,       -- Azrethoc's Stomp
-    [GetSpellInfo(8151)] = 1,       -- Surprise Attack
-    [GetSpellInfo(3635)] = 1,       -- Crystal Gaze
-    [GetSpellInfo(21188)] = 1,      -- Stun Bomb Attack
-    [GetSpellInfo(16451)] = 1,      -- Judge's Gavel
-    [GetSpellInfo(3589)] = 1,       -- Deafening Screech
-    [GetSpellInfo(4320)] = 1,       -- Trelane's Freezing Touch
-    [GetSpellInfo(6942)] = 1,       -- Overwhelming Stench
-    [GetSpellInfo(8715)] = 1,       -- Terrifying Howl
-    [GetSpellInfo(8817)] = 1,       -- Smoke Bomb
-    [GetSpellInfo(25772)] = 1,      -- Mental Domination
-    [GetSpellInfo(15859)] = 1,      -- Dominate Mind
-    [GetSpellInfo(24753)] = 1,      -- Trick
-    [GetSpellInfo(19408)] = 1,      -- Panic
-    [GetSpellInfo(23364)] = 1,      -- Tail Lash
-    [GetSpellInfo(19364)] = 1,      -- Ground Stomp
-    [GetSpellInfo(19369)] = 1,      -- Ancient Despair
-    [GetSpellInfo(19641)] = 1,      -- Pyroclast Barrage
-    [GetSpellInfo(19393)] = 1,      -- Soul Burn
-    [GetSpellInfo(20277)] = 1,      -- Fist of Ragnaros
-    [GetSpellInfo(19780)] = 1,      -- Hand of Ragnaros
-    [GetSpellInfo(18431)] = 1,      -- Bellowing Roar
-    [GetSpellInfo(22289)] = 1,      -- Brood Power: Green
-    [GetSpellInfo(22291)] = 1,      -- Brood Power: Bronze
-    [GetSpellInfo(22561)] = 1,      -- Brood Power: Green
-    [GetSpellInfo(19872)] = 1,      -- Calm Dragonkin
-    [GetSpellInfo(22274)] = 1,      -- Greater Polymorph
-    [GetSpellInfo(23310)] = 1,      -- Time Lapse
-    [GetSpellInfo(23174)] = 1,      -- Chromatic Mutation
-    [GetSpellInfo(23171)] = 1,      -- Time Stop (Brood Affliction: Bronze)
-    [GetSpellInfo(22667)] = 1,      -- Shadow Command
-    [GetSpellInfo(23603)] = 1,      -- Wild Polymorph
-    [GetSpellInfo(23182)] = 1,      -- Mark of Frost
-    [GetSpellInfo(25043)] = 1,      -- Aura of Nature
-    [GetSpellInfo(24811)] = 1,      -- Draw Spirit
-    [GetSpellInfo(25806)] = 1,      -- Creature of Nightmare
-    [GetSpellInfo(6253)] = 1,       -- Backhand
-    [GetSpellInfo(6466)] = 1,       -- Axe Toss
-    [GetSpellInfo(8242)] = 1,       -- Shield Slam
-    [GetSpellInfo(8285)] = 1,       -- Rampage
-    [GetSpellInfo(6524)] = 1,       -- Ground Tremor
-    [GetSpellInfo(6607)] = 1,       -- Lash
-    [GetSpellInfo(7399)] = 1,       -- Terrify
-    [GetSpellInfo(8150)] = 1,       -- Thundercrack
-    [GetSpellInfo(11020)] = 1,      -- Petrify
-    [GetSpellInfo(11641)] = 1,      -- Hex
-    [GetSpellInfo(17307)] = 1,      -- Knockout
-    [GetSpellInfo(16075)] = 1,      -- Throw Axe
-    [GetSpellInfo(16104)] = 1,      -- Crystallize
-    [GetSpellInfo(11836)] = 1,      -- Freeze Solid
-    [GetSpellInfo(29419)] = 1,      -- Flash Bomb
-    [GetSpellInfo(6304)] = 1,       -- Rhahk'Zor Slam
-    [GetSpellInfo(6435)] = 1,       -- Smite Slam
-    [GetSpellInfo(6432)] = 1,       -- Smite Stomp
-    [GetSpellInfo(228)] = 1,        -- Polymorph: Chicken
-    [GetSpellInfo(8040)] = 1,       -- Druid's Slumber
-    [GetSpellInfo(7967)] = 1,       -- Naralex's Nightmare
-    [GetSpellInfo(7139)] = 1,       -- Fel Stomp
-    [GetSpellInfo(7621)] = 1,       -- Arugal's Curse
-    [GetSpellInfo(7803)] = 1,       -- Thundershock
-    [GetSpellInfo(7074)] = 1,       -- Screams of the Past
-    [GetSpellInfo(8281)] = 1,       -- Sonic Burst
-    [GetSpellInfo(8359)] = 1,       -- Left for Dead
-    [GetSpellInfo(9256)] = 1,       -- Deep Sleep
-    [GetSpellInfo(12946)] = 1,      -- Putrid Stench
-    [GetSpellInfo(3636)] = 1,       -- Crystalline Slumber
-    [GetSpellInfo(10093)] = 1,      -- Harsh Winds
-    [GetSpellInfo(21808)] = 1,      -- Summon Shardlings
-    [GetSpellInfo(21869)] = 1,      -- Repulsive Gaze
-    [GetSpellInfo(12888)] = 1,      -- Cause Insanity
-    [GetSpellInfo(12480)] = 1,      -- Hex of Jammal'an
-    [GetSpellInfo(12890)] = 1,      -- Deep Slumber
-    [GetSpellInfo(25774)] = 1,      -- Mind Shatter
-    [GetSpellInfo(15471)] = 1,      -- Enveloping Web
-    [GetSpellInfo(3609)] = 1,       -- Paralyzing Poison
-    [GetSpellInfo(17492)] = 1,      -- Hand of Thaurissan
-    [GetSpellInfo(14870)] = 1,      -- Drunken Stupor
-    [GetSpellInfo(13902)] = 1,      -- Fist of Ragnaros
-    [GetSpellInfo(6945)] = 1,       -- Chest Pains
-    [GetSpellInfo(3551)] = 1,       -- Skull Crack
-    [GetSpellInfo(15618)] = 1,      -- Snap Kick
-    [GetSpellInfo(16508)] = 1,      -- Intimidating Roar
-    [GetSpellInfo(16497)] = 1,      -- Stun Bomb
-    [GetSpellInfo(17405)] = 1,      -- Domination
-    [GetSpellInfo(16798)] = 1,      -- Enchanting Lullaby
-    [GetSpellInfo(12734)] = 1,      -- Ground Smash
-    [GetSpellInfo(17293)] = 1,      -- Burning Winds
-    [GetSpellInfo(16869)] = 1,      -- Ice Tomb
-    [GetSpellInfo(22856)] = 1,      -- Ice Lock
-    [GetSpellInfo(16838)] = 1,      -- Banshee Shriek
+    3242,       -- Ravage
+    3271,       -- Fatigued
+    5708,       -- Swoop
+    11430,      -- Slam
+    17276,      -- Scald
+    18812,      -- Knockdown
+    3442,       -- Enslave
+    20683,      -- Highlord's Justice
+    17286,      -- Crusader's Hammer
+    3109,       -- Presence of Death
+    3143,       -- Glacial Roar
+    3263,       -- Touch of Ravenclaw
+    5106,       -- Crystal Flash
+    6266,       -- Kodo Stomp
+    6730,       -- Head Butt
+    6982,       -- Gust of Wind
+    7961,       -- Azrethoc's Stomp
+    8151,       -- Surprise Attack
+    3635,       -- Crystal Gaze
+    21188,      -- Stun Bomb Attack
+    16451,      -- Judge's Gavel
+    3589,       -- Deafening Screech
+    4320,       -- Trelane's Freezing Touch
+    6942,       -- Overwhelming Stench
+    8715,       -- Terrifying Howl
+    8817,       -- Smoke Bomb
+    25772,      -- Mental Domination
+    15859,      -- Dominate Mind
+    24753,      -- Trick
+    19408,      -- Panic
+    23364,      -- Tail Lash
+    19364,      -- Ground Stomp
+    19369,      -- Ancient Despair
+    19641,      -- Pyroclast Barrage
+    19393,      -- Soul Burn
+    20277,      -- Fist of Ragnaros
+    19780,      -- Hand of Ragnaros
+    18431,      -- Bellowing Roar
+    22289,      -- Brood Power: Green
+    22291,      -- Brood Power: Bronze
+    22561,      -- Brood Power: Green
+    19872,      -- Calm Dragonkin
+    22274,      -- Greater Polymorph
+    23310,      -- Time Lapse
+    23174,      -- Chromatic Mutation
+    23171,      -- Time Stop (Brood Affliction: Bronze)
+    22667,      -- Shadow Command
+    23603,      -- Wild Polymorph
+    23182,      -- Mark of Frost
+    25043,      -- Aura of Nature
+    24811,      -- Draw Spirit
+    25806,      -- Creature of Nightmare
+    6253,       -- Backhand
+    6466,       -- Axe Toss
+    8242,       -- Shield Slam
+    8285,       -- Rampage
+    6524,       -- Ground Tremor
+    6607,       -- Lash
+    7399,       -- Terrify
+    8150,       -- Thundercrack
+    11020,      -- Petrify
+    11641,      -- Hex
+    17307,      -- Knockout
+    16075,      -- Throw Axe
+    16104,      -- Crystallize
+    11836,      -- Freeze Solid
+    29419,      -- Flash Bomb
+    6304,       -- Rhahk'Zor Slam
+    6435,       -- Smite Slam
+    6432,       -- Smite Stomp
+    228,        -- Polymorph: Chicken
+    8040,       -- Druid's Slumber
+    7967,       -- Naralex's Nightmare
+    7139,       -- Fel Stomp
+    7621,       -- Arugal's Curse
+    7803,       -- Thundershock
+    7074,       -- Screams of the Past
+    8281,       -- Sonic Burst
+    8359,       -- Left for Dead
+    9256,       -- Deep Sleep
+    12946,      -- Putrid Stench
+    3636,       -- Crystalline Slumber
+    10093,      -- Harsh Winds
+    21808,      -- Summon Shardlings
+    21869,      -- Repulsive Gaze
+    12888,      -- Cause Insanity
+    12480,      -- Hex of Jammal'an
+    12890,      -- Deep Slumber
+    25774,      -- Mind Shatter
+    15471,      -- Enveloping Web
+    3609,       -- Paralyzing Poison
+    17492,      -- Hand of Thaurissan
+    14870,      -- Drunken Stupor
+    13902,      -- Fist of Ragnaros
+    6945,       -- Chest Pains
+    3551,       -- Skull Crack
+    15618,      -- Snap Kick
+    16508,      -- Intimidating Roar
+    16497,      -- Stun Bomb
+    17405,      -- Domination
+    16798,      -- Enchanting Lullaby
+    12734,      -- Ground Smash
+    17293,      -- Burning Winds
+    16869,      -- Ice Tomb
+    22856,      -- Ice Lock
+    16838,      -- Banshee Shriek
 }
+
+C_Timer.After(11, function()
+    for i = 1, #crowdControls do
+        local name = GetSpellInfo(crowdControls[i])
+        if name then
+            ClassicCastbars.crowdControls[name] = 1
+        end
+    end
+    crowdControls = nil
+end)
 
 -- Skip pushback calculation for these spells since they
 -- have chance to ignore pushback when talented, or is always immune.
@@ -1787,6 +1795,15 @@ ClassicCastbars.stopCastOnDamageList = {
     -- First Aid not included here since we track aura removed
 }
 
+-- Player spells that shouldn't be stopped on movement
+ClassicCastbars.castStopBlacklist = {
+    [GetSpellInfo(4068)] = 1,       -- Iron Grenade
+    [GetSpellInfo(19769)] = 1,      -- Thorium Grenade
+    [GetSpellInfo(13808)] = 1,      -- M73 Frag Grenade
+    [GetSpellInfo(6405)] = 1,       -- Furgbolg Form
+}
+
+-- Spells that can't be slowed or speed up
 ClassicCastbars.unaffectedCastModsSpells = {
     -- Player Spells
     [11605] = 1, -- Slam
@@ -2043,7 +2060,7 @@ addon:SetScript("OnEvent", function(self, event, ...)
 end)
 
 local activeGUIDs = {}
-local activeTimers = {}
+local activeTimers = {} -- active cast data
 local activeFrames = {}
 local npcCastTimeCacheStart = {}
 local npcCastTimeCache = {}
@@ -2056,6 +2073,7 @@ addon.activeTimers = activeTimers
 --ClassicCastbars = addon -- global ref for ClassicCastbars_Options
 
 -- upvalues for speed
+local strfind = _G.string.find
 local pairs = _G.pairs
 local UnitGUID = _G.UnitGUID
 local UnitAura = _G.UnitAura
@@ -2108,13 +2126,21 @@ function addon:CheckCastModifier(unitID, cast)
     end
 
     -- Buffs
-    -- These will only work for friendly units or if Detect Magic is on the unit
-    -- We could detect buffs in the CLEU aswell but this'll have to do for now.
     local _, className = UnitClass(unitID)
     local _, raceFile = UnitRace(unitID)
     if className == "DRUID" or className == "PRIEST" or className == "MAGE" or className == "PALADIN" or raceFile == "Troll" then
+        local libCD = LibStub and LibStub("LibClassicDurations", true)
+        local libCDEnemyBuffs = libCD and libCD.enableEnemyBuffTracking
+
         for i = 1, 32 do
-            local name = UnitAura(unitID, i, "HELPFUL")
+            local name
+            if not libCDEnemyBuffs then
+                name = UnitAura(unitID, i, "HELPFUL")
+            else
+                -- if LibClassicDurations happens to be loaded by some other addon, use it
+                -- to get enemy buff data
+                name = libCD.UnitAuraWithBuffs(unitID, i, "HELPFUL")
+            end
             if not name then break end -- no more buffs
 
             if name == BARKSKIN and not cast.hasBarkskinModifier then
@@ -2174,7 +2200,7 @@ function addon:StopAllCasts(unitGUID, noFadeOut)
     end
 end
 
--- Store new cast data for unit, and start castbar(s)
+-- Store or refresh new cast data for unit, and start castbar(s)
 function addon:StoreCast(unitGUID, spellName, spellID, iconTexturePath, castTime, isPlayer, isChanneled)
     local currTime = GetTime()
 
@@ -2192,7 +2218,7 @@ function addon:StoreCast(unitGUID, spellName, spellID, iconTexturePath, castTime
     cast.unitGUID = unitGUID
     cast.timeStart = currTime
     cast.isPlayer = isPlayer
-    cast.hasCastSlowModified = nil
+    cast.hasCastSlowModified = nil -- just nil previous values to avoid overhead of wiping table
     cast.hasBarkskinModifier = nil
     cast.hasNaturesGraceModifier = nil
     cast.hasFocusedCastingModifier = nil
@@ -2232,8 +2258,6 @@ function addon:CastPushback(unitGUID)
 
     if not cast.isChanneled then
         -- https://wow.gamepedia.com/index.php?title=Interrupt&oldid=305918
-        -- On level 1 it seems like the pushback value starts at 0.5 but at
-        -- higher lvl it is 1.0s. This needs some more testing.
         cast.pushbackValue = cast.pushbackValue or 1.0
         cast.maxValue = cast.maxValue + cast.pushbackValue
         cast.endTime = cast.endTime + cast.pushbackValue
@@ -2290,7 +2314,7 @@ function addon:ToggleUnitEvents(shouldReset)
     end
 
     if shouldReset then
-        self:PLAYER_ENTERING_WORLD() -- reset all data
+        self:PLAYER_ENTERING_WORLD() -- wipe all data
     end
 end
 
@@ -2377,14 +2401,14 @@ function addon:UNIT_AURA()
 end
 
 function addon:UNIT_TARGET(unitID)
+    if not self.db.target.autoPosition then return end
+
     -- reanchor castbar when target of target is cleared or shown
-    if self.db.target.autoPosition then
-        if unitID == "target" or unitID == "player" then
-            if activeFrames.target and activeGUIDs.target then
-                local parentFrame = self.AnchorManager:GetAnchor("target")
-                if parentFrame then
-                    self:SetTargetCastbarPosition(activeFrames.target, parentFrame)
-                end
+    if unitID == "target" or unitID == "player" then
+        if activeFrames.target and activeGUIDs.target then
+            local parentFrame = self.AnchorManager:GetAnchor("target")
+            if parentFrame then
+                self:SetTargetCastbarPosition(activeFrames.target, parentFrame)
             end
         end
     end
@@ -2434,6 +2458,7 @@ function addon:GROUP_ROSTER_UPDATE()
 end
 addon.GROUP_JOINED = addon.GROUP_ROSTER_UPDATE
 
+-- Upvalues for combat log events
 local bit_band = _G.bit.band
 local COMBATLOG_OBJECT_CONTROL_PLAYER = _G.COMBATLOG_OBJECT_CONTROL_PLAYER
 local COMBATLOG_OBJECT_TYPE_PLAYER = _G.COMBATLOG_OBJECT_TYPE_PLAYER
@@ -2459,7 +2484,7 @@ function addon:COMBAT_LOG_EVENT_UNFILTERED()
 
         if srcGUID ~= self.PLAYER_GUID then
             if isPlayer then
-                -- Use talent reduced cast time for certain player spells
+                -- Use hardcoded talent reduced cast time for certain player spells
                 local reducedTime = castTimeTalentDecreases[spellName]
                 if reducedTime then
                     castTime = reducedTime
@@ -2492,14 +2517,15 @@ function addon:COMBAT_LOG_EVENT_UNFILTERED()
             if activeTimers[srcGUID] and GetTime() - activeTimers[srcGUID].timeStart > 0.25 then
                 return self:StopAllCasts(srcGUID)
             end
-            return
+
+            return -- not a cast
         end
 
         local isPlayer = bit_band(srcFlags, COMBATLOG_OBJECT_CONTROL_PLAYER) > 0
 
         -- Auto correct cast times for mobs
         if not isPlayer and not channelCast then
-            if not strfind(srcGUID, "Player-") then -- incase player is mind controlled by NPC
+            if not strfind(srcGUID, "Player-") then -- incase player is mind controlled by an NPC
                 local cachedTime = npcCastTimeCache[srcName .. spellName]
                 if not cachedTime then
                     local cast = activeTimers[srcGUID]
@@ -2540,6 +2566,7 @@ function addon:COMBAT_LOG_EVENT_UNFILTERED()
             -- Aura that interrupts cast was applied
             return self:DeleteCast(dstGUID)
         elseif castTimeIncreases[spellName] and activeTimers[dstGUID] then
+            -- Cast modifiers doesnt modify already active casts, only the next time the player casts
             activeTimers[dstGUID].skipCastSlowModifier = true
         end
     elseif eventType == "SPELL_AURA_REMOVED" then
@@ -2573,14 +2600,8 @@ function addon:COMBAT_LOG_EVENT_UNFILTERED()
     end
 end
 
-local castStopBlacklist = {
-    [GetSpellInfo(4068)] = 1,       -- Iron Grenade
-    [GetSpellInfo(19769)] = 1,      -- Thorium Grenade
-    [GetSpellInfo(13808)] = 1,      -- M73 Frag Grenade
-    [GetSpellInfo(6405)] = 1,       -- Furgbolg Form
-}
-
 local refresh = 0
+local castStopBlacklist = ClassicCastbars.castStopBlacklist
 addon:SetScript("OnUpdate", function(self, elapsed)
     if not next(activeTimers) then return end
     local currTime = GetTime()
@@ -2632,9 +2653,10 @@ addon:SetScript("OnUpdate", function(self, elapsed)
                     castbar.Spark:SetPoint("CENTER", castbar, "LEFT", sparkPosition, 0)
                 end
             else
+                -- Delete cast incase stop event wasn't detected in CLEU
                 if castTime <= -0.25 then -- wait atleast 0.25s before deleting incase CLEU stop event is happening at same time
-                    -- Delete cast incase stop event wasn't detected in CLEU
-                    self:DeleteCast(cast.unitGUID, false, true, false, (currTime - cast.timeStart) > cast.maxValue + 0.25)
+                    local skipFade = ((currTime - cast.timeStart) > cast.maxValue + 0.25)
+                    self:DeleteCast(cast.unitGUID, false, true, false, skipFade)
                 end
             end
         end
@@ -2671,7 +2693,7 @@ end
 function addon:SetTargetCastbarPosition(castbar, parentFrame)
     local auraRows = parentFrame.auraRows or 0
 
-    if parentFrame.haveToT or parentFrame.haveElite or UnitExists("targettarget") then
+    if parentFrame.haveToT or parentFrame.haveElite or UnitExists("targettarget") then -- TODO: test if works with custom unitframe
         if parentFrame.buffsOnTop or auraRows <= 1 then
             castbar:SetPoint("CENTER", parentFrame, -18, -75)
         else
@@ -2899,7 +2921,7 @@ function addon:HideCastbar(castbar, noFadeOut)
         end
     end
 
-    if castbar:GetAlpha() > 0 then
+    if castbar:GetAlpha() > 0 and castbar.fade then
         castbar.fade:SetDuration(cast and cast.isInterrupted and 1.5 or 0.3)
         castbar.animationGroup:Play()
     end

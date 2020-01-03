@@ -166,7 +166,6 @@ local defaultSettings = {
 	Misc = {
 		Mail = true,
 		ItemLevel = true,
-		GemNEnchant = true,
 		ShowItemLevel = true,
 		HideErrors = true,
 		ExpRep = true,
@@ -200,6 +199,7 @@ local defaultSettings = {
 		EnhancedMenu = false,
 		AutoDismount = true,
 		TradeTabs = true,
+		InstantDelete = true,
 	},
 	Tutorial = {
 		Complete = false,

@@ -59,7 +59,7 @@ info.onEnter = function(self)
 	end
 
 	GameTooltip:AddDoubleLine(" ", I.LineString)
-	GameTooltip:AddDoubleLine(" ", I.LeftButton.."SpecPanel".." ", 1,1,1, .6,.8,1)
+	GameTooltip:AddDoubleLine(" ", I.LeftButton..U["SpecPanel"].." ", 1,1,1, .6,.8,1)
 	GameTooltip:Show()
 end
 
