@@ -1,4 +1,4 @@
-﻿--## Author: Peter Getov  ## Version: 2.8.1
+﻿--## Author: Peter Getov  ## Version: 2.9
 -- core - table (namespace) shared between every lua file
 local CharacterStatsClassic_UIConfig = {};
 
@@ -235,16 +235,16 @@ CSC_ScanTooltip:SetOwner(WorldFrame, "ANCHOR_NONE");
 local CSC_ScanTooltipPrefix = "CSC_ScanTooltip";
 
 local weaponStringByWeaponId = {
-	[LE_ITEM_WEAPON_AXE1H] 		= "Axes",
-	[LE_ITEM_WEAPON_AXE2H] 		= "Two-Handed Axes",
-	[LE_ITEM_WEAPON_MACE1H] 	= "Maces",
-	[LE_ITEM_WEAPON_MACE2H] 	= "Two-Handed Maces",
-	[LE_ITEM_WEAPON_POLEARM] 	= "Polearms",
-	[LE_ITEM_WEAPON_SWORD1H] 	= "Swords",
-	[LE_ITEM_WEAPON_SWORD2H] 	= "Two-Handed Swords",
-	[LE_ITEM_WEAPON_STAFF] 		= "Staves",
-	[LE_ITEM_WEAPON_UNARMED] 	= "Fist Weapons",
-	[LE_ITEM_WEAPON_DAGGER] 	= "Daggers"
+	[LE_ITEM_WEAPON_AXE1H] 		= CSC_WEAPON_AXE1H_TXT,
+	[LE_ITEM_WEAPON_AXE2H] 		= CSC_WEAPON_AXE2H_TXT,
+	[LE_ITEM_WEAPON_MACE1H] 	= CSC_WEAPON_MACE1H_TXT,
+	[LE_ITEM_WEAPON_MACE2H] 	= CSC_WEAPON_MACE2H_TXT,
+	[LE_ITEM_WEAPON_POLEARM] 	= CSC_WEAPON_POLEARM_TXT,
+	[LE_ITEM_WEAPON_SWORD1H] 	= CSC_WEAPON_SWORD1H_TXT,
+	[LE_ITEM_WEAPON_SWORD2H] 	= CSC_WEAPON_SWORD2H_TXT,
+	[LE_ITEM_WEAPON_STAFF] 		= CSC_WEAPON_STAFF_TXT,
+	[LE_ITEM_WEAPON_UNARMED] 	= CSC_WEAPON_UNARMED_TXT,
+	[LE_ITEM_WEAPON_DAGGER] 	= CSC_WEAPON_DAGGER_TXT
 };
 
 -- GENERAL UTIL FUNCTIONS --
@@ -386,7 +386,7 @@ local function CSC_GetBonusHitFromWeaponSkill(unit)
 		if itemSubtypeId then
 			local weaponString = weaponStringByWeaponId[itemSubtypeId];
 			if weaponString then
-				local skillRank, skillModifier = CSC_GetSkillRankAndModifier("武器技能", weaponString);
+				local skillRank, skillModifier = CSC_GetSkillRankAndModifier(CSC_WEAPON_SKILLS_HEADER, weaponString);
 				if skillRank and skillModifier then
 					local weaponSkillMin = 300;
 					local weaponSkillBorder = 305;
@@ -648,7 +648,7 @@ function CSC_PaperDollFrame_SetRangedAttackPower(statFrame, unit)
     local valueNum = max(0, base + posBuff + negBuff);
     CSC_PaperDollFrame_SetLabelAndText(statFrame, STAT_ATTACK_POWER, valueText, false, valueNum);
 	statFrame.tooltip = tooltipText;
-    statFrame.tooltip2 = format(RANGED_ATTACK_POWER_TOOLTIP, base/ATTACK_POWER_MAGIC_NUMBER);
+    statFrame.tooltip2 = format(RANGED_ATTACK_POWER_TOOLTIP, valueNum/ATTACK_POWER_MAGIC_NUMBER);
     statFrame:Show();
 end
 
@@ -888,7 +888,7 @@ function CSC_PaperDollFrame_SetDefense(statFrame, unit)
 		if isHeader ~= nil and isHeader then
 			currentHeader = skillName;
 		else
-			if (currentHeader == "武器技能" and skillName == DEFENSE) or (currentHeader == "Weapon Skills" and skillName == DEFENSE) then
+			if (currentHeader == CSC_WEAPON_SKILLS_HEADER and skillName == DEFENSE) then
 				skillIndex = i;
 				break;
 			end
