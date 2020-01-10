@@ -19,23 +19,9 @@ local WARLOCK       = 9
 local MONK          = 10
 local DRUID         = 11
 local DEMONHUNTER   = 12
-local function GetPowerType()
-    local _, _, class = UnitClass("player") 
-    if (class == MONK and GetSpecialization() == 3) then
-        return Enum.PowerType.Chi
-    elseif (class == PALADIN) then
-        return GetSpecialization() == 3 and Enum.PowerType.HolyPower
-    elseif (class == WARLOCK) then
-        return Enum.PowerType.SoulShards
-    elseif (class == MAGE) then
-        return GetSpecialization() == 1 and Enum.PowerType.ArcaneCharges
-    elseif (class == ROGUE) then
-        return Enum.PowerType.ComboPoints
-    elseif (class == DRUID) then
-        return UnitPowerType("player") == Enum.PowerType.Energy and Enum.PowerType.ComboPoints or nil
-    --elseif (class == DEATHKNIGHT) then
-    end
-end
+
+local fntBig = CreateFont("SIFontBig");
+fntBig:SetFont(STANDARD_TEXT_FONT, 22, "THICKOUTLINE");
 
 local fntMedium = CreateFont("SIFontMedium");  -- Power, absolute health
 fntMedium:SetFont(STANDARD_TEXT_FONT, 16, "OUTLINE");
@@ -68,38 +54,31 @@ BlinkHealth.digitTexCoords = {
 	["texWidth"] = 512,
 	["texHeight"] = 128
 };
-
-BlinkHealth.powerColor = {
-	AMMOSLOT = {0.8, 0.6, 0},
-	ENERGY = {1, 1, 0},
-	FOCUS = {1, 0.5, 0.25},
-	FUEL = {0, 0.55, 0.5},
-	HAPPINESS = {0, 1, 1},
-	MANA = {0.31, 0.45, 0.63},
-	RAGE = {0.69, 0.31, 0.31},
-	RUNES = {0.55, 0.57, 0.61},
-	RUNIC_POWER = {0, 0.82, 1},
-  FURY = {0.788, 0.259, 0.992},
-  PAIN = {255/255, 156/255, 0},
-  INSANITY = {0.40, 0, 0.80}, -- PowerBarColor
-};
-
-BlinkHealth.runeColors = {
-	{1, 0, 0};
-	{0, .5, 0};
-	{0, 1, 1};
-	{.9, .1, 1};
-}
 BlinkHealth.classColor = {};
-do for k, v in pairs(RAID_CLASS_COLORS) do BlinkHealth.classColor[k] = {v.r, v.g, v.b}; end end
+do
+    for k, v in pairs(RAID_CLASS_COLORS) do
+        BlinkHealth.classColor[k] = {v.r, v.g, v.b};
+    end
+end
+
+function BlinkHealth:OnInitialize()
+	self.frame = {};
+	self:CreateAnchorFrame()
+	self:ConstructFrame("player");
+	self:ConstructFrame("target");
+	self:UpdateUnitFrame();
+	SlashCmdList["BLINKHEALTH"] = BlinkHealth_SlashHandler;
+	SLASH_BLINKHEALTH1 = "/bht";
+	if (ShiGuangPerDB.BHTHit == true) then sendCmd("/bht hiton") else sendCmd("/bht hitoff") end
+end
+
+
 
 function BlinkHealth:OnEnable()
 	self:RegisterEvent("PLAYER_TARGET_CHANGED");
-  --self:RegisterEvent("PLAYER_SPECIALIZATION_CHANGED");
-  self:RegisterEvent("PLAYER_ENTERING_WORLD");
 	self:RegisterEvent("PLAYER_REGEN_DISABLED");
 	self:RegisterEvent("PLAYER_REGEN_ENABLED");
-  self:RegisterEvent("UNIT_POWER_UPDATE");
+
 	self.frame["player"]:Show();
 	self.handle = self:ScheduleRepeatingTimer("UpdateUnitValues", 0.05);
 end
@@ -115,26 +94,12 @@ function BlinkHealth:PLAYER_TARGET_CHANGED()
 	self:UpdateUnitFrame();
 end
 
-function BlinkHealth:PLAYER_SPECIALIZATION_CHANGED()
-    BlinkHealthTextPowerType = GetPowerType()
-end
-
-function BlinkHealth:PLAYER_ENTERING_WORLD()
-    BlinkHealthTextPowerType = GetPowerType()
-end
-
 function BlinkHealth:PLAYER_REGEN_DISABLED()
 	self:UpdateUnitFrame();
 end
 
 function BlinkHealth:PLAYER_REGEN_ENABLED()
 	self:UpdateUnitFrame();
-end
-
-function BlinkHealth:UNIT_POWER_UPDATE(event, unit)
-	if (unit == "player") then
-        if BlinkHealthTextPowerType then self:UpdateComboPoints(); end
-	end
 end
 
 function BlinkHealth:CreateAnchorFrame()
@@ -183,7 +148,7 @@ function BlinkHealth:CreateAnchorFrame()
 	end);
 
 	--self.anchor.originalStopMovingOrSizing = self.anchor.StopMovingOrSizing;
-	self.anchor.duration = 1;  	--RegisterForSaveFrame(self.anchor);
+	--self.anchor.duration = 1;  	--RegisterForSaveFrame(self.anchor);
 	self.anchor:Hide();
 end
 
@@ -205,16 +170,6 @@ function BlinkHealth:UpdateUnitFrame()
 		self.frame["target"]:SetAlpha(0.2);
 		self.frame["target"]:Hide();
 	end
-end
-
-function BlinkHealth:UpdateComboPoints()
-	local comboPoints = UnitPower(PlayerFrame.unit, BlinkHealthTextPowerType);
-	  if (comboPoints and comboPoints > 0) then
-        self.hitPoint.text:SetText(comboPoints);
-	  else
-        self.hitPoint.text:SetText("");
-        self.hitPoint.hit:SetText("");
-	  end
 end
 
 function BlinkHealth:UpdateUnitValues()
@@ -293,18 +248,11 @@ function BlinkHealth:UpdateUnitValues()
 			hexColor = self:ToHexColor(UnitSelectionColor("target"));
 		end
 		--精英、银英、世界boss加前缀
-		if(UnitClassification("target")=="elite") then
-			name="[精英]"..name;
-		end
-		if(UnitClassification("target")=="rare") then
-			name="[稀有]"..name;
-		end
-		if(UnitClassification("target")=="rareelite") then
-			name="[稀有精英]"..name;
-		end
-		if(UnitClassification("target")=="worldboss") then
-			name="[世界BOSS]"..name;
-		end
+		if(UnitClassification("target")=="elite") then name="[精英]"..name; end
+		if(UnitClassification("target")=="rare") then name="[稀有]"..name; end
+		if(UnitClassification("target")=="rareelite") then name="[稀有精英]"..name; end
+		if(UnitClassification("target")=="worldboss") then name="[世界BOSS]"..name; end
+		
 		self.frame["target"].name:SetFormattedText("|cff%s%s|r", hexColor, name);
 	
 		if (UnitExists("targettarget")) then
@@ -454,164 +402,6 @@ function BlinkHealth:ConstructHealth(unit)
 
 	this.name = name;
 end
----------------------- 符文条
-do
-function BlinkHealth:ConstructRunes()
-	local this = self.frame["player"];
-	self.Runes = CreateFrame("Frame", nil, this)	
-	self.Runes:SetWidth(96)
-	self.Runes:SetHeight(16)
-	self.Runes:SetPoint("TOPRIGHT", this.heal, "BOTTOMRIGHT", 0, -1);
-	self.Runes:Hide();
-
-	for i = 1, 6 do
-		self.Runes[i] = CreateFrame("StatusBar", nil, self.Runes)
-		self.Runes[i]:SetStatusBarTexture("Interface\\AddOns\\_ShiGuang\\Media\\Modules\\BlinkHealthText\\blank.blp")
-		self.Runes[i]:SetWidth(16)
-		self.Runes[i]:SetHeight(16)
-
-		if i == 1 then
-			self.Runes[i]:SetPoint("TOPLEFT", self.Runes, "TOPLEFT")
-		else
-			self.Runes[i]:SetPoint("LEFT", self.Runes[i - 1], "RIGHT")
-		end
-
-		local backdrop = self.Runes[i]:CreateTexture(nil, "ARTWORK")
-		backdrop:SetWidth(16)
-		backdrop:SetHeight(16)
-		backdrop:SetAllPoints()
-		backdrop:SetTexture("Interface\\AddOns\\_ShiGuang\\Media\\Modules\\BlinkHealthText\\combo.blp")
-		backdrop:SetTexCoord(0, 16 / 64, 0, 1)
-				
-		-- This is actually the fill layer, but "bg" gets automatically vertex-colored by the runebar module. So let's make use of that!
-		self.Runes[i].bg = self.Runes[i]:CreateTexture(nil, "OVERLAY")
-		self.Runes[i].bg:SetWidth(16)
-		self.Runes[i].bg:SetHeight(16)
-		self.Runes[i].bg:SetPoint("BOTTOM")
-		self.Runes[i].bg:SetTexture("Interface\\AddOns\\_ShiGuang\\Media\\Modules\\BlinkHealthText\\combo.blp")
-		self.Runes[i].bg:SetTexCoord(0.5, 0.75, 0, 1)
-				
-		-- Shine effect
-		local shinywheee = CreateFrame("Frame", nil, self.Runes[i])
-		shinywheee:SetAllPoints()
-		shinywheee:SetAlpha(0)
-		shinywheee:Hide()
-				
-		local shine = shinywheee:CreateTexture(nil, "OVERLAY")
-		shine:SetAllPoints()
-		shine:SetPoint("CENTER")
-		shine:SetTexture("Interface\\Cooldown\\star4.blp")
-		shine:SetBlendMode("ADD")
-
-		local anim = shinywheee:CreateAnimationGroup()
-		local alphaIn = anim:CreateAnimation("Alpha")
-	--	alphaIn:SetChange(0.3)
-		alphaIn:SetFromAlpha(0)
-		alphaIn:SetToAlpha(0.3)		
-		alphaIn:SetDuration(0.4)
-		alphaIn:SetOrder(1)
-		local rotateIn = anim:CreateAnimation("Rotation")
-		rotateIn:SetDegrees(-90)
-		rotateIn:SetDuration(0.4)
-		rotateIn:SetOrder(1)
-		local scaleIn = anim:CreateAnimation("Scale")
-		scaleIn:SetScale(2, 2)
-		scaleIn:SetOrigin("CENTER", 0, 0)
-		scaleIn:SetDuration(0.4)
-		scaleIn:SetOrder(1)
-		local alphaOut = anim:CreateAnimation("Alpha")
-	--	alphaOut:SetChange(-0.5)
-		alphaOut:SetFromAlpha(0.5)
-		alphaOut:SetToAlpha(0)			
-		alphaOut:SetDuration(0.4)
-		alphaOut:SetOrder(2)
-		local rotateOut = anim:CreateAnimation("Rotation")
-		rotateOut:SetDegrees(-90)
-		rotateOut:SetDuration(0.3)
-		rotateOut:SetOrder(2)
-		local scaleOut = anim:CreateAnimation("Scale")
-		scaleOut:SetScale(-2, -2)
-		scaleOut:SetOrigin("CENTER", 0, 0)
-		scaleOut:SetDuration(0.4)
-		scaleOut:SetOrder(2)
-				
-		anim:SetScript("OnFinished", function() shinywheee:Hide() end)
-		shinywheee:SetScript("OnShow", function() anim:Play() end)
-				
-		-- Fill the dots
-		self.Runes[i]:SetScript("OnValueChanged", function(self, val)
-			-- Resize round overlay texture when hidden statusbar changes
-			if (({GetRuneCooldown(self:GetID())})[3]) then
-				-- Rune ready: show all 16x16px, play animation
-				self.bg:SetWidth(16)
-				self.bg:SetHeight(16)
-				self.bg:SetTexCoord(0.5, 0.75, 0, 1)
-				shinywheee:Show()
-			else
-				-- Dot distance from top & bottom of texture: 4px
-				self.bg:SetWidth(16)
-				self.bg:SetHeight(4 + 8 * val / 10)
-				self.bg:SetTexCoord(0.25, 0.5, 12 / 16 - 8 * val / 10 / 16, 1)
-			end
-		end)
-	end
-end
-
-local OnUpdate = function(self, elapsed)
-	local duration = self.duration + elapsed
-	if(duration >= self.max) then
-		return self:SetScript("OnUpdate", nil)
-	else
-		self.duration = duration
-		return self:SetValue(duration)
-	end
-end
-
-function BlinkHealth:UpdateRuneType(event, rid)	
-	local runeType = 3; --GetRuneType(rid)
-	local colors = self.runeColors[runeType]
-	local rune = self.Runes[rid];
-	local r, g, b = colors[1], colors[2], colors[3];
-	rune:SetStatusBarColor(r, g, b);
-	if(rune.bg) then
-		rune.bg:SetVertexColor(r, g, b);
-	end
-end
-
-function BlinkHealth:UpdateRune(event, rid)
-	local rune = self.Runes[rid]
-	if(rune) then
-		local start, duration, runeReady = GetRuneCooldown(rune:GetID())
-		if(runeReady) then
-			rune:SetMinMaxValues(0, 1)
-			rune:SetValue(1)
-			rune:SetScript("OnUpdate", nil)
-		else
-			rune.duration = GetTime() - start
-			rune.max = duration
-			rune:SetMinMaxValues(1, duration)
-			rune:SetScript("OnUpdate", OnUpdate)
-		end
-	end
-end
-
-function BlinkHealth:EnableRune()
-	local runes = self.Runes;
-	for i=1, 6 do
-		local rune = runes[i];
-		rune:SetID(i);
-		self:UpdateRuneType(nil, i);
-	end
-	self:RegisterEvent("RUNE_POWER_UPDATE", "UpdateRune");
-	--self:RegisterEvent("RUNE_TYPE_UPDATE", "UpdateRuneType"); --aby8
-	runes:Show();
-end
-
-function BlinkHealth:DisableRune()
-	self.Runes:Hide();
-	self:UnregisterEvent("RUNE_POWER_UPDATE");
-end
-end
 ----------------------
 function BlinkHealth:ConstructFrame(unit)
 	self.frame[unit] = CreateFrame("Frame", "SimpleInfoPlayerFrame" .. unit, UIParent);
@@ -652,97 +442,11 @@ end)
 	end
 	self:ConstructHealth(unit);	
 end
-
-function BlinkHealth:CreateHitAnchor()
-	if (self.HitAnchor) then return end
-
-	self.HitAnchor = CreateFrame("Button", "SimpleInfoHitPointAnchorFrameNew", UIParent);
-	self.HitAnchor:SetSize(100, 80);
-	self.HitAnchor:EnableMouse(true);
-	self.HitAnchor:SetMovable(true);
-	self.HitAnchor:SetPoint("CENTER", UIParent, "CENTER", 121, -43);
-	local backdrop = {
-		bgFile = "Interface\\ChatFrame\\ChatFrameBackground",
-		edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border",
-		tileSize = 16, edgeSize = 10, tile = true,
-		insets = {left = 2, right = 2, top = 2, bottom = 2}
-	};		
-	self.HitAnchor:SetBackdrop(backdrop);
-	self.HitAnchor:SetBackdropColor(0.1, 0.1, 0.1, 0.65)
-	self.HitAnchor:SetBackdropBorderColor(0.5, 0.5, 0.5, 1)
-	
-	self.HitAnchor.close = CreateFrame("Button", nil, self.HitAnchor, "UIPanelCloseButton");
-	self.HitAnchor.close:SetPoint("TOPRIGHT", self.HitAnchor, "TOPRIGHT", 1, 1);
-
-	self.HitAnchor.text = self.HitAnchor:CreateFontString(nil, "OVERLAY");
-	self.HitAnchor.text:SetFont("Interface\\Addons\\_ShiGuang\\Media\\Fonts\\REDCIRCL.ttf", 21, "OUTLINE");
-	self.HitAnchor.text:SetPoint("LEFT", self.HitAnchor, "LEFT", 20, -5);
-	self.HitAnchor.text:SetJustifyH("RIGHT");
-	self.HitAnchor.text:SetTextColor(1.0, 0.69, 0.0);
-	self.HitAnchor.text:SetText("5 hit");
-
-	self.HitAnchor:RegisterForClicks("LeftButtonDown", "RightButtonDown");
-	self.HitAnchor:SetScript("OnMouseDown", function(self, button)
-		if (button == "LeftButton") then
-			self:StartMoving();
-			self.isMoving = true;
-		else
-			self:Hide();
-		end
-		
-	end);
-	self.HitAnchor:SetScript("OnMouseUp", function(self)
-		if (self.isMoving) then self:StopMovingOrSizing(); end		
-	end);
-	
-	--self.HitAnchor.originalStopMovingOrSizing = self.HitAnchor.StopMovingOrSizing;
-	self.HitAnchor.duration = 1;
-	self.HitAnchor:Hide();
-end
-
-function BlinkHealth:ConstructHitPoints()
-	self:CreateHitAnchor();
-	if (not self.hitPoint) then
-		self.hitPoint = CreateFrame("Frame", nil, UIParent);
-		self.hitPoint:SetWidth(100);
-		self.hitPoint:SetHeight(80);
-		self.hitPoint:SetPoint("CENTER", self.HitAnchor, "CENTER", 0, 0);
-		self.hitPoint.text = self.hitPoint:CreateFontString(nil, "OVERLAY");
-		self.hitPoint.text:SetFont("Interface\\Addons\\_ShiGuang\\Media\\Fonts\\REDCIRCL.ttf", 43, "OUTLINE");
-		self.hitPoint.text:SetPoint("LEFT", self.HitAnchor, "LEFT", 20, -5);
-		self.hitPoint.text:SetJustifyH("RIGHT");
-		self.hitPoint.text:SetTextColor(1.0, 0.69, 0.0);
-		self.hitPoint.text:SetText("");
-		self.hitPoint.hit = self.hitPoint:CreateFontString(nil, "OVERLAY");
-		self.hitPoint.hit:SetFont("Interface\\Addons\\_ShiGuang\\Media\\Fonts\\REDCIRCL.ttf", 14, "OUTLINE");
-		self.hitPoint.hit:SetPoint("BOTTOMLEFT", self.hitPoint.text, "BOTTOMRIGHT", 5, 16);
-		self.hitPoint.hit:SetTextColor(1.0, 0.69, 0.0);
-	end	
-end
-
-function BlinkHealth:ToggleRuneFrameVisible(switch)
-	if (switch) then	
-		self:EnableRune();
-		self:ScheduleTimer("EnableRune", 1);
-	else
-		self:DisableRune();
-	end
-end
-
-function BlinkHealth:ToggleHitPoint(switch)
-	if (switch) then
-		self.hitPoint:Show();
-	else
-		self.hitPoint:Hide();
-	end
-end
 function BlinkHealth:ShowAnchor() self.anchor:Show(); end
-function BlinkHealth:ShowHitAnchor() self.HitAnchor:Show(); end
 
 function BlinkHealth_SlashHandler(msg)
 	local BHT_1 = "输入 /bht on 或 /bht off 开关插件\n";
 	local BHT_2 = "输入 /bht m 调整位置\n";
-	local BHT_3 = "输入 /bht hiton 或 /bht hitoff 是否显示数字连击点数\n";
 	local cmdtype, para1 = strsplit(" ", string.lower(msg))
 	local listSec = 0;
 	if para1 ~= nil then
@@ -752,35 +456,9 @@ function BlinkHealth_SlashHandler(msg)
 	elseif (cmdtype == "off") then BlinkHealth:OnDisable();
 	elseif (cmdtype == "move" or cmdtype == "m") then
 			BlinkHealth:ShowAnchor();
-			BlinkHealth:ShowHitAnchor();
-  elseif (cmdtype == "hiton") then
-		if (I.MyClass == "MONK") or (I.MyClass == "PALADIN") or (I.MyClass == "WARLOCK") or (I.MyClass == "MAGE") or (I.MyClass == "ROGUE") or (I.MyClass == "DRUID") then	
-			BlinkHealth:ToggleHitPoint(true);
-		end			
-		ShiGuangPerDB.BHTHit = true;		
-	elseif (cmdtype == "hitoff") then
-		if (I.MyClass == "MONK") or (I.MyClass == "PALADIN") or (I.MyClass == "WARLOCK") or (I.MyClass == "MAGE") or (I.MyClass == "ROGUE") or (I.MyClass == "DRUID") then
-			BlinkHealth:ToggleHitPoint(false);
-		end
-		ShiGuangPerDB.BHTHit = false;
 	else 
-		DEFAULT_CHAT_FRAME:AddMessage(BHT_1..BHT_2..BHT_3);
+		DEFAULT_CHAT_FRAME:AddMessage(BHT_1..BHT_2);
 	end
-end
-
-function BlinkHealth:OnInitialize()
-	self.frame = {};
-	self:CreateAnchorFrame()
-	self:ConstructFrame("player");
-	self:ConstructFrame("target");
-	if (I.MyClass == "DEATHKNIGHT") then self:ConstructRunes(); BlinkHealth:ToggleRuneFrameVisible(true); end	
-	if (I.MyClass == "MONK") or (I.MyClass == "PALADIN") or (I.MyClass == "WARLOCK") or (I.MyClass == "MAGE") or (I.MyClass == "ROGUE") or (I.MyClass == "DRUID") then		
-		self:ConstructHitPoints();	-- 构建连击点
-	end	
-	self:UpdateUnitFrame();
-	SlashCmdList["BLINKHEALTH"] = BlinkHealth_SlashHandler;
-	SLASH_BLINKHEALTH1 = "/bht";
-	if (ShiGuangPerDB.BHTHit == true) then sendCmd("/bht hiton") else sendCmd("/bht hitoff") end
 end
 
 ------------------------------------------------------头像渐隐
