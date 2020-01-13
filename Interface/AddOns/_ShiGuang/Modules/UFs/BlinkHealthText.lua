@@ -69,10 +69,7 @@ function BlinkHealth:OnInitialize()
 	self:UpdateUnitFrame();
 	SlashCmdList["BLINKHEALTH"] = BlinkHealth_SlashHandler;
 	SLASH_BLINKHEALTH1 = "/bht";
-	if (ShiGuangPerDB.BHTHit == true) then sendCmd("/bht hiton") else sendCmd("/bht hitoff") end
 end
-
-
 
 function BlinkHealth:OnEnable()
 	self:RegisterEvent("PLAYER_TARGET_CHANGED");

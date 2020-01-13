@@ -12300,6 +12300,7 @@ local ResetDetectionStartDelay=1;--	How long from first damage event when reset 
 
 local HealthQueryThrottle=10;--	How long between sending broadcasts about the same mob
 local PurgeTimerInterval=10;--	Time between unit purge checks
+local RecordedTimeout=30--	How long to keep recorded units in cache to prevent reincarnating mobs from spamming our death detection (only while dead)
 local DeathTimeout=300--	How long from death when CreatureKey can be acquired
 local DamageTimeout=120--	How long to wait between CLEs
 local TargetTimeout=60--	How long to keep CreatureKeys when no damage taken
@@ -12372,19 +12373,21 @@ local function StoreMaxHealth(creaturekey,maxhealth,overwrite)
 end
 
 local function ProcessAuras(unit)
-if not UnitIsUnit(unit,"target") then return; end
 	local creaturekey=AddOn_GetUnitCreatureKey(unit);-- Can return nil for invalid units
 	if not creaturekey or AddOn_IsBlacklistedCreatureKey(creaturekey) then return; end--	Don't process if invalid or blacklisted
 
-	local i=1;
+	local data,i=UnitCache[UnitGUID(unit)],1;
+	if data and data.IsRecorded then return; end--	Exit if marked as recorded
+
 	repeat
 		local _,_,_,_,_,_,_,_,_,spellid=UnitDebuff(unit,i,"PLAYER");
 		if spellid and HealthDetectionAuras[spellid] then
 			local maxhealth=UnitHealthMax(unit);
 			if maxhealth~=UnitHealthNormalizedMax then
 				StoreMaxHealth(creaturekey,maxhealth,true);
+				if data then data.IsRecorded=true; end
 			end
-			return;--	Done here
+			break;--	Done here
 		end
 		i=i+1;
 	until not spellid
@@ -12405,10 +12408,11 @@ local function ProcessUnit(unit)--	Called when we're aware of a new/updated unit
 		QueryCreatureHealth(creaturekey);--	Query if unknown
 	end
 
-	if UnitIsDead(unit) then--	Mob is dead, deal with UnitCache data and wipe it
-		if data then
+	if UnitIsDead(unit) then--	Mob is dead, deal with UnitCache data
+		if data and not data.IsRecorded then--	Don't process if recorded already
 			StoreMaxHealth(creaturekey,data.Damage);--	Store damage tally
-			UnitCache[guid]=nil;--	Done with this, wipe it
+			data.IsRecorded=true;--	Mark recorded so we don't attempt to store this mob again
+			data.IsDead=true;--	Mark dead for cleanup later
 		end
 	else--	Mob is alive, update UnitCache
 		local now=GetTime();
@@ -12446,20 +12450,24 @@ local function ProcessCLE(...)
 
 	local now=GetTime();
 	if guid and (suffix=="DAMAGE" or suffix=="HEAL") and not AddOn_IsBlacklistedGUID(guid) then
---		Normalize damage and remove overkill/overheal (over=-1 if not overkill/overheal)
-		damage=damage and (suffix=="HEAL" and -1 or 1)*(damage-math_max(over,0)) or 0;
-
 		local data=UnitCache[guid];
-		local total=math_max((data and data.Damage or 0)+damage,0);--	Add the damage (Deals with overheal by clamping at zero)
-		if over>=0 and damage>=0 then--	If we overkilled, it's a death (damage<0 is overheal)
-			local creaturekey=data and data.CreatureKey;
-			StoreMaxHealth(creaturekey,total);--	Store damage tally
-			if creaturekey then UnitCache[guid]=nil;--	Done with this, wipe it
-			elseif data then data.IsDead=true; end--	Not enough info, just flag death
-		else--	Unit still alive, store new damage value
-			if not data then data={}; UnitCache[guid]=data; end--	Create table if it doesn't exist
-			if not data.FirstEvent then data.FirstEvent=now; end--	Log first damage event (Helps prevent race conditions with mob reset detection)
-			data.Damage=total;--	Update damage tally
+		if not data then data={}; UnitCache[guid]=data; end--	Create table if it doesn't exist
+		if not data.IsRecorded then--	Only process if not marked as recorded
+--			Normalize damage and remove overkill/overheal (over=-1 if not overkill/overheal)
+			damage=damage and (suffix=="HEAL" and -1 or 1)*(damage-math_max(over,0)) or 0;
+
+			local total=math_max((data.Damage or 0)+damage,0);--	Add the damage (Deals with overheal by clamping at zero)
+			if over>=0 and damage>=0 then--	If we overkilled, it's a death (damage<0 is overheal)
+				local creaturekey=data.CreatureKey;--	Can be nil if we don't have a valid CreatureKey yet
+				if creaturekey then
+					StoreMaxHealth(creaturekey,total);--	Store damage tally
+					data.IsRecorded=true;--	Mark recorded so we don't attempt to store this mob again
+				end
+				data.IsDead=true;--	Mark dead for processing/cleanup later
+			else--	Unit still alive, store new damage value
+				if not data.FirstEvent then data.FirstEvent=now; end--	Log first damage event (Helps prevent race conditions with mob reset detection)
+				data.Damage=total;--	Update damage tally
+			end
 		end
 	end
 
@@ -12542,7 +12550,7 @@ AddOn.SetTimerInterval(PurgeTimerInterval,function(elapsed)
 	for guid,data in pairs(UnitCache) do--	Scan UnitCache
 --		Priority-based timeout
 		if now-data.LastSeen>(
-			data.IsDead and DeathTimeout
+			data.IsDead and (data.IsRecorded and RecordedTimeout or DeathTimeout)
 		or	(data.Damage and DamageTimeout
 		or	(data.CreatureKey and TargetTimeout
 		or 0))) then

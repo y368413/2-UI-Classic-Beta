@@ -35,6 +35,7 @@ local autoOpenItems = {
 	[7190]	 = true, -- Scorched Rocket Boots
 --	[7209]	 = true, -- Tazan's Satchel -- Lockpicking
 --	[7870]	 = true, -- Thaumaturgy Vessel Lockbox -- Lockpicking
+	[7973]    = true, -- Big-mouth Clam
 	[8049]	 = true, -- Gnarlpine Necklace
 	[8366]	 = true, -- Bloated Trout
 	[8484]	 = true, -- Gadgetzan Water Co. Care Package

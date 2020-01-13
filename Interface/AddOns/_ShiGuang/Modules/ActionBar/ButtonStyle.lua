@@ -424,12 +424,11 @@ local function MoveMicroButtons()
 		menu:SetScale(0.75)
 	end
 	CharacterMicroButton:SetPoint("BOTTOMRIGHT", Minimap, "BOTTOMLEFT", 3, -8)
-	KeyRingButton:SetPoint("BOTTOMLEFT", CharacterMicroButton, "TOPRIGHT", 0, 0) 
 	SpellbookMicroButton:SetPoint("BOTTOMRIGHT", CharacterMicroButton, "TOPRIGHT", 0, -21)
 	if UnitLevel("player") >= 10 then
 	  TalentMicroButton:SetPoint("BOTTOMRIGHT", SpellbookMicroButton, "TOPRIGHT", 0, -21)
 	  QuestLogMicroButton:SetPoint("BOTTOMRIGHT", TalentMicroButton, "TOPRIGHT", 0, -21)
-	  	else
+	else
 	  QuestLogMicroButton:SetPoint("BOTTOMRIGHT", SpellbookMicroButton, "TOPRIGHT", 0, -21)
 	end
 	SocialsMicroButton:SetPoint("BOTTOMRIGHT", QuestLogMicroButton, "TOPRIGHT", 0, -21)
@@ -438,6 +437,9 @@ local function MoveMicroButtons()
 	HelpMicroButton:SetPoint("BOTTOMRIGHT", MainMenuMicroButton, "TOPRIGHT", 0, -21) 
 	--AchievementMicroButton:SetPoint("BOTTOMRIGHT", LFDMicroButton, "TOPRIGHT", 0, -4)
 	--StoreMicroButton:SetPoint("BOTTOMRIGHT", QuestLogMicroButton, "TOPRIGHT", 0, -4)
+	if not MaoRUISettingDB["Bags"]["Enable"] then return end
+	if IsAddOnLoaded("Combuctor") or IsAddOnLoaded("Bagnon") then return end
+	KeyRingButton:SetPoint("BOTTOMLEFT", CharacterMicroButton, "TOPRIGHT", 0, 0) 
 end
 HotSpotMicroMenu:RegisterEvent("PLAYER_LOGIN")
 HotSpotMicroMenu:SetScript("OnEvent", function()

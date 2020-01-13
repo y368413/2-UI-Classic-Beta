@@ -196,7 +196,7 @@ GameTooltip:HookScript("OnTooltipSetUnit",function(self)
 
 		if AddOn.IsBlacklistedUnit(unit) then self:AddLine(AddOn.Localization.UITweaksTooltip_Blacklisted,0.5,0.5,0.5); hasdata=true; end
 		if creaturekey then
-			if AddOn.UnitHasHealthData(unit) then self:AddLine(AddOn.Localization.UITweaksTooltip_HealthRecorded,0,1,0); hasdata=true; end
+			if AddOn.UnitHasHealthData(unit) then hasdata=true; end  --self:AddLine(AddOn.Localization.UITweaksTooltip_HealthRecorded,0,1,0);
 			if AddOn.HasHealthOverride(creaturekey) then self:AddLine(AddOn.Localization.UITweaksTooltip_HealthOverride,0.5,0.5,1); hasdata=true; end
 			if not hasdata then self:AddLine(AddOn.Localization.UITweaksTooltip_NoData,1,0,0); end
 		end
