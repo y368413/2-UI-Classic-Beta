@@ -73,6 +73,7 @@ end
 
 function BlinkHealth:OnEnable()
 	self:RegisterEvent("PLAYER_TARGET_CHANGED");
+  self:RegisterEvent("PLAYER_ENTERING_WORLD");
 	self:RegisterEvent("PLAYER_REGEN_DISABLED");
 	self:RegisterEvent("PLAYER_REGEN_ENABLED");
 
@@ -91,6 +92,10 @@ function BlinkHealth:PLAYER_TARGET_CHANGED()
 	self:UpdateUnitFrame();
 end
 
+function BlinkHealth:PLAYER_ENTERING_WORLD()
+    BlinkHealthTextPowerType = GetPowerType()
+    self:UpdateUnitFrame();
+end
 function BlinkHealth:PLAYER_REGEN_DISABLED()
 	self:UpdateUnitFrame();
 end

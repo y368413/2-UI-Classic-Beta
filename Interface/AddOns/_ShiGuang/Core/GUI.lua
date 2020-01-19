@@ -73,7 +73,7 @@ local defaultSettings = {
 		Enable = true,
 		ClickThrough = false,
 		IconScale = 1,
-		atchSpellRank = true,
+		WatchSpellRank = true,
 		DeprecatedAuras = false,
 		QuakeRing = false,
 	},
