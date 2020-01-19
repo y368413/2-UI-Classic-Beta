@@ -1,4 +1,4 @@
-﻿--## Author: Lars "Goldpaw" Norberg ## Version: 1.0.24
+﻿--## Author: Lars "Goldpaw" Norberg ## Version: 1.0
 
 -- Using the Combuctor way to retrieve names, namespaces and stuff
 local MODULE =  ...
@@ -21,7 +21,6 @@ local string_upper = string.upper
 local tonumber = tonumber
 
 -- WoW API
-local C_TransmogCollection = _G.C_TransmogCollection
 local CreateFrame = _G.CreateFrame
 local GetContainerItemInfo = _G.GetContainerItemInfo
 local GetDetailedItemLevelInfo = _G.GetDetailedItemLevelInfo 
@@ -33,8 +32,6 @@ local S_ITEM_BOUND1 = _G.ITEM_SOULBOUND
 local S_ITEM_BOUND2 = _G.ITEM_ACCOUNTBOUND
 local S_ITEM_BOUND3 = _G.ITEM_BNETACCOUNTBOUND
 local S_ITEM_LEVEL = "^" .. string_gsub(_G.ITEM_LEVEL, "%%d", "(%%d+)")
-local S_TRANSMOGRIFY_STYLE_UNCOLLECTED = _G.TRANSMOGRIFY_STYLE_UNCOLLECTED
-local S_TRANSMOGRIFY_TOOLTIP_APPEARANCE_UNKNOWN = _G.TRANSMOGRIFY_TOOLTIP_APPEARANCE_UNKNOWN
 local S_CONTAINER_SLOTS = "^" .. (string.gsub(string.gsub(CONTAINER_SLOTS, "%%([%d%$]-)d", "(%%d+)"), "%%([%d%$]-)s", "%.+"))
 
 -- Localization. 
@@ -50,33 +47,6 @@ end
 local Cache_ItemBind = {}
 local Cache_ItemGarbage = {}
 local Cache_ItemLevel = {}
-local Cache_Uncollected = {}
-
--- Flag tracking merchant frame visibility
-local MERCHANT_VISIBLE
-
--- Just keep this running, regardless of other stuff (?)
--- *might be conflicts with the standard Update function here. 
-local MerchantTracker = CreateFrame("Frame")
-MerchantTracker:RegisterEvent("MERCHANT_SHOW")
-MerchantTracker:RegisterEvent("MERCHANT_CLOSED")
-MerchantTracker:SetScript("OnEvent", function(self, event, ...) 
-	if (event == "MERCHANT_SHOW") then
-		MERCHANT_VISIBLE = true
-	elseif (event == "MERCHANT_CLOSED") then 
-		MERCHANT_VISIBLE = false
-	end
-	for button,ItemGarbage in pairs(Cache_ItemGarbage) do
-		local JunkIcon = button.JunkIcon
-		if JunkIcon then
-			if (MERCHANT_VISIBLE and ItemGarbage.showJunk) then 
-				JunkIcon:Show()
-			else 
-				JunkIcon:Hide()
-			end
-		end
-	end
-end)
 
 -----------------------------------------------------------
 -- Utility Functions
@@ -191,20 +161,20 @@ local Cache_GetItemGarbage = function(button)
 
 		ItemGarbage.tempLocked = true
 
-		local itemLink = button:GetItem()
-		if itemLink then 
-			local _, _, itemRarity, iLevel, _, _, _, _, itemEquipLoc = GetItemInfo(itemLink)
-			local texture, itemCount, locked, quality, readable, _, _, isFiltered, noValue, itemID = GetContainerItemInfo(button:GetBag(), button:GetID())
-		
-			local isBattlePet, battlePetLevel, battlePetRarity = GetBattlePetInfo(itemLink)
-			if isBattlePet then 
-				itemRarity = battlePetRarity
-			end
+			local itemLink = button:GetItem()
+			if itemLink then 
+				local _, _, itemRarity, iLevel, _, _, _, _, itemEquipLoc = GetItemInfo(itemLink)
+				local texture, itemCount, locked, quality, readable, _, _, isFiltered, noValue, itemID = GetContainerItemInfo(button:GetBag(), button:GetID())
+			
+				local isBattlePet, battlePetLevel, battlePetRarity = GetBattlePetInfo(itemLink)
+				if isBattlePet then 
+					itemRarity = battlePetRarity
+				end
 
-			if not(((quality and (quality > 0)) or (itemRarity and (itemRarity > 0))) and (not locked)) then
-				Icon:SetDesaturated(true)
-			end 
-		end
+				if not(((quality and (quality > 0)) or (itemRarity and (itemRarity > 0))) and (not locked)) then
+					Icon:SetDesaturated(true)
+				end 
+			end
 
 		ItemGarbage.tempLocked = false
 	end)
@@ -213,7 +183,6 @@ local Cache_GetItemGarbage = function(button)
 
 	return ItemGarbage
 end
-
 
 -----------------------------------------------------------
 -- Main Update
@@ -298,18 +267,18 @@ local Update = function(self)
 						if ItemLevel and (tonumber(ItemLevel) > 0) then
 							scannedLevel = ItemLevel
 						end
-					else
+					--else
 						-- Check line 3, some artifacts have the ilevel there
-						line = _G[ScannerTipName.."TextLeft3"]
-						if line then
-							local msg = line:GetText()
-							if msg and string_find(msg, S_ITEM_LEVEL) then
-								local ItemLevel = string_match(msg, S_ITEM_LEVEL)
-								if ItemLevel and (tonumber(ItemLevel) > 0) then
-									scannedLevel = ItemLevel
-								end
-							end
-						end
+						--line = _G[ScannerTipName.."TextLeft3"]
+						--if line then
+							--local msg = line:GetText()
+							--if msg and string_find(msg, S_ITEM_LEVEL) then
+								--local ItemLevel = string_match(msg, S_ITEM_LEVEL)
+								--if ItemLevel and (tonumber(ItemLevel) > 0) then
+									--scannedLevel = ItemLevel
+								--end
+							--end
+						--end
 					end
 				end
 			end
@@ -360,7 +329,7 @@ local Update = function(self)
 			if ItemGarbage then 
 				ItemGarbage.showJunk = showJunk
 			end 
-			if (MERCHANT_VISIBLE and showJunk) then 
+			if showJunk then 
 				JunkIcon:Show()
 			else
 				JunkIcon:Hide()
@@ -368,9 +337,6 @@ local Update = function(self)
 		end
 
 	else
-		if Cache_Uncollected[self] then 
-			Cache_Uncollected[self]:Hide()
-		end	
 		if Cache_ItemLevel[self] then
 			Cache_ItemLevel[self]:SetText("")
 		end
@@ -383,7 +349,7 @@ local Update = function(self)
 		end
 		local JunkIcon = self.JunkIcon
 		if JunkIcon then 
-			if (MERCHANT_VISIBLE and showJunk) then 
+			if showJunk then 
 				JunkIcon:Show()
 			else
 				JunkIcon:Hide()
@@ -392,6 +358,4 @@ local Update = function(self)
 	end	
 end 
 
-Module.OnEnable = function(self)
-	hooksecurefunc(Combuctor.ItemSlot, "Update", Update)
-end 
+hooksecurefunc(Combuctor.Item, "Update", Update)

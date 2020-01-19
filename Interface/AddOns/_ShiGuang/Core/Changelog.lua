@@ -16,11 +16,11 @@ local quest = {
 	 "5人小队的框架位置很不习惯.|cff3399FF        按着Shift拖小队的第一个队友框",
 	 "点击聊天框角色名称可实现:|cff3399FF     Shift-密语 Ctrl-邀请工会 Alt-组队邀请",
    "|cFF00DDFF如需改进和反馈，可以回帖或者在讨论组(n9PnFl0o)告诉我，谢谢。",
-   "-------------------------------2020-01-06----[怀旧]",
+   "-------------------------------"..GetAddOnMetadata("_ShiGuang", "X-StatsVersion").."----[怀旧]",
    "[修复]大地图Npc显示过滤保存失效的bug",
    "[修复]职业技能依赖物品计数失效的bug",
    "[更新]ClassicCastbars、LibClassicDurations和CharacterStatsClass",
-   "[插件]版本号升级为v 0.4.1",
+   "[插件]版本号升级为v "..GetAddOnMetadata("_ShiGuang", "Version"),
    "--------------------------over",
 }
 local story = {

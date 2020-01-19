@@ -4,7 +4,7 @@ local G = M:RegisterModule("GUI")
 
 local tonumber, tostring, pairs, ipairs, next, select, type = tonumber, tostring, pairs, ipairs, next, select, type
 local tinsert, format, strsplit = table.insert, string.format, string.split
-local r, g, b = I.r, I.g, I.b
+local cr, cg, cb = I.r, I.g, I.b
 local guiTab, guiPage, f, dataFrame = {}, {}
 
 -- Default Settings
@@ -31,6 +31,7 @@ local defaultSettings = {
 		Scale = 1,
 		BindType = 1,
 		OverrideWA = false,
+		MicroMenu = true,
 	},
 	Bags = {
 		Enable = true,
@@ -42,21 +43,25 @@ local defaultSettings = {
 		BagsiLvlcolor = false,
 		ReverseSort = true,
 		ItemFilter = true,
-		--ItemSetFilter = false,
+		ItemSetFilter = false,
 		DeleteButton = true,
 		FavouriteItems = {},
 		GatherEmpty = false,
 		SpecialBagsColor = true,
 		ShowNewItem = true,
+		SplitCount = 1,
+		SpecialBagsColor = false,
+		iLvlToShow = 1,
 	},
 	Auras = {
 		Reminder = true,
 		Totems = true,
 		DestroyTotems = true,
+		Statue = true,
 		BlinkComboHelper = true,
 		EnergyBar = true,
 		ClassRecourePlace = true,
-		ClassAuras = false,
+		ClassAuras = true,
 		ReverseBuffs = false,
 		BuffSize = 30,
 		BuffsPerRow = 16,
@@ -68,7 +73,9 @@ local defaultSettings = {
 		Enable = true,
 		ClickThrough = false,
 		IconScale = 1,
-		WatchSpellRank = true,
+		atchSpellRank = true,
+		DeprecatedAuras = false,
+		QuakeRing = false,
 	},
 	UFs = {
 		PlayerFrameScale = 0.9,
@@ -108,6 +115,7 @@ local defaultSettings = {
 	},
 	Nameplate = {
 		Enable = true,
+		Numberstyle = false,
 		ColorBorder = true,
 		PlayerAura = false,
 		maxAuras = 6,
@@ -167,8 +175,11 @@ local defaultSettings = {
 		Mail = true,
 		ItemLevel = true,
 		ShowItemLevel = true,
+		MissingStats = true,
 		HideErrors = true,
 		ExpRep = true,
+		Screenshot = true,
+		TradeTabs = true,
 		Interrupt = true,
 		OwnInterrupt = true,
 		InterruptSound = true,
@@ -193,13 +204,12 @@ local defaultSettings = {
 		PlacedItemAlert = false,
 		RareAlertInWild = false,
 		xMerchant = true,
+		InstantDelete = true,
 		RaidCD = true,
 		PulseCD = false,
 		SorasThreat = true,
 		EnhancedMenu = false,
 		AutoDismount = true,
-		TradeTabs = true,
-		InstantDelete = true,
 	},
 	Tutorial = {
 		Complete = false,
@@ -210,7 +220,6 @@ local accountSettings = {
 	ChatFilterList = "%*",
 	ChatFilterWhiteList = "",
 	Timestamp = false,
-	NameplateFilter = {[1]={}, [2]={}},
 	Changelog = {},
 	totalGold = {},
 	RepairType = 1,
@@ -232,6 +241,7 @@ local accountSettings = {
 	SystemInfoType = 1,
 	DisableInfobars = false,
 	ClassColorChat = true,
+	ContactList = {}
 }
 
 -- Initial settings
@@ -257,7 +267,7 @@ local function InitialSettings(source, target, fullClean)
 
 	for i, j in pairs(target) do
 		if source[i] == nil then target[i] = nil end
-		if type(j) == "table" and fullClean then
+		if fullClean and type(j) == "table" then
 			for k, v in pairs(j) do
 				if type(v) ~= "table" and source[i] and source[i][k] == nil then
 					target[i][k] = nil
@@ -290,6 +300,18 @@ end
 
 local function updateBagSortOrder()
 	SetSortBagsRightToLeft(not MaoRUISettingDB["Bags"]["ReverseSort"])
+end
+
+local function updateBagStatus()
+	M:GetModule("Bags"):UpdateAllBags()
+end
+
+local function updateActionbarScale()
+	M:GetModule("Actionbar"):UpdateAllScale()
+end
+
+local function updateReminder()
+	M:GetModule("Auras"):InitReminder()
 end
 
 local function updateChatSticky()
@@ -515,7 +537,7 @@ local optionList = {		-- type, key, value, name, horizon, horizon2, doubleline
 local function SelectTab(i)
 	for num = 1, #tabList do
 		if num == i then
-			guiTab[num]:SetBackdropColor(r, g, b, .3)
+			guiTab[num]:SetBackdropColor(cr, cg, cb, .3)
 			guiTab[num].checked = true
 			guiPage[num]:Show()
 		else
@@ -532,7 +554,7 @@ local function tabOnClick(self)
 end
 local function tabOnEnter(self)
 	if self.checked then return end
-	self:SetBackdropColor(r, g, b, .3)
+	self:SetBackdropColor(cr, cg, cb, .3)
 end
 local function tabOnLeave(self)
 	if self.checked then return end
@@ -541,7 +563,7 @@ end
 
 local function CreateTab(parent, i, name)
 	local tab = CreateFrame("Button", nil, parent)
-	tab:SetPoint("TOP", -270 + 90*(i-1), -116)
+	tab:SetPoint("TOP", -270 + 90*(i-1) + R.mult, -116)
 	tab:SetSize(90, 30)
 	M.CreateBD(tab, .3)
 	M.CreateFS(tab, 15, name, "system", "CENTER", 0, 0)
@@ -631,6 +653,7 @@ local function CreateOption(i)
 		-- Slider
 		elseif optType == 3 then
 			local min, max, step = unpack(data)
+			local decimal = step > 2 and 2 or step
 			local x, y
 			if horizon2 then
 				x, y = 460, -offset + 32
@@ -645,10 +668,14 @@ local function CreateOption(i)
 			s:SetScript("OnValueChanged", function(_, v)
 				local current = tonumber(format("%."..step.."f", v))
 				NDUI_VARIABLE(key, value, current)
-				s.value:SetText(current)
+				s.value:SetText(format("%."..decimal.."f", current))
 				if callback then callback() end
 			end)
-			s.value:SetText(format("%."..step.."f", NDUI_VARIABLE(key, value)))
+			s.value:SetText(format("%."..decimal.."f", NDUI_VARIABLE(key, value)))
+			if tooltip then
+				s.title = U["Tips"]
+				M.AddTooltip(s, "ANCHOR_RIGHT", tooltip, "info")
+			end
 		-- Dropdown
 		elseif optType == 4 then
 			local dd = M.CreateDropDown(parent, 143, 26, data)
@@ -698,10 +725,14 @@ local function CreateOption(i)
 		else
 			local l = CreateFrame("Frame", nil, parent)
 			l:SetPoint("TOPLEFT", 25, -offset - 12)
-			M.CreateGF(l, 560, R.mult, "Horizontal", 1, 1, 1, .25, .25)
+			M.CreateGF(l, 550, R.mult, "Horizontal", 1, 1, 1, .25, .25)
 			offset = offset + 32
 		end
 	end
+
+	local footer = CreateFrame("Frame", nil, parent)
+	footer:SetSize(20, 20)
+	footer:SetPoint("TOPLEFT", 25, -offset)
 end
 
 local bloodlustFilter = {
@@ -737,7 +768,7 @@ local function exportData()
 								end
 							end
 						end
-					elseif KEY == "Mover" or KEY == "InternalCD" then
+					elseif KEY == "Mover" or KEY == "InternalCD" or KEY == "AuraWatchMover" then
 						text = text..";"..KEY..":"..key
 						for _, v in ipairs(value) do
 							text = text..":"..tostring(v)
@@ -758,12 +789,9 @@ local function exportData()
 	end
 
 	for KEY, VALUE in pairs(MaoRUIDB) do
-		if KEY == "NameplateFilter" then
-			for index, value in pairs(VALUE) do
-				text = text..";ACCOUNT:"..KEY..":"..index
-				for spellID in pairs(value) do
-					text = text..":"..spellID
-				end
+		if KEY == "ContactList" then
+			for name, color in pairs(VALUE) do
+				text = text..";ACCOUNT:"..KEY..":"..name..":"..color
 			end
 		end
 	end
@@ -837,11 +865,9 @@ local function importData()
 			itemID = tonumber(itemID)
 			MaoRUISettingDB[key][spellID] = {spellID, duration, indicator, unit, itemID}
 		elseif key == "ACCOUNT" then
-			if value == "NameplateFilter" then
-				local spells = {select(4, strsplit(":", option))}
-				for _, spellID in next, spells do
-					MaoRUIDB[value][tonumber(arg1)][tonumber(spellID)] = true
-				end
+			if value == "ContactList" then
+				local name, r, g, b = select(3, strsplit(":", option))
+				MaoRUIDB["ContactList"][name] = r..":"..g..":"..b
 			end
 		elseif tonumber(arg1) then
 			if value == "DBMCount" then
@@ -948,7 +974,7 @@ local function OpenGUI()
 	f:SetSize(1280, 600)
 	f:SetPoint("CENTER")
 	f:SetFrameStrata("HIGH")
-	f:SetFrameLevel(5)
+	f:SetFrameLevel(10)
 	M.CreateMF(f)
 	M.CreateFS(f, 43, "2 UI", true, "TOP", 0, -62)
 	M.CreateFS(f, 21, "v"..I.Version, false, "TOP", 80, -80)
@@ -1056,8 +1082,6 @@ function G:OnLogin()
 		PlaySound(SOUNDKIT.IG_MAINMENU_OPTION)
 	end)
 end
-
-
 
 SlashCmdList["MAORUIGUI"] = OpenGUI
 SLASH_MAORUIGUI1 = '/mr'

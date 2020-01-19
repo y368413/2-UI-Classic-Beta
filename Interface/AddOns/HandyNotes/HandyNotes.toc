@@ -15,7 +15,6 @@
 ## X-Repple: 2 UI
 
 libs\LibUIDropDownMenu\LibUIDropDownMenu.xml
-libs\LibQTip-1.0\LibQTip-1.0.lua
 libs\HereBeDragons\HereBeDragons.xml
 
 # Locale files

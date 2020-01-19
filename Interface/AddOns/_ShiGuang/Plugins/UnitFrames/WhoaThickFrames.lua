@@ -212,32 +212,11 @@ targetFrameStatusText()
 	end
 end)]]
 
---[[	Player and target frames dead / ghost text.
--- hooksecurefunc("TextStatusBar_UpdateTextStringWithValues",function(self)
-hooksecurefunc("TextStatusBar_UpdateTextString",function(self)
-	if UnitIsDead("player") or UnitIsGhost("player") then
-		PlayerFrameHealthBar.TextString:SetFontObject(SystemFont_Small);
-		PlayerFrameHealthBar.TextString:SetTextColor(1.0,0.82,0,1);
-		PlayerFrameHealthBar.TextString:Show();
-	else
-			--PlayerFrameHealthBar.TextString:SetFontObject(SystemFont_Outline_Small);
-			PlayerFrameHealthBar.TextString:SetFontObject(TextStatusBarText);
-		PlayerFrameHealthBar.TextString:SetTextColor(1,1,1,1);
-	end
-	if UnitIsDead("player") then
-		PlayerFrameHealthBar.TextString:SetText(DEAD);
-	elseif UnitIsGhost("player") then
-		PlayerFrameHealthBar.TextString:SetText("Ghost");
-	end
-	if UnitIsGhost("target") then
-		TargetFrame.deadText:SetText("Ghost");
-		TargetFrame.deadText:Show();
-	end
-end)]]
 
 --	Player frame.
 local function playerFrame(self)
 		PlayerFrameTexture:SetTexture("Interface\\Addons\\_ShiGuang\\Media\\Modules\\UFs\\UI-TargetingFrame");
+		PlayerPVPIcon:SetTexture("Interface\\TargetingFrame\\UI-PVP-FFA");
 		PlayerStatusTexture:SetTexture("Interface\\AddOns\\_ShiGuang\\Media\\Modules\\UFs\\UI-Player-Status");
 	PlayerStatusTexture:ClearAllPoints();
 	PlayerStatusTexture:SetPoint("CENTER", PlayerFrame, "CENTER",16, 8);
@@ -354,6 +333,11 @@ hooksecurefunc("TargetFrame_CheckClassification", function(self, forceNormalText
 	self.deadText:SetPoint("TOPLEFT", self.healthbar, "TOPRIGHT", 12, -8)
 	self.unconsciousText:SetPoint("CENTER", self.manabar, "CENTER",0,0);
 	self.nameBackground:Hide();
+	if UnitIsCivilian(self.unit) then
+		self.name:SetTextColor(1.0,0,0);
+	else
+		self.name:SetTextColor(1.0,0.82,0,1);
+	end
 	-- self.threatIndicator:SetTexture("Interface\\TargetingFrame\\UI-TargetingFrame-Flash");
 	self.name:SetPoint("LEFT", self, 15, 36);
 	self.healthbar:SetSize(119, 28);
@@ -433,6 +417,12 @@ hooksecurefunc("TargetFrame_CheckClassification", function(self, forceNormalText
 				self.pvpIcon:SetTexture("Interface\\TargetingFrame\\UI-PVP-FFA");
 		elseif ( factionGroup and factionGroup ~= "Neutral" and UnitIsPVP(self.unit) ) then
 				self.pvpIcon:SetTexture("Interface\\TargetingFrame\\UI-PVP-"..factionGroup);
+		end
+		if (UnitIsCivilian(self.unit)) then
+				self.questIcon:SetTexture("Interface\\Addons\\_ShiGuang\\Media\\Modules\\UFs\\PortraitWarningBadge");
+			self.questIcon:Show();
+		else
+			self.questIcon:Hide();
 		end
 	end
 end)

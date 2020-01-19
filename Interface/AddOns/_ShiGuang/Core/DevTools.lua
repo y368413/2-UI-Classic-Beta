@@ -17,7 +17,7 @@ local strfind, format, strsplit = string.find, string.format, string.split
 local pairs, tonumber, tostring = pairs, tonumber, tostring
 local floor, ceil = math.floor, math.ceil
 
-local dev = {"烂柯人", "Helements"}
+local dev = {"风筝风灵风", "Helements"}
 local function isDeveloper()
 	for _, name in pairs(dev) do
 		if I.MyName == name then
@@ -26,7 +26,6 @@ local function isDeveloper()
 	end
 end
 I.isDeveloper = isDeveloper()
-
 
 SlashCmdList["NDUI_ENUMTIP"] = function()
 	local enumf = EnumerateFrames()

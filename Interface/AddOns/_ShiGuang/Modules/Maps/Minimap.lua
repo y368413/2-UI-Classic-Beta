@@ -50,7 +50,7 @@ function module:ReskinRegions()
 	-- Tracking icon
 	MiniMapTrackingFrame:SetScale(.7)
 	MiniMapTrackingFrame:ClearAllPoints()
-	MiniMapTrackingFrame:SetPoint("BOTTOMLEFT", Minimap, 0, 5)
+	MiniMapTrackingFrame:SetPoint("TOPLEFT", Minimap, 0, 3)
 	MiniMapTrackingBorder:Hide()
 	MiniMapTrackingIcon:SetTexCoord(unpack(I.TexCoord))
 	local bg = M.CreateBG(MiniMapTrackingIcon)

@@ -38,9 +38,7 @@ function module:AddNewAuraWatch(class, list)
 				local name = GetSpellInfo(spellID)
 				if not name then
 					wipe(v)
-					--if I.isDeveloper then
-						print(format("|cffFF0000XXX:|r '%s' %s", class, spellID))
-					--end
+					if I.isDeveloper then print(format("|cffFF0000XXX:|r '%s' %s", class, spellID)) end
 				end
 			end
 		end

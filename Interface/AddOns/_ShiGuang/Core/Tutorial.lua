@@ -11,10 +11,11 @@ print("--------------- 有你们的魔兽,才是世界 -->>>")
 
 -- Tuitorial
 local function DefaultSettings()
-	SetCVar("scriptErrors", 1)     --0是屏蔽错误1是不屏蔽错误 
+	SetCVar("scriptErrors", 1)     --0是屏蔽错误1是不屏蔽错误
+	SetCVar("autoQuestWatch", 1)  
 	SetCVar("alwaysCompareItems", 1)
 	SetCVar("synchronizeSettings", 1)
-  SetCVar("synchronizeMacros", 1)
+	SetCVar("synchronizeMacros", 1)
 	SetCVar("ShowClassColorInNameplate", 1)
 	SetCVar("screenshotQuality", 10)
 	SetCVar("showTutorials", 0)
@@ -32,13 +33,17 @@ local function ForceDefaultSettings()
 	SetCVar("lootUnderMouse", 1)
 	SetCVar("autoSelfCast", 1)
 	SetCVar("nameplateShowEnemies", 1)
+	SetCVar("nameplateShowSelf", 0)
 	SetCVar("nameplateShowAll", 1)
 	SetCVar("nameplateMotion", 1)
 	SetCVar("nameplateShowFriendlyNPCs", 0)
 	SetCVar("ActionButtonUseKeyDown", 1)
-	SetCVar("alwaysShowActionBars", 1)
+	--SetCVar("alwaysShowActionBars", 1)
 	SetCVar("lockActionBars", 1)
-	SetActionBarToggles(1, 1, 1, 1)
+	SetActionBarToggles(1, 1, 0, 0)
+	SHOW_MULTI_ACTIONBAR_1="1" --左下方动作条 
+  SHOW_MULTI_ACTIONBAR_2="1" --右下方动作条 
+  --InterfaceOptions_UpdateMultiActionBars() --刷新动作条
 	SetCVar("enableFloatingCombatText", 0)
 	SetCVar("floatingCombatTextCombatState", 0)
 	SetCVar("floatingCombatTextCombatDamage", 0)
@@ -65,7 +70,6 @@ local function ForceDefaultSettings()
   SetCVar("floatingCombatTextAuras", 0)   --光環 
 	SetCVar("doNotFlashLowHealthWarning", 1)
 	SetCVar("ffxGlow", 0)
-	SetCVar("autoQuestWatch", 1)
 	--SetCVar("cameraYawMoveSpeed", 360); -- Maximum in-game: 270
 	SetCVar("statusText",1) --状态文字
 	SetCVar("statusTextDisplay","NUMERIC")--头像状态文字形式："NUMERIC"数值"PERCENT"百分比"BOTH"同时显示
@@ -73,7 +77,8 @@ local function ForceDefaultSettings()
 end
 
 local function ForceRaidFrame()
-	if not CompactUnitFrameProfiles.selectedProfile then return end
+		--CompactRaidFrameContainer:SetScale(0.85)
+	if not CompactUnitFrameProfiles then return end
 	SetRaidProfileOption(CompactUnitFrameProfiles.selectedProfile, "useClassColors", true) --显示职业颜色
 	SetRaidProfileOption(CompactUnitFrameProfiles.selectedProfile, "displayPowerBar", false) --显示能量条 
 	SetRaidProfileOption(CompactUnitFrameProfiles.selectedProfile, "displayBorder", false) --显示边框
@@ -275,7 +280,7 @@ local function ForceBigwigs()
 			["BigWigs_Plugins_Bars"] = {
 				["profiles"] = {
 					["Default"] = {
-						["outline"] = "OUTLINE",
+						["outline"] = I.Font[3],
 						["fontSize"] = 12,
 						["BigWigsAnchor_y"] = 336,
 						["BigWigsAnchor_x"] = 20,
@@ -358,23 +363,23 @@ end
 -- Tutorial
 local function YesTutor()
 	  DefaultSettings()
-	  ForceDefaultSettings()
-	  ForceRaidFrame()
-	  ForceChatSettings()
+			ForceDefaultSettings()
+			ForceRaidFrame()
+			ForceChatSettings()
 	  --MaoRUIDB["LockUIScale"] = true
 	  SetupUIScale()
-	  MaoRUIDB["DBMRequest"] = true
-	  MaoRUIDB["SkadaRequest"] = true
-	  MaoRUIDB["BWRequest"] = true
-	  ForceAddonSkins()
+			MaoRUIDB["DBMRequest"] = true
+			MaoRUIDB["SkadaRequest"] = true
+			MaoRUIDB["BWRequest"] = true
+			ForceAddonSkins()
 			MaoRUIDB["ResetDetails"] = true
-		MaoRUISettingDB["Tutorial"]["Complete"] = true
+			MaoRUISettingDB["Tutorial"]["Complete"] = true
 end
 
 local welcome
 local function HelloWorld()
 	if welcome then welcome:Show() return end
-	local BackDropFile = "Interface\\Addons\\_ShiGuang\\Media\\Modules\\Raid\\solid"
+	local BackDropFile = "Interface\\Addons\\_ShiGuang\\Media\\Modules\\Raid\\Solid"
 	welcome = CreateFrame("Frame", "UI_Tutorial", UIParent)
 	welcome:SetPoint("TOPLEFT",0,0)
 	welcome:SetPoint("BOTTOMRIGHT",0,0)
@@ -443,7 +448,7 @@ local function HelloWorld()
 		ShiGuangPerDB["BHT"] = false
 		ReloadUI()
   end)
-	SmallText1 = M:CreatStyleText(LeftPic, STANDARD_TEXT_FONT, 16, "OUTLINE", "[ Classic v "..GetAddOnMetadata("_ShiGuang", "Version").." ]", "LEFT",RightPic,"RIGHT",-26,60, I.r, I.g, I.b)
+	SmallText1 = M:CreatStyleText(LeftPic, STANDARD_TEXT_FONT, 16, "OUTLINE", "[ Classic " ..GetAddOnMetadata("_ShiGuang", "X-Support").. " v "..GetAddOnMetadata("_ShiGuang", "Version").." ]", "LEFT",RightPic,"RIGHT",-26,60, I.r, I.g, I.b)
 	SmallText2 = M:CreatStyleText(LeftPic, STANDARD_TEXT_FONT, 16, "OUTLINE", "[ https://www.maorui.net ]", "LEFT",RightPic,"RIGHT",-26,20, I.r, I.g, I.b)
 	SmallText3 = M:CreatStyleText(LeftPic, STANDARD_TEXT_FONT, 16, "OUTLINE", "[ 鼠标右键点击小地图便捷插件设置 ]", "LEFT",RightPic,"RIGHT",-26,-20, I.r, I.g, I.b)
 	SmallText4 = M:CreatStyleText(LeftPic, STANDARD_TEXT_FONT, 16, "OUTLINE", "[ 系统自带功能，插件有针对性增强或者删减 ]", "LEFT",RightPic,"RIGHT",-26,-60, I.r, I.g, I.b)
@@ -512,7 +517,6 @@ function module:OnLogin()
 	M:RegisterEvent("UI_SCALE_CHANGED", SetupUIScale)
 	DefaultSettings()
 	ForceAddonSkins()
-	
 	if not MaoRUISettingDB["Tutorial"]["Complete"] then HelloWorld() end
 			
 	if (ShiGuangPerDB["BHT"] == true) then

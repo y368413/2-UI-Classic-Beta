@@ -57,6 +57,10 @@ function Brother:UpdateData()
 		self:PLAYER_EQUIPMENT_CHANGED(i)
 	end
 
+	if HasKey and HasKey() then
+		self:BAG_UPDATE(KEYRING_CONTAINER)
+	end
+
 	self:GUILD_ROSTER_UPDATE()
 	self:PLAYER_MONEY()
 end
@@ -70,24 +74,16 @@ function Brother:RemoveEvent(event)
 end
 
 -------------------------------------------------------------
-local EquipmentSlots = INVSLOT_LAST_EQUIPPED
-local BagSlots = NUM_BAG_SLOTS
-local BankSlots = NUM_BANKBAGSLOTS
-local VaultSlots = 80 * 2
 
-local FirstBankSlot = 1 + BagSlots
-local LastBankSlot = BankSlots + BagSlots
-local Backpack = BACKPACK_CONTAINER
-local Bank = BANK_CONTAINER
-local Reagents = REAGENTBANK_CONTAINER
-
+local NUM_VAULT_SLOTS = 80 * 2
+local FIRST_BANK_SLOT = 1 + NUM_BAG_SLOTS
+local LAST_BANK_SLOT = NUM_BANKBAGSLOTS + NUM_BAG_SLOTS
 
 --[[ Continuous Events ]]--
 
 function BagBrother:BAG_UPDATE(bag)
-	local isBag = bag > Bank and bag <= BagSlots
-	if isBag then
-  		self:SaveBag(bag, bag == Backpack)
+	if bag <= NUM_BAG_SLOTS then
+  	self:SaveBag(bag, bag <= BACKPACK_CONTAINER, bag == KEYRING_CONTAINER and HasKey and HasKey())
 	end
 end
 
@@ -108,15 +104,15 @@ end
 
 function BagBrother:BANKFRAME_CLOSED()
 	if self.atBank then
-		for i = FirstBankSlot, LastBankSlot do
+		for i = FIRST_BANK_SLOT, LAST_BANK_SLOT do
 			self:SaveBag(i)
 		end
 
-		if Reagents and IsReagentBankUnlocked() then
-			self:SaveBag(Reagents, true)
+		if REAGENTBANK_CONTAINER and IsReagentBankUnlocked() then
+			self:SaveBag(REAGENTBANK_CONTAINER, true)
 		end
 
-		self:SaveBag(Bank, true)
+		self:SaveBag(BANK_CONTAINER, true)
 		self.atBank = nil
 	end
 end
@@ -133,7 +129,7 @@ function BagBrother:VOID_STORAGE_CLOSE()
 		self.Player.vault = {}
 		self.atVault = nil
 
-		for i = 1, VaultSlots do
+		for i = 1, NUM_VAULT_SLOTS do
 			local id = GetVoidItemInfo(1, i)
     		self.Player.vault[i] = id and tostring(id) or nil
   		end
@@ -185,17 +181,29 @@ end
 
 --------------------------------------------------------------------
 
-function BagBrother:SaveBag(bag, onlyItems)
+function BagBrother:SaveBag(bag, onlyItems, saveSize)
 	local size = GetContainerNumSlots(bag)
 	if size > 0 then
 		local items = {}
+		local pets = {}
 		for slot = 1, size do
-			local _, count, _,_,_,_, link = GetContainerItemInfo(bag, slot)
+			local _, count, _, _, _, _, link = GetContainerItemInfo(bag, slot)
+			if link then
+				local itemID = tonumber(link:match("item:(%d+)"))
+				if itemID == nil then
+					local _, speciesID, level, breedQuality, maxHealth, power, speed, battlePetID = strsplit(":", link)
+					if speciesID then
+						count = 1
+					end
+				end
+			end
 			items[slot] = self:ParseItem(link, count)
 		end
 
 		if not onlyItems then
 			self:SaveEquip(ContainerIDToInventoryID(bag), size)
+		elseif saveSize then
+			items.size = size
 		end
 
 		self.Player[bag] = items
@@ -217,7 +225,7 @@ function BagBrother:ParseItem(link, count)
 		if id == 0 and TradeSkillFrame then
 			local focus = GetMouseFocus():GetName()
 
-			if focus == 'TradeSkillSkillIcon' then 
+			if focus == 'TradeSkillSkillIcon' then
 				link = GetTradeSkillItemLink(TradeSkillFrame.selectedSkill)
 			else
 				local i = focus:match('TradeSkillReagent(%d+)')
@@ -232,7 +240,7 @@ function BagBrother:ParseItem(link, count)
 		else
 			link = link:match('|H%l+:([%d:]+)')
 		end
-		
+
 		if count and count > 1 then
 			link = link .. ';' .. count
 		end
@@ -313,9 +321,19 @@ end
 --[[ Bags ]]--
 
 function Interface:GetBag(realm, player, bag)
-  local slot = tonumber(bag) and bag > 0 and ContainerIDToInventoryID(bag)
-  if slot then
-    return Interface:GetItem(realm, player, 'equip', slot)
+  if tonumber(bag) then
+    local slot = bag > 0 and ContainerIDToInventoryID(bag)
+    if slot then
+      return Interface:GetItem(realm, player, 'equip', slot)
+    else
+      realm = BrotherBags[realm]
+      player = realm and realm[player]
+      bag = player and player[bag]
+
+      return bag and {
+        owned = true,
+        count = bag.size }
+    end
   end
 end
 
