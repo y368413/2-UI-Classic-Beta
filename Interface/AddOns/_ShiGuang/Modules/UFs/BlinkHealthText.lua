@@ -19,7 +19,6 @@ local WARLOCK       = 9
 local MONK          = 10
 local DRUID         = 11
 local DEMONHUNTER   = 12
-
 local fntBig = CreateFont("SIFontBig");
 fntBig:SetFont(STANDARD_TEXT_FONT, 22, "THICKOUTLINE");
 
@@ -54,6 +53,22 @@ BlinkHealth.digitTexCoords = {
 	["texWidth"] = 512,
 	["texHeight"] = 128
 };
+
+BlinkHealth.powerColor = {
+	AMMOSLOT = {0.8, 0.6, 0},
+	ENERGY = {1, 1, 0},
+	FOCUS = {1, 0.5, 0.25},
+	FUEL = {0, 0.55, 0.5},
+	HAPPINESS = {0, 1, 1},
+	MANA = {0.31, 0.45, 0.63},
+	RAGE = {0.69, 0.31, 0.31},
+	RUNES = {0.55, 0.57, 0.61},
+	RUNIC_POWER = {0, 0.82, 1},
+  FURY = {0.788, 0.259, 0.992},
+	PAIN = {0, 0.82, 1},
+  INSANITY = {0.40, 0, 0.80}, -- PowerBarColor
+};
+
 BlinkHealth.classColor = {};
 do
     for k, v in pairs(RAID_CLASS_COLORS) do
@@ -93,9 +108,9 @@ function BlinkHealth:PLAYER_TARGET_CHANGED()
 end
 
 function BlinkHealth:PLAYER_ENTERING_WORLD()
-    BlinkHealthTextPowerType = GetPowerType()
     self:UpdateUnitFrame();
 end
+
 function BlinkHealth:PLAYER_REGEN_DISABLED()
 	self:UpdateUnitFrame();
 end

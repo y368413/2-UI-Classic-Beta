@@ -19,6 +19,7 @@ local quest = {
    "-------------------------------"..GetAddOnMetadata("_ShiGuang", "X-StatsVersion").."----[怀旧]",
    "[修复]简易头像刷新问题",
    "[修复]背包无法正常显示钥匙链问题",
+   "[移除]XD快捷键形态切换(因导致后台污染)",
    "[更新]ClassicCastbars、LibClassicDurations和CharacterStatsClass",
    "[插件]版本号升级为v "..GetAddOnMetadata("_ShiGuang", "Version"),
    "--------------------------over",

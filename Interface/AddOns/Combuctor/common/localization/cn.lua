@@ -7,8 +7,8 @@ local L = LibStub('AceLocale-3.0'):NewLocale(ADDON, 'zhCN')
 if not L then return end
 
 --keybindings
-L.ToggleBags = '切换背包'
-L.ToggleBank = '切换银行'
+L.ToggleBags = '    切换背包'
+L.ToggleBank = '    切换银行'
 L.ToggleGuild = '切换公会银行'
 L.ToggleVault = '切换虚空仓库'
 
