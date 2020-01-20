@@ -1,4 +1,4 @@
---## Author: Wardz ## Version: v1.2.2
+--## Author: Wardz ## Version: v1.2.3
 local ClassicCastbars = {}
 local PoolManager = {}
 ClassicCastbars.PoolManager = PoolManager
@@ -180,8 +180,8 @@ function AnchorManager:GetAnchor(unitID)
         return cache[unitID]
     end
 
-    if unitID == "player" then
-        -- special case for player casting bar
+    if unitID == "player" or unitID == "focus" then
+        -- special case for player/focus casting bar
         return UIParent
     end
 
@@ -1769,7 +1769,6 @@ ClassicCastbars.pushbackBlacklist = {
     [GetSpellInfo(19769)] = 1,      -- Thorium Grenade
     [GetSpellInfo(13278)] = 1,      -- Gnomish Death Ray
     [GetSpellInfo(20589)] = 1,      -- Escape Artist
-    [GetSpellInfo(20549)] = 1,      -- War Stomp
 }
 
 -- Casts that should be stopped on damage received
@@ -1996,6 +1995,34 @@ ClassicCastbars.defaultConfig = {
         frameLevel = 10,
         statusBackgroundColor = { 0, 0, 0, 0.535 },
     },
+
+    focus = {
+        enabled = true,
+        width = 150,
+        height = 15,
+        iconSize = 16,
+        showCastInfoOnly = false,
+        showTimer = false,
+        showIcon = true,
+        autoPosition = false,
+        castFont = _G.STANDARD_TEXT_FONT,
+        castFontSize = 10,
+        castStatusBar = "Interface\\TargetingFrame\\UI-StatusBar",
+        castBorder = "Interface\\CastingBar\\UI-CastingBar-Border-Small",
+        hideIconBorder = false,
+        position = { "TOPLEFT", 275, -260 },
+        iconPositionX = -5,
+        iconPositionY = 0,
+        borderColor = { 1, 1, 1, 1 },
+        statusColor = { 1, 0.7, 0, 1 },
+        statusColorChannel = { 0, 1, 0, 1 },
+        textColor = { 1, 1, 1, 1 },
+        textPositionX = 6,
+        textPositionY = -1,
+        frameLevel = 10,
+        statusBackgroundColor = { 0, 0, 0, 0.535 },
+    },
+
     party = {
         enabled = true,
         width = 120,
@@ -2100,6 +2127,7 @@ local BLINDING_LIGHT = GetSpellInfo(23733)
 local BERSERKING = GetSpellInfo(20554)
 
 function addon:CheckCastModifier(unitID, cast)
+    if unitID == "focus" then return end
     if not self.db.pushbackDetect or not cast then return end
     if cast.unitGUID == self.PLAYER_GUID then return end -- modifiers already taken into account with CastingInfo()
     if unaffectedCastModsSpells[cast.spellID] then return end
@@ -2269,6 +2297,29 @@ function addon:CastPushback(unitGUID)
     end
 end
 
+SLASH_CCFOCUS1 = "/focus"
+SLASH_CCFOCUS2 = "/castbarfocus"
+SlashCmdList["CCFOCUS"] = function()
+    local tarGUID = UnitGUID("target")
+    if tarGUID then
+        activeGUIDs.focus = tarGUID
+        addon:StopCast("focus", true)
+        addon:StartCast(tarGUID, "focus")
+        addon:SetFocusDisplay(UnitName("target"))
+    else
+        SlashCmdList["CCFOCUSCLEAR"]()
+    end
+end
+
+SLASH_CCFOCUSCLEAR1 = "/clearfocus"
+SlashCmdList["CCFOCUSCLEAR"] = function()
+    if activeGUIDs.focus then
+        activeGUIDs.focus = nil
+        addon:StopCast("focus", true)
+        addon:SetFocusDisplay(nil)
+    end
+end
+
 local function GetSpellCastInfo(spellID)
     local _, _, icon, castTime = GetSpellInfo(spellID)
     if not castTime then return end
@@ -2326,6 +2377,7 @@ function addon:PLAYER_ENTERING_WORLD(isInitialLogin)
     wipe(activeTimers)
     wipe(activeFrames)
     PoolManager:GetFramePool():ReleaseAll() -- also wipes castbar._data
+    self:SetFocusDisplay(nil)
 
     if self.db.party.enabled and IsInGroup() then
         self:GROUP_ROSTER_UPDATE()
@@ -2614,12 +2666,14 @@ addon:SetScript("OnUpdate", function(self, elapsed)
         if refresh < 0 then
             if next(activeGUIDs) then
                 for unitID, unitGUID in pairs(activeGUIDs) do
-                    local cast = activeTimers[unitGUID]
-                    -- Only stop cast for players since some mobs runs while casting, also because
-                    -- of lag we have to only stop it if the cast has been active for atleast 0.25 sec
-                    if cast and cast.isPlayer and currTime - cast.timeStart > 0.25 then
-                        if not castStopBlacklist[cast.spellName] and GetUnitSpeed(unitID) ~= 0 then
-                            self:DeleteCast(unitGUID)
+                    if unitID ~= "focus" then
+                        local cast = activeTimers[unitGUID]
+                        -- Only stop cast for players since some mobs runs while casting, also because
+                        -- of lag we have to only stop it if the cast has been active for atleast 0.25 sec
+                        if cast and cast.isPlayer and currTime - cast.timeStart > 0.25 then
+                            if not castStopBlacklist[cast.spellName] and GetUnitSpeed(unitID) ~= 0 then
+                                self:DeleteCast(unitGUID)
+                            end
                         end
                     end
                 end
@@ -2676,6 +2730,7 @@ local min = _G.math.min
 local max = _G.math.max
 local ceil = _G.math.ceil
 local UnitExists = _G.UnitExists
+local InCombatLockdown = _G.InCombatLockdown
 
 function addon:GetCastbarFrame(unitID)
     -- PoolManager:DebugInfo()
@@ -3008,4 +3063,104 @@ function addon:SkinPlayerCastbar()
 
     self:SetCastbarStyle(CastingBarFrame, nil, db)
     self:SetCastbarFonts(CastingBarFrame, nil, db)
+end
+
+function addon:CreateOrUpdateSecureFocusButton(text)
+    if not self.FocusButton then
+        -- Create an invisible secure click trigger above the nonsecure castbar frame
+        self.FocusButton = CreateFrame("Button", "FocusCastbar", nil, "SecureActionButtonTemplate")
+        self.FocusButton:SetAttribute("type", "macro")
+        --self.FocusButton:SetAllPoints(self.FocusFrame)
+        --self.FocusButton:SetSize(ClassicCastbarsDB.focus.width + 5, ClassicCastbarsDB.focus.height + 35)
+    end
+
+    local db = ClassicCastbarsDB.focus
+    self.FocusButton:SetPoint(db.position[1], UIParent, db.position[2], db.position[3])
+    self.FocusButton:SetSize(db.width + 5, db.height + 35)
+
+    self.FocusButton:SetAttribute("macrotext", "/targetexact " .. text)
+    self.FocusFrame.Text:SetText(text)
+end
+
+local NewTimer = _G.C_Timer.NewTimer
+local focusTargetTimer
+local focusTargetResetTimer
+
+function addon:SetFocusDisplay(text)
+    if focusTargetTimer and not focusTargetTimer:IsCancelled() then
+        focusTargetTimer:Cancel()
+        focusTargetTimer = nil
+    end
+    if focusTargetResetTimer and not focusTargetResetTimer:IsCancelled() then
+        focusTargetResetTimer:Cancel()
+        focusTargetResetTimer = nil
+    end
+
+    if not text then -- clear focus
+        if self.FocusFrame then
+            self.FocusFrame.Text:SetText("")
+        end
+
+        if self.FocusButton then
+            if not InCombatLockdown() then
+                self.FocusButton:SetAttribute("macrotext", "")
+            else
+                -- If we're in combat try to check every 4s if we left combat and can update secure frame
+                local function ClearFocusTarget()
+                    if not InCombatLockdown() then
+                        addon.FocusButton:SetAttribute("macrotext", "")
+                    else
+                        focusTargetResetTimer = NewTimer(4, ClearFocusTarget)
+                    end
+                end
+                focusTargetResetTimer = NewTimer(4, ClearFocusTarget)
+            end
+        end
+
+        return
+    end
+
+    if not self.FocusFrame then
+        -- Create a new unsecure frame to display focus text. We dont reuse the castbar frame as we want to
+        -- display this text even when the castbar is hidden
+        self.FocusFrame = CreateFrame("Frame", nil, UIParent)
+        self.FocusFrame:SetSize(ClassicCastbarsDB.focus.width + 5, ClassicCastbarsDB.focus.height + 35)
+        self.FocusFrame.Text = self.FocusFrame:CreateFontString(nil, "ARTWORK", "GameFontNormalLargeOutline")
+        self.FocusFrame.Text:SetPoint("CENTER", self.FocusFrame, 0, 20)
+    end
+
+    if UnitIsPlayer("target") then
+        self.FocusFrame.Text:SetTextColor(RAID_CLASS_COLORS[select(2, UnitClass("target"))]:GetRGBA())
+    else
+        self.FocusFrame.Text:SetTextColor(1, 0.819, 0, 1)
+    end
+
+    local isInCombat = InCombatLockdown()
+    if not isInCombat then
+        self:CreateOrUpdateSecureFocusButton(text)
+    else
+        -- If we're in combat try to check every 4s if we left combat and can update secure frame
+        local function UpdateFocusTarget()
+            if not InCombatLockdown() then
+                addon:CreateOrUpdateSecureFocusButton(text)
+            else
+                focusTargetTimer = NewTimer(4, UpdateFocusTarget)
+            end
+        end
+
+        focusTargetTimer = NewTimer(4, UpdateFocusTarget)
+    end
+
+    -- HACK: quickly create the focus castbar if it doesnt exist and hide it.
+    -- This is just to make anchoring easier for self.FocusFrame on first usage
+    if not activeFrames.focus then
+        local pos = ClassicCastbarsDB.focus.position
+        local castbar = self:GetCastbarFrame("focus")
+        castbar:ClearAllPoints()
+        castbar:SetParent(UIParent)
+        castbar:SetPoint(pos[1], UIParent, pos[2], pos[3])
+    end
+
+    self.FocusFrame.Text:SetText(isInCombat and text .. " (|cffff0000P|r)" or text)
+    self.FocusFrame:SetPoint("CENTER", activeFrames.focus, 0, 0)
 end
