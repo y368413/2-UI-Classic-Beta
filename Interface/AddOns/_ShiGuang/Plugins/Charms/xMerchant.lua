@@ -867,7 +867,7 @@ end
 xMerchant_InitItemsButtons()
 
 hooksecurefunc("MerchantFrame_Update", function()
-	if ( MerchantFrame.selectedTab == 1 ) and MaoRUISettingDB["Misc"]["xMerchant"] then
+	if ( MerchantFrame.selectedTab == 1 ) and MaoRUIDB["Misc"]["xMerchant"] then
 		for i=1, 12, 1 do _G["MerchantItem"..i]:Hide(); end
 		frame:Show();
 		--CurrencyUpdate();
@@ -889,4 +889,4 @@ hooksecurefunc("MerchantFrame_Update", function()
 	end
 end);
 
-hooksecurefunc("MerchantFrame_OnHide", function() if MaoRUISettingDB["Misc"]["xMerchant"] then wipe(errors); wipe(currencies); end end);
+hooksecurefunc("MerchantFrame_OnHide", function() if MaoRUIDB["Misc"]["xMerchant"] then wipe(errors); wipe(currencies); end end);

@@ -4,7 +4,7 @@ local _, ns = ...
 local M, R, U, I = unpack(ns)
 local MISC = M:GetModule("Misc")
 function MISC:WallpaperKit()
-if not MaoRUISettingDB["Misc"]["WallpaperKit"] then return end
+if not MaoRUIDB["Misc"]["WallpaperKit"] then return end
 local WallpaperKitcfg = {}
 -- DISPLAY
 WallpaperKitcfg.show = {

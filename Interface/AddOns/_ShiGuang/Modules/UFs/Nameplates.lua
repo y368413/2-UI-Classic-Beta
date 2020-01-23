@@ -5,7 +5,7 @@ local LCD = I.LibClassicDurations
 -- Auras
 local function CreateAuraIcon(parent)
 	local button = CreateFrame("Frame", nil, parent)
-	button:SetSize(MaoRUISettingDB["Nameplate"]["AuraSize"], MaoRUISettingDB["Nameplate"]["AuraSize"])
+	button:SetSize(MaoRUIDB["Nameplate"]["AuraSize"], MaoRUIDB["Nameplate"]["AuraSize"])
 	M.CreateSD(button, 3, 3)
 
 	button.icon = button:CreateTexture(nil, "OVERLAY", nil, 3)
@@ -29,7 +29,7 @@ local function UpdateAuraIcon(button, unit, index, filter, customIcon)
 	button.spellID = spellID
 
 	local color = DebuffTypeColor[debuffType] or DebuffTypeColor.none
-	if MaoRUISettingDB["Nameplate"]["ColorBorder"] then
+	if MaoRUIDB["Nameplate"]["ColorBorder"] then
 		button.Shadow:SetBackdropBorderColor(color.r, color.g, color.b)
 	else
 		button.Shadow:SetBackdropBorderColor(0, 0, 0)
@@ -59,15 +59,15 @@ end
 local function AuraFilter(caster, spellID, unit)
 	if caster == "player" then
 		--1:none, 2:all, 3:white, 4:black, 5:aurawatch
-		if MaoRUISettingDB["Nameplate"]["AuraFilter"] == 1 then
+		if MaoRUIDB["Nameplate"]["AuraFilter"] == 1 then
 			return false
-		elseif MaoRUISettingDB["Nameplate"]["AuraFilter"] == 2 then
+		elseif MaoRUIDB["Nameplate"]["AuraFilter"] == 2 then
 			return true
-		elseif MaoRUISettingDB["Nameplate"]["AuraFilter"] == 3 and R.WhiteList[spellID] then
+		elseif MaoRUIDB["Nameplate"]["AuraFilter"] == 3 and R.WhiteList[spellID] then
 			return true
-		elseif MaoRUISettingDB["Nameplate"]["AuraFilter"] == 4 and not R.BlackList[spellID] then
+		elseif MaoRUIDB["Nameplate"]["AuraFilter"] == 4 and not R.BlackList[spellID] then
 			return true
-		elseif MaoRUISettingDB["Nameplate"]["AuraFilter"] == 5 then
+		elseif MaoRUIDB["Nameplate"]["AuraFilter"] == 5 then
 			local auraList = R.AuraWatchList[I.MyClass]
 			if auraList then
 				for _, value in pairs(auraList) do
@@ -83,9 +83,9 @@ local function AuraFilter(caster, spellID, unit)
 		end
 	else
 		--1:none, 2:white
-		if MaoRUISettingDB["Nameplate"]["OtherFilter"] == 1 then
+		if MaoRUIDB["Nameplate"]["OtherFilter"] == 1 then
 			return false
-		elseif MaoRUISettingDB["Nameplate"]["OtherFilter"] == 2 and R.WhiteList[spellID] then
+		elseif MaoRUIDB["Nameplate"]["OtherFilter"] == 2 and R.WhiteList[spellID] then
 			return true
 		end
 	end
@@ -96,7 +96,7 @@ local function UpdateBuffs(unitFrame)
 	local iconsFrame = unitFrame.iconsFrame
 
 	if not iconsFrame or not unit then return end
-	if UnitIsUnit(unit, "player") and not MaoRUISettingDB["Nameplate"]["PlayerAura"] then
+	if UnitIsUnit(unit, "player") and not MaoRUIDB["Nameplate"]["PlayerAura"] then
 		iconsFrame:Hide()
 		return
 	else
@@ -105,7 +105,7 @@ local function UpdateBuffs(unitFrame)
 
 	local i = 1
 	for index = 1, 15 do
-		if i <= MaoRUISettingDB["Nameplate"]["maxAuras"] then
+		if i <= MaoRUIDB["Nameplate"]["maxAuras"] then
 			local name, _, _, _, _, _, caster, _, _, spellID = LCD:UnitAura(unit, index, "HELPFUL")
 			local matchbuff, customIcon = AuraFilter(caster, spellID, unit)
 			if name and matchbuff then
@@ -126,7 +126,7 @@ local function UpdateBuffs(unitFrame)
 	end
 
 	for index = 1, 20 do
-		if i <= MaoRUISettingDB["Nameplate"]["maxAuras"] then
+		if i <= MaoRUIDB["Nameplate"]["maxAuras"] then
 			local name, _, _, _, _, _, caster, _, _, spellID = LCD:UnitAura(unit, index, "HARMFUL")
 			local matchdebuff, customIcon = AuraFilter(caster, spellID, unit)
 			if name and matchdebuff then
@@ -208,7 +208,7 @@ local function UpdateHealth(unitFrame)
 	local p = minHealth/maxHealth * 100
 	unitFrame.healthBar:SetValue(p/100)
 
-	if MaoRUISettingDB["Nameplate"]["Figure"] and RealMobHealth and RealMobHealth.UnitHasHealthData(unit) then
+	if MaoRUIDB["Nameplate"]["Figure"] and RealMobHealth and RealMobHealth.UnitHasHealthData(unit) then
 		local value, max = RealMobHealth.GetUnitHealth(unit)
 		unitFrame.healthBar.value:SetText(M.Numb(value))  --.." | "..M.Numb(max)
 	else
@@ -242,12 +242,12 @@ local function UpdateHealthColor(unitFrame)
 		r, g, b = .7, .7, .7
 	else
 		if UnitIsPlayer(unit) and UnitReaction(unit, "player") >= 5 then
-			if MaoRUISettingDB["Nameplate"]["FriendlyCC"] then
+			if MaoRUIDB["Nameplate"]["FriendlyCC"] then
 				r, g, b = M.UnitColor(unit)
 			else
 				r, g, b = .3, .3, 1
 			end
-		elseif UnitIsPlayer(unit) and UnitReaction(unit, "player") <= 4 and MaoRUISettingDB["Nameplate"]["HostileCC"] then
+		elseif UnitIsPlayer(unit) and UnitReaction(unit, "player") <= 4 and MaoRUIDB["Nameplate"]["HostileCC"] then
 			r, g, b = M.UnitColor(unit)
 		elseif IsTapDenied(unitFrame) then
 			r, g, b = .6, .6, .6
@@ -261,7 +261,7 @@ local function UpdateHealthColor(unitFrame)
 		unitFrame.r, unitFrame.g, unitFrame.b = r, g, b
 	end
 
-	if not MaoRUISettingDB["Nameplate"]["TankMode"] and I.Role ~= "Tank" then
+	if not MaoRUIDB["Nameplate"]["TankMode"] and I.Role ~= "Tank" then
 			hp.Shadow:SetBackdropBorderColor(0, 0, 0)
 	else
 		hp.Shadow:SetBackdropBorderColor(0, 0, 0)
@@ -272,7 +272,7 @@ local function UpdateSelectionHighlight(unitFrame)
 	local unit = unitFrame.displayedUnit
 	local redarrowleft, redarrowright, glow, line = unitFrame.redarrowleft, unitFrame.redarrowright, unitFrame.glowBorder, unitFrame.underLine
 
-	if UnitIsUnit(unit, "target") and not UnitIsUnit(unit, "player") and MaoRUISettingDB["Nameplate"]["Arrow"] then
+	if UnitIsUnit(unit, "target") and not UnitIsUnit(unit, "player") and MaoRUIDB["Nameplate"]["Arrow"] then
 		unitFrame.redarrowleft:Show()
 		unitFrame.redarrowright:Show()
 		if glow then glow:Show() end
@@ -282,7 +282,7 @@ local function UpdateSelectionHighlight(unitFrame)
 		if glow then glow:Hide() end
 	end
 
-	--if not MaoRUISettingDB["Nameplate"]["Numberstyle"] then	
+	--if not MaoRUIDB["Nameplate"]["Numberstyle"] then	
 			unitFrame.redarrowleft:SetRotation(math.rad(90))
 			unitFrame.redarrowleft:SetPoint("RIGHT", unitFrame.healthBar, "LEFT", 1, 0)
 			unitFrame.redarrowright:SetRotation(math.rad(-90))
@@ -348,7 +348,7 @@ local function UpdateAll(unitFrame)
 end
 
 local function NamePlate_OnEvent(self, event, ...)
-	if not MaoRUISettingDB["Nameplate"]["Enable"] then
+	if not MaoRUIDB["Nameplate"]["Enable"] then
 		self:UnregisterAllEvents()
 		return
 	end
@@ -406,7 +406,7 @@ end
 -- Driver frame
 local function NamePlates_UpdateNamePlateOptions()
 	-- Called at VARIABLES_LOADED and by "Larger Nameplates" interface options checkbox
-	local baseNamePlateWidth = MaoRUISettingDB["Nameplate"]["Width"]
+	local baseNamePlateWidth = MaoRUIDB["Nameplate"]["Width"]
 	local baseNamePlateHeight = 40
 	local horizontalScale = tonumber(GetCVar("NamePlateHorizontalScale"))
 	C_NamePlate.SetNamePlateEnemySize(baseNamePlateWidth * horizontalScale, baseNamePlateHeight)
@@ -429,7 +429,7 @@ local function HideBlizzard()
 	--end)
 
 	-- CVars (Default: .08, .1, 60, .8, 1.1, .5)
-	if MaoRUISettingDB["Nameplate"]["InsideView"] then
+	if MaoRUIDB["Nameplate"]["InsideView"] then
 		SetCVar("nameplateOtherTopInset", .05)
 		SetCVar("nameplateOtherBottomInset", .08)
 	else
@@ -443,7 +443,7 @@ local function HideBlizzard()
 	SetCVar("nameplateMaxDistance", "6e1")
 	SetCVar("nameplateOverlapH", .5)
 	SetCVar("nameplateOverlapV", .7)
-	SetCVar("nameplateMinAlpha", MaoRUISettingDB["Nameplate"]["MinAlpha"])
+	SetCVar("nameplateMinAlpha", MaoRUIDB["Nameplate"]["MinAlpha"])
 
 	C_NamePlate.SetNamePlateFriendlyClickThrough(false)
 	SetCVar("nameplateSelectedScale", 1.43)
@@ -473,13 +473,13 @@ local function OnNamePlateCreated(namePlate)
 	namePlate.UnitFrame = unitFrame
 
 	local hp = CreateFrame("StatusBar", nil, unitFrame)
-	hp:SetHeight(MaoRUISettingDB["Nameplate"]["Height"])
+	hp:SetHeight(MaoRUIDB["Nameplate"]["Height"])
 	hp:SetPoint("TOPLEFT", 0, -20)
 	hp:SetPoint("TOPRIGHT", 0, -20)
 	hp:SetMinMaxValues(0, 1)
 	M.CreateSB(hp)
 	M.SmoothBar(hp)
-	if MaoRUISettingDB["Nameplate"]["Figure"] then
+	if MaoRUIDB["Nameplate"]["Figure"] then
 	  hp.value = M.CreateFS(hp, 9, "", false, "TOPRIGHT", 2, 6)
 	else
 	  hp.value = M.CreateFS(hp, 12, "", false, "TOPRIGHT", 0, 8)
@@ -511,7 +511,7 @@ local function OnNamePlateCreated(namePlate)
 	ricon:Hide()
 	rtf.RaidTargetIcon = ricon
 
-	if MaoRUISettingDB["Nameplate"]["Arrow"] then
+	if MaoRUIDB["Nameplate"]["Arrow"] then
 		local redarrowleft = unitFrame:CreateTexture(nil, "OVERLAY")
 		redarrowleft:SetSize(21, 21)
 		redarrowleft:SetTexture("Interface\\Addons\\_ShiGuang\\Media\\Modules\\Raid\\textureArrowAbove")
@@ -558,7 +558,7 @@ local function OnNamePlateRemoved(unit)
 end
 
 local function NamePlates_OnEvent(self, event, ...)
-	if not MaoRUISettingDB["Nameplate"]["Enable"] then
+	if not MaoRUIDB["Nameplate"]["Enable"] then
 		self:UnregisterAllEvents()
 		return
 	end

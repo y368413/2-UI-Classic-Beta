@@ -3,7 +3,7 @@ ns[1] = {}			-- M, Basement
 ns[2] = {}			-- R, Config
 ns[3] = {}			-- U, Locales
 ns[4] = {}			-- I, Database
-MaoRUISettingDB, MaoRUIDB = {}, {}
+MaoRUIDB, MaoRUIAccountDB = {}, {}
 ShiGuangDB = ShiGuangDB or {}
 ShiGuangPerDB = ShiGuangPerDB or {}
 

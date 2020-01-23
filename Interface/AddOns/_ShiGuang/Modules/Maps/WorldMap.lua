@@ -78,7 +78,7 @@ function module:UpdateMapID()
 end
 
 function module:SetupCoords()
-	if not MaoRUISettingDB["Map"]["Coord"] then return end
+	if not MaoRUIDB["Map"]["Coord"] then return end
 
 	playerCoords = M.CreateFS(WorldMapFrame, 12, "", false, "BOTTOMLEFT", 10, 6)
 	cursorCoords = M.CreateFS(WorldMapFrame, 12, "", false, "BOTTOMLEFT", 120, 6)
@@ -93,8 +93,8 @@ end
 function module:UpdateMapScale()
 	if self.isMaximized and self:GetScale() ~= 1 then
 		self:SetScale(1)
-	elseif not self.isMaximized and self:GetScale() ~= MaoRUISettingDB["Map"]["MapScale"] then
-		self:SetScale(MaoRUISettingDB["Map"]["MapScale"])
+	elseif not self.isMaximized and self:GetScale() ~= MaoRUIDB["Map"]["MapScale"] then
+		self:SetScale(MaoRUIDB["Map"]["MapScale"])
 	end
 end
 
@@ -153,7 +153,7 @@ local function isMouseOverMap()
 end
 
 function module:MapFader()
-	if MaoRUISettingDB["Map"]["MapFader"] then
+	if MaoRUIDB["Map"]["MapFader"] then
 		PlayerMovementFrameFader.AddDeferredFrame(WorldMapFrame, .5, 1, .5, isMouseOverMap)
 	else
 		PlayerMovementFrameFader.RemoveFrame(WorldMapFrame)

@@ -5,8 +5,8 @@ if not R.Infobar.Location then return end
 local module = M:GetModule("Infobar")
 local info = module:RegisterInfobar("Location", R.Infobar.LocationPos)
 local mapModule = M:GetModule("Maps")
-local format, unpack = string.format, unpack
 info.text:SetFont(unpack(R.Infobar.TTFonts))
+local format, unpack = string.format, unpack
 local WorldMapFrame, SELECTED_DOCK_FRAME, ChatFrame_OpenChat = WorldMapFrame, SELECTED_DOCK_FRAME, ChatFrame_OpenChat
 local GetSubZoneText, GetZoneText, GetZonePVPInfo, IsInInstance = GetSubZoneText, GetZoneText, GetZonePVPInfo, IsInInstance
 local C_Map_GetBestMapForUnit = C_Map.GetBestMapForUnit

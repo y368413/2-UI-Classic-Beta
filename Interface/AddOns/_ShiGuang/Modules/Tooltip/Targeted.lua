@@ -9,7 +9,7 @@ local UnitExists, UnitIsUnit, UnitIsDeadOrGhost, UnitName = UnitExists, UnitIsUn
 local targetTable = {}
 
 function TT:ScanTargets()
-	if not MaoRUISettingDB["Tooltip"]["TargetBy"] then return end
+	if not MaoRUIDB["Tooltip"]["TargetBy"] then return end
 	if not IsInGroup() then return end
 
 	local _, unit = self:GetUnit()

@@ -3,6 +3,12 @@ local M, R, U, I = unpack(ns)
 local S = M:GetModule("Skins")
 
 local function ReskinDetails()
+	local Details = _G.Details
+	-- instance table can be nil sometimes
+	Details.tabela_instancias = Details.tabela_instancias or {}
+	-- toggle windows on init
+	Details:ReabrirTodasInstancias()
+
 	local function setupInstance(instance)
 		if instance.styled then return end
 		if not instance.baseframe then return end
@@ -15,8 +21,8 @@ local function ReskinDetails()
 		instance:MenuAnchor(16, 3)
 		instance:ToolbarMenuButtonsSize(1)
 		instance:AttributeMenu(true, 0, 3, I.Font[1], 13, {1, 1, 1}, 1, true)
-		instance:SetBarSettings(18, MaoRUIDB["ResetDetails"] and "normTex" or nil)
-		instance:SetBarTextSettings(MaoRUIDB["ResetDetails"] and 14 or nil, I.Font[1], nil, nil, nil, true, true, nil, nil, nil, nil, nil, nil, false, nil, false, nil)
+		instance:SetBarSettings(18, MaoRUIAccountDB["ResetDetails"] and "normTex" or nil)
+		instance:SetBarTextSettings(MaoRUIAccountDB["ResetDetails"] and 14 or nil, I.Font[1], nil, nil, nil, true, true, nil, nil, nil, nil, nil, nil, false, nil, false, nil)
 
 		local bg = M.CreateBG(instance.baseframe)
 		bg:SetPoint("TOPLEFT", -1, 18)
@@ -60,7 +66,7 @@ local function ReskinDetails()
 		instance:LockInstance(true)
 	end
 
-	if MaoRUIDB["ResetDetails"] then
+	if MaoRUIAccountDB["ResetDetails"] then
 		local height = 190
 		if instance1 then
 			if instance2 then
@@ -84,13 +90,12 @@ local function ReskinDetails()
 	end
 
 	-- Numberize
-	local _detalhes = _G._detalhes
-	local current = MaoRUIDB["NumberFormat"]
+	local current = MaoRUIAccountDB["NumberFormat"]
 	if current < 3 then
-		_detalhes.numerical_system = current
-		_detalhes:SelectNumericalSystem()
+		Details.numerical_system = current
+		Details:SelectNumericalSystem()
 	end
-	_detalhes.OpenWelcomeWindow = function()
+	Details.OpenWelcomeWindow = function()
 		if instance1 then
 			EmbedWindow(instance1, -3, 25, 320, 190)
 			instance1:SetBarSettings(18, "normTex")
@@ -98,7 +103,7 @@ local function ReskinDetails()
 		end
 	end
 
-	MaoRUIDB["ResetDetails"] = false
+	MaoRUIAccountDB["ResetDetails"] = false
 end
 
 S:LoadWithAddOn("Details", "Details", ReskinDetails)

@@ -86,8 +86,8 @@ local function setupInfoFrame()
 
 	for i = 1, 4 do
 		bu[i]:SetScript("OnClick", function()
-			MaoRUIDB["GuildSortBy"] = i
-			MaoRUIDB["GuildSortOrder"] = not MaoRUIDB["GuildSortOrder"]
+			MaoRUIAccountDB["GuildSortBy"] = i
+			MaoRUIAccountDB["GuildSortOrder"] = not MaoRUIAccountDB["GuildSortOrder"]
 			applyData()
 		end)
 	end
@@ -234,10 +234,10 @@ end
 
 local function sortGuild(a, b)
 	if a and b then
-		if MaoRUIDB["GuildSortOrder"] then
-			return a[MaoRUIDB["GuildSortBy"]] < b[MaoRUIDB["GuildSortBy"]]
+		if MaoRUIAccountDB["GuildSortOrder"] then
+			return a[MaoRUIAccountDB["GuildSortBy"]] < b[MaoRUIAccountDB["GuildSortBy"]]
 		else
-			return a[MaoRUIDB["GuildSortBy"]] > b[MaoRUIDB["GuildSortBy"]]
+			return a[MaoRUIAccountDB["GuildSortBy"]] > b[MaoRUIAccountDB["GuildSortBy"]]
 		end
 	end
 end

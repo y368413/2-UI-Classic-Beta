@@ -45,8 +45,8 @@ info.onEvent = function(self, event)
 	end
 	self.text:SetText(module:GetMoneyString(newMoney))
 
-	if not MaoRUIDB["totalGold"][myRealm] then MaoRUIDB["totalGold"][myRealm] = {} end
-	MaoRUIDB["totalGold"][myRealm][myName] = {GetMoney(), I.MyClass}
+	if not MaoRUIAccountDB["totalGold"][myRealm] then MaoRUIAccountDB["totalGold"][myRealm] = {} end
+	MaoRUIAccountDB["totalGold"][myRealm][myName] = {GetMoney(), I.MyClass}
 
 	oldMoney = newMoney
 end
@@ -56,15 +56,15 @@ StaticPopupDialogs["RESETGOLD"] = {
 	button1 = YES,
 	button2 = NO,
 	OnAccept = function()
-		wipe(MaoRUIDB["totalGold"][myRealm])
-		MaoRUIDB["totalGold"][myRealm][myName] = {GetMoney(), I.MyClass}
+		wipe(MaoRUIAccountDB["totalGold"][myRealm])
+		MaoRUIAccountDB["totalGold"][myRealm][myName] = {GetMoney(), I.MyClass}
 	end,
 	whileDead = 1,
 }
 
 info.onMouseUp = function(self, btn)
 	if IsControlKeyDown() then
-		MaoRUIDB["AutoSell"] = not MaoRUIDB["AutoSell"]
+		MaoRUIAccountDB["AutoSell"] = not MaoRUIAccountDB["AutoSell"]
 		self:onEnter()
 	elseif btn == "RightButton" then
 		StaticPopup_Show("RESETGOLD")
@@ -89,7 +89,7 @@ info.onEnter = function(self)
 
 	local totalGold = 0
 	GameTooltip:AddLine(U["Character"], .6,.8,1)
-	local thisRealmList = MaoRUIDB["totalGold"][myRealm]
+	local thisRealmList = MaoRUIAccountDB["totalGold"][myRealm]
 	for k, v in pairs(thisRealmList) do
 		local gold, class = unpack(v)
 		local r, g, b = M.ClassColor(class)
@@ -100,7 +100,7 @@ info.onEnter = function(self)
 	GameTooltip:AddDoubleLine(TOTAL..":", module:GetMoneyString(totalGold), .6,.8,1, 1,1,1)
 
   GameTooltip:AddDoubleLine(" ","--------------",1,1,1,0.5,0.5,0.5)
-	GameTooltip:AddDoubleLine(" ",U["AutoSell Junk"]..": "..(MaoRUIDB["AutoSell"] and "|cff55ff55"..VIDEO_OPTIONS_ENABLED or "|cffff5555"..VIDEO_OPTIONS_DISABLED),1,1,1,.6,.8,1)
+	GameTooltip:AddDoubleLine(" ",U["AutoSell Junk"]..": "..(MaoRUIAccountDB["AutoSell"] and "|cff55ff55"..VIDEO_OPTIONS_ENABLED or "|cffff5555"..VIDEO_OPTIONS_DISABLED),1,1,1,.6,.8,1)
 	GameTooltip:Show()
 end
 
@@ -141,7 +141,7 @@ local function startSelling()
 end
 
 local function updateSelling(event, ...)
-	if not MaoRUIDB["AutoSell"] then return end
+	if not MaoRUIAccountDB["AutoSell"] then return end
 
 	local _, arg = ...
 	if event == "MERCHANT_SHOW" then

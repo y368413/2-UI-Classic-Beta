@@ -194,10 +194,10 @@ SlashCmdList.MOUSEOVERBIND = function()
 
 		function bind:Deactivate(save)
 			if save then
-				AttemptToSaveBindings(MaoRUISettingDB["Actionbar"]["BindType"])
+				AttemptToSaveBindings(MaoRUIDB["Actionbar"]["BindType"])
 				print("|cffffff00"..KEY_BOUND.."|r")
 			else
-				LoadBindings(MaoRUISettingDB["Actionbar"]["BindType"])
+				LoadBindings(MaoRUIDB["Actionbar"]["BindType"])
 				print("|cffffff00"..UNCHECK_ALL.."|r")
 			end
 			self.enabled = false
@@ -230,13 +230,13 @@ SlashCmdList.MOUSEOVERBIND = function()
 				bind:Deactivate(false)
 			end)
 			local box = M.CreateCheckBox(frame)
-			box:SetChecked(MaoRUISettingDB["Actionbar"]["BindType"] == 2)
+			box:SetChecked(MaoRUIDB["Actionbar"]["BindType"] == 2)
 			box:SetPoint("RIGHT", text, "LEFT", -5, -0)
 			box:SetScript("OnClick", function(self)
 				if self:GetChecked() == true then
-					MaoRUISettingDB["Actionbar"]["BindType"] = 2
+					MaoRUIDB["Actionbar"]["BindType"] = 2
 				else
-					MaoRUISettingDB["Actionbar"]["BindType"] = 1
+					MaoRUIDB["Actionbar"]["BindType"] = 1
 				end
 			end)
 		end

@@ -106,7 +106,7 @@ end)
 
 info.onMouseUp = function(self, btn)
 	if btn == "RightButton" then
-		MaoRUIDB["RepairType"] = mod(MaoRUIDB["RepairType"] + 1, 2)
+		MaoRUIAccountDB["RepairType"] = mod(MaoRUIAccountDB["RepairType"] + 1, 2)
 		self:onEnter()
 	else
 		ToggleCharacter("PaperDollFrame")
@@ -143,7 +143,7 @@ info.onEnter = function(self)
 	end
 
 	GameTooltip:AddDoubleLine(" ", I.LineString)
-	GameTooltip:AddDoubleLine(" ", U["Auto Repair"]..": "..repairlist[MaoRUIDB["RepairType"]].." ", 1,1,1, .6,.8,1)
+	GameTooltip:AddDoubleLine(" ", U["Auto Repair"]..": "..repairlist[MaoRUIAccountDB["RepairType"]].." ", 1,1,1, .6,.8,1)
 	GameTooltip:Show()
 end
 
@@ -175,7 +175,7 @@ local function merchantClose()
 end
 
 local function merchantShow()
-	if IsShiftKeyDown() or MaoRUIDB["RepairType"] == 0 or not CanMerchantRepair() then return end
+	if IsShiftKeyDown() or MaoRUIAccountDB["RepairType"] == 0 or not CanMerchantRepair() then return end
 	autoRepair()
 	M:RegisterEvent("MERCHANT_CLOSED", merchantClose)
 end

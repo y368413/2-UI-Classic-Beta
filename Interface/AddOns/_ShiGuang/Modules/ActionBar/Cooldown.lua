@@ -80,7 +80,7 @@ function module:StartTimer(start, duration)
 	if self.noOCC or hideNumbers[self] then return end
 
 	local frameName = self.GetName and self:GetName() or ""
-	if MaoRUISettingDB["Actionbar"]["OverrideWA"] and strfind(frameName, "WeakAuras") then
+	if MaoRUIDB["Actionbar"]["OverrideWA"] and strfind(frameName, "WeakAuras") then
 		self.noOCC = true
 		return
 	end
@@ -164,7 +164,7 @@ function module:RegisterActionButton()
 end
 
 function module:OnLogin()
-	if not MaoRUISettingDB["Actionbar"]["Cooldown"] then return end
+	if not MaoRUIDB["Actionbar"]["Cooldown"] then return end
 
 	local cooldownIndex = getmetatable(ActionButton1Cooldown).__index
 	hooksecurefunc(cooldownIndex, "SetCooldown", module.StartTimer)

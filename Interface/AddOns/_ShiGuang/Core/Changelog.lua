@@ -102,11 +102,11 @@ end
 local function compareToShow(event)
 	if UI_Tutorial then return end
 
-	local old1, old2 = strsplit(".", MaoRUIDB["Changelog"].Version or "")
+	local old1, old2 = strsplit(".", MaoRUIAccountDB["Changelog"].Version or "")
 	local cur1, cur2 = strsplit(".", I.Version)
 	if old1 ~= cur1 or old2 ~= cur2 then
 		Helplist()
-		MaoRUIDB["Changelog"].Version = I.Version
+		MaoRUIAccountDB["Changelog"].Version = I.Version
 	end
 
 	M:UnregisterEvent(event, compareToShow)

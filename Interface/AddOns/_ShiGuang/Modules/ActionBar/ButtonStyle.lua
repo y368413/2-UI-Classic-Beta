@@ -122,7 +122,7 @@ local function SetupBackdrop(button)
 	M.CreateBD(bg)
 	M.CreateSD(bg)
 	M.CreateTex(bg)
-	if MaoRUISettingDB["Actionbar"]["Classcolor"] then
+	if MaoRUIDB["Actionbar"]["Classcolor"] then
 		bg:SetBackdropColor(I.r, I.g, I.b, .25)
 	else
 		bg:SetBackdropColor(.2, .2, .2, .25)
@@ -163,7 +163,7 @@ local replaces = {
 
 function Bar:UpdateHotKey()
 	local hotkey = _G[self:GetName().."HotKey"]
-	if hotkey and hotkey:IsShown() and not MaoRUISettingDB["Actionbar"]["Hotkeys"] then
+	if hotkey and hotkey:IsShown() and not MaoRUIDB["Actionbar"]["Hotkeys"] then
 		hotkey:Hide()
 		return
 	end
@@ -231,7 +231,7 @@ function Bar:StyleActionButton(button, cfg)
 	local overlay = CreateFrame("Frame", nil, button)
 	overlay:SetAllPoints()
 	if count then
-		if MaoRUISettingDB["Actionbar"]["Count"] then
+		if MaoRUIDB["Actionbar"]["Count"] then
 			count:SetParent(overlay)
 			SetupFontString(count, cfg.count)
 		else
@@ -239,7 +239,7 @@ function Bar:StyleActionButton(button, cfg)
 		end
 	end
 	if hotkey then
-		if MaoRUISettingDB["Actionbar"]["Hotkeys"] then
+		if MaoRUIDB["Actionbar"]["Hotkeys"] then
 			hotkey:SetParent(overlay)
 			Bar.UpdateHotKey(button)
 			SetupFontString(hotkey, cfg.hotkey)
@@ -248,7 +248,7 @@ function Bar:StyleActionButton(button, cfg)
 		end
 	end
 	if name then
-		if MaoRUISettingDB["Actionbar"]["Macro"] then
+		if MaoRUIDB["Actionbar"]["Macro"] then
 			name:SetParent(overlay)
 			SetupFontString(name, cfg.name)
 		else
@@ -294,7 +294,7 @@ function Bar:StyleExtraActionButton(cfg)
 	--hotkey, count
 	local overlay = CreateFrame("Frame", nil, button)
 	overlay:SetAllPoints()
-	if MaoRUISettingDB["Actionbar"]["Hotkeys"] then
+	if MaoRUIDB["Actionbar"]["Hotkeys"] then
 		hotkey:SetParent(overlay)
 		Bar.UpdateHotKey(button)
 		cfg.hotkey.font = {I.Font[1], 13, I.Font[3]}
@@ -302,7 +302,7 @@ function Bar:StyleExtraActionButton(cfg)
 	else
 		hotkey:Hide()
 	end
-	if MaoRUISettingDB["Actionbar"]["Count"] then
+	if MaoRUIDB["Actionbar"]["Count"] then
 		count:SetParent(overlay)
 		cfg.count.font = {I.Font[1], 16, I.Font[3]}
 		SetupFontString(count, cfg.count)
@@ -406,7 +406,7 @@ function Bar:ReskinBars()
 	-- Update hotkeys
 	hooksecurefunc("ActionButton_UpdateHotkeys", Bar.UpdateHotKey)
 	hooksecurefunc("PetActionButton_SetHotkeys", Bar.UpdateHotKey)
-	if MaoRUISettingDB["Actionbar"]["Hotkeys"] then
+	if MaoRUIDB["Actionbar"]["Hotkeys"] then
 		Bar:UpdateStanceHotKey()
 		M:RegisterEvent("UPDATE_BINDINGS", Bar.UpdateStanceHotKey)
 	end
@@ -425,7 +425,7 @@ local function MoveMicroButtons()
 	end
 	CharacterMicroButton:SetPoint("BOTTOMRIGHT", Minimap, "BOTTOMLEFT", 3, -8)
 	SpellbookMicroButton:SetPoint("BOTTOMRIGHT", CharacterMicroButton, "TOPRIGHT", 0, -21)
-	if IsAddOnLoaded("Combuctor") or IsAddOnLoaded("Bagnon") or MaoRUISettingDB["Bags"]["Enable"] then
+	if IsAddOnLoaded("Combuctor") or IsAddOnLoaded("Bagnon") or MaoRUIDB["Bags"]["Enable"] then
 	KeyRingButton:SetPoint("BOTTOMLEFT", UIParent, "BOTTOMRIGHT", 3, 0)
 	else
 	KeyRingButton:SetPoint("BOTTOMLEFT", CharacterMicroButton, "BOTTOMRIGHT", 0, 8)
@@ -445,7 +445,7 @@ local function MoveMicroButtons()
 end
 HotSpotMicroMenu:RegisterEvent("PLAYER_LOGIN")
 HotSpotMicroMenu:SetScript("OnEvent", function()
-  if not MaoRUISettingDB["Actionbar"]["Enable"] then return end
+  if not MaoRUIDB["Actionbar"]["Enable"] then return end
 	hooksecurefunc("UpdateMicroButtons", MoveMicroButtons)
 	MoveMicroButtons()
 end)

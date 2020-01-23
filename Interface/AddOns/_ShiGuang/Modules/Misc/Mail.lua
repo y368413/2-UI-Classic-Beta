@@ -2,7 +2,7 @@
 local M, R, U, I = unpack(ns)
 local MISC = M:GetModule("Misc")
 
-local strsplit, pairs, tonumber, sub = string.split, pairs, tonumber, string.sub
+local strsplit, pairs, tonumber, sub, strfind = string.split, pairs, tonumber, string.sub, string.find
 local deletedelay, mailItemIndex, inboxItems = .5, 0, {}
 local button1, button2, button3, lastopened, imOrig_InboxFrame_OnClick, hasNewMail, takingOnlyCash, onlyCurrentMail, needsToWait, skipMail
 
@@ -133,8 +133,8 @@ end
 
 function MISC:MailItem_AddDelete(i)
 	local bu = CreateFrame("Button", nil, self)
-	bu:SetPoint("BOTTOMRIGHT", self:GetParent(), "BOTTOMRIGHT", -10, 5)
-	bu:SetSize(16, 16)
+	bu:SetPoint("BOTTOMRIGHT", self:GetParent(), "BOTTOMRIGHT", -8, 6)
+	bu:SetSize(14, 14)
 	M.PixelIcon(bu, 136813, true)
 	bu.id = i
 	bu:SetScript("OnClick", MISC.MailBox_DelectClick)
@@ -191,8 +191,117 @@ function MISC:InboxItem_OnEnter()
 	end
 end
 
+function MISC:MailBox_ContactList()
+	local bars = {}
+	local barIndex = 0
+
+	local bu = M.CreateGear(SendMailFrame)
+	bu:SetPoint("LEFT", SendMailNameEditBox, "RIGHT", 0, 0)
+
+	local list = CreateFrame("Frame", nil, bu)
+	list:SetSize(210, 421)
+	list:SetPoint("TOPLEFT", MailFrame, "TOPRIGHT", 5, 0)
+	list:SetFrameStrata("Tooltip")
+	M.SetBackground(list)
+	M.CreateFS(list, 14, U["ContactList"], "system", "TOP", 0, -6)
+
+	local editbox = M.CreateEditBox(list, 121, 26)
+	editbox:SetPoint("TOPLEFT", 6, -21)
+	local swatch = M.CreateColorSwatch(list, "")
+	swatch:SetPoint("LEFT", editbox, "RIGHT", 5, 0)
+
+	local function sortBars()
+		local index = 0
+		for _, bar in pairs(bars) do
+			if bar:IsShown() then
+				bar:SetPoint("TOPLEFT", list, 1, -50 - index*21)
+				index = index + 1
+			end
+		end
+	end
+
+	local function buttonOnClick(self)
+		local text = self.name:GetText() or ""
+		SendMailNameEditBox:SetText(text)
+	end
+
+	local function deleteOnClick(self)
+		MaoRUIAccountDB["ContactList"][self.__owner.name:GetText()] = nil
+		self.__owner:Hide()
+		sortBars()
+		barIndex = barIndex - 1
+	end
+
+	local function createContactBar(text, r, g, b)
+		local button = CreateFrame("Button", nil, list)
+		button:SetSize(166, 21)
+		button.HL = button:CreateTexture(nil, "HIGHLIGHT")
+		button.HL:SetAllPoints()
+		button.HL:SetColorTexture(1, 1, 1, .25)
+	
+		button.name = M.CreateFS(button, 13, text, false, "LEFT", 12, 0)
+		button.name:SetPoint("RIGHT", button, "LEFT", 233, 0)
+		button.name:SetJustifyH("LEFT")
+		button.name:SetTextColor(r, g, b)
+	
+		button:RegisterForClicks("AnyUp")
+		button:SetScript("OnClick", buttonOnClick)
+	
+		button.delete = M.CreateButton(button, 21, 21, true, "Interface\\RAIDFRAME\\ReadyCheck-NotReady")
+		button.delete:SetPoint("LEFT", button, "RIGHT", 6, 0)
+		button.delete.__owner = button
+		button.delete:SetScript("OnClick", deleteOnClick)
+	
+		return button
+	end
+
+	local function createBar(text, r, g, b)
+		if barIndex < 17 then
+			barIndex = barIndex + 1
+		end
+		for i = 1, barIndex do
+			if not bars[i] then
+				bars[i] = createContactBar(text, r, g, b)
+			end
+			if not bars[i]:IsShown() then
+				bars[i]:Show()
+				bars[i].name:SetText(text)
+				bars[i].name:SetTextColor(r, g, b)
+				break
+			end
+		end
+	end
+
+	bu:SetScript("OnClick", function()
+		ToggleFrame(list)
+	end)
+
+	local add = M.CreateButton(list, 43, 26, ADD, 14)
+	add:SetPoint("LEFT", swatch, "RIGHT", 6, 0)
+	add:SetScript("OnClick", function()
+		local text = editbox:GetText()
+		if text == "" or tonumber(text) then return end -- incorrect input
+		if not strfind(text, "-") then text = text.."-"..I.MyRealm end -- complete player realm name
+
+		local r, g, b = swatch.tex:GetVertexColor()
+		MaoRUIAccountDB["ContactList"][text] = r..":"..g..":"..b
+		createBar(text, r, g, b)
+		sortBars()
+		editbox:SetText("")
+	end)
+
+	for name, color in pairs(MaoRUIAccountDB["ContactList"]) do
+		if color then
+			local r, g, b = strsplit(":", color)
+			r, g, b = tonumber(r), tonumber(g), tonumber(b)
+			createBar(name, r, g, b)
+		end
+	end
+	sortBars()
+end
+
 function MISC:MailBox()
-	if not MaoRUISettingDB["Misc"]["Mail"] then return end
+	if not MaoRUIDB["Misc"]["Mail"] then return end
 	if IsAddOnLoaded("Postal") then return end
 
 	for i = 1, 7 do
@@ -228,6 +337,8 @@ function MISC:MailBox()
 	hooksecurefunc("InboxFrame_Update", MISC.InboxFrame_Hook)
 	hooksecurefunc("InboxFrameItem_OnEnter", MISC.InboxItem_OnEnter)
 
+	MISC:MailBox_ContactList()
+
 	-- Replace the alert frame
 	if InboxTooMuchMail then
 		InboxTooMuchMail:ClearAllPoints()
@@ -239,81 +350,62 @@ function MISC:MailBox()
 end
 
 -------MailinputboxResizer---------------------------------------------------------------
-	local editbox_width = 230		--EditBox width				--default: 224
-	local moneyframe_pos = {"TOPLEFT","SendMailFrame","TOPLEFT",82,-70,}	--Money display position
-
-local c = SendMailCostMoneyFrame
-c:ClearAllPoints()
-c:SetPoint(unpack(moneyframe_pos))
-local f = "SendMailNameEditBox" 
-_G[f]:SetSize(editbox_width or 224,20)
-local r=_G[f.."Right"]
-r:ClearAllPoints()
-r:SetPoint("TOPRIGHT",0,0)
-local mi=_G[f.."Middle"]
-mi:SetSize(0,20)
-mi:ClearAllPoints()
-mi:SetPoint("LEFT",f.."Left","LEFT",8,0)
-mi:SetPoint("RIGHT",r,"RIGHT",-8,0)
+SendMailCostMoneyFrame:ClearAllPoints()
+SendMailCostMoneyFrame:SetPoint("TOPLEFT","SendMailFrame","TOPLEFT",82,-70)
+_G["SendMailNameEditBox"]:SetSize(228,21)				----EditBox width default: 224
+_G["SendMailNameEditBoxRight"]:ClearAllPoints()
+_G["SendMailNameEditBoxRight"]:SetPoint("TOPRIGHT",0,0)
+_G["SendMailNameEditBoxMiddle"]:SetSize(0,21)
+_G["SendMailNameEditBoxMiddle"]:ClearAllPoints()
+_G["SendMailNameEditBoxMiddle"]:SetPoint("LEFT","SendMailNameEditBoxLeft","LEFT",3,0)
+_G["SendMailNameEditBoxMiddle"]:SetPoint("RIGHT",_G["SendMailNameEditBoxRight"],"RIGHT",-3,0)
 
 -- Mailbox Cleaner-------- by Jadya - EU-Well of Eternity---------------------------------
-local min, low = math.min, string.lower
 local title = GEAR_DELETEEMPTYMAILS_TITLE
-local snd
 local em_enabled = false
-local i
-local lastindex, timeout = 0,0
-local timeout_range = 1 -- one second
-local f = CreateFrame("Frame")
-
+local timeout = 0
+local MailboxCleaner = CreateFrame("Frame")
 local options_desc = { ["read"] = "Delete unread mails" }
 
 local function endloop()
  em_enabled = false
- f:Hide()
+ MailboxCleaner:Hide()
  print(title.." - Done.")
 end
 
 local function update()
  if not em_enabled or not InboxFrame or not InboxFrame:IsVisible() then endloop() return end
-
  local num = GetInboxNumItems()
-
  if num < 1 or i < 1 then
   endloop()
   return
  end
- 
  local t = time()
- 
  if timeout > 0 then
   if i > num or (timeout < t) then
-   i = min(i - 1, num)
+   i = math.min(i - 1, num)
    timeout = 0
   else
    return
   end
  end
 
- --canDelete = InboxItemCanDelete(i)
- --if canDelete then
+ --if InboxItemCanDelete(i) then
  local packageIcon, stationeryIcon, sender, subject, money, CODAmount, daysLeft, itemCount, wasRead, wasReturned, textCreated, canReply, isGM, itemQuantity = GetInboxHeaderInfo(i)
- if (ShiGuangDB["MailRead"] or wasRead) and not isGM and (not snd or (snd and (snd == low(sender)))) and
-  (not itemCount or itemCount == 0) and (not money or money == 0) then
+ if (ShiGuangDB["MailRead"] or wasRead) and not isGM and (not snd or (snd and (snd == string.lower(sender)))) and (not itemCount or itemCount == 0) and (not money or money == 0) then
   DeleteInboxItem(i)
   timeout = t + 1
  else
   i = i - 1
  end   
  --end
- 
  if i > num then 
   endloop()
  end
 end
 
-f:SetScript("OnUpdate", update)
-f:Hide()
+MailboxCleaner:SetScript("OnUpdate", update)
+MailboxCleaner:Hide()
 
 local function printOptionMsg(arg, help)
  if ShiGuangDB[arg] == nil then return end
@@ -321,7 +413,6 @@ local function printOptionMsg(arg, help)
 end
 
 local function start(arg)
-
  if arg == "MailRead" then
   ShiGuangDB["MailRead"] = not ShiGuangDB["MailRead"]
   printOptionMsg(arg)
@@ -333,260 +424,20 @@ local function start(arg)
   return
  end
  if arg and arg ~= "" then
-  snd = low(arg)
+  snd = string.lower(arg)
  else
   snd = nil
  end
  i = GetInboxNumItems()
  print(title.." - Doing"..(snd and " from "..snd or "").."...")
  em_enabled = true
- f:Show()
+ MailboxCleaner:Show()
 end
 
 local eventframe = CreateFrame("Frame")
 eventframe:RegisterEvent("PLAYER_ENTERING_WORLD")
-local function eventhandler()
- printOptionMsg("...", true)
- eventframe:SetScript("OnEvent", nil)
-end
-eventframe:SetScript("OnEvent", eventhandler)
+eventframe:SetScript("OnEvent", function() printOptionMsg("...", true) eventframe:SetScript("OnEvent", nil) end)
 -- slash command
 SLASH_MAILBOXCLEANER1 = "/mbclean"
 SLASH_MAILBOXCLEANER2 = "/mailboxcleaner"
 SlashCmdList["MAILBOXCLEANER"] = start
-
-
------------------------------------- 輸入框名冊-- Author:M----------------------------------
---此表會被重載
-TinyRosterDB = {
-    SendMailNameEditBox = {},                                                   --發郵件
-    BankItemSearchBox = {},                                                     --銀行查找
-    BagItemSearchBox = {},                                                      --背包查找
-}
-
---按鈕數量和高度
-local numButton, btnHeight = 12, 18
-
---加入/删除名冊
-local function toggle(list, name, delete)
-    local pos
-    if (name == "") then return end
-    for i, v in ipairs(list) do
-        if (v == name) then pos = i end
-    end
-    if (not pos) then
-        table.insert(list, 1, name)
-    elseif (delete and pos) then
-        table.remove(list, pos)
-    end
-    --table.sort(list, function(a, b) return string.byte(a) < string.byte(b) end)
-end
-
---左鍵選擇,右鍵刪除
-local function onclick(self, button)
-    local editbox = self:GetParent().editbox
-    if (not editbox) then return end
-    if (IsControlKeyDown() and button == "RightButton") then
-        for k in pairs(editbox.rosterList) do
-            editbox.rosterList[k] = nil
-        end
-        return editbox.rosterFunc(editbox)
-    elseif (button == "RightButton") then
-        toggle(editbox.rosterList, self.text, true)
-        return editbox.rosterFunc(editbox)
-    end
-    editbox:SetText(self.text)
-    self:GetParent():Hide()
-    editbox.rosterAddButton:Hide()
-end
-
---创建按钮
-local function createButton(parent, index)
-    local button = CreateFrame("Button", "TinyRosterFrameButton"..index, parent, "ClassicLFGListSearchAutoCompleteButtonTemplate")
-    button:SetAlpha(0.9)
-    button:SetHeight(btnHeight)
-    button.Label:SetJustifyH("CENTER")
-    button.Label:SetFont(UNIT_NAME_FONT, 14, "NORMAL")
-    button:RegisterForClicks("LeftButtonUp", "RightButtonUp")
-    button:SetScript("OnClick", onclick)
-    if (index == 1) then
-        button:SetPoint("TOPLEFT", parent, "TOPLEFT")
-        button:SetPoint("TOPRIGHT", parent, "TOPRIGHT")
-    else
-        button:SetPoint("TOPLEFT", _G["TinyRosterFrameButton"..(index-1)], "BOTTOMLEFT")
-        button:SetPoint("TOPRIGHT", _G["TinyRosterFrameButton"..(index-1)], "BOTTOMRIGHT")
-    end
-end
-
---系統自動填充是異步行爲 空字符不觸發此函數
-hooksecurefunc("AutoComplete_UpdateResults", function(self, results, context)
-    if (self.CallbackToTinyRoster) then
-        if (#results == 0) then
-            self.CallbackToTinyRoster = false
-        else
-            TinyRosterFrame:ClearAllPoints()
-            TinyRosterFrame:SetPoint("TOPLEFT", self, "BOTTOMLEFT", 4, 0)
-            TinyRosterFrame:SetPoint("TOPRIGHT", self, "BOTTOMRIGHT", -3, 0)
-        end
-    end
-end)
-
---顯示名冊 1.處理異步情況 2.context在獲得焦點時值是true
-local function ShowRosterList(editbox, context)
-    TinyRosterFrame.editbox = editbox
-    local text = editbox:GetText()
-    if (not AutoCompleteBox.CallbackToTinyRoster or text == "") then
-        TinyRosterFrame:Show()
-        TinyRosterFrame:ClearAllPoints()
-        TinyRosterFrame:SetPoint("TOPLEFT", editbox, "BOTTOMLEFT", -2, 0)
-        TinyRosterFrame:SetPoint("TOPRIGHT", editbox, "BOTTOMRIGHT", -3, 0)
-    end
-    local AutoCompleteFrame = editbox:GetParent().AutoCompleteFrame
-    if (AutoCompleteFrame and AutoCompleteFrame:IsShown()) then
-        TinyRosterFrame:ClearAllPoints()
-        TinyRosterFrame:SetPoint("TOPLEFT", AutoCompleteFrame, "BOTTOMLEFT", 7, 8)
-        TinyRosterFrame:SetPoint("TOPRIGHT", AutoCompleteFrame, "BOTTOMRIGHT", -4, 8)
-    end
-    if (editbox.autoCompleteParams) then
-        AutoCompleteBox.CallbackToTinyRoster = true
-    else
-        AutoCompleteBox.CallbackToTinyRoster = false
-    end
-    local button
-    local index = 1
-    local list = editbox.rosterList
-    --當記錄大於按鈕總數,用戶變更輸入之後,自動開啓模糊查詢
-    if (context == "userInput" and #list > numButton and strlen(text) > 0) then
-        list = {}
-        for _, v in ipairs(editbox.rosterList) do
-            if (string.find(v,text)) then tinsert(list,v) end 
-        end
-    end
-    while (list[index] and index <= numButton) do
-        button = _G["TinyRosterFrameButton"..index]
-        button.text = list[index]
-        button:SetText(list[index])
-        button:Show()
-        index = index + 1
-    end
-
-    TinyRosterFrame:SetHeight(index*btnHeight)
-    editbox.rosterAddButton:Show()
-    editbox.rosterAddButton:ClearAllPoints()
-    editbox.rosterAddButton:SetPoint("BOTTOMLEFT", TinyRosterFrame, "BOTTOMLEFT")
-    editbox.rosterAddButton:SetPoint("BOTTOMRIGHT", TinyRosterFrame, "BOTTOMRIGHT")
-    
-    while (_G["TinyRosterFrameButton"..index]) do
-        _G["TinyRosterFrameButton"..index]:Hide()
-        index = index + 1
-    end
-end
-
---用戶輸入
-local function OnTextChanged(self, userInput)
-    if (userInput) then ShowRosterList(self, "userInput") end
-end
-
---失去焦點
-local function OnEditFocusLost(self)
-    TinyRosterFrame:Hide()
-    self.rosterAddButton:Hide()
-    toggle(self.rosterList, self:GetText()) --自動保存
-end
-
---獲取框架
-local function getEditBox(name)
-    local frame, subframe, thirdframe = strsplit(".", name)
-    if (thirdframe and _G[frame] and _G[frame][subframe]) then
-        return _G[frame][subframe][thirdframe]
-    elseif (subframe and _G[frame]) then
-        return _G[frame][subframe]
-    else
-        return _G[frame]
-    end
-end
-
---讓輸入框有此功能
-local function fn(editboxName, config)
-    local editbox = getEditBox(editboxName)
-    if (not editbox) then return end
-    if (not config.list) then config.list = {} end
-    editbox.rosterMark = true
-    editbox.rosterList = config.list
-    editbox.rosterFunc = ShowRosterList
-    --editbox.autoCompleteParams = nil --去掉註釋表示關閉系統自動填充
-    editbox:HookScript("OnTextChanged", OnTextChanged)
-    editbox:HookScript("OnEditFocusGained", ShowRosterList)
-    editbox:HookScript("OnEditFocusLost", OnEditFocusLost)
-    editbox.rosterAddButton = CreateFrame("Button", nil, TinyRosterFrame, "ClassicLFGListSearchAutoCompleteButtonTemplate")
-    editbox.rosterAddButton:Hide()
-    editbox.rosterAddButton:SetHeight(btnHeight)
-    editbox.rosterAddButton.Label:SetFont(UNIT_NAME_FONT, 14, "OUTLINE")
-    editbox.rosterAddButton.Label:SetJustifyH("CENTER")
-    editbox.rosterAddButton.Label:SetTextColor(1, 0.82, 0)
-    editbox.rosterAddButton:SetText(SAVE..NAME)
-    editbox.rosterAddButton:RegisterForClicks("LeftButtonUp", "RightButtonUp")
-    editbox.rosterAddButton:SetScript("OnClick", function(self, button)
-        if (button == "LeftButton") then
-            local text = editbox:GetText()
-            if (text and text ~= "") then
-                toggle(editbox.rosterList, text)
-                editbox.rosterFunc(editbox)
-            end
-        else
-            editbox:SetText("")
-        end
-    end)
-end
-
---創建框架
-do
-    local function OnEvent(self, event)
-        --[[if (event == "VARIABLES_LOADED") then
-            self:UnregisterEvent("VARIABLES_LOADED")
-            for editboxName, v in pairs(TinyRosterDB) do
-                if (not v.depands or (v.depands and IsAddOnLoaded(v.depands))) then
-                    fn(editboxName, v)
-                end
-            end
-        end]]
-        if (event == "ADDON_LOADED") then
-            for editboxName, v in pairs(TinyRosterDB) do
-                --if (v.depands and v.depands == arg1 and not getEditBox(editboxName).rosterMark) then
-                    fn(editboxName, v)
-                --end
-            end
-        end
-    end
-    local TinyRosterFrame = CreateFrame("Frame", "TinyRosterFrame", UIParent)
-    TinyRosterFrame:Hide()
-    TinyRosterFrame:SetClampedToScreen(true)
-    TinyRosterFrame:SetFrameStrata("DIALOG")
-    TinyRosterFrame:SetSize(136, numButton*btnHeight)
-    TinyRosterFrame.BottomLeftBorder = TinyRosterFrame:CreateTexture(nil, "ARTWORK", "UI-Frame-BotCornerLeft")
-    TinyRosterFrame.BottomLeftBorder:ClearAllPoints()
-    TinyRosterFrame.BottomLeftBorder:SetPoint("BOTTOMLEFT", -7, -7)
-    TinyRosterFrame.BottomRightBorder = TinyRosterFrame:CreateTexture(nil, "ARTWORK", "UI-Frame-BotCornerRight")
-    TinyRosterFrame.BottomRightBorder:ClearAllPoints()
-    TinyRosterFrame.BottomRightBorder:SetPoint("BOTTOMRIGHT", 4, -7)
-    TinyRosterFrame.BottomBorder = TinyRosterFrame:CreateTexture(nil, "ARTWORK", "_UI-Frame-Bot")
-    TinyRosterFrame.BottomBorder:ClearAllPoints()
-    TinyRosterFrame.BottomBorder:SetPoint("BOTTOMLEFT", TinyRosterFrame.BottomLeftBorder, "BOTTOMRIGHT")
-    TinyRosterFrame.BottomBorder:SetPoint("BOTTOMRIGHT", TinyRosterFrame.BottomRightBorder, "BOTTOMLEFT")
-    TinyRosterFrame.LeftBorder = TinyRosterFrame:CreateTexture(nil, "ARTWORK", "!UI-Frame-LeftTile")
-    TinyRosterFrame.LeftBorder:ClearAllPoints()
-    TinyRosterFrame.LeftBorder:SetPoint("TOP", 0, 1)
-    TinyRosterFrame.LeftBorder:SetPoint("BOTTOMLEFT", TinyRosterFrame.BottomLeftBorder, "TOPLEFT")
-    TinyRosterFrame.RightBorder = TinyRosterFrame:CreateTexture(nil, "ARTWORK", "!UI-Frame-RightTile")
-    TinyRosterFrame.RightBorder:ClearAllPoints()
-    TinyRosterFrame.RightBorder:SetPoint("TOP", 0, 1)
-    TinyRosterFrame.RightBorder:SetPoint("BOTTOMRIGHT", TinyRosterFrame.BottomRightBorder, "TOPRIGHT", 1, 0)
-    TinyRosterFrame.TopBorder = TinyRosterFrame:CreateTexture(nil, "ARTWORK", "_UI-Frame-Bot")
-    TinyRosterFrame.TopBorder:ClearAllPoints()
-    TinyRosterFrame.TopBorder:SetPoint("TOPLEFT", TinyRosterFrame, "TOPLEFT", -2, 3)
-    TinyRosterFrame.TopBorder:SetPoint("BOTTOMRIGHT", TinyRosterFrame, "TOPRIGHT", 2, -3)
-    for i = 1, numButton do createButton(TinyRosterFrame, i) end
-    TinyRosterFrame:SetScript("OnEvent", OnEvent)
-    TinyRosterFrame:RegisterEvent("VARIABLES_LOADED")
-    TinyRosterFrame:RegisterEvent("ADDON_LOADED")
-end

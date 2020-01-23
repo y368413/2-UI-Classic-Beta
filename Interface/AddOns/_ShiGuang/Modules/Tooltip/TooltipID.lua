@@ -136,7 +136,7 @@ function TT:UpdateSpellCaster(...)
 end
 
 function TT:SetupTooltipID()
-	if MaoRUISettingDB["Tooltip"]["HideAllID"] then return end
+	if MaoRUIDB["Tooltip"]["HideAllID"] then return end
 
 	-- Update all
 	hooksecurefunc(GameTooltip, "SetHyperlink", TT.SetHyperLinkID)

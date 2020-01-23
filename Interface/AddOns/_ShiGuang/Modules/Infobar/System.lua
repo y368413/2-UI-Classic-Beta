@@ -154,7 +154,7 @@ info.onMouseUp = function(self, btn)
 		ResetCPUUsage()
 		module.loginTime = GetTime()
 	elseif btn == "MiddleButton" then
-		MaoRUIDB["SystemInfoType"] = mod(MaoRUIDB["SystemInfoType"] + 1, 3)
+		MaoRUIAccountDB["SystemInfoType"] = mod(MaoRUIAccountDB["SystemInfoType"] + 1, 3)
 	elseif btn == "LeftButton" then
 		if scriptProfile then
 			SetCVar("scriptProfile", 0)

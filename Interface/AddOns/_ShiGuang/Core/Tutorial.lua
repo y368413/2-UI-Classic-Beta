@@ -106,10 +106,10 @@ local function clipScale(scale)
 end
 
 local function GetPerfectScale()
-	local scale = MaoRUIDB["UIScale"]
+	local scale = MaoRUIAccountDB["UIScale"]
 	local bestScale = max(.4, min(1.15, 768 / I.ScreenHeight))
 	local pixelScale = 768 / I.ScreenHeight
-	if MaoRUIDB["LockUIScale"] then scale = clipScale(bestScale) end
+	if MaoRUIAccountDB["LockUIScale"] then scale = clipScale(bestScale) end
 	R.mult = (bestScale / scale) - ((bestScale - pixelScale) / scale)
 
 	return scale
@@ -126,7 +126,7 @@ local function SetupUIScale()
 		UIParent:SetScale(scale)
 	end
 
-	MaoRUIDB["UIScale"] = clipScale(scale)
+	MaoRUIAccountDB["UIScale"] = clipScale(scale)
 	isScaling = false
 end
 
@@ -139,7 +139,7 @@ local function ForceChatSettings()
 	end
 	FCF_SavePositionAndDimensions(ChatFrame1)
 
-	MaoRUISettingDB["Chat"]["Lock"] = true
+	MaoRUIDB["Chat"]["Lock"] = true
 end
 
 StaticPopupDialogs["RELOAD_NDUI"] = {
@@ -207,7 +207,7 @@ local function ForceDBMOptions()
 	DBM_AllSavedOptions["Default"]["HideObjectivesFrame"] = false
 	DBM_AllSavedOptions["Default"]["WarningFontSize"] = 20
 	DBM_AllSavedOptions["Default"]["SpecialWarningFontSize2"] = 36
-	MaoRUIDB["DBMRequest"] = false
+	MaoRUIAccountDB["DBMRequest"] = false
 end
 -- Skada
 local function ForceSkadaOptions()
@@ -267,7 +267,7 @@ local function ForceSkadaOptions()
 			},
 		},
 	}
-	MaoRUIDB["SkadaRequest"] = false
+	MaoRUIAccountDB["SkadaRequest"] = false
 end
 
 -- BigWigs
@@ -350,13 +350,13 @@ local function ForceBigwigs()
 			},
 		},
 	}
-	MaoRUIDB["BWRequest"] = false
+	MaoRUIAccountDB["BWRequest"] = false
 end
 
 local function ForceAddonSkins()
-	if MaoRUIDB["DBMRequest"] then ForceDBMOptions() end
-	if MaoRUIDB["SkadaRequest"] then ForceSkadaOptions() end
-	if MaoRUIDB["BWRequest"] then ForceBigwigs() end
+	if MaoRUIAccountDB["DBMRequest"] then ForceDBMOptions() end
+	if MaoRUIAccountDB["SkadaRequest"] then ForceSkadaOptions() end
+	if MaoRUIAccountDB["BWRequest"] then ForceBigwigs() end
 end
 
 -- Tutorial
@@ -365,14 +365,15 @@ local function YesTutor()
 			ForceDefaultSettings()
 			ForceRaidFrame()
 			ForceChatSettings()
-	  --MaoRUIDB["LockUIScale"] = true
+	  --MaoRUIAccountDB["LockUIScale"] = true
 	  SetupUIScale()
-			MaoRUIDB["DBMRequest"] = true
-			MaoRUIDB["SkadaRequest"] = true
-			MaoRUIDB["BWRequest"] = true
+			MaoRUIAccountDB["DBMRequest"] = true
+			MaoRUIAccountDB["SkadaRequest"] = true
+			MaoRUIAccountDB["BWRequest"] = true
 			ForceAddonSkins()
-			MaoRUIDB["ResetDetails"] = true
-			MaoRUISettingDB["Tutorial"]["Complete"] = true
+			MaoRUIAccountDB["ResetDetails"] = true
+			MaoRUIDB["Skins"]["ResetRecount"] = true
+			MaoRUIDB["Tutorial"]["Complete"] = true
 end
 
 local welcome
@@ -516,7 +517,7 @@ function module:OnLogin()
 	M:RegisterEvent("UI_SCALE_CHANGED", SetupUIScale)
 	DefaultSettings()
 	ForceAddonSkins()
-	if not MaoRUISettingDB["Tutorial"]["Complete"] then HelloWorld() end
+	if not MaoRUIDB["Tutorial"]["Complete"] then HelloWorld() end
 			
 	if (ShiGuangPerDB["BHT"] == true) then
 	      sendCmd("/bht on")

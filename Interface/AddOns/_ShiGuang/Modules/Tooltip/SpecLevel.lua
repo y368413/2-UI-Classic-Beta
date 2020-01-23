@@ -179,7 +179,7 @@ function TT:InspectUnit(unit, forced)
 		level = currentDB.level
 		self:SetupSpecLevel(nil, level)
 
-		if not MaoRUISettingDB["Tooltip"]["SpecLevelByShift"] and IsShiftKeyDown() then forced = true end
+		if not MaoRUIDB["Tooltip"]["SpecLevelByShift"] and IsShiftKeyDown() then forced = true end
 		if level and not forced and (GetTime() - currentDB.getTime < resetTime) then updater.elapsed = frequency return end
 		if not UnitIsVisible(unit) or UnitIsDeadOrGhost("player") or UnitOnTaxi("player") then return end
 		if InspectFrame and InspectFrame:IsShown() then return end
@@ -190,7 +190,7 @@ function TT:InspectUnit(unit, forced)
 end
 
 function TT:InspectUnitSpecAndLevel()
-	if MaoRUISettingDB["Tooltip"]["SpecLevelByShift"] and not IsShiftKeyDown() then return end
+	if MaoRUIDB["Tooltip"]["SpecLevelByShift"] and not IsShiftKeyDown() then return end
 
 	local _, unit = self:GetUnit()
 	if not unit or not CanInspect(unit) then return end

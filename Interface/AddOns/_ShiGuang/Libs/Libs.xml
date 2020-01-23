@@ -1,10 +1,11 @@
 <Ui xmlns="http://www.blizzard.com/wow/ui/">
-	<Include file="cargBags\cargBags.xml"/>
 	<Include file="Ace\Ace.xml"/>
-	<Script file="LibButtonGlow.lua"/>
-	<Script file="LibBase64.lua"/>
-	<!--Script file="LibClassicCasterino.lua"/-->
+	<Script file="GetTotemInfo.lua"/>
 	<Script file="LibAuraTypes.lua"/>
 	<Script file="LibSpellLocks.lua"/>
 	<Include file="LibClassicDurations\LibClassicDurations.xml"/>
+	<Include file="cargBags\cargBags.xml"/>
+	<Script file="LibButtonGlow.lua"/>
+	<Script file="LibBase64.lua"/>
+	<!--Script file="RealMobHealth.lua"/-->
 </Ui>

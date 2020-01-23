@@ -94,7 +94,7 @@ end
 
 function G:CreateBarWidgets(parent, texture)
 	local icon = CreateFrame("Frame", nil, parent)
-	icon:SetSize(20, 20)
+	icon:SetSize(21, 21)
 	icon:SetPoint("LEFT", 5, 0)
 	M.PixelIcon(icon, texture, true)
 
@@ -156,8 +156,8 @@ local function CreatePanel()
 		button1 = YES,
 		button2 = NO,
 		OnAccept = function()
-			MaoRUISettingDB["AuraWatchList"] = {}
-			MaoRUISettingDB["InternalCD"] = {}
+			MaoRUIDB["AuraWatchList"] = {}
+			MaoRUIDB["InternalCD"] = {}
 			ReloadUI()
 		end,
 		whileDead = 1,
@@ -170,7 +170,7 @@ local function CreatePanel()
 	local function SortBars(index)
 		local num, onLeft, onRight = 1, 1, 1
 		for k in pairs(barTable[index]) do
-			if (index < 10 and MaoRUISettingDB["AuraWatchList"][index][k]) or (index == 10 and MaoRUISettingDB["InternalCD"][k]) then
+			if (index < 10 and MaoRUIDB["AuraWatchList"][index][k]) or (index == 10 and MaoRUIDB["InternalCD"][k]) then
 				local bar = barTable[index][k]
 				if num == 1 then
 					bar:SetPoint("TOPLEFT", 10, -10)
@@ -233,7 +233,7 @@ local function CreatePanel()
 		end
 		close:SetScript("OnClick", function()
 			bar:Hide()
-			MaoRUISettingDB["AuraWatchList"][index][spellID] = nil
+			MaoRUIDB["AuraWatchList"][index][spellID] = nil
 			barTable[index][spellID] = nil
 			SortBars(index)
 		end)
@@ -280,7 +280,7 @@ local function CreatePanel()
 		M.AddTooltip(icon, "ANCHOR_RIGHT", intID)
 		close:SetScript("OnClick", function()
 			bar:Hide()
-			MaoRUISettingDB["InternalCD"][intID] = nil
+			MaoRUIDB["InternalCD"][intID] = nil
 			barTable[index][intID] = nil
 			SortBars(index)
 		end)
@@ -298,9 +298,9 @@ local function CreatePanel()
 		local bu = M.CreateCheckBox(parent)
 		bu:SetHitRectInsets(-100, 0, 0, 0)
 		bu:SetPoint("TOPRIGHT", -40, -145)
-		bu:SetChecked(MaoRUISettingDB["AuraWatchList"]["Switcher"][index])
+		bu:SetChecked(MaoRUIDB["AuraWatchList"]["Switcher"][index])
 		bu:SetScript("OnClick", function()
-			MaoRUISettingDB["AuraWatchList"]["Switcher"][index] = bu:GetChecked()
+			MaoRUIDB["AuraWatchList"]["Switcher"][index] = bu:GetChecked()
 		end)
 		M.CreateFS(bu, 15, "|cffff0000"..U["AW Switcher"], false, "RIGHT", -25, 0)
 	end
@@ -355,7 +355,7 @@ local function CreatePanel()
 	end
 
 	for i, group in pairs(groups) do
-		if not MaoRUISettingDB["AuraWatchList"][i] then MaoRUISettingDB["AuraWatchList"][i] = {} end
+		if not MaoRUIDB["AuraWatchList"][i] then MaoRUIDB["AuraWatchList"][i] = {} end
 		barTable[i] = {}
 
 		tabs[i] = CreateFrame("Button", "$parentTab"..i, f)
@@ -371,7 +371,7 @@ local function CreatePanel()
 
 		local Option = {}
 		if i < 10 then
-			for _, v in pairs(MaoRUISettingDB["AuraWatchList"][i]) do
+			for _, v in pairs(MaoRUIDB["AuraWatchList"][i]) do
 				AddAura(tabs[i].List.child, i, v)
 			end
 			Option[1] = G:CreateDropdown(tabs[i].Page, U["Type*"], 20, -30, {"AuraID", "SpellID", "SlotID", "TotemID"}, U["Type Intro"])
@@ -410,7 +410,7 @@ local function CreatePanel()
 				end)
 			end
 		elseif i == 10 then
-			for _, v in pairs(MaoRUISettingDB["InternalCD"]) do
+			for _, v in pairs(MaoRUIDB["InternalCD"]) do
 				AddInternal(tabs[i].List.child, i, v)
 			end
 			Option[13] = G:CreateEditbox(tabs[i].Page, U["IntID*"], 20, -30, U["IntID Intro"])
@@ -448,19 +448,19 @@ local function CreatePanel()
 				if (typeID == "AuraID" or typeID == "SpellID") and not GetSpellInfo(spellID) then UIErrorsFrame:AddMessage(I.InfoColor..U["Incorrect SpellID"]) return end
 
 				local realID = spellID or slotID or totemID
-				if MaoRUISettingDB["AuraWatchList"][i][realID] then UIErrorsFrame:AddMessage(I.InfoColor..U["Existing ID"]) return end
+				if MaoRUIDB["AuraWatchList"][i][realID] then UIErrorsFrame:AddMessage(I.InfoColor..U["Existing ID"]) return end
 
-				MaoRUISettingDB["AuraWatchList"][i][realID] = {typeID, realID, unitID, Option[4].Text:GetText(), tonumber(Option[5]:GetText()) or false, Option[6]:GetChecked(), Option[7]:GetChecked(), Option[8]:GetChecked(), Option[9]:GetText(), Option[10]:GetChecked()}
-				AddAura(tabs[i].List.child, i, MaoRUISettingDB["AuraWatchList"][i][realID])
+				MaoRUIDB["AuraWatchList"][i][realID] = {typeID, realID, unitID, Option[4].Text:GetText(), tonumber(Option[5]:GetText()) or false, Option[6]:GetChecked(), Option[7]:GetChecked(), Option[8]:GetChecked(), Option[9]:GetText(), Option[10]:GetChecked()}
+				AddAura(tabs[i].List.child, i, MaoRUIDB["AuraWatchList"][i][realID])
 				for i = 2, 12 do G:ClearEdit(Option[i]) end
 			elseif i == 10 then
 				local intID, duration, trigger, unit, itemID = tonumber(Option[13]:GetText()), tonumber(Option[14]:GetText()), Option[15].Text:GetText(), Option[16].Text:GetText(), tonumber(Option[17]:GetText())
 				if not intID or not duration or not trigger or not unit then UIErrorsFrame:AddMessage(I.InfoColor..U["Incomplete Input"]) return end
 				if intID and not GetSpellInfo(intID) then UIErrorsFrame:AddMessage(I.InfoColor..U["Incorrect SpellID"]) return end
-				if MaoRUISettingDB["InternalCD"][intID] then UIErrorsFrame:AddMessage(I.InfoColor..U["Existing ID"]) return end
+				if MaoRUIDB["InternalCD"][intID] then UIErrorsFrame:AddMessage(I.InfoColor..U["Existing ID"]) return end
 
-				MaoRUISettingDB["InternalCD"][intID] = {intID, duration, trigger, unit, itemID}
-				AddInternal(tabs[i].List.child, i, MaoRUISettingDB["InternalCD"][intID])
+				MaoRUIDB["InternalCD"][intID] = {intID, duration, trigger, unit, itemID}
+				AddInternal(tabs[i].List.child, i, MaoRUIDB["InternalCD"][intID])
 				for i = 13, 17 do G:ClearEdit(Option[i]) end
 			end
 		end)

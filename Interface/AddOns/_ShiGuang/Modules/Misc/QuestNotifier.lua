@@ -22,7 +22,7 @@ local function completeText(link)
 end
 
 local function sendQuestMsg(msg)
-	if MaoRUISettingDB["Misc"]["OnlyCompleteRing"] then return end
+	if MaoRUIDB["Misc"]["OnlyCompleteRing"] then return end
 
 	--if IsPartyLFG() then
 		--SendChatMessage(msg, "INSTANCE_CHAT")
@@ -51,8 +51,8 @@ local questMatches = {
 }
 
 function MISC:FindQuestProgress(_, msg)
-	if not MaoRUISettingDB["Misc"]["QuestProgress"] then return end
-	if MaoRUISettingDB["Misc"]["OnlyCompleteRing"] then return end
+	if not MaoRUIDB["Misc"]["QuestProgress"] then return end
+	if MaoRUIDB["Misc"]["OnlyCompleteRing"] then return end
 
 	for _, pattern in pairs(questMatches) do
 		if strmatch(msg, pattern) then
@@ -91,7 +91,7 @@ function MISC:FindQuestComplete()
 end
 
 function MISC:QuestNotifier()
-	if MaoRUISettingDB["Misc"]["QuestNotifier"] then
+	if MaoRUIDB["Misc"]["QuestNotifier"] then
 		self:FindQuestComplete()
 		M:RegisterEvent("QUEST_ACCEPTED", self.FindQuestAccept)
 		M:RegisterEvent("QUEST_LOG_UPDATE", self.FindQuestComplete)

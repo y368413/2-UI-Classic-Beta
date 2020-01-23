@@ -73,7 +73,7 @@ function BaudErrorFrameShowError(Error)
 	if not EnableSound then return end
 
 	if GetTime() > SoundTime then
-		PlaySound(48942, "Master")
+		PlaySound(SOUNDKIT.U_CHAT_SCROLL_BUTTON, "Master")
 		SoundTime = GetTime() + 1
 	end
 end

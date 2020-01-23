@@ -3,10 +3,10 @@ local M, R, U, I = unpack(ns)
 local S = M:RegisterModule("Skins")
 
 function S:OnLogin()
-	PlayerFrame:SetScale(MaoRUISettingDB["UFs"]["PlayerFrameScale"]) 
-	TargetFrame:SetScale(MaoRUISettingDB["UFs"]["PlayerFrameScale"])
+	PlayerFrame:SetScale(MaoRUIDB["UFs"]["PlayerFrameScale"]) 
+	TargetFrame:SetScale(MaoRUIDB["UFs"]["PlayerFrameScale"])
 	local cr, cg, cb = 0, 0, 0
-	if MaoRUISettingDB["Skins"]["ClassLine"] then cr, cg, cb = I.r, I.g, I.b end
+	if MaoRUIDB["Skins"]["ClassLine"] then cr, cg, cb = I.r, I.g, I.b end
 
 	-- TOPLEFT
 	local Tinfobar = CreateFrame("Frame", nil, UIParent)
@@ -39,7 +39,7 @@ function S:OnLogin()
 	Rinfobar2:SetPoint("TOP", Rinfobar, "BOTTOM")
 	M.CreateGF(Rinfobar2, 520, R.mult, "Horizontal", cr, cg, cb, 0, .8)
    ----BOTTOM
-   if MaoRUISettingDB["Skins"]["InfobarLine"] then
+   if MaoRUIDB["Skins"]["InfobarLine"] then
    local Bottomline = CreateFrame("Frame", nil, UIParent) 
    Bottomline:SetFrameLevel(0) 
    Bottomline:SetFrameStrata("BACKGROUND")
@@ -75,17 +75,32 @@ function S:OnLogin()
 	end
 end
 
+function S:GetToggleDirection()
+	local direc = MaoRUIDB["Skins"]["ToggleDirection"]
+	if direc == 1 then
+		return ">", "<", "RIGHT", "LEFT", -2, 0, 20, 80
+	elseif direc == 2 then
+		return "<", ">", "LEFT", "RIGHT", 2, 0, 20, 80
+	elseif direc == 3 then
+		return "∨", "∧", "BOTTOM", "TOP", 0, 2, 80, 20
+	else
+		return "∧", "∨", "TOP", "BOTTOM", 0, -2, 80, 20
+	end
+end
+
+local toggleFrames = {}
+
 function S:CreateToggle(frame)
 	local close = M.CreateButton(frame, 20, 80, ">", 18)
-	close:SetPoint("RIGHT", frame.bg, "LEFT", -2, 0)
 	M.CreateSD(close)
 	M.CreateTex(close)
+	frame.closeButton = close
 
 	local open = M.CreateButton(UIParent, 20, 80, "<", 18)
-	open:SetPoint("RIGHT", frame.bg, "RIGHT", 2, 0)
 	M.CreateSD(open)
 	M.CreateTex(open)
 	open:Hide()
+	frame.openButton = open
 
 	open:SetScript("OnClick", function()
 		open:Hide()
@@ -94,12 +109,36 @@ function S:CreateToggle(frame)
 		open:Show()
 	end)
 
+	S:SetToggleDirection(frame)
+	tinsert(toggleFrames, frame)
+
 	return open, close
+end
+
+function S:SetToggleDirection(frame)
+	local str1, str2, rel1, rel2, x, y, width, height = S:GetToggleDirection()
+	local parent = frame.bg
+	local close = frame.closeButton
+	local open = frame.openButton
+	close:ClearAllPoints()
+	close:SetPoint(rel1, parent, rel2, x, y)
+	close:SetSize(width, height)
+	close.text:SetText(str1)
+	open:ClearAllPoints()
+	open:SetPoint(rel1, parent, rel1, -x, -y)
+	open:SetSize(width, height)
+	open.text:SetText(str2)
+end
+
+function S:RefreshToggleDirection()
+	for _, frame in pairs(toggleFrames) do
+		S:SetToggleDirection(frame)
+	end
 end
 
 function S:LoadWithAddOn(addonName, value, func)
 	local function loadFunc(event, addon)
-		if not MaoRUISettingDB["Skins"][value] then return end
+		if not MaoRUIDB["Skins"][value] then return end
 
 		if event == "PLAYER_ENTERING_WORLD" then
 			M:UnregisterEvent(event, loadFunc)

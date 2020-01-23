@@ -1,7 +1,7 @@
 ﻿local _, ns = ...
 local M, R, U, I = unpack(ns)
 local module = M:RegisterModule("Chat")
--- Reskin Chat
+
 local maxLines = 1024
 local maxWidth, maxHeight = UIParent:GetWidth(), UIParent:GetHeight()
 local tostring, pairs, ipairs, strsub, strlower = tostring, pairs, ipairs, string.sub, string.lower
@@ -20,17 +20,17 @@ end
 
 local isScaling = false
 function module:UpdateChatSize()
-	if not MaoRUISettingDB["Chat"]["Lock"] then return end
+	if not MaoRUIDB["Chat"]["Lock"] then return end
 	if isScaling then return end
 	isScaling = true
 
 	ChatFrame1:ClearAllPoints()
 	ChatFrame1:SetPoint("BOTTOMLEFT", UIParent, "BOTTOMLEFT", 0, 21)
-	ChatFrame1:SetWidth(MaoRUISettingDB["Chat"]["ChatWidth"])
-	ChatFrame1:SetHeight(MaoRUISettingDB["Chat"]["ChatHeight"])
+	ChatFrame1:SetWidth(MaoRUIDB["Chat"]["ChatWidth"])
+	ChatFrame1:SetHeight(MaoRUIDB["Chat"]["ChatHeight"])
 	local bg = ChatFrame1.gradientBG
 	if bg then
-		bg:SetHeight(MaoRUISettingDB["Chat"]["ChatHeight"] + 30)
+		bg:SetHeight(MaoRUIDB["Chat"]["ChatHeight"] + 30)
 	end
 	isScaling = false
 end
@@ -43,7 +43,7 @@ function module:SkinChat()
 	self:SetClampRectInsets(0, 0, 0, 0)
 	self:SetMaxResize(maxWidth, maxHeight)
 	self:SetMinResize(120, 60)
-	if MaoRUISettingDB["Chat"]["Outline"] then
+	if MaoRUIDB["Chat"]["Outline"] then
 	  self:SetFont(I.Font[1], fontSize, "OUTLINE")
 	else
 	  self:SetFont(fontStyle, fontSize)
@@ -85,7 +85,7 @@ function module:SkinChat()
 	M.StripTextures(tab, 7)
 	--hooksecurefunc(tab, "SetAlpha", module.TabSetAlpha)
 
-	--if MaoRUISettingDB["Chat"]["Lock"] then M.StripTextures(self) end
+	--if MaoRUIDB["Chat"]["Lock"] then M.StripTextures(self) end
 	M.HideObject(self.buttonFrame)
 	--M.HideObject(self.ScrollBar)
 	M.HideObject(self.ScrollToBottomButton)
@@ -163,7 +163,7 @@ hooksecurefunc("FloatingChatFrame_OnMouseScroll", module.QuickMouseScroll)
 -- Autoinvite by whisper
 local whisperList = {}
 function module:UpdateWhisperList()
-	M.SplitList(whisperList, MaoRUISettingDB["Chat"]["Keyword"], true)
+	M.SplitList(whisperList, MaoRUIDB["Chat"]["Keyword"], true)
 end
 
 function module:IsUnitInGuild(unitName)
@@ -186,12 +186,12 @@ function module.OnChatWhisper(event, ...)
 				local gameID = select(6, BNGetFriendInfoByID(presenceID))
 				if gameID then
 					local _, charName, _, realmName = BNGetGameAccountInfo(gameID)
-					if CanCooperateWithGameAccount(gameID) and (not MaoRUISettingDB["Chat"]["GuildInvite"] or module:IsUnitInGuild(charName.."-"..realmName)) then
+					if CanCooperateWithGameAccount(gameID) and (not MaoRUIDB["Chat"]["GuildInvite"] or module:IsUnitInGuild(charName.."-"..realmName)) then
 						BNInviteFriend(gameID)
 					end
 				end
 			else
-				if not MaoRUISettingDB["Chat"]["GuildInvite"] or IsGuildMember(guid) then
+				if not MaoRUIDB["Chat"]["GuildInvite"] or IsGuildMember(guid) then
 					InviteToGroup(author)
 				end
 			end
@@ -200,7 +200,7 @@ function module.OnChatWhisper(event, ...)
 end
 
 function module:WhipserInvite()
-	if not MaoRUISettingDB["Chat"]["Invite"] then return end
+	if not MaoRUIDB["Chat"]["Invite"] then return end
 	self:UpdateWhisperList()
 	M:RegisterEvent("CHAT_MSG_WHISPER", module.OnChatWhisper)
 	M:RegisterEvent("CHAT_MSG_BN_WHISPER", module.OnChatWhisper)
@@ -209,7 +209,7 @@ end
 -- Timestamp
 function module:UpdateTimestamp()
 	local greyStamp = I.GreyColor.."[%H:%M]|r" --"[%H:%M:%S]|r "
-	if MaoRUIDB["Timestamp"] then
+	if MaoRUIAccountDB["Timestamp"] then
 		SetCVar("showTimestamps", greyStamp)
 	elseif GetCVar("showTimestamps") == greyStamp then
 		SetCVar("showTimestamps", "none")
@@ -218,7 +218,7 @@ end
 
 -- Classcolor name
 function module:UpdateClassColorName()
-	if MaoRUIDB["ClassColorChat"] then
+	if MaoRUIAccountDB["ClassColorChat"] then
 		SetCVar("chatClassColorOverride", "0")
 	else
 		SetCVar("chatClassColorOverride", "1")
@@ -227,7 +227,7 @@ end
 
 -- Sticky whisper
 function module:ChatWhisperSticky()
-	if MaoRUISettingDB["Chat"]["Sticky"] then
+	if MaoRUIDB["Chat"]["Sticky"] then
 		ChatTypeInfo["WHISPER"].sticky = 1
 		ChatTypeInfo["BN_WHISPER"].sticky = 1
 	else
@@ -281,7 +281,7 @@ function module:OnLogin()
 	self:WhipserInvite()
 
 	-- Lock chatframe
-	if MaoRUISettingDB["Chat"]["Lock"] then
+	if MaoRUIDB["Chat"]["Lock"] then
 		self:UpdateChatSize()
 		hooksecurefunc("FCF_SavePositionAndDimensions", self.UpdateChatSize)
 		M:RegisterEvent("UI_SCALE_CHANGED", self.UpdateChatSize)
@@ -289,7 +289,7 @@ function module:OnLogin()
 
 	-- ProfanityFilter
 	if not BNFeaturesEnabledAndConnected() then return end
-	if not MaoRUISettingDB["Chat"]["Freedom"] then
+	if not MaoRUIDB["Chat"]["Freedom"] then
 		SetCVar("profanityFilter", 1)
 	else
 		SetCVar("profanityFilter", 0)

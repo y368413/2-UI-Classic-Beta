@@ -860,7 +860,7 @@ local function HookButtons()
 end
 
 frame:SetScript("OnEvent", function(self, event, ...)
-    --if not MaoRUISettingDB["Misc"]["FriendGroups"] then self:UnregisterAllEvents() return end
+    --if not MaoRUIDB["Misc"]["FriendGroups"] then self:UnregisterAllEvents() return end
 	if event == "PLAYER_LOGIN" then
 		Hook("FriendsList_Update", FriendGroups_Update, true)
 		--if other addons have hooked this, we should too

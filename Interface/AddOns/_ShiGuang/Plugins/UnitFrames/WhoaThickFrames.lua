@@ -54,15 +54,18 @@ hooksecurefunc("TargetFrame_CheckFaction", npcReactionBrightColors)
   
 --	Whoa's customs target unit reactions HP colors.
 local function npcReactionColors(healthbar, unit)
+			healthbar:SetStatusBarColor(0,0.9,0)
 		if UnitExists(unit) and (not UnitIsPlayer(unit)) then
-			if (UnitIsTapDenied(unit)) then
-				healthbar:SetStatusBarColor(0.5, 0.5, 0.5)
-			end
 			local reaction = FACTION_BAR_COLORS[UnitReaction(unit,"player")];
 			if reaction then
 				healthbar:SetStatusBarColor(reaction.r, reaction.g, reaction.b);
 			else
 				healthbar:SetStatusBarColor(0,0.6,0.1)
+			end
+			if (UnitIsTapDenied(unit)) then
+				healthbar:SetStatusBarColor(0.5, 0.5, 0.5)
+			elseif UnitIsCivilian(unit) then
+				healthbar:SetStatusBarColor(1.0, 1.0, 1.0)
 			end
 		end
 end

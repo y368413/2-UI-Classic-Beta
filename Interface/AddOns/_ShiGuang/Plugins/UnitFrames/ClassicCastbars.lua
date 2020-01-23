@@ -2336,7 +2336,7 @@ local function GetSpellCastInfo(spellID)
 end
 
 function addon:ToggleUnitEvents(shouldReset)
-    if MaoRUISettingDB["Nameplate"]["TargetClassicCastbars"] then
+    if MaoRUIDB["Nameplate"]["TargetClassicCastbars"] then
         self:RegisterEvent("PLAYER_TARGET_CHANGED")
         if self.db.target.autoPosition then
             self:RegisterUnitEvent("UNIT_AURA", "target")
@@ -2348,7 +2348,7 @@ function addon:ToggleUnitEvents(shouldReset)
         self:UnregisterEvent("UNIT_TARGET")
     end
 
-    if MaoRUISettingDB["Nameplate"]["ClassicCastbars"] then
+    if MaoRUIDB["Nameplate"]["ClassicCastbars"] then
         self:RegisterEvent("NAME_PLATE_UNIT_ADDED")
         self:RegisterEvent("NAME_PLATE_UNIT_REMOVED")
     else

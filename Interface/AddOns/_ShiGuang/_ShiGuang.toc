@@ -3,8 +3,8 @@
 ## Author: ShiGuang、TuTu、Siweia
 ## Notes: Time Flies...
 ## Version: 0.4.2
-## SavedVariables: MaoRUIDB,ShiGuangDB,CastbarsDB,DialogKeyDB,TinyRosterDB
-## SavedVariablesPerCharacter: MaoRUISettingDB,ShiGuangPerDB,DEX_SAVE
+## SavedVariables: MaoRUIAccountDB,ShiGuangDB,CastbarsDB,DialogKeyDB
+## SavedVariablesPerCharacter: MaoRUIDB,ShiGuangPerDB,DEX_SAVE
 
 ## X-Support: Classic
 ## X-Repple: 2 UI

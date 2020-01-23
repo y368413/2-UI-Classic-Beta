@@ -59,7 +59,7 @@ function MISC:OnLogin()
 	end)
 
 	-- Auto chatBubbles
-	if MaoRUIDB["AutoBubbles"] then
+	if MaoRUIAccountDB["AutoBubbles"] then
 		local function updateBubble()
 			local name, instType = GetInstanceInfo()
 			if name and instType == "raid" then
@@ -78,11 +78,21 @@ function MISC:OnLogin()
 
 	-- Instant delete
 	hooksecurefunc(StaticPopupDialogs["DELETE_GOOD_ITEM"], "OnShow", function(self)
-		self.editBox:SetText(DELETE_ITEM_CONFIRM_STRING)
+		if MaoRUIDB["Misc"]["InstantDelete"] then
+			self.editBox:SetText(DELETE_ITEM_CONFIRM_STRING)
+		end
 	end)
 
 	-- Fix blizz error
 	MAIN_MENU_MICRO_ALERT_PRIORITY = MAIN_MENU_MICRO_ALERT_PRIORITY or {}
+
+	-- Fix blizz bug in addon list
+	local _AddonTooltip_Update = AddonTooltip_Update
+	function AddonTooltip_Update(owner)
+		if not owner then return end
+		if owner:GetID() < 1 then return end
+		_AddonTooltip_Update(owner)
+	end
 end
 
 -- Reanchor Vehicle
@@ -150,7 +160,7 @@ function MISC:DoFasterLoot()
 end
 
 function MISC:UpdateFasterLoot()
-	if MaoRUISettingDB["Misc"]["FasterLoot"] then
+	if MaoRUIDB["Misc"]["FasterLoot"] then
 		M:RegisterEvent("LOOT_READY", MISC.DoFasterLoot)
 	else
 		M:UnregisterEvent("LOOT_READY", MISC.DoFasterLoot)
@@ -202,7 +212,7 @@ function MISC:ErrorBlockerOnEvent(_, text)
 end
 
 function MISC:UpdateErrorBlocker()
-	if MaoRUISettingDB["Misc"]["HideErrors"] then
+	if MaoRUIDB["Misc"]["HideErrors"] then
 		M:RegisterEvent("UI_ERROR_MESSAGE", MISC.ErrorBlockerOnEvent)
 	else
 		isRegistered = true
@@ -235,20 +245,6 @@ function MISC:TradeTargetInfo()
 end
 
 -- Show BID and highlight price
--- AH Gold Icon
-local function formats(value)
-	local str = ''
-	if value > 9999 then
-		str = str .. format('|c00ffd700%d●|r', floor(value / 10000))
-	end
-	if value > 99 and floor(value/100)%100 ~= 0 then
-		str = str .. format('|c00c7c7cf%d●|r', (floor(value / 100) % 100))
-	end
-	if floor(value)%100 ~= 0 then
-		str = str .. format('|c00eda55f%d●|r', (floor(value) % 100))
-	end
-	return str
-end
 function MISC:BidPriceHighlight()
 	if IsAddOnLoaded("Auc-Advanced") then return end
 	local function setupMisc(event, addon)
@@ -271,6 +267,20 @@ function MISC:BidPriceHighlight()
 						local itemName = _G[buttonName.."Name"]
 						local moneyFrame = _G[buttonName.."MoneyFrame"]
 						local buyoutMoney = _G[buttonName.."BuyoutFrameMoney"]
+						-- AH Gold Icon
+						local function formats(value)
+							local str = ''
+							if value > 9999 then
+								str = str .. format('|c00ffd700%d●|r', floor(value / 10000))
+							end
+							if value > 99 and floor(value/100)%100 ~= 0 then
+								str = str .. format('|c00c7c7cf%d●|r', (floor(value / 100) % 100))
+							end
+							if floor(value)%100 ~= 0 then
+								str = str .. format('|c00eda55f%d●|r', (floor(value) % 100))
+							end
+							return str
+						end
 						if buyoutPrice >= 1e6 then color = "red" end
 							if bidAmount > 0 then
 								name = name .. " |cffffff00[￥]|r"
@@ -416,7 +426,7 @@ function MISC:MenuButton_Show(_, unit)
 end
 
 function MISC:MenuButton_Add()
-	if not MaoRUISettingDB["Misc"]["EnhancedMenu"] then return end
+	if not MaoRUIDB["Misc"]["EnhancedMenu"] then return end
 
 	MISC.MenuButtonList = {
 		["name"] = COPY_NAME,
@@ -427,7 +437,7 @@ end
 
 -- Auto dismount and auto stand
 function MISC:AutoDismount()
-	if not MaoRUISettingDB["Misc"]["AutoDismount"] then return end
+	if not MaoRUIDB["Misc"]["AutoDismount"] then return end
 
 	local standString = {
 		[ERR_LOOT_NOTSTANDING] = true,

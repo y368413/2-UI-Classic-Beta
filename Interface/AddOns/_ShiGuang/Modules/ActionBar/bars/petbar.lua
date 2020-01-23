@@ -12,9 +12,9 @@ function Bar:CreatePetbar()
 	local frame = CreateFrame("Frame", "NDui_ActionBarPet", UIParent, "SecureHandlerStateTemplate")
 	frame:SetWidth(num*cfg.size + (num-1)*margin + 2*padding)
 	frame:SetHeight(cfg.size + 2*padding)
-	if MaoRUISettingDB["Actionbar"]["Style"] == 3 then
+	if MaoRUIDB["Actionbar"]["Style"] == 3 then
 		frame.Pos = {"BOTTOM", UIParent, "BOTTOM", 355, 85}
-	elseif (MaoRUISettingDB["Actionbar"]["Style"] == 4) or (MaoRUISettingDB["Actionbar"]["Style"] == 8) then
+	elseif (MaoRUIDB["Actionbar"]["Style"] == 4) or (MaoRUIDB["Actionbar"]["Style"] == 8) then
 	  frame.Pos = {"BOTTOM", UIParent, "BOTTOM", 80, 120}
 	else
 		frame.Pos = {"BOTTOM", UIParent, "BOTTOM", 100, 90}

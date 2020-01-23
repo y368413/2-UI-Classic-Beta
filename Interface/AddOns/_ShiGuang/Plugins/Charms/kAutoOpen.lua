@@ -1,6 +1,6 @@
 ﻿local kAutoOpen = CreateFrame('Frame')
 kAutoOpen:SetScript('OnEvent', function(self, event, ...)
- if not MaoRUISettingDB["Misc"]["kAutoOpen"] then self:UnregisterAllEvents() return end
+ if not MaoRUIDB["Misc"]["kAutoOpen"] then self:UnregisterAllEvents() return end
  self[event](...)
 end)
 

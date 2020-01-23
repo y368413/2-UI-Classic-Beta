@@ -3,7 +3,7 @@ local M, R, U, I = unpack(ns)
 local P = M:GetModule("Skins")
 
 function P:LootEx()
-	--if not MaoRUISettingDB["Skins"]["Loot"] then return end
+	--if not MaoRUIDB["Skins"]["Loot"] then return end
 	
 ------------------------------------------------------------ImprovedLootFrame
 local wow_classic = WOW_PROJECT_ID and WOW_PROJECT_ID == WOW_PROJECT_CLASSIC

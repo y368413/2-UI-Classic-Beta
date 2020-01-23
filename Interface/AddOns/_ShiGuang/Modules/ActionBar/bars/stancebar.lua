@@ -13,11 +13,11 @@ function Bar:CreateStancebar()
 	local frame = CreateFrame("Frame", "NDui_ActionBarStance", UIParent, "SecureHandlerStateTemplate")
 	frame:SetWidth(num*cfg.size + (num-1)*margin + 2*padding)
 	frame:SetHeight(cfg.size + 2*padding)
-	if (MaoRUISettingDB["Actionbar"]["Style"] == 7) or (MaoRUISettingDB["Actionbar"]["Style"] == 6) or (MaoRUISettingDB["Actionbar"]["Style"] == 10) then
+	if (MaoRUIDB["Actionbar"]["Style"] == 7) or (MaoRUIDB["Actionbar"]["Style"] == 6) or (MaoRUIDB["Actionbar"]["Style"] == 10) then
 		frame.Pos = {"BOTTOM", UIParent, "BOTTOM", -120, 90}
-	elseif (MaoRUISettingDB["Actionbar"]["Style"] == 4) or (MaoRUISettingDB["Actionbar"]["Style"] == 8) then
+	elseif (MaoRUIDB["Actionbar"]["Style"] == 4) or (MaoRUIDB["Actionbar"]["Style"] == 8) then
 		frame.Pos = {"BOTTOM", UIParent, "BOTTOM", -42, 120}
-	elseif MaoRUISettingDB["Actionbar"]["Style"] == 3 then
+	elseif MaoRUIDB["Actionbar"]["Style"] == 3 then
 		frame.Pos = {"BOTTOM", UIParent, "BOTTOM", -295, 85}
 	else
 		frame.Pos = {"BOTTOM", UIParent, "BOTTOM", -62, 85}

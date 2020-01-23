@@ -13,16 +13,16 @@ function A:OnLogin()
 	-- Config
 	settings = {
 		Buffs = {
-			size = MaoRUISettingDB["Auras"]["BuffSize"],
-			wrapAfter = MaoRUISettingDB["Auras"]["BuffsPerRow"],
+			size = MaoRUIDB["Auras"]["BuffSize"],
+			wrapAfter = MaoRUIDB["Auras"]["BuffsPerRow"],
 			maxWraps = 3,
-			reverseGrow = MaoRUISettingDB["Auras"]["ReverseBuffs"],
+			reverseGrow = MaoRUIDB["Auras"]["ReverseBuffs"],
 		},
 		Debuffs = {
-			size = MaoRUISettingDB["Auras"]["DebuffSize"],
-			wrapAfter = MaoRUISettingDB["Auras"]["DebuffsPerRow"],
+			size = MaoRUIDB["Auras"]["DebuffSize"],
+			wrapAfter = MaoRUIDB["Auras"]["DebuffsPerRow"],
 			maxWraps = 1,
-			reverseGrow = MaoRUISettingDB["Auras"]["ReverseDebuffs"],
+			reverseGrow = MaoRUIDB["Auras"]["ReverseDebuffs"],
 		},
 	}
 

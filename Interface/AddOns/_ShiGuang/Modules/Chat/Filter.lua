@@ -16,12 +16,12 @@ local msgSymbols = {"`", "～", "＠", "＃", "^", "＊", "！", "？", "。", "
 
 local FilterList = {}
 function module:UpdateFilterList()
-	M.SplitList(FilterList, MaoRUIDB["ChatFilterList"], true)
+	M.SplitList(FilterList, MaoRUIAccountDB["ChatFilterList"], true)
 end
 
 local WhiteFilterList = {}
 function module:UpdateFilterWhiteList()
-	M.SplitList(WhiteFilterList, MaoRUIDB["ChatFilterWhiteList"], true)
+	M.SplitList(WhiteFilterList, MaoRUIAccountDB["ChatFilterWhiteList"], true)
 end
 
 -- ECF strings compare
@@ -45,12 +45,15 @@ end
 
 R.BadBoys = {} -- debug
 local chatLines, prevLineID, filterResult = {}, 0, false
+
 function module:GetFilterResult(event, msg, name, flag, guid)
 	if name == I.MyName or (event == "CHAT_MSG_WHISPER" and flag == "GM") or flag == "DEV" then
 		return
 	elseif guid and (IsGuildMember(guid) or BNGetGameAccountInfoByGUID(guid) or C_FriendList_IsFriend(guid) or IsGUIDInGroup(guid)) then
 		return
 	end
+
+	if MaoRUIDB["Chat"]["BlockStranger"] and event == "CHAT_MSG_WHISPER" then return true end -- Block strangers
 
 	if R.BadBoys[name] and R.BadBoys[name] >= 5 then return true end
 
@@ -90,7 +93,7 @@ function module:GetFilterResult(event, msg, name, flag, guid)
 		end
 	end
 
-	if matches >= MaoRUISettingDB["Chat"]["Matches"] then
+	if matches >= MaoRUIDB["Chat"]["Matches"] then
 		return true
 	end
 
@@ -215,7 +218,7 @@ function module:UpdateChatItemLevel(_, msg, ...)
 end
 
 function module:ChatFilter()
-	if MaoRUISettingDB["Chat"]["EnableFilter"] then
+	if MaoRUIDB["Chat"]["EnableFilter"] then
 		self:UpdateFilterList()
 		self:UpdateFilterWhiteList()
 		ChatFrame_AddMessageEventFilter("CHAT_MSG_CHANNEL", self.UpdateChatFilter)
@@ -226,7 +229,7 @@ function module:ChatFilter()
 		ChatFrame_AddMessageEventFilter("CHAT_MSG_TEXT_EMOTE", self.UpdateChatFilter)
 	end
 
-	if MaoRUISettingDB["Chat"]["BlockAddonAlert"] then
+	if MaoRUIDB["Chat"]["BlockAddonAlert"] then
 		ChatFrame_AddMessageEventFilter("CHAT_MSG_SAY", self.UpdateAddOnBlocker)
 		ChatFrame_AddMessageEventFilter("CHAT_MSG_WHISPER", self.UpdateAddOnBlocker)
 		ChatFrame_AddMessageEventFilter("CHAT_MSG_EMOTE", self.UpdateAddOnBlocker)
@@ -239,7 +242,7 @@ function module:ChatFilter()
 		ChatFrame_AddMessageEventFilter("CHAT_MSG_CHANNEL", self.UpdateAddOnBlocker)
 	end
 
-	if MaoRUISettingDB["Chat"]["ChatItemLevel"] then
+	if MaoRUIDB["Chat"]["ChatItemLevel"] then
 		ChatFrame_AddMessageEventFilter("CHAT_MSG_LOOT", self.UpdateChatItemLevel)
 		ChatFrame_AddMessageEventFilter("CHAT_MSG_CHANNEL", self.UpdateChatItemLevel)
 		ChatFrame_AddMessageEventFilter("CHAT_MSG_SAY", self.UpdateChatItemLevel)
