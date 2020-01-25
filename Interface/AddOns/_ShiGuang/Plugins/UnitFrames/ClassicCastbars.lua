@@ -1,4 +1,4 @@
---## Author: Wardz ## Version: v1.2.3
+--## Author: Wardz ## Version: v1.2.4
 local ClassicCastbars = {}
 local PoolManager = {}
 ClassicCastbars.PoolManager = PoolManager
@@ -1937,7 +1937,7 @@ ClassicCastbars.unaffectedCastModsSpells = {
 
 -- Addon Savedvariables
 ClassicCastbars.defaultConfig = {
-    version = "14", -- settings version
+    version = "15", -- settings version
     pushbackDetect = true,
     movementDetect = true,
     locale = GetLocale(),
@@ -2299,13 +2299,14 @@ end
 
 SLASH_CCFOCUS1 = "/focus"
 SLASH_CCFOCUS2 = "/castbarfocus"
-SlashCmdList["CCFOCUS"] = function()
-    local tarGUID = UnitGUID("target")
+SlashCmdList["CCFOCUS"] = function(msg)
+    local unitID = msg == "mouseover" and "mouseover" or "target"
+    local tarGUID = UnitGUID(unitID)
     if tarGUID then
         activeGUIDs.focus = tarGUID
         addon:StopCast("focus", true)
         addon:StartCast(tarGUID, "focus")
-        addon:SetFocusDisplay(UnitName("target"))
+        addon:SetFocusDisplay(UnitName(unitID), unitID)
     else
         SlashCmdList["CCFOCUSCLEAR"]()
     end
@@ -3068,14 +3069,14 @@ end
 function addon:CreateOrUpdateSecureFocusButton(text)
     if not self.FocusButton then
         -- Create an invisible secure click trigger above the nonsecure castbar frame
-        self.FocusButton = CreateFrame("Button", "FocusCastbar", nil, "SecureActionButtonTemplate")
+        self.FocusButton = CreateFrame("Button", "FocusCastbar", UIParent, "SecureActionButtonTemplate")
         self.FocusButton:SetAttribute("type", "macro")
         --self.FocusButton:SetAllPoints(self.FocusFrame)
         --self.FocusButton:SetSize(ClassicCastbarsDB.focus.width + 5, ClassicCastbarsDB.focus.height + 35)
     end
 
     local db = ClassicCastbarsDB.focus
-    self.FocusButton:SetPoint(db.position[1], UIParent, db.position[2], db.position[3])
+    self.FocusButton:SetPoint(db.position[1], UIParent, db.position[2], db.position[3] + 30)
     self.FocusButton:SetSize(db.width + 5, db.height + 35)
 
     self.FocusButton:SetAttribute("macrotext", "/targetexact " .. text)
@@ -3086,7 +3087,7 @@ local NewTimer = _G.C_Timer.NewTimer
 local focusTargetTimer
 local focusTargetResetTimer
 
-function addon:SetFocusDisplay(text)
+function addon:SetFocusDisplay(text, unitID)
     if focusTargetTimer and not focusTargetTimer:IsCancelled() then
         focusTargetTimer:Cancel()
         focusTargetTimer = nil
@@ -3129,8 +3130,8 @@ function addon:SetFocusDisplay(text)
         self.FocusFrame.Text:SetPoint("CENTER", self.FocusFrame, 0, 20)
     end
 
-    if UnitIsPlayer("target") then
-        self.FocusFrame.Text:SetTextColor(RAID_CLASS_COLORS[select(2, UnitClass("target"))]:GetRGBA())
+    if UnitIsPlayer(unitID) then
+        self.FocusFrame.Text:SetTextColor(RAID_CLASS_COLORS[select(2, UnitClass(unitID))]:GetRGBA())
     else
         self.FocusFrame.Text:SetTextColor(1, 0.819, 0, 1)
     end
@@ -3162,5 +3163,5 @@ function addon:SetFocusDisplay(text)
     end
 
     self.FocusFrame.Text:SetText(isInCombat and text .. " (|cffff0000P|r)" or text)
-    self.FocusFrame:SetPoint("CENTER", activeFrames.focus, 0, 0)
+    self.FocusFrame:SetAllPoints(activeFrames.focus)
 end
