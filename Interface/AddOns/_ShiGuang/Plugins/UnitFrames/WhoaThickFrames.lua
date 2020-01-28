@@ -24,7 +24,7 @@ for i = 1, 4 do CreateBarPctText(_G["PartyMemberFrame"..i], "LEFT", "RIGHT", 6, 
 --for i = 1, MAX_BOSS_FRAMES do CreateBarPctText(_G["Boss"..i.."TargetFrame"], "LEFT", "RIGHT", 8, 30, "NumberFontNormal", 36) end	
 
 --	Player class colors HP.
-local function unitClassColors(healthbar, unit)
+function unitClassColors(healthbar, unit)
 	if UnitIsPlayer(unit) and UnitClass(unit) then
 		_, class = UnitClass(unit);
 		local class = CUSTOM_CLASS_COLORS and CUSTOM_CLASS_COLORS[class] or RAID_CLASS_COLORS[class];
@@ -37,24 +37,9 @@ end
 hooksecurefunc("UnitFrameHealthBar_Update", unitClassColors)
 hooksecurefunc("HealthBar_OnValueChanged", function(self) unitClassColors(self, self.unit) end)
 
-	--	Blizzard's target unit reactions HP color
-local function npcReactionBrightColors()
-		FACTION_BAR_COLORS = {
-			[1] = {r =  0.9, g = 0.0, b = 0.0},
-			[2] = {r =  0.9, g = 0.0, b = 0.0},
-			[3] = {r =  0.9, g = 0.0, b = 0.0},
-			[4] = {r =  0.9, g =  0.9, b = 0.0},
-			[5] = {r = 0.0, g = 0.9, b = 0.0},
-			[6] = {r = 0.0, g = 0.9, b = 0.0},
-			[7] = {r = 0.0, g = 0.9, b = 0.0},
-			[8] = {r = 0.0, g = 0.9, b = 0.0},
-		};
-end
-hooksecurefunc("TargetFrame_CheckFaction", npcReactionBrightColors)
   
 --	Whoa's customs target unit reactions HP colors.
 local function npcReactionColors(healthbar, unit)
-			healthbar:SetStatusBarColor(0,0.9,0)
 		if UnitExists(unit) and (not UnitIsPlayer(unit)) then
 			local reaction = FACTION_BAR_COLORS[UnitReaction(unit,"player")];
 			if reaction then
@@ -68,6 +53,9 @@ local function npcReactionColors(healthbar, unit)
 				healthbar:SetStatusBarColor(1.0, 1.0, 1.0)
 			end
 		end
+		--if UnitExists(unit) and (not UnitIsPlayer(unit)) then
+			--healthbar:SetStatusBarColor(0,0.9,0)
+		--end
 end
 hooksecurefunc("UnitFrameHealthBar_Update", npcReactionColors)
 hooksecurefunc("HealthBar_OnValueChanged", function(self) npcReactionColors(self, self.unit) end)
@@ -130,18 +118,19 @@ targetFrameStatusText()
 		statusFrame:Show();
 		local k,m=1e3
 		local m=k*k
-		--valueDisplay	=	(( value >= 1e3 and value < 1e5 and format("%1.3f",value/k)) or
-							--( value >= 1e5 and value < 1e6 and format("%1.0f K",value/k)) or
-							--( value >= 1e6 and value < 1e9 and format("%1.1f M",value/m)) or
-							--( value >= 1e9 and format("%1.1f M",value/m)) or value )
+		
+		valueDisplay	=	(( value >= 1e3 and value < 1e5 and format("%1.3f",value/k)) or
+							( value >= 1e5 and value < 1e6 and format("%1.0f K",value/k)) or
+							( value >= 1e6 and value < 1e9 and format("%1.1f M",value/m)) or
+							( value >= 1e9 and format("%1.1f M",value/m)) or value )
 							
-		--valueMaxDisplay	=	(( valueMax >= 1e3 and valueMax < 1e5 and format("%1.3f",valueMax/k)) or
-							--( valueMax >= 1e5 and valueMax < 1e6 and format("%1.0f K",valueMax/k)) or
-							--( valueMax >= 1e6 and valueMax < 1e9 and format("%1.1f M",valueMax/m)) or
-							--( valueMax >= 1e9 and format("%1.1f M",valueMax/m)) or valueMax )
+		valueMaxDisplay	=	(( valueMax >= 1e3 and valueMax < 1e5 and format("%1.3f",valueMax/k)) or
+							( valueMax >= 1e5 and valueMax < 1e6 and format("%1.0f K",valueMax/k)) or
+							( valueMax >= 1e6 and valueMax < 1e9 and format("%1.1f M",valueMax/m)) or
+							( valueMax >= 1e9 and format("%1.1f M",valueMax/m)) or valueMax )
 
-		local valueDisplay = value;
-		local valueMaxDisplay = valueMax;
+		-- local valueDisplay = value;
+		-- local valueMaxDisplay = valueMax;
 		
 		local textDisplay = GetCVar("statusTextDisplay");
 		if ( value and valueMax > 0 and ( (textDisplay ~= "NUMERIC" and textDisplay ~= "NONE") or statusFrame.showPercentage ) and not statusFrame.showNumeric) then
@@ -218,51 +207,55 @@ end)]]
 
 --	Player frame.
 local function playerFrame(self)
-		PlayerFrameTexture:SetTexture("Interface\\Addons\\_ShiGuang\\Media\\Modules\\UFs\\UI-TargetingFrame");
-		PlayerPVPIcon:SetTexture("Interface\\TargetingFrame\\UI-PVP-FFA");
-		PlayerStatusTexture:SetTexture("Interface\\AddOns\\_ShiGuang\\Media\\Modules\\UFs\\UI-Player-Status");
+	PlayerStatusTexture:SetTexture("Interface\\AddOns\\_ShiGuang\\Media\\Modules\\UFs\\UI-Player-Status");
 	PlayerStatusTexture:ClearAllPoints();
 	PlayerStatusTexture:SetPoint("CENTER", PlayerFrame, "CENTER",16, 8);
-		PlayerFrameBackground:SetWidth(120);
-		self.name:Hide();
-		--self.name:ClearAllPoints();
-		--self.name:SetPoint("CENTER", PlayerFrame, "CENTER",50.5, 36);
+	PlayerFrameBackground:SetWidth(120);
+	self.name:Hide();
+	--self.name:ClearAllPoints();
+	--self.name:SetPoint("CENTER", PlayerFrame, "CENTER",50.5, 36);
 	self.healthbar:SetPoint("TOPLEFT",106,-24);
-		self.healthbar:SetHeight(28);
-		self.healthbar.LeftText:ClearAllPoints();
-		self.healthbar.LeftText:SetPoint("LEFT",self.healthbar,"LEFT",5,0);	
-		self.healthbar.RightText:ClearAllPoints();
-		self.healthbar.RightText:SetPoint("RIGHT",self.healthbar,"RIGHT",-5,0);
-		self.healthbar.TextString:SetPoint("CENTER", self.healthbar, "CENTER", 0, 0);
-		self.manabar.LeftText:ClearAllPoints();
+	self.healthbar:SetHeight(28);
+	self.healthbar.LeftText:ClearAllPoints();
+	self.healthbar.LeftText:SetPoint("LEFT",self.healthbar,"LEFT",5,0);	
+	self.healthbar.RightText:ClearAllPoints();
+	self.healthbar.RightText:SetPoint("RIGHT",self.healthbar,"RIGHT",-5,0);
+	self.healthbar.TextString:SetPoint("CENTER", self.healthbar, "CENTER", 0, 0);
+	self.manabar.LeftText:ClearAllPoints();
 	self.manabar.LeftText:SetPoint("LEFT",self.manabar,"LEFT",5,-1)		;
 	self.manabar.RightText:ClearAllPoints();
 	self.manabar.RightText:SetPoint("RIGHT",self.manabar,"RIGHT",-4,-1);
 	self.manabar.TextString:SetPoint("CENTER",self.manabar,"CENTER",0,-1);
-		--PlayerFrameGroupIndicatorText:ClearAllPoints();
-		--PlayerFrameGroupIndicatorText:SetPoint("BOTTOMLEFT", PlayerFrame,"TOP",0,-20);
-		PlayerFrameGroupIndicatorLeft:Hide();
-		PlayerFrameGroupIndicatorMiddle:Hide();
-		PlayerFrameGroupIndicatorRight:Hide();
+	--PlayerFrameGroupIndicatorText:ClearAllPoints();
+	--PlayerFrameGroupIndicatorText:SetPoint("BOTTOMLEFT", PlayerFrame,"TOP",0,-20);
+	PlayerFrameGroupIndicatorLeft:Hide();
+	PlayerFrameGroupIndicatorMiddle:Hide();
+	PlayerFrameGroupIndicatorRight:Hide();
+	PlayerFrameTexture:SetTexture("Interface\\Addons\\_ShiGuang\\Media\\Modules\\UFs\\UI-TargetingFrame");
+	PlayerPVPIcon:SetTexture("Interface\\Addons\\_ShiGuang\\Media\\Modules\\UFs\\UI-PVP-FFA");
+	--PlayerPVPIcon:SetTexture("Interface\\TargetingFrame\\UI-PVP-FFA");
+
 end
 hooksecurefunc("PlayerFrame_ToPlayerArt", playerFrame)
 function playerPvpIcon()
 	local factionGroup, factionName = UnitFactionGroup("player");
 	if ( factionGroup and factionGroup ~= "Neutral" and UnitIsPVP("player") ) then
-			PlayerPVPIcon:SetTexture("Interface\\TargetingFrame\\UI-PVP-"..factionGroup);
+			PlayerPVPIcon:SetTexture("Interface\\Addons\\_ShiGuang\\Media\\Modules\\UFs\\UI-PVP-"..factionGroup);
+			--PlayerPVPIcon:SetTexture("Interface\\TargetingFrame\\UI-PVP-"..factionGroup);
 	end
 end
 hooksecurefunc("PlayerFrame_UpdatePvPStatus", playerPvpIcon)
 
-local function playerFontStyle(self)
+
+--[[hooksecurefunc("PlayerFrame_ToPlayerArt", function(self)
 		self.healthbar.LeftText:SetFontObject(SystemFont_Outline_Small);
 		self.healthbar.RightText:SetFontObject(SystemFont_Outline_Small);
 		self.manabar.LeftText:SetFontObject(SystemFont_Outline_Small);
 		self.manabar.RightText:SetFontObject(SystemFont_Outline_Small);
 		-- self.healthbar.TextString:SetFontObject(SystemFont_Outline_Small);
 		self.manabar.TextString:SetFontObject(SystemFont_Outline_Small);
-end
-hooksecurefunc("PlayerFrame_ToPlayerArt", playerFontStyle)
+end)]]
+
 --	Player vehicle frame.
 hooksecurefunc("PlayerFrame_ToVehicleArt", function(self, vehicleType)
 		if ( vehicleType == "Natural" ) then
@@ -285,11 +278,12 @@ hooksecurefunc("PlayerFrame_ToVehicleArt", function(self, vehicleType)
 	PlayerName:SetPoint("CENTER",50,23);
 	PlayerFrameBackground:SetWidth(114);
 end)
+
 hooksecurefunc("PlayerFrame_ToPlayerArt", function()
 	PetFrameHealthBarTextRight:SetPoint("RIGHT",PetFrameHealthBar,"RIGHT",2,0);
 	PetFrameManaBarTextRight:SetPoint("RIGHT",PetFrameManaBar,"RIGHT",2,-5);
-	PetFrameHealthBarTextLeft:SetPoint("LEFT",PetFrameHealthBar,"LEFT",0,0);
-	PetFrameHealthBarTextRight:SetPoint("RIGHT",PetFrameHealthBar,"RIGHT",0,0);
+		PetFrameHealthBarTextLeft:SetPoint("LEFT",PetFrameHealthBar,"LEFT",0,0);
+		PetFrameHealthBarTextRight:SetPoint("RIGHT",PetFrameHealthBar,"RIGHT",0,0);
 		PetFrameManaBarText:SetPoint("CENTER",PetFrameManaBar,"CENTER",0,-3);
 		PetFrameManaBarTextLeft:SetPoint("LEFT",PetFrameManaBar,"LEFT",0,-3);
 		PetFrameManaBarTextRight:SetPoint("RIGHT",PetFrameManaBar,"RIGHT",0,-3);
@@ -305,10 +299,12 @@ hooksecurefunc("PetFrame_Update", function(self, override)
 	if ( (not PlayerFrame.animating) or (override) ) then
 		if ( UnitIsVisible(self.unit) and PetUsesPetFrame() and not PlayerFrame.vehicleHidesPet ) then
 			if ( UnitPowerMax(self.unit) == 0 ) then
-					PetFrameTexture:SetTexture("Interface\\TargetingFrame\\UI-SmallTargetingFrame-NoMana");
+					PetFrameTexture:SetTexture("Interface\\Addons\\_ShiGuang\\Media\\Modules\\UFs\\UI-SmallTargetingFrame-NoMana");
+					--PetFrameTexture:SetTexture("Interface\\TargetingFrame\\UI-SmallTargetingFrame-NoMana");
 				PetFrameManaBarText:Hide();
 			else
-					PetFrameTexture:SetTexture("Interface\\TargetingFrame\\UI-SmallTargetingFrame");
+					PetFrameTexture:SetTexture("Interface\\Addons\\_ShiGuang\\Media\\Modules\\UFs\\UI-SmallTargetingFrame");
+					--PetFrameTexture:SetTexture("Interface\\TargetingFrame\\UI-SmallTargetingFrame");
 			end
 		end
 	end
@@ -330,8 +326,8 @@ petFrameBg();
 --	Target frame
 hooksecurefunc("TargetFrame_CheckClassification", function(self, forceNormalTexture)
 	local classification = UnitClassification(self.unit);
-	--self.highLevelTexture:ClearAllPoints();
-	--self.highLevelTexture:SetPoint("CENTER", self.levelText, "CENTER", 1,0);
+	self.highLevelTexture:ClearAllPoints();
+	self.highLevelTexture:SetPoint("CENTER", self.levelText, "CENTER", 1,0);
 	self.deadText:SetFont(STANDARD_TEXT_FONT,21,"OUTLINE")
 	self.deadText:SetPoint("TOPLEFT", self.healthbar, "TOPRIGHT", 12, -8)
 	self.unconsciousText:SetPoint("CENTER", self.manabar, "CENTER",0,0);
@@ -354,24 +350,25 @@ hooksecurefunc("TargetFrame_CheckClassification", function(self, forceNormalText
 	self.manabar.TextString:SetPoint("CENTER", self.manabar, "CENTER", 0, -1);
 	-- TargetFrame.threatNumericIndicator:SetPoint("BOTTOM", PlayerFrame, "TOP", 72, -21);
 	-- FocusFrame.threatNumericIndicator:SetAlpha(0);
+	local path = "Interface\\Addons\\_ShiGuang\\Media\\Modules\\UFs\\";
 	if ( forceNormalTexture ) then
-		self.borderTexture:SetTexture("Interface\\TargetingFrame\\UI-TargetingFrame");
+		self.borderTexture:SetTexture(path.."UI-TargetingFrame");
 		CreateBarPctText(TargetFrame, "LEFT", "RIGHT", 88, -8, "NumberFontNormalLarge", 36)
 	elseif ( classification == "minus" ) then
-		self.borderTexture:SetTexture("Interface\\TargetingFrame\\UI-TargetingFrame-Minus");
+		self.borderTexture:SetTexture(path.."UI-TargetingFrame-Minus");
 		forceNormalTexture = true;
 		CreateBarPctText(TargetFrame, "LEFT", "RIGHT", 66, 0, "NumberFontNormalLarge", 36)
 	elseif ( classification == "worldboss" or classification == "elite" ) then
-		self.borderTexture:SetTexture("Interface\\Addons\\_ShiGuang\\Media\\Modules\\UFs\\UI-TargetingFrame-Elite");
+		self.borderTexture:SetTexture(path.."UI-TargetingFrame-Elite");
 		CreateBarPctText(TargetFrame, "LEFT", "RIGHT", 102, -8, "NumberFontNormalLarge", 36)
 	elseif ( classification == "rareelite" ) then
-		self.borderTexture:SetTexture("Interface\\Addons\\_ShiGuang\\Media\\Modules\\UFs\\UI-TargetingFrame-Rare-Elite");
+		self.borderTexture:SetTexture(path.."UI-TargetingFrame-Rare-Elite");
 		CreateBarPctText(TargetFrame, "LEFT", "RIGHT", 102, -8, "NumberFontNormalLarge", 36)
 	elseif ( classification == "rare" ) then
-		self.borderTexture:SetTexture("Interface\\Addons\\_ShiGuang\\Media\\Modules\\UFs\\UI-TargetingFrame-Rare");
+		self.borderTexture:SetTexture(path.."UI-TargetingFrame-Rare");
 		CreateBarPctText(TargetFrame, "LEFT", "RIGHT", 102, -8, "NumberFontNormalLarge", 36)
 	else
-		self.borderTexture:SetTexture("Interface\\Addons\\_ShiGuang\\Media\\Modules\\UFs\\UI-TargetingFrame");
+		self.borderTexture:SetTexture(path.."UI-TargetingFrame");
 		forceNormalTexture = true;
 		CreateBarPctText(TargetFrame, "LEFT", "RIGHT", 88, -8, "NumberFontNormalLarge", 36)
 	end
@@ -417,9 +414,11 @@ hooksecurefunc("TargetFrame_CheckClassification", function(self, forceNormalText
 	if ( self.showPVP ) then
 		local factionGroup = UnitFactionGroup(self.unit);
 		if ( UnitIsPVPFreeForAll(self.unit) ) then
-				self.pvpIcon:SetTexture("Interface\\TargetingFrame\\UI-PVP-FFA");
+				self.pvpIcon:SetTexture("Interface\\Addons\\_ShiGuang\\Media\\Modules\\UFs\\UI-PVP-FFA");
+				--self.pvpIcon:SetTexture("Interface\\TargetingFrame\\UI-PVP-FFA");
 		elseif ( factionGroup and factionGroup ~= "Neutral" and UnitIsPVP(self.unit) ) then
-				self.pvpIcon:SetTexture("Interface\\TargetingFrame\\UI-PVP-"..factionGroup);
+				self.pvpIcon:SetTexture("Interface\\Addons\\_ShiGuang\\Media\\Modules\\UFs\\UI-PVP-"..factionGroup);
+				--self.pvpIcon:SetTexture("Interface\\TargetingFrame\\UI-PVP-"..factionGroup);
 		end
 		if (UnitIsCivilian(self.unit)) then
 				self.questIcon:SetTexture("Interface\\Addons\\_ShiGuang\\Media\\Modules\\UFs\\PortraitWarningBadge");
@@ -430,7 +429,8 @@ hooksecurefunc("TargetFrame_CheckClassification", function(self, forceNormalText
 	end
 end)
 
-local function targetFontStyle (self)
+
+--[[hooksecurefunc("TargetFrame_CheckClassification", function(self)
 	if not mi2addon then
 		self.healthbar.LeftText:SetFontObject(SystemFont_Outline_Small);
 		self.healthbar.RightText:SetFontObject(SystemFont_Outline_Small);
@@ -439,8 +439,7 @@ local function targetFontStyle (self)
 		self.healthbar.TextString:SetFontObject(SystemFont_Outline_Small);
 		self.manabar.TextString:SetFontObject(SystemFont_Outline_Small);
 	end
-end
-hooksecurefunc("TargetFrame_CheckClassification", targetFontStyle)
+end)]]
 
 -- Mana texture
 hooksecurefunc("UnitFrameManaBar_UpdateType", function(manaBar)
@@ -481,7 +480,7 @@ hooksecurefunc("TargetFrame_CheckClassification", totFrame)
 --[[	Party Frames.
 function whoaPartyFrames()
 	local useCompact = GetCVarBool("useCompactPartyFrames");
-	if IsInGroup(player) and (not IsInRaid(player)) and (not useCompact) then 
+	if (GetCVarBool("useCompactPartyFrames") == false) and IsInGroup(player) and (not IsInRaid(player)) then 
 		for i = 1, 4 do
 		if UnitExists(unit) then
 			_G["PartyMemberFrame"..i.."Name"]:SetSize(80,12);
@@ -514,12 +513,10 @@ hooksecurefunc("UnitFrame_Update", whoaPartyFrames)
 hooksecurefunc("PartyMemberFrame_ToPlayerArt", whoaPartyFrames)
 
 hooksecurefunc("TextStatusBar_UpdateTextStringWithValues", function()
-	--if (cfg.usePartyFrames) then
 		for i = 1, 4 do
 				_G["PartyMemberFrame"..i.."ManaBarText"]:SetText(" ");
 				_G["PartyMemberFrame"..i.."ManaBarTextLeft"]:SetText(" ");
 				_G["PartyMemberFrame"..i.."ManaBarTextRight"]:SetText(" ");
 		end
-	--end
 end)]]
 --------------------------------------------------------------------------------------whoa end

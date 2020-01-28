@@ -59,7 +59,7 @@ function MISC:OnLogin()
 	end)
 
 	-- Auto chatBubbles
-	if MaoRUIAccountDB["AutoBubbles"] then
+	if MaoRUIDB["AutoBubbles"] then
 		local function updateBubble()
 			local name, instType = GetInstanceInfo()
 			if name and instType == "raid" then
@@ -78,7 +78,7 @@ function MISC:OnLogin()
 
 	-- Instant delete
 	hooksecurefunc(StaticPopupDialogs["DELETE_GOOD_ITEM"], "OnShow", function(self)
-		if MaoRUIDB["Misc"]["InstantDelete"] then
+		if MaoRUIPerDB["Misc"]["InstantDelete"] then
 			self.editBox:SetText(DELETE_ITEM_CONFIRM_STRING)
 		end
 	end)
@@ -160,7 +160,7 @@ function MISC:DoFasterLoot()
 end
 
 function MISC:UpdateFasterLoot()
-	if MaoRUIDB["Misc"]["FasterLoot"] then
+	if MaoRUIPerDB["Misc"]["FasterLoot"] then
 		M:RegisterEvent("LOOT_READY", MISC.DoFasterLoot)
 	else
 		M:UnregisterEvent("LOOT_READY", MISC.DoFasterLoot)
@@ -212,7 +212,7 @@ function MISC:ErrorBlockerOnEvent(_, text)
 end
 
 function MISC:UpdateErrorBlocker()
-	if MaoRUIDB["Misc"]["HideErrors"] then
+	if MaoRUIPerDB["Misc"]["HideErrors"] then
 		M:RegisterEvent("UI_ERROR_MESSAGE", MISC.ErrorBlockerOnEvent)
 	else
 		isRegistered = true
@@ -426,7 +426,7 @@ function MISC:MenuButton_Show(_, unit)
 end
 
 function MISC:MenuButton_Add()
-	if not MaoRUIDB["Misc"]["EnhancedMenu"] then return end
+	if not MaoRUIPerDB["Misc"]["EnhancedMenu"] then return end
 
 	MISC.MenuButtonList = {
 		["name"] = COPY_NAME,
@@ -437,7 +437,7 @@ end
 
 -- Auto dismount and auto stand
 function MISC:AutoDismount()
-	if not MaoRUIDB["Misc"]["AutoDismount"] then return end
+	if not MaoRUIPerDB["Misc"]["AutoDismount"] then return end
 
 	local standString = {
 		[ERR_LOOT_NOTSTANDING] = true,

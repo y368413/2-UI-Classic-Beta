@@ -226,7 +226,7 @@ function MISC:MailBox_ContactList()
 	end
 
 	local function deleteOnClick(self)
-		MaoRUIAccountDB["ContactList"][self.__owner.name:GetText()] = nil
+		MaoRUIDB["ContactList"][self.__owner.name:GetText()] = nil
 		self.__owner:Hide()
 		sortBars()
 		barIndex = barIndex - 1
@@ -284,13 +284,13 @@ function MISC:MailBox_ContactList()
 		if not strfind(text, "-") then text = text.."-"..I.MyRealm end -- complete player realm name
 
 		local r, g, b = swatch.tex:GetVertexColor()
-		MaoRUIAccountDB["ContactList"][text] = r..":"..g..":"..b
+		MaoRUIDB["ContactList"][text] = r..":"..g..":"..b
 		createBar(text, r, g, b)
 		sortBars()
 		editbox:SetText("")
 	end)
 
-	for name, color in pairs(MaoRUIAccountDB["ContactList"]) do
+	for name, color in pairs(MaoRUIDB["ContactList"]) do
 		if color then
 			local r, g, b = strsplit(":", color)
 			r, g, b = tonumber(r), tonumber(g), tonumber(b)
@@ -301,7 +301,7 @@ function MISC:MailBox_ContactList()
 end
 
 function MISC:MailBox()
-	if not MaoRUIDB["Misc"]["Mail"] then return end
+	if not MaoRUIPerDB["Misc"]["Mail"] then return end
 	if IsAddOnLoaded("Postal") then return end
 
 	for i = 1, 7 do

@@ -196,15 +196,15 @@ function M:CreateMF(parent, saved)
 		frame:StopMovingOrSizing()
 		if not saved then return end
 		local orig, _, tar, x, y = frame:GetPoint()
-		MaoRUIDB["TempAnchor"][frame:GetName()] = {orig, "UIParent", tar, x, y}
+		MaoRUIPerDB["TempAnchor"][frame:GetName()] = {orig, "UIParent", tar, x, y}
 	end)
 end
 
 function M:RestoreMF()
 	local name = self:GetName()
-	if name and MaoRUIDB["TempAnchor"][name] then
+	if name and MaoRUIPerDB["TempAnchor"][name] then
 		self:ClearAllPoints()
-		self:SetPoint(unpack(MaoRUIDB["TempAnchor"][name]))
+		self:SetPoint(unpack(MaoRUIPerDB["TempAnchor"][name]))
 	end
 end
 
@@ -279,7 +279,7 @@ end
 
 -- Numberize
 function M.Numb(n)
-	if MaoRUIAccountDB["NumberFormat"] == 1 then
+	if MaoRUIDB["NumberFormat"] == 1 then
 		if n >= 1e12 then
 			return format("%.2ft", n / 1e12)
 		elseif n >= 1e9 then
@@ -291,7 +291,7 @@ function M.Numb(n)
 		else
 			return format("%.0f", n)
 		end
-	elseif MaoRUIAccountDB["NumberFormat"] == 2 then
+	elseif MaoRUIDB["NumberFormat"] == 2 then
 		if n >= 1e12 then
 			return format("%.2f"..U["NumberCap3"], n / 1e12)
 		elseif n >= 1e8 then
@@ -435,7 +435,7 @@ function M.FormatTime(s)
 	elseif s > 3 then
 		return format("|cffffff00%d|r", s), s - floor(s)
 	else
-		if MaoRUIDB["Actionbar"]["DecimalCD"] then
+		if MaoRUIPerDB["Actionbar"]["DecimalCD"] then
 			return format("|cffff0000%.1f|r", s), s - format("%.1f", s)
 		else
 			return format("|cffff0000%d|r", s + .5), s - floor(s)

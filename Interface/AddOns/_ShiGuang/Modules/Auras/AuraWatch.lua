@@ -40,7 +40,7 @@ local function DataAnalyze(v)
 end
 
 local function InsertData(index, target)
-	if MaoRUIDB["AuraWatchList"]["Switcher"][index] then
+	if MaoRUIPerDB["AuraWatchList"]["Switcher"][index] then
 		wipe(target)
 	end
 
@@ -57,15 +57,15 @@ local function ConvertTable()
 	for i = 1, 10 do
 		myTable[i] = {}
 		if i < 10 then
-			local value = MaoRUIDB["AuraWatchList"][i]
+			local value = MaoRUIPerDB["AuraWatchList"][i]
 			if value and next(value) then
 				for spellID, v in pairs(value) do
 					myTable[i][spellID] = DataAnalyze(v)
 				end
 			end
 		else
-			if next(MaoRUIDB["InternalCD"]) then
-				for spellID, v in pairs(MaoRUIDB["InternalCD"]) do
+			if next(MaoRUIPerDB["InternalCD"]) then
+				for spellID, v in pairs(MaoRUIPerDB["InternalCD"]) do
 					myTable[i][spellID] = DataAnalyze(v)
 				end
 			end
@@ -117,7 +117,7 @@ end
 
 local auraListByName = {}
 local function BuildNamesForSpellRank()
-	if not MaoRUIDB["AuraWatch"]["WatchSpellRank"] then return end
+	if not MaoRUIPerDB["AuraWatch"]["WatchSpellRank"] then return end
 
 	for KEY, VALUE in pairs(AuraList) do
 		for spellID, value in pairs(VALUE.List) do
@@ -209,7 +209,7 @@ end
 
 -- Icon mode
 local function BuildICON(iconSize)
-	iconSize = iconSize * MaoRUIDB["AuraWatch"]["IconScale"]
+	iconSize = iconSize * MaoRUIPerDB["AuraWatch"]["IconScale"]
 
 	local frame = CreateFrame("Frame", nil, PetBattleFrameHider)
 	frame:SetSize(iconSize, iconSize)
@@ -232,7 +232,7 @@ local function BuildICON(iconSize)
 	frame.glowFrame = M.CreateBG(frame, 4)
 	frame.glowFrame:SetSize(iconSize+8, iconSize+8)
 
-	if not MaoRUIDB["AuraWatch"]["ClickThrough"] then enableTooltip(frame) end
+	if not MaoRUIPerDB["AuraWatch"]["ClickThrough"] then enableTooltip(frame) end
 
 	frame:Hide()
 	return frame
@@ -250,7 +250,7 @@ local function BuildTEXT(iconSize)
 	frame.Count = M.CreateFS(frame, iconSize*.55, "", false, "BOTTOMRIGHT", 6, -3)
 	frame.Spellname = M.CreateFS(frame, 12, "", false, "LEFT", iconSize, -3)
 
-	if not MaoRUIDB["AuraWatch"]["ClickThrough"] then enableTooltip(frame) end
+	if not MaoRUIPerDB["AuraWatch"]["ClickThrough"] then enableTooltip(frame) end
 
 	frame:Hide()
 	return frame
@@ -277,7 +277,7 @@ local function BuildBAR(barWidth, iconSize)
 	frame.Spellname = M.CreateFS(frame.Statusbar, 11, "", false, "LEFT", 1, 8)
 	frame.Spellname:SetWidth(frame.Statusbar:GetWidth()*.65)
 	frame.Spellname:SetJustifyH("LEFT")
-	if not MaoRUIDB["AuraWatch"]["ClickThrough"] then enableTooltip(frame) end
+	if not MaoRUIPerDB["AuraWatch"]["ClickThrough"] then enableTooltip(frame) end
 
 	frame:Hide()
 	return frame
@@ -305,7 +305,7 @@ local function BuildBAR2(barWidth, iconSize)
 	frame.Spellname:SetWidth(frame.Statusbar:GetWidth()*.65)
 	frame.Spellname:SetJustifyH("LEFT")
 
-	if not MaoRUIDB["AuraWatch"]["ClickThrough"] then enableTooltip(frame) end
+	if not MaoRUIPerDB["AuraWatch"]["ClickThrough"] then enableTooltip(frame) end
 
 	frame:Hide()
 	return frame
@@ -724,7 +724,7 @@ end
 
 -- Event
 function A.AuraWatch_OnEvent(event, ...)
-	if not MaoRUIDB["AuraWatch"]["Enable"] then
+	if not MaoRUIPerDB["AuraWatch"]["Enable"] then
 		M:UnregisterEvent("PLAYER_ENTERING_WORLD", A.AuraWatch_OnEvent)
 		M:UnregisterEvent("COMBAT_LOG_EVENT_UNFILTERED", A.AuraWatch_OnEvent)
 		return
@@ -762,7 +762,7 @@ StaticPopupDialogs["RESET_AURAWATCH_MOVER"] = {
 	button1 = OKAY,
 	button2 = CANCEL,
 	OnAccept = function()
-		wipe(MaoRUIDB["AuraWatchMover"])
+		wipe(MaoRUIPerDB["AuraWatchMover"])
 		ReloadUI()
 	end,
 }

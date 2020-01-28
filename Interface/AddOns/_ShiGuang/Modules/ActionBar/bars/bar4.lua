@@ -7,7 +7,7 @@ function Bar:CreateBar4()
 	local padding, margin = 2, 2
 	local num = NUM_ACTIONBAR_BUTTONS
 	local buttonList = {}
-	local layout = MaoRUIDB["Actionbar"]["Style"]
+	local layout = MaoRUIPerDB["Actionbar"]["Style"]
 	if (layout == 2) or (layout == 3) or (layout == 7)  or (layout == 8) or (layout == 9) or (layout == 10) then cfg.size = 38 end
 
 	--create the frame to hold the buttons
@@ -127,7 +127,7 @@ function Bar:CreateBar4()
 	end
 
 	--create the mouseover functionality
-	if MaoRUIDB["Actionbar"]["Bar4Fade"] and cfg.fader then
+	if MaoRUIPerDB["Actionbar"]["Bar4Fade"] and cfg.fader then
 		Bar.CreateButtonFrameFader(frame, buttonList, cfg.fader)
 	end
 end

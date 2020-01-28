@@ -17,10 +17,11 @@ local quest = {
 	 "点击聊天框角色名称可实现:|cff3399FF     Shift-密语 Ctrl-邀请工会 Alt-组队邀请",
    "|cFF00DDFF如需改进和反馈，可以回帖或者在讨论组(n9PnFl0o)告诉我，谢谢。",
    "-------------------------------"..GetAddOnMetadata("_ShiGuang", "X-StatsVersion").."----[怀旧]",
-   "[修复]简易头像刷新问题",
-   "[修复]背包无法正常显示钥匙链问题",
-   "[移除]XD快捷键形态切换(因导致后台污染)",
-   "[更新]ClassicCastbars、LibClassicDurations和CharacterStatsClass",
+   "[祝福]祝大家新年快乐，身体健康，阖家幸福，心想事成!",
+   "[重写]整个控制台和设置",
+   "[更新]背包设置",
+   "[修复]外服使用时无法看到聊天消息的bug",
+   "[修复]一些其它反馈的bug",
    "[插件]版本号升级为v "..GetAddOnMetadata("_ShiGuang", "Version"),
    "--------------------------over",
 }
@@ -102,11 +103,11 @@ end
 local function compareToShow(event)
 	if UI_Tutorial then return end
 
-	local old1, old2 = strsplit(".", MaoRUIAccountDB["Changelog"].Version or "")
+	local old1, old2 = strsplit(".", MaoRUIDB["Changelog"].Version or "")
 	local cur1, cur2 = strsplit(".", I.Version)
 	if old1 ~= cur1 or old2 ~= cur2 then
 		Helplist()
-		MaoRUIAccountDB["Changelog"].Version = I.Version
+		MaoRUIDB["Changelog"].Version = I.Version
 	end
 
 	M:UnregisterEvent(event, compareToShow)

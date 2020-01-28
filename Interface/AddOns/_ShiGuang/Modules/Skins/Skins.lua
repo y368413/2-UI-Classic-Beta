@@ -3,10 +3,10 @@ local M, R, U, I = unpack(ns)
 local S = M:RegisterModule("Skins")
 
 function S:OnLogin()
-	PlayerFrame:SetScale(MaoRUIDB["UFs"]["PlayerFrameScale"]) 
-	TargetFrame:SetScale(MaoRUIDB["UFs"]["PlayerFrameScale"])
+	PlayerFrame:SetScale(MaoRUIPerDB["UFs"]["PlayerFrameScale"]) 
+	TargetFrame:SetScale(MaoRUIPerDB["UFs"]["PlayerFrameScale"])
 	local cr, cg, cb = 0, 0, 0
-	if MaoRUIDB["Skins"]["ClassLine"] then cr, cg, cb = I.r, I.g, I.b end
+	if MaoRUIPerDB["Skins"]["ClassLine"] then cr, cg, cb = I.r, I.g, I.b end
 
 	-- TOPLEFT
 	local Tinfobar = CreateFrame("Frame", nil, UIParent)
@@ -39,7 +39,7 @@ function S:OnLogin()
 	Rinfobar2:SetPoint("TOP", Rinfobar, "BOTTOM")
 	M.CreateGF(Rinfobar2, 520, R.mult, "Horizontal", cr, cg, cb, 0, .8)
    ----BOTTOM
-   if MaoRUIDB["Skins"]["InfobarLine"] then
+   if MaoRUIPerDB["Skins"]["InfobarLine"] then
    local Bottomline = CreateFrame("Frame", nil, UIParent) 
    Bottomline:SetFrameLevel(0) 
    Bottomline:SetFrameStrata("BACKGROUND")
@@ -55,8 +55,6 @@ function S:OnLogin()
 	self:DBMSkin()
 	self:SkadaSkin()
 	self:BigWigsSkin()
-	--self:PostalSkin()
-	--self:ExtraQuestSkin()
 	self:LoadOtherSkins()
 	self:LootEx()		-- Ê°È¡ÔöÇ¿
 	-- Register skin
@@ -76,7 +74,7 @@ function S:OnLogin()
 end
 
 function S:GetToggleDirection()
-	local direc = MaoRUIDB["Skins"]["ToggleDirection"]
+	local direc = MaoRUIPerDB["Skins"]["ToggleDirection"]
 	if direc == 1 then
 		return ">", "<", "RIGHT", "LEFT", -2, 0, 20, 80
 	elseif direc == 2 then
@@ -138,7 +136,7 @@ end
 
 function S:LoadWithAddOn(addonName, value, func)
 	local function loadFunc(event, addon)
-		if not MaoRUIDB["Skins"][value] then return end
+		if not MaoRUIPerDB["Skins"][value] then return end
 
 		if event == "PLAYER_ENTERING_WORLD" then
 			M:UnregisterEvent(event, loadFunc)

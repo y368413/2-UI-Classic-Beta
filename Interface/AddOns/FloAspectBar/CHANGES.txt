@@ -1,30 +1,24 @@
-tag d80754187f50c07981c1cec28458b945e99bb96f 1.13.24-classic
+tag 18cc0d5aa6ce108e23c9da2de8fdae02931e28b2 1.13.25-classic
 Author:	Floraline <floraline@ophiuchus.org>
-Date:	Tue Sep 17 21:58:08 2019 +0200
+Date:	Sun Jan 5 18:56:49 2020 +0100
 
-Tagging for release
+Tagging for release of 1.13.25
 
-commit 60af15b5729d3161518629d564ca10c8a162441e
+commit b4fa346c69036b0f82cd975c0a769ac9e3bdc940
 Author: Floraline <floraline@ophiuchus.org>
-Date:   Tue Sep 17 21:37:55 2019 +0200
+Date:   Sun Jan 5 18:53:07 2020 +0100
 
-    Bump version
+    update toc version
 
-commit 57848b349894815f723bca1f0f275eb4f75b0c7b
+commit 5e8d2df30f12f188c9f25362780ae7c14e1063e4
 Author: Floraline <floraline@ophiuchus.org>
-Date:   Tue Sep 17 21:34:34 2019 +0200
+Date:   Sun Jan 5 18:38:03 2020 +0100
 
-    Add aspect of the pack
+    Fix an issue with /reload and key bindings
 
-commit 6d644e407c261a2c2b66c573e4f1e39518632f50
+commit c7f09531bcd5198825d032a1cd5b9458c04c263a
 Author: Floraline <floraline@ophiuchus.org>
-Date:   Tue Sep 17 21:32:45 2019 +0200
+Date:   Tue Nov 5 20:57:37 2019 +0100
 
-    Remove unused field
-
-commit 85ca3024bfcf752744f6a799038a7840d7f0b963
-Author: Floraline <floraline@ophiuchus.org>
-Date:   Tue Sep 17 21:29:18 2019 +0200
-
-    Fix the tooltip to show the max rank known
+    update FloLib from FloTotemBar
 

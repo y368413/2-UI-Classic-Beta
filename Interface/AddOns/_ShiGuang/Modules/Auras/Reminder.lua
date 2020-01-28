@@ -93,7 +93,7 @@ end
 function A:InitReminder()
 	if not groups then return end
 
-	if MaoRUIDB["Auras"]["Reminder"] then
+	if MaoRUIPerDB["Auras"]["Reminder"] then
 		if not parentFrame then
 			parentFrame = CreateFrame("Frame", nil, UIParent)
 			parentFrame:SetPoint("CENTER", -220, 130)

@@ -22,10 +22,10 @@ function M:Mover(text, value, anchor, width, height, isAuraWatch)
 	mover.text = M.CreateFS(mover, I.Font[2], text)
 	mover.text:SetWordWrap(true)
 
-	if not MaoRUIDB[key][value] then
+	if not MaoRUIPerDB[key][value] then
 		mover:SetPoint(unpack(anchor))
 	else
-		mover:SetPoint(unpack(MaoRUIDB[key][value]))
+		mover:SetPoint(unpack(MaoRUIPerDB[key][value]))
 	end
 	mover:EnableMouse(true)
 	mover:SetMovable(true)
@@ -107,7 +107,7 @@ function MISC:DoTrim(trimX, trimY)
 		f.__y.__current = y
 		mover:ClearAllPoints()
 		mover:SetPoint(point, UIParent, point, x, y)
-		MaoRUIDB[mover.__key][mover.__value] = {point, "UIParent", point, x, y}
+		MaoRUIPerDB[mover.__key][mover.__value] = {point, "UIParent", point, x, y}
 	end
 end
 
@@ -121,7 +121,7 @@ function MISC:Mover_OnClick(btn)
 	elseif IsControlKeyDown() and btn == "RightButton" then
 		self:ClearAllPoints()
 		self:SetPoint(unpack(self.__anchor))
-		MaoRUIDB[self.__key][self.__value] = nil
+		MaoRUIPerDB[self.__key][self.__value] = nil
 	end
 	updater.__owner = self
 	MISC.UpdateTrimFrame(self)
@@ -152,7 +152,7 @@ function MISC:Mover_OnDragStop()
 
 	self:ClearAllPoints()
 	self:SetPoint(orig, "UIParent", tar, x, y)
-	MaoRUIDB[self.__key][self.__value] = {orig, "UIParent", tar, x, y}
+	MaoRUIPerDB[self.__key][self.__value] = {orig, "UIParent", tar, x, y}
 	MISC.UpdateTrimFrame(self)
 	updater:Hide()
 end
@@ -182,8 +182,8 @@ StaticPopupDialogs["RESET_MOVER"] = {
 	button1 = OKAY,
 	button2 = CANCEL,
 	OnAccept = function()
-		wipe(MaoRUIDB["Mover"])
-		wipe(MaoRUIDB["AuraWatchMover"])
+		wipe(MaoRUIPerDB["Mover"])
+		wipe(MaoRUIPerDB["AuraWatchMover"])
 		ReloadUI()
 	end,
 }

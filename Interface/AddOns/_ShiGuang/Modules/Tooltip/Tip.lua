@@ -41,14 +41,14 @@ function TT:HideLines()
 				tiptext:SetText(nil)
 				tiptext:Hide()
 			elseif linetext == FACTION_HORDE then
-				if MaoRUIDB["Tooltip"]["FactionIcon"] then
+				if MaoRUIPerDB["Tooltip"]["FactionIcon"] then
 					tiptext:SetText(nil)
 					tiptext:Hide()
 				else
 					tiptext:SetText("|cffff5040"..linetext.."|r")
 				end
 			elseif linetext == FACTION_ALLIANCE then
-				if MaoRUIDB["Tooltip"]["FactionIcon"] then
+				if MaoRUIPerDB["Tooltip"]["FactionIcon"] then
 					tiptext:SetText(nil)
 					tiptext:Hide()
 				else
@@ -97,7 +97,7 @@ end
 
 function TT:OnTooltipSetUnit()
 	if self:IsForbidden() then return end
-	if MaoRUIDB["Tooltip"]["CombatHide"] and InCombatLockdown() then self:Hide() return end
+	if MaoRUIPerDB["Tooltip"]["CombatHide"] and InCombatLockdown() then self:Hide() return end
 	TT.HideLines(self)
 
 	local unit = TT.GetUnit(self)
@@ -117,11 +117,11 @@ function TT:OnTooltipSetUnit()
 			local name, realm = UnitName(unit)
 			local pvpName = UnitPVPName(unit)
 			local relationship = UnitRealmRelationship(unit)
-			if not MaoRUIDB["Tooltip"]["HideTitle"] and pvpName then
+			if not MaoRUIPerDB["Tooltip"]["HideTitle"] and pvpName then
 				name = pvpName
 			end
 			if realm and realm ~= "" then
-				if isShiftKeyDown or not MaoRUIDB["Tooltip"]["HideRealm"] then
+				if isShiftKeyDown or not MaoRUIPerDB["Tooltip"]["HideRealm"] then
 					name = name.."-"..realm
 				elseif relationship == LE_REALM_RELATION_COALESCED then
 					name = name..FOREIGN_SERVER_LABEL
@@ -136,7 +136,7 @@ function TT:OnTooltipSetUnit()
 			end
 			GameTooltipTextLeft1:SetFormattedText("%s", name..(status or ""))
 
-			if MaoRUIDB["Tooltip"]["FactionIcon"] then
+			if MaoRUIPerDB["Tooltip"]["FactionIcon"] then
 				local faction = UnitFactionGroup(unit)
 				if faction and faction ~= "Neutral" then
 					TT.InsertFactionFrame(self, faction)
@@ -154,11 +154,11 @@ function TT:OnTooltipSetUnit()
 				end
 
 				rankIndex = rankIndex + 1
-				if MaoRUIDB["Tooltip"]["HideRank"] then rank = "" end
+				if MaoRUIPerDB["Tooltip"]["HideRank"] then rank = "" end
 				if guildRealm and isShiftKeyDown then
 					guildName = guildName.."-"..guildRealm
 				end
-				if MaoRUIDB["Tooltip"]["HideJunkGuild"] and not isShiftKeyDown then
+				if MaoRUIPerDB["Tooltip"]["HideJunkGuild"] and not isShiftKeyDown then
 					if strlen(guildName) > 31 then guildName = "..." end
 				end
 				GameTooltipTextLeft2:SetText("<"..guildName.."> "..rank.."("..rankIndex..")")
@@ -279,7 +279,7 @@ end
 -- Anchor and mover
 local mover
 function TT:GameTooltip_SetDefaultAnchor(parent)
-	if MaoRUIDB["Tooltip"]["Cursor"] then
+	if MaoRUIPerDB["Tooltip"]["Cursor"] then
 		self:SetOwner(parent, "ANCHOR_CURSOR_RIGHT")
 	else
 		if not mover then
@@ -302,7 +302,7 @@ function TT:ReskinTooltip()
 		return
 	end
 	if self:IsForbidden() then return end
-	self:SetScale(MaoRUIDB["Tooltip"]["Scale"])
+	self:SetScale(MaoRUIPerDB["Tooltip"]["Scale"])
 
 	if not self.tipStyled then
 		self:SetBackdrop(nil)
@@ -323,7 +323,7 @@ function TT:ReskinTooltip()
 	end
 
 	self.bg.Shadow:SetBackdropBorderColor(0, 0, 0)
-	if MaoRUIDB["Tooltip"]["ClassColor"] and self.GetItem then
+	if MaoRUIPerDB["Tooltip"]["ClassColor"] and self.GetItem then
 		local _, item = self:GetItem()
 		if item then
 			local quality = select(3, GetItemInfo(item))

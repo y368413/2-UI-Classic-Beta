@@ -172,11 +172,11 @@ function S:ResetRecount()
 	Recount.db.profile.Font = DEFAULT
 	Recount:UpdateBarTextures()
 
-	MaoRUIDB["Skins"]["ResetRecount"] = false
+	MaoRUIPerDB["Skins"]["ResetRecount"] = false
 end
 
 function S:RecountSkin()
-	if not MaoRUIDB["Skins"]["Recount"] then return end
+	if not MaoRUIPerDB["Skins"]["Recount"] then return end
 	if not IsAddOnLoaded("Recount") then return end
 
 	local frame = Recount_MainWindow
@@ -197,7 +197,7 @@ function S:RecountSkin()
 		Recount.MainWindow:Hide()
 	end)
 
-	if MaoRUIDB["Skins"]["ResetRecount"] then S:ResetRecount() end
+	if MaoRUIPerDB["Skins"]["ResetRecount"] then S:ResetRecount() end
 	hooksecurefunc(Recount, "ResetPositions", S.ResetRecount)
 
 end

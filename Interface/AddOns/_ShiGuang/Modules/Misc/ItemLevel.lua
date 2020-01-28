@@ -91,7 +91,7 @@ function MISC:RefreshButtonInfo()
 				if quality then
 					local color = BAG_ITEM_QUALITY_COLORS[quality]
 					MISC:ItemBorderSetColor(slotFrame, color.r, color.g, color.b)
-					if MaoRUIDB["Misc"]["ShowItemLevel"] and level and level > 1 and quality > 1 then
+					if MaoRUIPerDB["Misc"]["ShowItemLevel"] and level and level > 1 and quality > 1 then
 						slotFrame.iLvlText:SetText(level)
 						slotFrame.iLvlText:SetTextColor(1, 0.8, 0)  --color.r, color.g, color.b
 					end
@@ -135,7 +135,7 @@ function MISC:ItemLevel_SetupLevel(frame, strType, unit)
 					if quality then
 						local color = BAG_ITEM_QUALITY_COLORS[quality]
 						MISC:ItemBorderSetColor(slotFrame, color.r, color.g, color.b)
-						if MaoRUIDB["Misc"]["ShowItemLevel"] and level and level > 1 and quality > 1 then
+						if MaoRUIPerDB["Misc"]["ShowItemLevel"] and level and level > 1 and quality > 1 then
 							slotFrame.iLvlText:SetText(level)
 					slotFrame.iLvlText:SetTextColor(1, 0.8, 0)  --color.r, color.g, color.b
 						end
@@ -164,7 +164,7 @@ function MISC:ItemLevel_UpdateInspect(...)
 end
 
 function MISC:ShowItemLevel()
-	if not MaoRUIDB["Misc"]["ItemLevel"] then return end
+	if not MaoRUIPerDB["Misc"]["ItemLevel"] then return end
 
 	-- iLvl on CharacterFrame
 	CharacterFrame:HookScript("OnShow", MISC.ItemLevel_UpdatePlayer)

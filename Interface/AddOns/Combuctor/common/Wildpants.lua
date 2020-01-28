@@ -50,7 +50,7 @@ local FrameDefaults = {
 	hiddenBags = {},
 
 	rules = AsArray({
-		'all', 'all/normal', 'all/trade', 'all/reagent', 'all/keys', 'all/quiver',
+		'all', 'all/trade', 'all/reagent', 'all/keys', 'all/quiver',  --, 'all/normal'
 		'equip', 'equip/armor', 'equip/weapon', 'equip/trinket',
 		'binding', 'binding/account', 'binding/equip', 'binding/use', 'binding/all', "binding/soulbound",
 		'use', 'use/consume', 'use/enhance',

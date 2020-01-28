@@ -344,7 +344,7 @@ function S:QuestTracker()
 		end
 	end)
 
-	if not MaoRUIDB["Skins"]["QuestTracker"] then return end
+	if not MaoRUIPerDB["Skins"]["QuestTracker"] then return end
 
 	S:EnhancedQuestLog()
 	S:EnhancedQuestTracker()

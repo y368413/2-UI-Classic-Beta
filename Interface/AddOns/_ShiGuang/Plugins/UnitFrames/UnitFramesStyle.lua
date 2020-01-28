@@ -15,7 +15,7 @@
 
 ------------------------------------------Class icon---------------------------------------
 hooksecurefunc("UnitFramePortrait_Update",function(self) 
-   if not MaoRUIDB["UFs"]["UFClassIcon"] then return end
+   if not MaoRUIPerDB["UFs"]["UFClassIcon"] then return end
         if self.portrait then 
                 if UnitIsPlayer(self.unit) then                 
                         if CLASS_ICON_TCOORDS[select(2, UnitClass(self.unit))] then 

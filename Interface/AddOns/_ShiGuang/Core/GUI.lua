@@ -56,7 +56,6 @@ local defaultSettings = {
 		Reminder = true,
 		Totems = true,
 		DestroyTotems = true,
-		ClassAuras = true,
 		ReverseBuffs = false,
 		BuffSize = 30,
 		BuffsPerRow = 16,
@@ -125,11 +124,11 @@ local defaultSettings = {
 		Distance = 42,
 		Width = 106,
 		Height = 6,
+		FullHealth = false,
     HighlightTarget = true,
     HighlightFocus = true,
     ClassicCastbars = true,
     TargetClassicCastbars = true,
-    Figure = false,
 	},
 	Skins = {
 		DBM = true,
@@ -179,7 +178,6 @@ local defaultSettings = {
 		Interrupt = true,
 		OwnInterrupt = true,
 		InterruptSound = true,
-		DispellSound = true,
 		AlertInInstance = true,
 		BrokenSpell = false,
 		FasterLoot = true,
@@ -277,14 +275,14 @@ local loader = CreateFrame("Frame")
 loader:RegisterEvent("ADDON_LOADED")
 loader:SetScript("OnEvent", function(self, _, addon)
 	if addon ~= "_ShiGuang" then return end
-	if not MaoRUIDB["Classic"] then
-		MaoRUIDB = {}
-		MaoRUIDB["Classic"] = true
+	if not MaoRUIPerDB["Classic"] then
+		MaoRUIPerDB = {}
+		MaoRUIPerDB["Classic"] = true
 	end
 
-	InitialSettings(defaultSettings, MaoRUIDB, true)
-	InitialSettings(accountSettings, MaoRUIAccountDB)
-	I.normTex = textureList[MaoRUIAccountDB["TexStyle"]]
+	InitialSettings(defaultSettings, MaoRUIPerDB, true)
+	InitialSettings(accountSettings, MaoRUIDB)
+	I.normTex = textureList[MaoRUIDB["TexStyle"]]
 
 	self:UnregisterAllEvents()
 end)
@@ -295,7 +293,7 @@ local function setupAuraWatch()
 end
 
 local function updateBagSortOrder()
-	SetSortBagsRightToLeft(not MaoRUIDB["Bags"]["ReverseSort"])
+	SetSortBagsRightToLeft(not MaoRUIPerDB["Bags"]["ReverseSort"])
 end
 
 local function updateBagStatus()
@@ -369,15 +367,15 @@ local function updateErrorBlocker()
 	M:GetModule("Misc"):UpdateErrorBlocker()
 end
 local function resetDetails()
-	MaoRUIAccountDB["ResetDetails"] = true
+	MaoRUIDB["ResetDetails"] = true
 end
 -- Config
 local tabList = {
 	U["Actionbar"],
 	U["Nameplate"],
 	U["Auras"],
-	U["Skins"],
 	U["ChatFrame"],
+	U["Skins"],
 	U["Misc"],
 	U["UI Settings"],
 }
@@ -385,35 +383,39 @@ local tabList = {
 local optionList = {		-- type, key, value, name, horizon, horizon2, doubleline
 	[1] = {
 		{1, "Actionbar", "Enable", "|cff00cc4c"..U["Enable Actionbar"]},
-		{1, "Actionbar", "Classcolor", U["ClassColor BG"], true},
-		{1, "Actionbar", "Bar4Fade", U["Bar4 Fade"]},
-		{1, "Actionbar", "Bar5Fade", U["Bar5 Fade"], true},
-		{4, "Actionbar", "Style", "|cff00cc4c"..U["Actionbar Style"], true, true, {"-- 2*(3+12+3) --", "-- 2*(6+12+6) --", "-- 2*6+3*12+2*6 --", "-- 3*12 --", "-- 2*(12+6) --", "-- MR --", "-- PVP --", "-- 3*(4+12+4) --", "-- PVP2 --", "-- JK --"}},
+		{3, "Actionbar", "Scale", U["Actionbar Scale"].."*", true, false, {.8, 1.5, 1}, updateActionbarScale},
+		{4, "Actionbar", "Style", U["Actionbar Style"], true, true, {"-- 2*(3+12+3) --", "-- 2*(6+12+6) --", "-- 2*6+3*12+2*6 --", "-- 3*12 --", "-- 2*(12+6) --", "-- MR --", "-- PVP --", "-- 3*(4+12+4) --", "-- PVP2 --", "-- JK --"}},
 		{},--blank
-		{1, "Actionbar", "Hotkeys", U["Actionbar Hotkey"]},
-		{1, "Actionbar", "Macro", U["Actionbar Macro"], true},
-		{1, "Actionbar", "Count", U["Actionbar Item Counts"], true, true},
 		{1, "Actionbar", "Cooldown", "|cff00cc4c"..U["Show Cooldown"]},
 		{1, "Actionbar", "DecimalCD", U["Decimal Cooldown"].."*", true},
 		{1, "Actionbar", "OverrideWA", U["HideCooldownOnWA"], true, true},
+		{1, "Actionbar", "Hotkeys", U["Actionbar Hotkey"]},
+		{1, "Actionbar", "Macro", U["Actionbar Macro"], true},
+		{1, "Actionbar", "Count", U["Actionbar Item Counts"], true, true},
+		--{1, "Actionbar", "MicroMenu", U["Micromenu"]},
+		{1, "Actionbar", "Classcolor", U["ClassColor BG"]},
+		{1, "Actionbar", "Bar4Fade", U["Bar4 Fade"], true},
+		{1, "Actionbar", "Bar5Fade", U["Bar5 Fade"], true, true},
 	},
 	[2] = {
 		{1, "Nameplate", "Enable", "|cff00cc4c"..U["Enable Nameplate"]},
-		{1, "Nameplate", "Figure", U["Show FullHealth"], true},
-		{1, "Nameplate", "Arrow", U["RightArrow"], true, true},
+		{1, "Nameplate", "Numberstyle", "数字模式", true},
+		--{1, "Nameplate", "nameonly", "友方仅显示名字", true, true},
+		{1, "Nameplate", "ColorBorder", U["ColorBorder"].."*", true, true},
 		{1, "Nameplate", "TankMode", "|cff00cc4c"..U["Tank Mode"].."*"},
 		{1, "Nameplate", "FriendlyCC", U["Friendly CC"].."*", true},
 		{1, "Nameplate", "HostileCC", U["Hostile CC"].."*", true, true},
-		{1, "Nameplate", "HighlightTarget", U["TargetGlow"]},
-		{1, "Nameplate", "ClassicCastbars", "|cff00cc4c"..U["UFs Castbar"], true},
-		{1, "Nameplate", "TargetClassicCastbars", "|cff00cc4c"..U["Target Castbar"], true, true},
+		{1, "Nameplate", "InsideView", U["Nameplate InsideView"]},
+		{1, "Nameplate", "FullHealth", U["Show FullHealth"], true},
+		{1, "Nameplate", "ClassicCastbars", "|cff00cc4c"..U["UFs Castbar"]},
+		{1, "Nameplate", "TargetClassicCastbars", "|cff00cc4c"..U["Target Castbar"], true},
 		{1, "UFs", "UFFade", U["UFFade"]},
 		{1, "UFs", "UFClassIcon", U["UFClassIcon"], true},
-	  {1, "UFs", "UFPctText", U["UFPctText"], true, true},
-		{},--blank
+		{1, "UFs", "UFPctText", U["UFPctText"], true, true},
 		{3, "Nameplate", "MinAlpha", U["Nameplate MinAlpha"], false, false, {0, 1, 1}},
 		{3, "Nameplate", "maxAuras", U["Max Auras"], true, false, {0, 10, 0}},
 		{3, "Nameplate", "AuraSize", U["Auras Size"], true, true, {12, 36, 0}},
+		{},--blank
 		{3, "Nameplate", "Distance", U["Nameplate Distance"], false, false, {20, 100, 0}},
 		{3, "Nameplate", "Width", U["NP Width"], true, false, {60, 160, 0}},
 		{3, "Nameplate", "Height", U["NP Height"], true, true, {3, 16, 0}},
@@ -427,51 +429,48 @@ local optionList = {		-- type, key, value, name, horizon, horizon2, doubleline
 		{1, "Auras", "ReverseDebuffs", U["ReverseDebuffs"], true, true},
 		{3, "Auras", "BuffSize", U["BuffSize"], false, false, {24, 40, 0}},
 		{3, "Auras", "DebuffSize", U["DebuffSize"], true, false, {24, 40, 0}},
+		{},--blank
 		{3, "Auras", "BuffsPerRow", U["BuffsPerRow"], false, false, {10, 20, 0}},
 		{3, "Auras", "DebuffsPerRow", U["DebuffsPerRow"], true, false, {10, 16, 0}},
 		{3, "AuraWatch", "IconScale", U["AuraWatch IconScale"], true, true, {.8, 2, 1}},
 	},
 	[4] = {
-		{1, "Misc", "QuestNotifier", "|cff00cc4c"..U["QuestNotifier"].."*", false, false, nil, updateQuestNotifier},
-		{1, "Misc", "QuestProgress", U["QuestProgress"].."*", true},
-		{1, "Misc", "OnlyCompleteRing", U["OnlyCompleteRing"].."*", true, true},
-		{1, "Misc", "Interrupt", "|cff00cc4c"..U["Interrupt Alert"].."*", false, false, nil, updateInterruptAlert}, 
-		{1, "Misc", "AlertInInstance", U["Alert In Instance"].."*", true},
-		{1, "Misc", "OwnInterrupt", U["Own Interrupt"].."*", true, true},
-		{1, "Misc", "BrokenSpell", U["Broken Spell"].."*"},
-		{1, "Misc", "InterruptSound", U["Interrupt Alarm"], true},
-		--{1, "Misc", "DispellSound", U["Dispell Alarm"], true, true},
-		{},--blank
-	  {1, "Misc", "ShowItemLevel", "|cff00cc4c"..U["Show ItemLevel"]},
-	  {1, "Skins", "InfobarLine", U["Bar Line"]},
-	  {1, "Misc", "xMerchant", U["xMerchant"], true},
-	  {1, "Misc", "WallpaperKit", U["WallpaperKit"], true, true},
-	  --{1, "Misc", "CrazyCatLady", U["Death Alarm"]},
-	  --{1, "Misc", "PlacedItemAlert", U["Placed Item Alert"]},
-	  {1, "Bags", "Enable", U["Enable Bags"]},
-		{1, "Misc", "AutoDismount", U["AutoDismount"], true},
-	},
-	[5] = {
 		{1, "Chat", "Outline", U["Font Outline"]},
 		{1, "ACCOUNT", "Timestamp", U["Timestamp"], true, false, nil, updateTimestamp},
 		{1, "Chat", "Sticky", U["Chat Sticky"].."*", true, true, nil, updateChatSticky},
 		--{1, "Chat", "WhisperColor", U["Differ WhipserColor"].."*"},
-		{1, "Chat", "Lock", "|cff00cc4c"..U["Lock Chat"]},
-		{1, "Chat", "EnableFilter", "|cff00cc4c"..U["Enable Chatfilter"], true},
+		--{1, "Chat", "Freedom", U["Language Filter"], true, true},
+		{1, "Chat", "EnableFilter", "|cff00cc4c"..U["Enable Chatfilter"]},
+		{1, "Chat", "BlockStranger", "|cffff0000"..U["BlockStranger"].."*", true, false, nil, nil, U["BlockStrangerTip"]},
 		{1, "Chat", "BlockAddonAlert", U["Block Addon Alert"], true, true},
 		{1, "Chat", "Invite", "|cff00cc4c"..U["Whisper Invite"]},
 		{1, "Chat", "GuildInvite", U["Guild Invite Only"].."*", true},
-		{1, "Chat", "Freedom", U["Language Filter"], true, true},
-		{},--blank
+		{1, "ACCOUNT", "AutoBubbles", U["AutoBubbles"], true, true},
+		{1, "Chat", "Lock", "|cff00cc4c"..U["Lock Chat"]},
 		{3, "Chat", "Matches", U["Keyword Match"].."*", false, false, {1, 3, 0}},
 		{3, "Chat", "ChatWidth", U["LockChatWidth"].."*", true, false, {200, 600, 0}, updateChatSize},
-		{3, "Chat", "ChatHeight", U["LockChatHeight"].."*", true, true, {100, 500, 0}, updateChatSize},
-		{},--blank				
+		{3, "Chat", "ChatHeight", U["LockChatHeight"].."*", true, true, {100, 500, 0}, updateChatSize},	
+		{},--blank
 		{2, "ACCOUNT", "ChatFilterWhiteList", U["ChatFilterWhiteList"].."*", false, false, nil, updateFilterWhiteList, U["ChatFilterWhiteListTip"]},
 		{2, "ACCOUNT", "ChatFilterList", U["Filter List"].."*", true, false, nil, updateFilterList},
 		{2, "Chat", "Keyword", U["Whisper Keyword"].."*", true, true, nil, updateWhisperList},
 	},
-	[6] = {
+	[5] = {
+		{1, "ACCOUNT", "AutoBubbles", U["AutoBubbles"]},
+		{1, "Skins", "DBM", U["DBM Skin"], true},
+		--{1, "Skins", "BarLine", U["Bar Line"]},
+		--{1, "Skins", "ChatLine", U["Chat Line"]},
+		--{1, "Skins", "MenuLine", U["Menu Line"], true},
+		{1, "Skins", "ClassLine", U["ClassColor Line"], true, true},
+		--{1, "Skins", "Skada", U["Skada Skin"], true, true},
+		{1, "Skins", "Recount", U["Recount Skin"]},
+		--{1, "Skins", "Bigwigs", U["Bigwigs Skin"]},
+		{1, "Skins", "TMW", U["TMW Skin"], true},
+		{1, "Skins", "Details", U["Details Skin"], true, true, resetDetails},
+		{1, "ACCOUNT", "DisableInfobars", U["DisableInfobars"]},
+		{1, "Skins", "WeakAuras", U["WeakAuras Skin"], true},
+	  --{1, "Skins", "InfobarLine", U["Bar Line"]},
+		{},--blank
 		{1, "Tooltip", "CombatHide", U["Hide Tooltip"].."*"},
 		{1, "Tooltip", "Cursor", U["Follow Cursor"].."*", true},
 		{1, "Tooltip", "ClassColor", U["Classcolor Border"].."*", true, true},
@@ -482,40 +481,52 @@ local optionList = {		-- type, key, value, name, horizon, horizon2, doubleline
 		{1, "Tooltip", "HideRealm", U["Hide Realm"].."*", true},
 		{1, "Tooltip", "SpecLevelByShift", U["Show SpecLevelByShift"].."*", true, true},
 		{1, "Tooltip", "TargetBy", U["Show TargetedBy"].."*"},
+		{1, "Tooltip", "HideAllID", "|cff00cc4c"..U["HideAllID"], true},
 		{},--blank
-		{1, "Misc", "AutoQuest", "|cff00cc4c"..U["Auto Quest"]},
 		{1, "Map", "Coord", U["Map Coords"]},
 		{1, "Map", "MapFader", U["MapFader"].."*", true, false, nil, updateMapFader},
 		{1, "Map", "Clock", U["Minimap Clock"], true, true, nil, showMinimapClock},
 		--{1, "Map", "CombatPulse", U["Minimap Pulse"]},
-		{1, "Map", "WhoPings", U["Show WhoPings"]},
-		{1, "Misc", "ExpRep", U["Show Expbar"], true},
-	  {1, "Misc", "AutoMark", U["Auto Mark"], true, true},
-	  {1, "Misc", "kAutoOpen", U["kAutoOpen"]},
-		{1, "Misc", "AutoConfirmRoll", U["AutoConfirmRoll"], true},
-		{1, "Misc", "Mail", U["Mail Tool"], true, true},
+		--{1, "Map", "WhoPings", U["Show WhoPings"]},
+	},
+	[6] = {
+		{1, "Misc", "QuestNotifier", "|cff00cc4c"..U["QuestNotifier"].."*", false, false, nil, updateQuestNotifier},
+		{1, "Misc", "QuestProgress", U["QuestProgress"].."*", true},
+		{1, "Misc", "OnlyCompleteRing", U["OnlyCompleteRing"].."*", true, true},
+		{1, "Misc", "Interrupt", "|cff00cc4c"..U["Interrupt Alert"].."*", false, false, nil, updateInterruptAlert}, 
+		{1, "Misc", "AlertInInstance", U["Alert In Instance"].."*", true},
+		{1, "Misc", "OwnInterrupt", U["Own Interrupt"].."*", true, true},
+		{1, "Misc", "BrokenSpell", U["Broken Spell"].."*"},
+		{1, "Misc", "InterruptSound", U["Interrupt Alarm"], true},
+	  {1, "Misc", "CrazyCatLady", U["Death Alarm"], true, true},
+	  {1, "Misc", "PlacedItemAlert", U["Placed Item Alert"]},
+		{},--blank
+	  {1, "Misc", "ShowItemLevel", "|cff00cc4c"..U["Show ItemLevel"]},
+	  {1, "Misc", "xMerchant", U["xMerchant"], true},
+	  {1, "Misc", "WallpaperKit", U["WallpaperKit"], true, true},
+	  {1, "Bags", "Enable", U["Enable Bags"]},
+		{1, "Misc", "AutoDismount", U["AutoDismount"], true},
+		{1, "Misc", "AutoQuest", "|cff00cc4c"..U["Auto Quest"], true, true},
+		{1, "Misc", "ExpRep", U["Show Expbar"]},
+	  {1, "Misc", "AutoMark", U["Auto Mark"], true},
+	  {1, "Misc", "kAutoOpen", U["kAutoOpen"], true, true},
+		{1, "Misc", "AutoConfirmRoll", U["AutoConfirmRoll"]},
+		{1, "Misc", "Mail", U["Mail Tool"], true},
+		{1, "Misc", "FasterLoot", U["Faster Loot"], true, true, nil, updateFasterLoot},
+		{1, "Misc", "HideErrors", U["Hide Error"], false, false, nil, updateErrorBlocker},
 	},
 	[7] = {
-		{1, "Misc", "FasterLoot", U["Faster Loot"], false, false, nil, updateFasterLoot},
-		{1, "Misc", "HideErrors", U["Hide Error"], true, false, nil, updateErrorBlocker},
-		{1, "ACCOUNT", "AutoBubbles", U["AutoBubbles"], true, true},
-		--{1, "Skins", "DBM", U["DBM Skin"]},
-		--{1, "Skins", "Skada", U["Skada Skin"], true},
-		--{1, "Skins", "Bigwigs", U["Bigwigs Skin"]},
-		{1, "Skins", "TMW", U["TMW Skin"]},
-		{1, "Skins", "Details", U["Details Skin"], true},
-		{1, "Skins", "WeakAuras", U["WeakAuras Skin"], true, true},
-		{4, "ACCOUNT", "TexStyle", U["Texture Style"], false, false, {U["Highlight"], U["Gradient"], U["Flat"]}},
-		{4, "ACCOUNT", "NumberFormat", U["Numberize"], true, false, {U["Number Type1"], U["Number Type2"], U["Number Type3"]}},
-		{2, "Skins", "DBMCount", U["Countdown Sec"].."*", true, true},
+		{2, "Skins", "DBMCount", U["Countdown Sec"].."*"},
+		{4, "ACCOUNT", "TexStyle", U["Texture Style"], true, false, {U["Highlight"], U["Gradient"], U["Flat"]}},
+		{4, "ACCOUNT", "NumberFormat", U["Numberize"], true, true, {U["Number Type1"], U["Number Type2"], U["Number Type3"]}},
 		{},--blank
 		{1, "ACCOUNT", "LockUIScale", "|cff00cc4c"..U["Lock UIScale"]},
 		{3, "ACCOUNT", "UIScale", U["Setup UIScale"], true, false, {.4, 1.15, 1}},
-		{3, "Actionbar", "Scale", U["Actionbar Scale"], true, true, {.8, 1.5, 1}, updateActionbarScale},
 		{},--blank
 		{3, "UFs", "PlayerFrameScale", U["PlayerFrame Scale"], false, false, {0.6, 1.2, 1}},
-		{3, "Tooltip", "Scale", U["Tooltip Scale"], true, false, {.5, 1.5, 1}},
+		{3, "Tooltip", "Scale", U["Tooltip Scale"].."*", true, false, {.5, 1.5, 1}},
 		{3, "Map", "MapScale", U["Map Scale"], true, true, {0.25, 2, 1}},
+		--{3, "Map", "MinmapScale", U["Minimap Scale"].."*", true, {1, 2, 1}, updateMinimapScale},
 	},
 }
 
@@ -564,15 +575,15 @@ end
 local function NDUI_VARIABLE(key, value, newValue)
 	if key == "ACCOUNT" then
 		if newValue ~= nil then
-			MaoRUIAccountDB[value] = newValue
+			MaoRUIDB[value] = newValue
 		else
-			return MaoRUIAccountDB[value]
+			return MaoRUIDB[value]
 		end
 	else
 		if newValue ~= nil then
-			MaoRUIDB[key][value] = newValue
+			MaoRUIPerDB[key][value] = newValue
 		else
-			return MaoRUIDB[key][value]
+			return MaoRUIPerDB[key][value]
 		end
 	end
 end
@@ -611,7 +622,7 @@ local function CreateOption(i)
 			end
 		-- Editbox
 		elseif optType == 2 then
-			local eb = M.CreateEditBox(parent, 160, 30)
+			local eb = M.CreateEditBox(parent, 160, 23)
 			eb:SetMaxLetters(999)
 			if horizon2 then
 				eb:SetPoint("TOPLEFT", 470, -offset + 32)
@@ -728,7 +739,7 @@ local bloodlustFilter = {
 
 local function exportData()
 	local text = "UISettings:"..I.Version..":"..I.MyName..":"..I.MyClass
-	for KEY, VALUE in pairs(MaoRUIDB) do
+	for KEY, VALUE in pairs(MaoRUIPerDB) do
 		if type(VALUE) == "table" then
 			for key, value in pairs(VALUE) do
 				if type(value) == "table" then
@@ -764,7 +775,7 @@ local function exportData()
 						end
 					end
 				else
-					if MaoRUIDB[KEY][key] ~= defaultSettings[KEY][key] then
+					if MaoRUIPerDB[KEY][key] ~= defaultSettings[KEY][key] then
 						text = text..";"..KEY..":"..key..":"..tostring(value)
 					end
 				end
@@ -772,7 +783,7 @@ local function exportData()
 		end
 	end
 
-	for KEY, VALUE in pairs(MaoRUIAccountDB) do
+	for KEY, VALUE in pairs(MaoRUIDB) do
 		if KEY == "ContactList" then
 			for name, color in pairs(VALUE) do
 				text = text..";ACCOUNT:"..KEY..":"..name..":"..color
@@ -806,18 +817,18 @@ local function importData()
 		local option = options[i]
 		local key, value, arg1 = strsplit(":", option)
 		if arg1 == "true" or arg1 == "false" then
-			MaoRUIDB[key][value] = toBoolean(arg1)
+			MaoRUIPerDB[key][value] = toBoolean(arg1)
 		elseif arg1 == "EMPTYTABLE" then
-			MaoRUIDB[key][value] = {}
+			MaoRUIPerDB[key][value] = {}
 		elseif arg1 == "r" or arg1 == "g" or arg1 == "b" then
 			local color = select(4, strsplit(":", option))
-			if MaoRUIDB[key][value] then
-				MaoRUIDB[key][value][arg1] = tonumber(color)
+			if MaoRUIPerDB[key][value] then
+				MaoRUIPerDB[key][value][arg1] = tonumber(color)
 			end
 		elseif key == "AuraWatchList" then
 			if value == "Switcher" then
 				local index, state = select(3, strsplit(":", option))
-				MaoRUIDB[key][value][tonumber(index)] = toBoolean(state)
+				MaoRUIPerDB[key][value][tonumber(index)] = toBoolean(state)
 			else
 				local idType, spellID, unit, caster, stack, amount, timeless, combat, text, flash = select(4, strsplit(":", option))
 				value = tonumber(value)
@@ -828,41 +839,41 @@ local function importData()
 				timeless = toBoolean(timeless)
 				combat = toBoolean(combat)
 				flash = toBoolean(flash)
-				if not MaoRUIDB[key][value] then MaoRUIDB[key][value] = {} end
-				MaoRUIDB[key][value][arg1] = {idType, spellID, unit, caster, stack, amount, timeless, combat, text, flash}
+				if not MaoRUIPerDB[key][value] then MaoRUIPerDB[key][value] = {} end
+				MaoRUIPerDB[key][value][arg1] = {idType, spellID, unit, caster, stack, amount, timeless, combat, text, flash}
 			end
 		elseif value == "FavouriteItems" then
 			local items = {select(3, strsplit(":", option))}
 			for _, itemID in next, items do
-				MaoRUIDB[key][value][tonumber(itemID)] = true
+				MaoRUIPerDB[key][value][tonumber(itemID)] = true
 			end
 		elseif key == "Mover" or key == "AuraWatchMover" then
 			local relFrom, parent, relTo, x, y = select(3, strsplit(":", option))
 			value = tonumber(value) or value
 			x = tonumber(x)
 			y = tonumber(y)
-			MaoRUIDB[key][value] = {relFrom, parent, relTo, x, y}
+			MaoRUIPerDB[key][value] = {relFrom, parent, relTo, x, y}
 		elseif key == "InternalCD" then
 			local spellID, duration, indicator, unit, itemID = select(3, strsplit(":", option))
 			spellID = tonumber(spellID)
 			duration = tonumber(duration)
 			itemID = tonumber(itemID)
-			MaoRUIDB[key][spellID] = {spellID, duration, indicator, unit, itemID}
+			MaoRUIPerDB[key][spellID] = {spellID, duration, indicator, unit, itemID}
 		elseif key == "ACCOUNT" then
 			if value == "RaidAuraWatch" then
 				local spells = {select(3, strsplit(":", option))}
 				for _, spellID in next, spells do
-					MaoRUIAccountDB[value][tonumber(spellID)] = true
+					MaoRUIDB[value][tonumber(spellID)] = true
 				end
 			elseif value == "ContactList" then
 				local name, r, g, b = select(3, strsplit(":", option))
-				MaoRUIAccountDB["ContactList"][name] = r..":"..g..":"..b
+				MaoRUIDB["ContactList"][name] = r..":"..g..":"..b
 			end
 		elseif tonumber(arg1) then
 			if value == "DBMCount" then
-				MaoRUIDB[key][value] = arg1
+				MaoRUIPerDB[key][value] = arg1
 			else
-				MaoRUIDB[key][value] = tonumber(arg1)
+				MaoRUIPerDB[key][value] = tonumber(arg1)
 			end
 		end
 	end
@@ -972,11 +983,11 @@ local function OpenGUI()
 	close:SetPoint("TOP", 280, -56)
 	close:SetScript("OnClick", function() f:Hide() end)
 
-	local scaleOld = MaoRUIAccountDB["UIScale"]
+	local scaleOld = MaoRUIDB["UIScale"]
 	local ok = M.CreateButton(f, 66, 21, OKAY)
 	ok:SetPoint("BOTTOMRIGHT", -260, 66)
 	ok:SetScript("OnClick", function()
-		local scale = MaoRUIAccountDB["UIScale"]
+		local scale = MaoRUIDB["UIScale"]
 		if scale ~= scaleOld then
 			UIParent:SetScale(scale)
 		end
@@ -996,14 +1007,14 @@ local function OpenGUI()
 		CreateOption(i)
 	end
 	local reset = M.CreateButton(f, 66, 21, "Reset?")
-	reset:SetPoint("BOTTOM", ok, "TOP", 0, 2)
+	reset:SetPoint("BOTTOMLEFT", 270, 66)
 	StaticPopupDialogs["RESET_NDUI"] = {
 		text = CONFIRM_RESET_SETTINGS,
 		button1 = YES,
 		button2 = NO,
 		OnAccept = function()
+			MaoRUIPerDB = {}
 			MaoRUIDB = {}
-			MaoRUIAccountDB = {}
 			ReloadUI()
 		end,
 		whileDead = 1,
@@ -1012,8 +1023,8 @@ local function OpenGUI()
 		StaticPopup_Show("RESET_NDUI")
 	end)
 
-	local import = M.CreateButton(f, 66, 21, U["Import"])
-	import:SetPoint("BOTTOMLEFT", 270, 66)
+	local import = M.CreateButton(f, 66, 26, U["Import"])
+	import:SetPoint("BOTTOMLEFT", 160, 33)
 	import:SetScript("OnClick", function()
 		f:Hide()
 		createDataFrame()
@@ -1022,8 +1033,8 @@ local function OpenGUI()
 		dataFrame.editBox:SetText("")
 	end)
 
-	local export = M.CreateButton(f, 66, 21, U["Export"])
-	export:SetPoint("BOTTOM", import, "TOP", 0, 2)
+	local export = M.CreateButton(f, 66, 26, U["Export"])
+	export:SetPoint("BOTTOMRIGHT", -150, 33)
 	export:SetScript("OnClick", function()
 		f:Hide()
 		createDataFrame()

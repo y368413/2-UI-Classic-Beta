@@ -8,9 +8,9 @@
 
 local VERSION
 if WOW_PROJECT_ID == WOW_PROJECT_MAINLINE then
-	VERSION = "8.2.24"
+	VERSION = "8.2.25"
 elseif WOW_PROJECT_ID == WOW_PROJECT_CLASSIC then
-	VERSION = "1.13.24"
+	VERSION = "1.13.25"
 end
 
 -------------------------------------------------------------------------------
@@ -111,6 +111,7 @@ function FloAspectBar_OnEvent(self, event, arg1, ...)
 		if WOW_PROJECT_ID == WOW_PROJECT_MAINLINE then
 			hooksecurefunc("SetSpecialization", function(specIndex, isPet) if not isPet then changingSpec = true end end);
 		end
+		FloLib_UpdateBindings(self, "SHAPESHIFT");
 
 	elseif event == "UNIT_SPELLCAST_SUCCEEDED" then
 		if arg1 == "player" then

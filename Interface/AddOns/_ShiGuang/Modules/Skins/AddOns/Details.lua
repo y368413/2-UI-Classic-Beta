@@ -21,8 +21,8 @@ local function ReskinDetails()
 		instance:MenuAnchor(16, 3)
 		instance:ToolbarMenuButtonsSize(1)
 		instance:AttributeMenu(true, 0, 3, I.Font[1], 13, {1, 1, 1}, 1, true)
-		instance:SetBarSettings(18, MaoRUIAccountDB["ResetDetails"] and "normTex" or nil)
-		instance:SetBarTextSettings(MaoRUIAccountDB["ResetDetails"] and 14 or nil, I.Font[1], nil, nil, nil, true, true, nil, nil, nil, nil, nil, nil, false, nil, false, nil)
+		instance:SetBarSettings(18, MaoRUIDB["ResetDetails"] and "normTex" or nil)
+		instance:SetBarTextSettings(MaoRUIDB["ResetDetails"] and 14 or nil, I.Font[1], nil, nil, nil, true, true, nil, nil, nil, nil, nil, nil, false, nil, false, nil)
 
 		local bg = M.CreateBG(instance.baseframe)
 		bg:SetPoint("TOPLEFT", -1, 18)
@@ -66,7 +66,7 @@ local function ReskinDetails()
 		instance:LockInstance(true)
 	end
 
-	if MaoRUIAccountDB["ResetDetails"] then
+	if MaoRUIDB["ResetDetails"] then
 		local height = 190
 		if instance1 then
 			if instance2 then
@@ -90,7 +90,7 @@ local function ReskinDetails()
 	end
 
 	-- Numberize
-	local current = MaoRUIAccountDB["NumberFormat"]
+	local current = MaoRUIDB["NumberFormat"]
 	if current < 3 then
 		Details.numerical_system = current
 		Details:SelectNumericalSystem()
@@ -103,7 +103,7 @@ local function ReskinDetails()
 		end
 	end
 
-	MaoRUIAccountDB["ResetDetails"] = false
+	MaoRUIDB["ResetDetails"] = false
 end
 
 S:LoadWithAddOn("Details", "Details", ReskinDetails)

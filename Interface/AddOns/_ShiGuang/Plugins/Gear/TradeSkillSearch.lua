@@ -3,12 +3,11 @@
 -------------------------------------------------------------------------------
 
 TradeSkillSearch = {}
-TradeSkillSearch.version = 7
 local TSS = {}
 TSS.x = 80
-TSS.y = -49
-TSS.w = 225
-TSS.h = 25
+TSS.y = -50
+TSS.w = 210
+TSS.h = 21
 TSS.rowHeight = 16
 
 local function SearchTradeSkillsInner(s)
@@ -67,7 +66,7 @@ local function SetupTradeSkillWidgets()
 	local f = CreateFrame("Frame", "TSSTradeSkillSearchFrame", TradeSkillFrame)
 	local text = f:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
 	text:SetPoint("LEFT")
-	text:SetText("Search:")
+	text:SetText(SEARCH..":")
 	f:SetPoint("TOPLEFT", TradeSkillFrame, "TOPLEFT", TSS.x - 7, TSS.y)
 	f:SetSize(TSS.w, TSS.h)
 	-- Create search box

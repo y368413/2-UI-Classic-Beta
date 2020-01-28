@@ -17,7 +17,7 @@ local CustomFilterList = {
 }
 
 local function isCustomFilter(item)
-	if not MaoRUIDB["Bags"]["ItemFilter"] then return end
+	if not MaoRUIPerDB["Bags"]["ItemFilter"] then return end
 	return CustomFilterList[item.id]
 end
 
@@ -31,12 +31,12 @@ local function isItemInBank(item)
 end
 
 local function isItemJunk(item)
-	if not MaoRUIDB["Bags"]["ItemFilter"] then return end
+	if not MaoRUIPerDB["Bags"]["ItemFilter"] then return end
 	return item.rarity == LE_ITEM_QUALITY_POOR and item.sellPrice > 0
 end
 
 local function isItemAmmo(item)
-	if not MaoRUIDB["Bags"]["ItemFilter"] then return end
+	if not MaoRUIPerDB["Bags"]["ItemFilter"] then return end
 	if I.MyClass == "HUNTER" then
 		return item.equipLoc == "INVTYPE_AMMO" or module.BagsType[item.bagID] == -1
 	elseif I.MyClass == "WARLOCK" then
@@ -45,8 +45,8 @@ local function isItemAmmo(item)
 end
 
 local function isItemEquipment(item)
-	if not MaoRUIDB["Bags"]["ItemFilter"] then return end
-	--if MaoRUIDB["Bags"]["ItemSetFilter"] then
+	if not MaoRUIPerDB["Bags"]["ItemFilter"] then return end
+	--if MaoRUIPerDB["Bags"]["ItemSetFilter"] then
 	--	return item.isInSet
 	--else
 		return item.level and item.rarity > LE_ITEM_QUALITY_POOR and (item.subType == EJ_LOOT_SLOT_FILTER_ARTIFACT_RELIC or item.classID == LE_ITEM_CLASS_WEAPON or item.classID == LE_ITEM_CLASS_ARMOR)
@@ -54,23 +54,23 @@ local function isItemEquipment(item)
 end
 
 local function isItemConsumble(item)
-	if not MaoRUIDB["Bags"]["ItemFilter"] then return end
+	if not MaoRUIPerDB["Bags"]["ItemFilter"] then return end
 	if isCustomFilter(item) == false then return end
 	return isCustomFilter(item) or (item.classID and (item.classID == LE_ITEM_CLASS_CONSUMABLE or item.classID == LE_ITEM_CLASS_ITEM_ENHANCEMENT))
 end
 
 local function isItemLegendary(item)
-	if not MaoRUIDB["Bags"]["ItemFilter"] then return end
+	if not MaoRUIPerDB["Bags"]["ItemFilter"] then return end
 	return item.rarity == LE_ITEM_QUALITY_LEGENDARY
 end
 
 local function isItemFavourite(item)
-	if not MaoRUIDB["Bags"]["ItemFilter"] then return end
-	return item.id and MaoRUIDB["Bags"]["FavouriteItems"][item.id]
+	if not MaoRUIPerDB["Bags"]["ItemFilter"] then return end
+	return item.id and MaoRUIPerDB["Bags"]["FavouriteItems"][item.id]
 end
 
 local function isEmptySlot(item)
-	if not MaoRUIDB["Bags"]["GatherEmpty"] then return end
+	if not MaoRUIPerDB["Bags"]["GatherEmpty"] then return end
 	return module.initComplete and not item.texture and module.BagsType[item.bagID] == 0
 end
 

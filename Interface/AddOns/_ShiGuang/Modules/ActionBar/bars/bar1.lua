@@ -5,12 +5,12 @@ local cfg = R.bars.bar1
 
 local function UpdateActionbarScale(bar)
 	local frame = _G["NDui_Action"..bar]
-	frame:SetScale(MaoRUIDB["Actionbar"]["Scale"])
-	frame.mover:SetScale(MaoRUIDB["Actionbar"]["Scale"])
+	frame:SetScale(MaoRUIPerDB["Actionbar"]["Scale"])
+	frame.mover:SetScale(MaoRUIPerDB["Actionbar"]["Scale"])
 end
 
 function Bar:UpdateAllScale()
-	if not MaoRUIDB["Actionbar"]["Enable"] then return end
+	if not MaoRUIPerDB["Actionbar"]["Enable"] then return end
 
 	UpdateActionbarScale("Bar1")
 	UpdateActionbarScale("Bar2")
@@ -24,12 +24,12 @@ function Bar:UpdateAllScale()
 end
 
 function Bar:OnLogin()
-	if not MaoRUIDB["Actionbar"]["Enable"] then return end
+	if not MaoRUIPerDB["Actionbar"]["Enable"] then return end
 
 	local padding, margin = 2, 2
 	local num = NUM_ACTIONBAR_BUTTONS
 	local buttonList = {}
-	local layout = MaoRUIDB["Actionbar"]["Style"]
+	local layout = MaoRUIPerDB["Actionbar"]["Style"]
 
 	--create the frame to hold the buttons
 	local frame = CreateFrame("Frame", "NDui_ActionBar1", UIParent, "SecureHandlerStateTemplate")

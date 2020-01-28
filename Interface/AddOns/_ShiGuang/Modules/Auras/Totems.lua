@@ -56,7 +56,7 @@ function A:UpdateTotems()
 end
 
 function A:Totems()
-	if not MaoRUIDB["Auras"]["Totems"] then return end
+	if not MaoRUIPerDB["Auras"]["Totems"] then return end
 	if I.isClassic then return end
 
 	TotemsGo()

@@ -3,7 +3,7 @@ local M, R, U, I = unpack(ns)
 local S = M:GetModule("Skins")
 
 function S:SkadaSkin()
-	if not MaoRUIDB["Skins"]["Skada"] then return end
+	if not MaoRUIPerDB["Skins"]["Skada"] then return end
 	if not IsAddOnLoaded("Skada") then return end
 
 	local pairs, ipairs, tinsert = pairs, ipairs, table.insert

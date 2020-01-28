@@ -111,7 +111,7 @@ function MISC:SetupScript(bar)
 end
 
 function MISC:Expbar()
-	if not MaoRUIDB["Misc"]["ExpRep"] then return end
+	if not MaoRUIPerDB["Misc"]["ExpRep"] then return end
 
 	local bar = CreateFrame("StatusBar", nil, Minimap)
 	bar:SetPoint("TOP", Minimap, "BOTTOM", 0, 0)

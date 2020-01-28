@@ -50,13 +50,13 @@ for spellID in pairs(spellBlackList) do
 end
 
 function MISC:IsAllyPet(sourceFlags)
-	if sourceFlags == I.MyPetFlags or (not MaoRUIDB["Misc"]["OwnInterrupt"] and (sourceFlags == I.PartyPetFlags or sourceFlags == I.RaidPetFlags)) then
+	if sourceFlags == I.MyPetFlags or (not MaoRUIPerDB["Misc"]["OwnInterrupt"] and (sourceFlags == I.PartyPetFlags or sourceFlags == I.RaidPetFlags)) then
 		return true
 	end
 end
 
 function MISC:InterruptAlert_Update(...)
-	if MaoRUIDB["Misc"]["AlertInInstance"] and (not IsInInstance()) then return end
+	if MaoRUIPerDB["Misc"]["AlertInInstance"] and (not IsInInstance()) then return end
 
 	local _, eventType, _, sourceGUID, sourceName, sourceFlags, _, _, destName, _, _, _, spellName, _, _, extraskillName, _, auraType = ...
 	if not sourceGUID or sourceName == destName then return end
@@ -65,12 +65,12 @@ function MISC:InterruptAlert_Update(...)
 		local infoText = infoType[eventType]
 		if infoText then
 			if infoText == U["BrokenSpell"] then
-				if not MaoRUIDB["Misc"]["BrokenSpell"] then return end
+				if not MaoRUIPerDB["Misc"]["BrokenSpell"] then return end
 				if auraType and auraType == AURA_TYPE_BUFF or blackList[spellName] then return end
 				SendChatMessage(format(infoText, sourceName, extraskillName, destName, spellName), msgChannel())
 			else
-				if MaoRUIDB["Misc"]["OwnInterrupt"] and sourceName ~= I.MyName and not MISC:IsAllyPet(sourceFlags) then return end
-				   if MaoRUIDB["Misc"]["InterruptSound"] then
+				if MaoRUIPerDB["Misc"]["OwnInterrupt"] and sourceName ~= I.MyName and not MISC:IsAllyPet(sourceFlags) then return end
+				   if MaoRUIPerDB["Misc"]["InterruptSound"] then
 				      PlaySoundFile("Interface\\Addons\\_ShiGuang\\Media\\Sounds\\ShutupFool.ogg", "Master")
 				   end
 				SendChatMessage(format(infoText, sourceName, spellName, destName, extraskillName), msgChannel())
@@ -88,7 +88,7 @@ function MISC:InterruptAlert_CheckGroup()
 end
 
 function MISC:InterruptAlert()
-	if MaoRUIDB["Misc"]["Interrupt"] then
+	if MaoRUIPerDB["Misc"]["Interrupt"] then
 		self:InterruptAlert_CheckGroup()
 		M:RegisterEvent("GROUP_LEFT", self.InterruptAlert_CheckGroup)
 		M:RegisterEvent("GROUP_JOINED", self.InterruptAlert_CheckGroup)
@@ -115,7 +115,7 @@ local itemList = {
 }
 
 function MISC:ItemAlert_Update(unit, _, spellID)
-	if not MaoRUIDB["Misc"]["PlacedItemAlert"] then return end
+	if not MaoRUIPerDB["Misc"]["PlacedItemAlert"] then return end
 
 	if (UnitInRaid(unit) or UnitInParty(unit)) and spellID and itemList[spellID] and lastTime ~= GetTime() then
 		local who = UnitName(unit)

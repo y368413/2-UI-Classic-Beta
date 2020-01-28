@@ -7,7 +7,7 @@ function Bar:CreateBar3()
 	local padding, margin = 2, 2
 	local num = NUM_ACTIONBAR_BUTTONS
 	local buttonList = {}
-	local layout = MaoRUIDB["Actionbar"]["Style"]
+	local layout = MaoRUIPerDB["Actionbar"]["Style"]
 	if layout ~= 1 then cfg = R.bars.bar2 end
 
 	--create the frame to hold the buttons
