@@ -204,7 +204,6 @@ local SetMrbarMicromenu = {
     --{ text = QUIT, func = function() ForceQuit() end, notCheckable = true},
 }
 
-
 function module:WhoPingsMyMap()
 	if not MaoRUIPerDB["Map"]["WhoPings"] then return end
 	local f = CreateFrame("Frame", nil, Minimap)
@@ -390,7 +389,7 @@ function module:SetupMinimap()
 	self:CreatePulse()
 	self:ReskinRegions()
 	self:WhoPingsMyMap()
-	--self:EasyTrackMenu()
+	self:EasyTrackMenu()
 
 	if LibDBIcon10_TownsfolkTracker then
 		LibDBIcon10_TownsfolkTracker:DisableDrawLayer("OVERLAY")

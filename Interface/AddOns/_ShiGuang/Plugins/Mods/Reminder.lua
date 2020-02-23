@@ -187,3 +187,44 @@ CrazyCatLady:SetScript("OnEvent", function(self, event, ...)
 	if event == "PLAYER_DEAD" then PlaySoundFile("Sound\\creature\\Auriaya\\UR_Auriaya_Death01.ogg", "Master")
 	elseif event == "PLAYER_UNGHOST" then StopMusic() end
 end)
+
+
+
+local CombatNotificationAlertFrame = CreateFrame("Frame", "CombatNotificationAlertFrame", UIParent)
+CombatNotificationAlertFrame:RegisterEvent("PLAYER_REGEN_ENABLED")
+CombatNotificationAlertFrame:RegisterEvent("PLAYER_REGEN_DISABLED")
+CombatNotificationAlertFrame:SetSize(360, 43)
+CombatNotificationAlertFrame:SetPoint("TOP", 0, -260)
+CombatNotificationAlertFrame.Bg = CombatNotificationAlertFrame:CreateTexture(nil, "BACKGROUND")
+CombatNotificationAlertFrame.Bg:SetTexture("Interface\\LEVELUP\\MinorTalents")
+CombatNotificationAlertFrame.Bg:SetPoint("TOP")
+CombatNotificationAlertFrame.Bg:SetSize(380, 42)
+CombatNotificationAlertFrame.Bg:SetTexCoord(0, 400 / 512, 341 / 512, 407 / 512)
+CombatNotificationAlertFrame.Bg:SetVertexColor(1, 1, 1, 0.4)
+CombatNotificationAlertFrame.text = CombatNotificationAlertFrame:CreateFontString(nil, "OVERLAY")  --ARTWORK", "GameFont_Gigantic"
+CombatNotificationAlertFrame.text:SetFont(GameFontNormal:GetFont(), 26, 'OUTLINE')	-- 字体
+CombatNotificationAlertFrame.text:SetShadowOffset(0,0)
+CombatNotificationAlertFrame.text:SetPoint("CENTER")
+CombatNotificationAlertFrame:Hide()
+CombatNotificationAlertFrame:SetScript("OnShow", function()
+    CombatNotificationAlertFrame.totalTime = 0.8
+    CombatNotificationAlertFrame.timer = 0
+end)
+CombatNotificationAlertFrame:SetScript("OnUpdate", function(self, elapsed)
+    CombatNotificationAlertFrame.timer = CombatNotificationAlertFrame.timer + elapsed
+    if (CombatNotificationAlertFrame.timer > CombatNotificationAlertFrame.totalTime) then CombatNotificationAlertFrame:Hide() end
+    if (CombatNotificationAlertFrame.timer <= 0.6) then
+        CombatNotificationAlertFrame:SetAlpha(CombatNotificationAlertFrame.timer * 2)
+    elseif (CombatNotificationAlertFrame.timer > 0.8) then
+        CombatNotificationAlertFrame:SetAlpha(1 - CombatNotificationAlertFrame.timer / CombatNotificationAlertFrame.totalTime)
+    end
+end)
+CombatNotificationAlertFrame:SetScript("OnEvent", function(self, event)
+    CombatNotificationAlertFrame:Hide()
+    if (event == "PLAYER_REGEN_DISABLED") then
+        CombatNotificationAlertFrame.text:SetText("|cFFFF0000"..COMBATNOTIFICATIONINFO_combat_enter.."|r")
+    elseif (event == "PLAYER_REGEN_ENABLED") then
+        CombatNotificationAlertFrame.text:SetText("|cff00ff00"..COMBATNOTIFICATIONINFO_combat_leave.."|r")
+    end
+    CombatNotificationAlertFrame:Show()
+end)
