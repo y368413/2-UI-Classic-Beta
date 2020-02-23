@@ -1,6 +1,4 @@
 ﻿--## Author: xbeeps
-
----------------------------------------------------------------------------------Castbars
 local Castbars = LibStub("AceAddon-3.0"):NewAddon("Castbars", "AceConsole-3.0");
 Castbars.SharedMedia = LibStub("LibSharedMedia-3.0");
 Castbars.DoNothing = function() end;
@@ -1300,7 +1298,7 @@ function Castbars:OnInitialize()
             },
             TargetCastingBarFrame =
             {
-                Show = false,
+                Show = true,
                 ShowIcon = true,
                 IconAlignment = "LEFT",
                 ShowTotalCastTime = false,
@@ -1341,7 +1339,7 @@ function Castbars:OnInitialize()
     --LibStub('LibDualSpec-1.0'):EnhanceOptions(self.options.args.profile, self.db)
     LibStub("AceConfig-3.0"):RegisterOptionsTable(CASTBARS_STYLE_TITLE, self.options);
     LibStub("AceConfigDialog-3.0"):AddToBlizOptions(CASTBARS_STYLE_TITLE, nil, nil, "general");
-    --LibStub("AceConfigDialog-3.0"):AddToBlizOptions(CASTBARS_STYLE_TITLE, "Profiles", CASTBARS_STYLE_TITLE, "profile");
+    LibStub("AceConfigDialog-3.0"):AddToBlizOptions(CASTBARS_STYLE_TITLE, "Profiles", CASTBARS_STYLE_TITLE, "profile");
     self:RegisterChatCommand("cbs", "ChatCommand");
     self:RegisterChatCommand("castbars", "ChatCommand");
 
@@ -1362,7 +1360,6 @@ function Castbars:OnInitialize()
 
     -- Create focus casting bar
     CreateFrame("StatusBar", "FocusCastingBarFrame", UIParent, "CastingBarFrameTemplate");
-    --FocusCastingBarFrame:RegisterEvent("PLAYER_FOCUS_CHANGED");
     CastingBarFrame_OnLoad(FocusCastingBarFrame, "focus", false, true);
 
     -- Register additional events on CastingBarFrame

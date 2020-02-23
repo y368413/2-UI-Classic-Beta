@@ -91,7 +91,7 @@ function BlinkHealth:OnEnable()
   self:RegisterEvent("PLAYER_ENTERING_WORLD");
 	self:RegisterEvent("PLAYER_REGEN_DISABLED");
 	self:RegisterEvent("PLAYER_REGEN_ENABLED");
-
+	self:RegisterEvent("UNIT_HEALTH");
 	self.frame["player"]:Show();
 	self.handle = self:ScheduleRepeatingTimer("UpdateUnitValues", 0.05);
 end
@@ -108,7 +108,13 @@ function BlinkHealth:PLAYER_TARGET_CHANGED()
 end
 
 function BlinkHealth:PLAYER_ENTERING_WORLD()
-    self:UpdateUnitFrame();
+    self:UpdateUnitFrame(); --更新状态显示数值
+end
+
+function BlinkHealth:UNIT_HEALTH(event, unit)
+	if (unit == "player") then	
+		self:UpdateUnitFrame(); --更新状态显示数值
+	end
 end
 
 function BlinkHealth:PLAYER_REGEN_DISABLED()
@@ -197,9 +203,10 @@ function BlinkHealth:UpdateUnitValues()
 		petheal, petmax = UnitHealth("pet"), UnitHealthMax("pet");
 		name = UnitName("pet");
 		_, powertype = UnitPowerType("player");
-	
-	perh = heal/maxheal * 100 + 0.5;
-	self:SetPercentText("player", perh);
+	if maxheal<1 then 
+		maxheal =1
+	end
+	self:SetPercentText("player", heal/maxheal * 100 + 0.5);
 	local hexColor = self:ToHexColor(1, 0.65, 0.16);  --0.49,0.99,0
 	heal, maxheal = self:FormatDigit(heal), self:FormatDigit(maxheal);
 	self.frame["player"].heal:SetFormattedText("|cff%s%s/%s|r", hexColor, heal, maxheal);	
@@ -214,8 +221,7 @@ function BlinkHealth:UpdateUnitValues()
 	-- pet
 	hexColor = self:ToHexColor(1, 0.65, 0.16);   --0.49,0.99,0
 	if (type(petmax) == "number" and petmax > 0 and name) then
-		perh = petheal/petmax*100+0.5
-		self.frame["player"].pet:SetFormattedText("|cff%s%s^-^%d%%|r<", hexColor, name, perh);
+		self.frame["player"].pet:SetFormattedText("|cff%s%s^-^%d%%|r<", hexColor, name, petheal/petmax*100+0.5);
 		self.frame["player"].pet:Show();
 	else
 		self.frame["player"].pet:Hide();
@@ -242,8 +248,10 @@ function BlinkHealth:UpdateUnitValues()
 		power, maxpower = UnitPower("target"), UnitPowerMax("target");
 		_, powertype = UnitPowerType("target");
 		name = UnitName("target");
-		perh = heal/maxheal * 100 + 0.5;
-		self:SetPercentText("target", perh);		
+		if maxheal < 1 then
+		maxheal =1
+		end
+		self:SetPercentText("target", heal/maxheal * 100 + 0.5);		
 		heal, maxheal = self:FormatDigit(heal), self:FormatDigit(maxheal);
 		local hexH = self:ToHexColor(1, 0.65, 0.16);   --0.49,0.99,0
 		if (powertype and PowerBarColor[powertype] and type(maxpower) == "number" and maxpower > 0) then
@@ -274,13 +282,15 @@ function BlinkHealth:UpdateUnitValues()
 	
 		if (UnitExists("targettarget")) then
 			heal, maxheal = UnitHealth("targettarget"), UnitHealthMax("targettarget");
-			perh = heal/maxheal*100+0.5
+			if maxheal < 1 then
+				maxheal =1
+			end
 			hexColor = self:ToHexColor(1, 0.65, 0.16);
 			name = UnitName("targettarget");
 			if (UnitIsUnit("targettarget", "player")) then
 				name = " "..YOU.." <";
 			end
-			self.frame["target"].tot:SetFormattedText("|cff%s>%s ★%d%%|r", hexColor, name, perh);
+			self.frame["target"].tot:SetFormattedText("|cff%s>%s ★%d%%|r", hexColor, name, heal/maxheal*100+0.5);
 			self.frame["target"].tot:Show();
 		else
 			self.frame["target"].tot:Hide();
@@ -302,10 +312,9 @@ end
 function BlinkHealth:SetPercentText(unit, percent)	
 	local health = self.frame[unit].health;	
 	local hPerc = ("%d"):format(percent); --%d%%
-	local len = string.len(hPerc);
 
 	for i = 1, 4 do
-		if i > len then
+		if i > string.len(hPerc) then
 			health[5 - i]:Hide();
 			health[5 - i].fill:Hide();
 		else
@@ -431,8 +440,8 @@ function BlinkHealth:ConstructFrame(unit)
      RightClickPlayer:SetPoint("TOPLEFT",0,0)
      RightClickPlayer:SetPoint("BOTTOMRIGHT",0,-16)
      RightClickPlayer:SetScript("OnMouseDown", function(self, button)
-		    if button == "LeftButton" then sendCmd("/click PlayerFrame LeftButton")
-		    elseif button == "RightButton" then sendCmd("/click PlayerFrame RightButton") 
+		    --if button == "LeftButton" then sendCmd("/click PlayerFrame LeftButton")
+		    if button == "RightButton" then sendCmd("/click PlayerFrame RightButton") 
 		    end
     end)
 -------------------------------------------------------------
@@ -443,16 +452,17 @@ function BlinkHealth:ConstructFrame(unit)
       RightClickTarget:SetPoint("TOPLEFT",0,0)
       RightClickTarget:SetPoint("BOTTOMRIGHT",0,-16)
       RightClickTarget:SetScript("OnMouseDown", function(self, button)
-    if button == "LeftButton" then
-		if CheckInteractDistance("target",1) then InspectUnit("target") end
-		elseif button == "RightButton" then
+    --if button == "LeftButton" then
+		  --if CheckInteractDistance("target",1) then InspectUnit("target") end
+		if button == "RightButton" then
         sendCmd("/click TargetFrame RightButton")
 		elseif button == "MiddleButton" then
-			if CheckInteractDistance("target",2) then InitiateTrade("target") end
+			--if CheckInteractDistance("target",2) then InitiateTrade("target") end
+			if CheckInteractDistance("target",1) then InspectUnit("target") end
 		elseif button == "Button4" then
 			if CheckInteractDistance("target",4) then FollowUnit(fullname, 1); end
-		else
-			if CheckInteractDistance("target",1) then InspectAchievements("target") end
+		--else
+			--if CheckInteractDistance("target",1) then InspectAchievements("target") end
 		end
 end)
 -------------------------------------------------------------

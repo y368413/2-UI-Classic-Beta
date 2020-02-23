@@ -60,7 +60,7 @@ function TrackingEye:OnInitialize()
 	--MiniMapTrackingFrame:SetScale(0.001) --hide frame permanently by making it tiny
 	LDBIcon:Register("TrackingEyeData", LDB)
 	--LDBIcon:GetMinimapButton("TrackingEyeData"):SetScale(1.13)
-	LDB.icon = GetTrackingTexture()
+	LDB.icon = GetTrackingTexture() or "Interface\\AddOns\\_ShiGuang\\Media\\Modules\\Role\\bubbleTex"
 	--self:RegisterChatCommand("te", "MinimapButton_ToggleLock")
 	self:RegisterEvent("MINIMAP_UPDATE_TRACKING", function() LDB.icon = GetTrackingTexture() end)
 end

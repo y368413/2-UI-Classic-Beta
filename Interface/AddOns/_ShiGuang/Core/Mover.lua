@@ -54,7 +54,7 @@ end
 function MISC:CalculateMoverPoints(mover, trimX, trimY)
 	local screenWidth = M:Round(UIParent:GetRight())
 	local screenHeight = M:Round(UIParent:GetTop())
-	local screenCenter = M:Round(UIParent:GetCenter())
+	local screenCenter = M:Round(UIParent:GetCenter(), nil)
 	local x, y = mover:GetCenter()
 
 	local LEFT = screenWidth / 3

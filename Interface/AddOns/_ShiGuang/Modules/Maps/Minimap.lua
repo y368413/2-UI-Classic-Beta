@@ -100,28 +100,27 @@ end
 --动作条样式
 local SetMrbarMenuFrame = CreateFrame("Frame", "ClickMenu", UIParent, "UIDropDownMenuTemplate")
 local SetMrbarMicromenu = {  
-    { text = "|cffff8800 ------------------------|r", notCheckable = true },
-    { text = "           "..MAINMENU_BUTTON.."", isTitle = true, notCheckable = true},
-    { text = "|cffff8800 ------------------------|r", notCheckable = true },
-    { text = CHARACTER, icon = 'Interface\\PaperDollInfoFrame\\UI-EquipmentManager-Toggle',
-        func = function() ToggleFrame(CharacterFrame) end, notCheckable = true},
-    { text = SPELLBOOK, icon = 'Interface\\MINIMAP\\TRACKING\\Class',
-        func = function() ToggleFrame(SpellBookFrame) end, notCheckable = true},
-    { text = TALENTS, icon = 'Interface\\MINIMAP\\TRACKING\\Ammunition',
-        func = function() if (not PlayerTalentFrame) then LoadAddOn('Blizzard_TalentUI') end
-        if (not GlyphFrame) then LoadAddOn('Blizzard_GlyphUI') end
-        ToggleTalentFrame() end, notCheckable = true},
-    { text = INVENTORY_TOOLTIP,  icon = 'Interface\\MINIMAP\\TRACKING\\Banker',
-        func = function() ToggleAllBags() end, notCheckable = true},
+    --{ text = "|cffff8800 ------------------------|r", notCheckable = true },
+    --{ text = "           "..MAINMENU_BUTTON.."", isTitle = true, notCheckable = true},
+    --{ text = "|cffff8800 ------------------------|r", notCheckable = true },
+    --{ text = CHARACTER, icon = 'Interface\\PaperDollInfoFrame\\UI-EquipmentManager-Toggle',
+        --func = function() ToggleFrame(CharacterFrame) end, notCheckable = true},
+    --{ text = SPELLBOOK, icon = 'Interface\\MINIMAP\\TRACKING\\Class',
+        --func = function() ToggleFrame(SpellBookFrame) end, notCheckable = true},
+    --{ text = TALENTS, icon = 'Interface\\MINIMAP\\TRACKING\\Ammunition',
+        --func = function() if (not PlayerTalentFrame) then LoadAddOn('Blizzard_TalentUI') end
+        --if (not GlyphFrame) then LoadAddOn('Blizzard_GlyphUI') end
+        --ToggleTalentFrame() end, notCheckable = true},
+    --{ text = INVENTORY_TOOLTIP,  icon = 'Interface\\MINIMAP\\TRACKING\\Banker',
+        --func = function() ToggleAllBags() end, notCheckable = true},
     --{ text = ACHIEVEMENTS, icon = 'Interface\\ACHIEVEMENTFRAME\\UI-Achievement-Shield',
         --func = function() ToggleAchievementFrame() end, notCheckable = true},
-    { text = QUEST_LOG, icon = 'Interface\\GossipFrame\\ActiveQuestIcon',
-        func = function() ToggleQuestLog() end, notCheckable = true},
-    { text = FRIENDS, icon = 'Interface\\FriendsFrame\\PlusManz-BattleNet',
-        func = function() ToggleFriendsFrame() end, notCheckable = true},
-    { text = GUILD, icon = 'Interface\\GossipFrame\\TabardGossipIcon',
-        func = function() if (IsTrialAccount()) then UIErrorsFrame:AddMessage(ERR_RESTRICTED_ACCOUNT, 1, 0, 0)
-        else ToggleGuildFrame() end end, notCheckable = true},
+    --{ text = QUEST_LOG, icon = 'Interface\\GossipFrame\\ActiveQuestIcon',
+        --func = function() ToggleQuestLog() end, notCheckable = true},
+    --{ text = FRIENDS, icon = 'Interface\\FriendsFrame\\PlusManz-BattleNet',
+        --func = function() ToggleFriendsFrame() end, notCheckable = true},
+    --{ text = GUILD, icon = 'Interface\\GossipFrame\\TabardGossipIcon',
+        --func = function() if (IsTrialAccount()) then UIErrorsFrame:AddMessage(ERR_RESTRICTED_ACCOUNT, 1, 0, 0) else ToggleGuildFrame() end end, notCheckable = true},
     --{ text = GROUP_FINDER, icon = 'Interface\\LFGFRAME\\BattleNetWorking0',
         --func = function() securecall(PVEFrame_ToggleFrame, 'GroupFinderFrame', LFDParentFrame) end, notCheckable = true},
     --{ text = ENCOUNTER_JOURNAL, icon = 'Interface\\MINIMAP\\TRACKING\\Profession',
@@ -129,7 +128,7 @@ local SetMrbarMicromenu = {
     --{ text = PLAYER_V_PLAYER, icon = 'Interface\\MINIMAP\\TRACKING\\BattleMaster', --broke
 	     --func = function() securecall(PVEFrame_ToggleFrame, 'PVPUIFrame', HonorFrame) end, notCheckable = true},
     --{ text = MOUNTS, icon = 'Interface\\MINIMAP\\TRACKING\\StableMaster',  --broke
-	  --func = function() securecall(ToggleCollectionsJournal, 1) end, tooltipTitle = securecall(MicroButtonTooltipText, MOUNTS_AND_PETS, 'TOGGLEPETJOURNAL'), notCheckable = true},
+	      --func = function() ToggleCollectionsJournal() end, notCheckable = true},
    -- { text = PETS, icon = 'Interface\\MINIMAP\\TRACKING\\StableMaster',  --broke
 	  --func = function() securecall(ToggleCollectionsJournal, 2) end, tooltipTitle = securecall(MicroButtonTooltipText, MOUNTS_AND_PETS, 'TOGGLEPETJOURNAL'), notCheckable = true},
     --{ text = TOY_BOX, icon = 'Interface\\MINIMAP\\TRACKING\\Reagents',  --broke 
@@ -140,8 +139,8 @@ local SetMrbarMicromenu = {
          --func = function() LoadAddOn('Blizzard_Calendar') Calendar_Toggle() end, notCheckable = true},
     --{ text = BLIZZARD_STORE, icon = 'Interface\\MINIMAP\\TRACKING\\BattleMaster',
          --func = function() LoadAddOn('Blizzard_StoreUI') securecall(ToggleStoreUI) end, notCheckable = true},
-    { text = GAMEMENU_HELP, icon = 'Interface\\CHATFRAME\\UI-ChatIcon-Blizz',
-         func = function() ToggleFrame(HelpFrame) end, notCheckable = true},
+    --{ text = GAMEMENU_HELP, icon = 'Interface\\CHATFRAME\\UI-ChatIcon-Blizz',
+         --func = function() ToggleFrame(HelpFrame) end, notCheckable = true},
     --{ text = BATTLEFIELD_MINIMAP,
          --func = function() securecall(ToggleBattlefieldMinimap) end, notCheckable = true},
     { text = "|cffff8800 ------------------------|r", notCheckable = true },
@@ -188,8 +187,8 @@ local SetMrbarMicromenu = {
     { text = "|cFF00DDFF ------- Style -------|r", isTitle = true, notCheckable = true },
     { text = MINIMAP_MENU_SWITCHUF, icon = 'Interface\\Icons\\Spell_Holy_Crusade',
         func = function() sendCmd("/loadmr"); end, notCheckable = true},
-    { text = MINIMAP_MENU_AFKSCREEN, icon = 'Interface\\Icons\\Spell_Nature_Sentinal',
-        func = function() sendCmd("/wallpaperkit"); end, notCheckable = true},
+    --{ text = MINIMAP_MENU_AFKSCREEN, icon = 'Interface\\Icons\\Spell_Nature_Sentinal',
+        --func = function() sendCmd("/wallpaperkit"); end, notCheckable = true},
     --{ text = MINIMAP_MENU_CHECKFOODSSS, icon = 'Interface\\MINIMAP\\TRACKING\\Reagents',
         --func = function() sendCmd("/hj"); end, notCheckable = true  },
     --{ text = "|cFF00DDFF -- OneKeyMacro --|r", func = function() sendCmd("/MacroHelp"); end, notCheckable = true},
@@ -230,7 +229,7 @@ function module:WhoPingsMyMap()
 end
 
 function module:UpdateMinimapScale()
-	local scale = MaoRUIPerDB["Map"]["MinmapScale"]
+	local scale = MaoRUIPerDB["Map"]["MinimapScale"]
 	Minimap:SetScale(scale)
 	Minimap.mover:SetSize(Minimap:GetWidth()*scale, Minimap:GetHeight()*scale)
 end
@@ -355,7 +354,7 @@ function module:SetupMinimap()
 	Minimap:SetPoint("TOPRIGHT", mover)
 	Minimap.mover = mover
 
-	--self:UpdateMinimapScale()
+	self:UpdateMinimapScale()
 	self:ShowMinimapClock()
 
 	-- Mousewheel Zoom
@@ -391,7 +390,7 @@ function module:SetupMinimap()
 	self:CreatePulse()
 	self:ReskinRegions()
 	self:WhoPingsMyMap()
-	self:EasyTrackMenu()
+	--self:EasyTrackMenu()
 
 	if LibDBIcon10_TownsfolkTracker then
 		LibDBIcon10_TownsfolkTracker:DisableDrawLayer("OVERLAY")

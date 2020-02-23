@@ -1,12 +1,7 @@
 <Ui xmlns="http://www.blizzard.com/wow/ui/">
 	<Include file="Chat\Chat.xml"/>
-	<Include file="Maps\Maps.xml"/>
-	<Include file="Loot\Loot.xml"/>
-	<Include file="Gear\Gear.xml"/>
-	<Include file="Charms\Charms.xml"/>
-	<Include file="Quest\Quest.xml"/>
-	<Include file="DamageExm\DamageExm.xml"/>
-	<Include file="Notice\Notice.xml"/>
+	<Include file="Mods\Mods.xml"/>
+	<Include file="DamageEx\DamageEx.xml"/>
 	<Include file="UnitFrames\UnitFrames.xml"/>
 	<Include file="Aces\Aces.xml"/>
 </Ui>

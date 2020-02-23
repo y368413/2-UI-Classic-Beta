@@ -349,6 +349,73 @@ function MISC:MailBox()
 	M.HideObject(OpenAllMail)
 end
 
+--## Version: 0.1.5
+local LockboxMailer = CreateFrame("Frame")
+LockboxMailer:RegisterEvent("PLAYER_LOGIN")
+LockboxMailer:SetScript("OnEvent", function(event, ...) LockboxMailer.LockboxTable = {} end)  
+local LockBoxButton = CreateFrame("Button", "LockBoxMailButton", SendMailFrame, "ActionButtonTemplate")
+LockBoxButton:ClearAllPoints()
+LockBoxButton:SetPoint("BOTTOMRIGHT", SendMailFrame, "BOTTOMRIGHT", -66, 123)
+LockBoxButton:SetSize(26,26)
+LockBoxButton:RegisterForClicks("AnyUp")
+LockBoxButton:SetScript("OnClick", function(_,btn) LockboxMailer:ProcessMailing() end)
+LockBoxButton.icon:SetTexture(134344)
+local LockboxMailerTooltip = CreateFrame("GameTooltip","LockboxMailerTooltip", UIParent, "GameTooltipTemplate");
+LockboxMailerTooltip:SetOwner(LockboxMailer, "ANCHOR_NONE");
+function LockboxMailer:FindLockboxes()
+    wipe(LockboxMailer.LockboxTable)
+    for bag = BACKPACK_CONTAINER, NUM_BAG_SLOTS do
+        for slot = 1, GetContainerNumSlots(bag) do
+            local lootable, itemLink = select(6,GetContainerItemInfo(bag, slot))
+            if itemLink then
+                local bindType = select(14, GetItemInfo(itemLink))
+
+                if bindType ~= 1 and lootable then
+                    LockboxMailerTooltip:SetBagItem(bag, slot)
+                    if LockboxMailerTooltip:IsShown() then
+                        for i = 1, LockboxMailerTooltip:NumLines() do
+                            local line = _G["LockboxMailerTooltipTextLeft"..i]:GetText()
+                            if (line == LOCKED) or (line == ITEM_OPENABLE) then
+                                tinsert(LockboxMailer.LockboxTable, { bag, slot } )
+                            end
+                        end
+                    end
+                end
+            end
+        end
+    end
+end
+function LockboxMailer:ProcessMailing()
+        --ClearSendMail()
+        --SendMailNameEditBox:SetText("烂柯人")
+    local attachmentIndex = 0
+    for i = 1, ATTACHMENTS_MAX_SEND do
+        if GetSendMailItem(i) then
+            attachmentIndex = attachmentIndex + 1
+        end
+    end
+
+    if attachmentIndex < ATTACHMENTS_MAX_SEND then
+        LockboxMailer:FindLockboxes()
+    end
+
+    local quantity = #LockboxMailer.LockboxTable
+    if next(LockboxMailer.LockboxTable) then
+        attachmentIndex = (attachmentIndex == 0 and 1 or attachmentIndex + 1)
+        for i = 1, quantity do
+            local item = tremove(LockboxMailer.LockboxTable)
+            if attachmentIndex == ATTACHMENTS_MAX_SEND then
+                UIErrorsFrame:AddMessage(ERR_MAIL_INVALID_ATTACHMENT_SLOT, 1.0, 0.1, 0.1, 1.0)
+                return
+            end
+            ClearCursor()
+            PickupContainerItem(item[1], item[2])
+            ClickSendMailItemButton()
+            attachmentIndex = attachmentIndex + 1
+        end
+            SendMailSubjectEditBox:SetText("["..quantity.."]")
+        end
+end
 -------MailinputboxResizer---------------------------------------------------------------
 SendMailCostMoneyFrame:ClearAllPoints()
 SendMailCostMoneyFrame:SetPoint("TOPLEFT","SendMailFrame","TOPLEFT",82,-70)

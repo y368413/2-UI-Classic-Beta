@@ -169,4 +169,5 @@ function Bar:OnLogin()
 	self:HideBlizz()
 	self:ReskinBars()
 	self:UpdateAllScale()
+	self:MicroMenu()
 end

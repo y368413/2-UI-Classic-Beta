@@ -4,8 +4,6 @@
 	<Script file="LibAuraTypes.lua"/>
 	<Script file="LibSpellLocks.lua"/>
 	<Include file="LibClassicDurations\LibClassicDurations.xml"/>
-	<Include file="cargBags\cargBags.xml"/>
 	<Script file="LibButtonGlow.lua"/>
 	<Script file="LibBase64.lua"/>
-	<!--Script file="RealMobHealth.lua"/-->
 </Ui>

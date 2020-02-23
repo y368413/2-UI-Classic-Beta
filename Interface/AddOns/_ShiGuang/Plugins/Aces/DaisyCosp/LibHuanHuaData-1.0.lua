@@ -2,12 +2,7 @@
 -- 感谢原作者 盒子哥
 -- Fix and Updata by 冰色之舞、图图 、ShiGuang
 --------------------------------------------------------------------------------
-
-local DataVersion = 1.02 --20190528 or 
-local LibHuanHuaData, oldminor = LibStub:NewLibrary("LibHuanHuaData-1.1", DataVersion)
-
-LibHuanHuaData.data = HuanhuaItemData;
-
+local LibHuanHuaData, oldminor = LibStub:NewLibrary("LibHuanHuaData-1.1", 1.02) --20190528
 local FindItemCache = {}
 setmetatable(FindItemCache, {__mode = "kv"})
 
@@ -17,7 +12,6 @@ local function tableFind(t, value)
 			return id;
 		end
 	end
-
 	return false;
 end
 
@@ -27,7 +21,7 @@ function LibHuanHuaData:FindItem(itemID)
 			return nil
 		else
 			local iType, subType, setName = string.match(FindItemCache[itemID], "(.+)|(.+)|(.+)");
-			local tmpInfo = self.data[iType][subType][setName];
+			local tmpInfo = HuanhuaItemData[iType][subType][setName];
 			return iType, subType, setName, tmpInfo;
 		end
 	else
@@ -39,8 +33,8 @@ function LibHuanHuaData:FindItem(itemID)
 		end		
 
 		local iType, subType, setName;
-		for t in pairs(self.data) do
-			for tt, b in pairs(self.data[t]) do
+		for t in pairs(HuanhuaItemData) do
+			for tt, b in pairs(HuanhuaItemData[t]) do
 				for name, ids in pairs(b) do
 					local retVal = tableFind(ids, itemID);
 					if (retVal) then
@@ -49,17 +43,12 @@ function LibHuanHuaData:FindItem(itemID)
 				end
 			end
 		end
-		
-		if (iType) then			
-			FindItemCache[itemID] = string.format("%s|%s|%s", iType, subType, setName);
-		else
-			FindItemCache[itemID] = "nil";
-		end
-		
 		if iType then
-			local tmpInfo = self.data[iType][subType][setName];
+			FindItemCache[itemID] = string.format("%s|%s|%s", iType, subType, setName);
+			local tmpInfo = HuanhuaItemData[iType][subType][setName];
 			return iType, subType, setName, tmpInfo;
 		else
+			FindItemCache[itemID] = "nil";
 			return nil;
 		end
 	end

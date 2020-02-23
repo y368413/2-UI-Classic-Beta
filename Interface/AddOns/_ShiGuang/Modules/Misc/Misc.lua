@@ -48,15 +48,12 @@ function MISC:OnLogin()
 	self:AutoDismount()
 	self:BidPriceHighlight()
 	self:TradeTabs()
-	self:WallpaperKit()
-	
+	self:xMerchant()
 
 	-- Max camera distancee
-	C_Timer.After(1, function()
-	if tonumber(GetCVar("cameraDistanceMaxZoomFactor")) ~= 4 then
-		SetCVar("cameraDistanceMaxZoomFactor", 4)
+	if tonumber(GetCVar("cameraDistanceMaxZoomFactor")) <= 2.6 then
+		SetCVar("cameraDistanceMaxZoomFactor", 2.6)
 	end
-	end)
 
 	-- Auto chatBubbles
 	if MaoRUIDB["AutoBubbles"] then
@@ -462,7 +459,6 @@ function MISC:AutoDismount()
 	M:RegisterEvent("UI_ERROR_MESSAGE", updateEvent)
 end
 
-do
 hooksecurefunc("TextStatusBar_UpdateTextStringWithValues",function(self,textString,value,_,maxValue)  ---	Custom status text format.
 	if self.RightText and value and maxValue>0 and not self.showPercentage and GetCVar("statusTextDisplay")=="BOTH" then
 		self.RightText:SetText(M.Numb(value))
@@ -483,4 +479,3 @@ hooksecurefunc("TextStatusBar_UpdateTextStringWithValues",function(self,textStri
 		_G["PartyMemberFrame"..i.."ManaBarTextRight"]:SetText(" ");
 	end]]
 end)
-end

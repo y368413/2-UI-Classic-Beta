@@ -24,7 +24,7 @@ local defaults = {								-- Default settings
 }
 
 DialogKey.buttons = {							-- List of buttons to try and click
-	"StaticPopup1Button1",
+	--"StaticPopup1Button1",
 	"QuestFrameCompleteButton",
 	"QuestFrameCompleteQuestButton",
 	"QuestFrameAcceptButton",
@@ -302,7 +302,7 @@ function DialogKey:WatchFrame(name)				-- Add given frame to the watch list
 		DialogKey:Glow(frame, "add")
 	end
 	
-	DialogKey:UpdateAdditionalFrames()
+	--DialogKey:UpdateAdditionalFrames()
 end
 
 function DialogKey:UnwatchFrame(name)			-- Remove given frame from the watch list
@@ -325,7 +325,7 @@ function DialogKey:UnwatchFrame(name)			-- Remove given frame from the watch lis
 		DialogKey:Glow(frame, "remove")
 	end
 	
-	DialogKey:UpdateAdditionalFrames()
+	--DialogKey:UpdateAdditionalFrames()
 end
 
 -- Primary functions --

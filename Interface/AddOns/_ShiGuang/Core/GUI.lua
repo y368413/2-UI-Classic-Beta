@@ -33,25 +33,6 @@ local defaultSettings = {
 		OverrideWA = false,
 		MicroMenu = true,
 	},
-	Bags = {
-		Enable = true,
-		BagsScale = 0.9,
-		IconSize = 34,
-		BagsWidth = 10,
-		BankWidth = 16,
-		BagsiLvl = true,
-		BagsiLvlcolor = false,
-		ReverseSort = true,
-		ItemFilter = true,
-		--ItemSetFilter = false,
-		DeleteButton = true,
-		FavouriteItems = {},
-		GatherEmpty = false,
-		SpecialBagsColor = true,
-		ShowNewItem = true,
-		SplitCount = 1,
-		iLvlToShow = 1,
-	},
 	Auras = {
 		Reminder = true,
 		Totems = true,
@@ -72,7 +53,7 @@ local defaultSettings = {
 	UFs = {
 		PlayerFrameScale = 0.9,
 		UFPctText = true,
-		UFClassIcon = false,
+		UFClassIcon = true,
 		UFFade = true,
 	},
 	Chat = {
@@ -100,11 +81,15 @@ local defaultSettings = {
 		Clock = false,
 		CombatPulse = false,
 		MapScale = 0.75,
-		MinmapScale = 1.5,
+		MinimapScale = 1,
 		ShowRecycleBin = false,
 		WhoPings = true,
 		MapReveal = true,
 		MapFader = false,
+		zrMMbordersize = 2,
+		zrMMbuttonsize = 16,
+		zrMMbuttonpos = "Bottom",
+		zrMMcustombuttons = {},
 	},
 	Nameplate = {
 		Enable = true,
@@ -261,7 +246,7 @@ local function InitialSettings(source, target, fullClean)
 
 	for i, j in pairs(target) do
 		if source[i] == nil then target[i] = nil end
-		if type(j) == "table" and fullClean then
+		if fullClean and type(j) == "table" then
 			for k, v in pairs(j) do
 				if type(v) ~= "table" and source[i] and source[i][k] == nil then
 					target[i][k] = nil
@@ -392,10 +377,10 @@ local optionList = {		-- type, key, value, name, horizon, horizon2, doubleline
 		{1, "Actionbar", "Hotkeys", U["Actionbar Hotkey"]},
 		{1, "Actionbar", "Macro", U["Actionbar Macro"], true},
 		{1, "Actionbar", "Count", U["Actionbar Item Counts"], true, true},
-		--{1, "Actionbar", "MicroMenu", U["Micromenu"]},
-		{1, "Actionbar", "Classcolor", U["ClassColor BG"]},
-		{1, "Actionbar", "Bar4Fade", U["Bar4 Fade"], true},
-		{1, "Actionbar", "Bar5Fade", U["Bar5 Fade"], true, true},
+		{1, "Actionbar", "MicroMenu", U["Micromenu"]},
+		{1, "Actionbar", "Classcolor", U["ClassColor BG"], true},
+		{1, "Actionbar", "Bar4Fade", U["Bar4 Fade"]},
+		{1, "Actionbar", "Bar5Fade", U["Bar5 Fade"], true},
 	},
 	[2] = {
 		{1, "Nameplate", "Enable", "|cff00cc4c"..U["Enable Nameplate"]},
@@ -504,7 +489,8 @@ local optionList = {		-- type, key, value, name, horizon, horizon2, doubleline
 	  {1, "Misc", "ShowItemLevel", "|cff00cc4c"..U["Show ItemLevel"]},
 	  {1, "Misc", "xMerchant", U["xMerchant"], true},
 	  {1, "Misc", "WallpaperKit", U["WallpaperKit"], true, true},
-	  {1, "Bags", "Enable", U["Enable Bags"]},
+	  --{1, "Bags", "Enable", U["Enable Bags"]},
+		{1, "Misc", "HideErrors", U["Hide Error"], false, false, nil, updateErrorBlocker},
 		{1, "Misc", "AutoDismount", U["AutoDismount"], true},
 		{1, "Misc", "AutoQuest", "|cff00cc4c"..U["Auto Quest"], true, true},
 		{1, "Misc", "ExpRep", U["Show Expbar"]},
@@ -513,7 +499,6 @@ local optionList = {		-- type, key, value, name, horizon, horizon2, doubleline
 		{1, "Misc", "AutoConfirmRoll", U["AutoConfirmRoll"]},
 		{1, "Misc", "Mail", U["Mail Tool"], true},
 		{1, "Misc", "FasterLoot", U["Faster Loot"], true, true, nil, updateFasterLoot},
-		{1, "Misc", "HideErrors", U["Hide Error"], false, false, nil, updateErrorBlocker},
 	},
 	[7] = {
 		{2, "Skins", "DBMCount", U["Countdown Sec"].."*"},
@@ -525,8 +510,8 @@ local optionList = {		-- type, key, value, name, horizon, horizon2, doubleline
 		{},--blank
 		{3, "UFs", "PlayerFrameScale", U["PlayerFrame Scale"], false, false, {0.6, 1.2, 1}},
 		{3, "Tooltip", "Scale", U["Tooltip Scale"].."*", true, false, {.5, 1.5, 1}},
-		{3, "Map", "MapScale", U["Map Scale"], true, true, {0.25, 2, 1}},
-		--{3, "Map", "MinmapScale", U["Minimap Scale"].."*", true, {1, 2, 1}, updateMinimapScale},
+		{3, "Map", "MapScale", U["Map Scale"], false, false, {0.25, 2, 1}},
+		{3, "Map", "MinimapScale", U["Minimap Scale"].."*", true, false, {1, 2, 1}, updateMinimapScale},
 	},
 }
 

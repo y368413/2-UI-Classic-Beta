@@ -412,7 +412,7 @@ function Bar:ReskinBars()
 	end
 end
 
---------------------------------X   HotSpotMicroMenu by Sojik X --------------------------------
+--[[------------------------------X   HotSpotMicroMenu by Sojik X --------------------------------
 
 local HotSpotMicroMenu = CreateFrame("Frame","MicroMenuHolder",UIParent)
 local MicroButtons = {
@@ -448,4 +448,4 @@ HotSpotMicroMenu:SetScript("OnEvent", function()
   if not MaoRUIPerDB["Actionbar"]["Enable"] then return end
 	hooksecurefunc("UpdateMicroButtons", MoveMicroButtons)
 	MoveMicroButtons()
-end)
+end)]]

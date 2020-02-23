@@ -246,10 +246,10 @@ function M:CreateGear(name)
 	bu.Icon = bu:CreateTexture(nil, "ARTWORK")
 	bu.Icon:SetAllPoints()
 	bu.Icon:SetTexture(I.gearTex)
-	--bu.Icon:SetTexCoord(0, .5, 0, .5)
+	bu.Icon:SetTexCoord(0, .5, 0, .5)
+	bu.Icon:SetVertexColor(1, 0, 0, 1)
 	bu:SetHighlightTexture(I.gearTex)
-	--bu:GetHighlightTexture():SetTexCoord(0, .5, 0, .5)
-
+	bu:GetHighlightTexture():SetTexCoord(0, .5, 0, .5)
 	return bu
 end
 
@@ -306,8 +306,10 @@ function M.Numb(n)
 	end
 end
 
-function M:Round(number)
-	return floor(number + .5)
+function M:Round(number, idp)
+	idp = idp or 0
+	local mult = 10 ^ idp
+	return floor(number * mult + .5) / mult
 end
 
 -- Color code
@@ -676,8 +678,15 @@ function M:CreateDropDown(width, height, data)
 	dd.Text:SetPoint("RIGHT", -5, 0)
 	dd.options = {}
 
-	local bu = M.CreateGear(dd)
-	bu:SetPoint("LEFT", dd, "RIGHT", -2, 0)
+	local bu = CreateFrame("Button", dd, self)
+	bu:SetSize(26, 26)
+	bu.Icon = bu:CreateTexture(nil, "ARTWORK")
+	bu.Icon:SetAllPoints()
+	bu.Icon:SetTexture("Interface\\Addons\\_ShiGuang\\Media\\Modules\\Raid\\ArrowLarge")
+	bu.Icon:SetVertexColor(1, 0, 0, 1)
+	bu:SetHighlightTexture("Interface\\Addons\\_ShiGuang\\Media\\Modules\\Raid\\ArrowLarge")
+	bu:GetHighlightTexture():SetVertexColor(0, 1, 0, 1)
+	bu:SetPoint("LEFT", dd, "RIGHT", -8, 3)
 	local list = CreateFrame("Frame", nil, dd)
 	list:SetPoint("TOP", dd, "BOTTOM", 0, -2)
 	M.CreateBD(list, 1)

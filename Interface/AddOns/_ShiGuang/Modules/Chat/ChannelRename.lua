@@ -36,7 +36,7 @@ function module:UpdateChannelNames(text, ...)
     text = gsub(text, "|h%[(%d+)%. WorldDefense.-%]|h", "|h%[%1%.WorldDefense%]|h")
 		text = gsub(text, "|h%[(%d+)%. GuildRecruitment.-%]|h", "|h%[%1%.Recruitment%]|h")
 		end
-		return self.oldAddMsg(self, text, r, g, b) --self.oldAddMsg(self, gsub(text, "|h%[(%d+)%..-%]|h", "|h[%1]|h"), ...)
+		return self.oldAddMsg(self, text, r, g, b) --self.oldAddMsg(self, gsub(text, "|h%[(%d+)%..-%]|h", "|h[%1]|h"), r, g, b)
 end
 
 function module:ChannelRename()

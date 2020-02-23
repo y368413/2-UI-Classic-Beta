@@ -14,7 +14,6 @@ local C_ChatInfo_RegisterAddonMessagePrefix = C_ChatInfo.RegisterAddonMessagePre
 
 function MISC:AddAlerts()
 	self:InterruptAlert()
-	--self:VersionCheck()
 	self:PlacedItemAlert()
 end
 

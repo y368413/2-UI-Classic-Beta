@@ -1,18 +1,53 @@
-  PlayerFrame:ClearAllPoints() PlayerFrame:SetPoint("RIGHT",UIParent,"CENTER", -150, -250) PlayerFrame:SetUserPlaced(true)  --PlayerFrame:SetScale(0.8) 
-  TargetFrame:ClearAllPoints() TargetFrame:SetPoint("LEFT",UIParent,"CENTER", 150, -250) TargetFrame:SetUserPlaced(true)  --TargetFrame:SetScale(0.8) 
-  PartyMemberFrame1:ClearAllPoints() PartyMemberFrame1:SetPoint("TOPLEFT", 260, -143) PartyMemberFrame1:SetUserPlaced(true)
-  PartyMemberFrame1:SetScript("OnMouseDown", function() --按shift移动小队
-		if (IsShiftKeyDown()) then PartyMemberFrame1:ClearAllPoints() PartyMemberFrame1:StartMoving() end
-  end)
-  PartyMemberFrame1:SetScript("OnMouseUp", function()
-		PartyMemberFrame1:StopMovingOrSizing()
-  end)
-  TargetFrameToT:ClearAllPoints() TargetFrameToT:SetPoint("LEFT",TargetFrame,"BOTTOMRIGHT", -43, 21)
-  TargetFrameToTTextureFrameName:ClearAllPoints() TargetFrameToTTextureFrameName:SetPoint("LEFT",TargetFrameToT,"Top", -8, -43)
-  PetFrameHealthBarText:SetPoint("BOTTOMRIGHT", PetFrame, "LEFT", 3,-6)  
-  PetFrameManaBarText:SetPoint("TOPRIGHT", PetFrame, "LEFT", 3, -6)
-  PetFrameManaBarText:SetTextColor(0, 1, 1)
+----------------------------------- iFrame  -----------------------------------------
+hooksecurefunc("TextStatusBar_UpdateTextString", function(bar)   ----	  血量百分比数字 
+	local value = bar:GetValue()
+	local _, max = bar:GetMinMaxValues()
+	if bar.pctText then
+		bar.pctText:SetText(value==0 and "" or tostring(math.ceil((value / max) * 100)))  --(value==0 and "" or tostring(math.ceil((value / max) * 100)) .. "%")
+		if not MaoRUIPerDB["UFs"]["UFPctText"] or value == max then bar.pctText:Hide()
+		elseif GetCVarBool("statusTextPercentage") and ( bar.unit == PlayerFrame.unit or bar.unit == "target" or bar.unit == "focus" ) then bar.pctText:Hide()
+		else bar.pctText:Show()
+		end
+	end
+end)
 
+local function colorHPBar(bar, unit)
+	if bar and not bar.lockValues and unit == bar.unit then
+		local min, max = bar:GetMinMaxValues()
+		local value = bar:GetValue()
+		if max > min then value = (value - min) / (max - min) else value = 0 end
+		if value > 0.5 then r, g, b = 2*(1-value), 1, 0 else r, g, b = 1, 2*value, 0 end
+			--if UnitIsPlayer(unit) and UnitClass(unit) then  --按职业着色
+				--local color = RAID_CLASS_COLORS[select(2, UnitClass(unit))]
+				--bar:SetStatusBarColor(color.r, color.g, color.b)
+			--else
+				--bar:SetStatusBarColor(r, g, b)
+			--end
+		if bar.pctText then	bar.pctText:SetTextColor(r, g, b) end
+	end
+end
+hooksecurefunc("UnitFrameHealthBar_Update", colorHPBar)
+hooksecurefunc("HealthBar_OnValueChanged", function(self) colorHPBar(self, self.unit) end)
+
+hooksecurefunc("UnitFrame_Update", function(self)
+	if self.name and self.unit then
+		local color = RAID_CLASS_COLORS[select(2, UnitClass(self.unit))] or NORMAL_FONT_COLOR
+	  if self.name then
+	    if UnitIsPlayer(self.unit) then 
+		   self.name:SetTextColor(color.r, color.g, color.b)
+		elseif UnitIsEnemy("player", "target") then 
+		   self.name:SetTextColor(1,0,0) 
+		elseif UnitIsFriend("player", "target") then 
+		   self.name:SetTextColor(0,1,0)  
+		else
+		   self.name:SetTextColor(1,1,0) 
+		end
+	end
+		--if string.len(self:GetName()) == 16 and string.find(self:GetName(), "PartyMemberFrame") then
+			--self.name:SetText(GetUnitName(self.unit))							-- 不显示队友姓名中的服务器名
+		--end
+	end
+end)
 ------------------------------------------Class icon---------------------------------------
 hooksecurefunc("UnitFramePortrait_Update",function(self) 
    if not MaoRUIPerDB["UFs"]["UFClassIcon"] then return end
@@ -32,7 +67,7 @@ end)
 local p=PlayerHitIndicator;p.Show=p.Hide;p:Hide() 
 local p=PetHitIndicator;p.Show=p.Hide;p:Hide() 
 
--------------------------------	  目标种族、职业和其它信息   ----------------------------------------
+--[[-----------------------------	  目标种族、职业和其它信息   ----------------------------------------
 TargetFrame:CreateFontString("TargetFrameType", "OVERLAY", "GameFontNormalSmall")
 TargetFrameType:SetPoint("BOTTOMRIGHT", TargetFrame, "BOTTOMRIGHT", -43, -8)
 TargetFrameType:SetTextColor(1, 0.75, 0)
@@ -57,7 +92,7 @@ hooksecurefunc("TargetFrame_Update", function(self)
 		end
 	TargetFrameType:SetText(typeText)
 	TargetFrameRace:SetText(raceText)
-end)
+end)]]
 	
 ------------------------------------------------------------------------------- TargetClassButton by 狂飙@cwdg(networm@qq.com) 20120119 DIY by y368413 
 -- Binding Variables
@@ -65,7 +100,6 @@ BINDING_NAME_INSPECT = "    "..INSPECT
 BINDING_NAME_TRADE = "    "..TRADE
 BINDING_NAME_WHISPER = "    "..WHISPER
 BINDING_NAME_FOLLOW = "    "..FOLLOW
---BINDING_NAME_COMPARE_ACHIEVEMENTS = COMPARE_ACHIEVEMENTS
 BINDING_NAME_Invite = "    "..CALENDAR_INVITE_PLAYER 
 
 local targeticon = CreateFrame("Button", "TargetClass", TargetFrame)
@@ -110,7 +144,7 @@ targeticon:SetScript("OnMouseDown", function(self, button)
 				end
 				ChatFrame_SendTell(fullname)
 		elseif button == "Button4" then
-			if CheckInteractDistance("target",4) then FollowUnit(fullname, 1); end
+			if CheckInteractDistance("target",4) then FollowUnit("target", 1); end
 		else
 			if CheckInteractDistance("target",1) then InspectAchievements("target") end
 		end
@@ -124,16 +158,3 @@ hooksecurefunc("TargetFrame_Update", function()
 		targeticon:Hide()
 	end
 end)
---[[hooksecurefunc("ActionButton_UpdateCount", function(actionButton)
-    local text = actionButton.Count
-    local action = actionButton.action
-    if not IsItemAction(action) and GetActionCount(action) > 0 then
-        local count = GetActionCount(action)
-        if ( count > (actionButton.maxDisplayCount or 9999 ) ) then
-            text:SetText("*")
-        else
-            text:SetText(count)
-            -- print(GetActionInfo(action))
-        end
-    end
-end)]]

@@ -4,16 +4,12 @@ local SoundTime = 0
 local EnableSound = true
 ShiGuangDB.BaudErrorFrameConfig = ShiGuangDB.BaudErrorFrameConfig or {}
 
-local function RegisterTaintEvents(self)
+function BaudErrorFrame_OnLoad(self)
+	self:RegisterEvent("VARIABLES_LOADED")
 	self:RegisterEvent("ADDON_ACTION_BLOCKED")
 	self:RegisterEvent("MACRO_ACTION_BLOCKED")
 	self:RegisterEvent("ADDON_ACTION_FORBIDDEN")
 	self:RegisterEvent("MACRO_ACTION_FORBIDDEN")
-end
-
-function BaudErrorFrame_OnLoad(self)
-	self:RegisterEvent("VARIABLES_LOADED")
-		RegisterTaintEvents(self)  --enableTaint
 
 	UIParent:UnregisterEvent("MACRO_ACTION_BLOCKED")
 	UIParent:UnregisterEvent("ADDON_ACTION_BLOCKED")

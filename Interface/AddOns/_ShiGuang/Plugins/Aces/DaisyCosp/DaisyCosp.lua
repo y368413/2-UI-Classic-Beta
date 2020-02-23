@@ -16,7 +16,7 @@ local function CreateHuanHuaInfo(tooltip, itemID)
     local iType, subType, setName, setsdata = DaisyCospdata:FindItem(itemID);
     if (iType) then
       local curCount, totalCount = DaisyCosp:GetSetItemCount(setsdata);
-      tooltip:AddLine("\n"..TRANSMOGRIFY.."  " .. setName .. (" (%d/%d)"):format(curCount, totalCount), 0.97, 0.51, 0.97);
+      tooltip:AddLine("["..TRANSMOGRIFY.."]" .. setName .. (" (%d/%d)"):format(curCount, totalCount), 0.97, 0.51, 0.97);
       for i, id in ipairs(setsdata) do
         local name = GetItemInfo(id);
         if (GetItemCount(id) > 0) then
@@ -35,7 +35,7 @@ end
     local itemID = string.match(link, "item:(%d+)");
     local iType, subType, setName, setsdata = DaisyCospdata:FindItem(itemID);
     if (not iType) then return; end
-    local model = DressUpModel;
+    local model = DressUpModel; --DressUpFrame.ModelScene:GetPlayerActor()
     if ( SideDressUpFrame.parentFrame and SideDressUpFrame.parentFrame:IsShown() ) then
       model = SideDressUpModel;
     end
@@ -56,7 +56,6 @@ GameTooltip:HookScript("OnTooltipSetItem", function(tooltip, ...)
 	local item = select(2, tooltip:GetItem())
 	if (not item) then return; end  -- or (not GetItemInfo(item)) 
 	local itemID = string.match(item, "item:(%d+)")
-	
 	if itemID and showHuahuaSet then
 		CreateHuanHuaInfo(tooltip, itemID)
 	end

@@ -1,5 +1,8 @@
 local rmhAddon = IsAddOnLoaded("RealMobHealth");
 local mi2addon = IsAddOnLoaded("MobInfo2-Classic");
+local ghostText = "Ghost";	-- for manual localization of word when you are dead and in ghost shape.
+local offlineText = "Offline";
+local deadText = DEAD;
 
 function CreateBarPctText(frame, ap, rp, x, y, font, fontsize)
 	local bar = frame.healthbar 
@@ -30,9 +33,10 @@ function unitClassColors(healthbar, unit)
 		local class = CUSTOM_CLASS_COLORS and CUSTOM_CLASS_COLORS[class] or RAID_CLASS_COLORS[class];
 		healthbar:SetStatusBarColor(class.r, class.g, class.b);
 		if not UnitIsConnected(unit) then
-			healthbar:SetStatusBarColor(0.5,0.5,0.5);
+			healthbar:SetStatusBarColor(0.6,0.6,0.6,0.5);
 		end
 	end
+	-- PlayerFrameHealthBar:SetStatusBarColor(0,0.9,0);
 end
 hooksecurefunc("UnitFrameHealthBar_Update", unitClassColors)
 hooksecurefunc("HealthBar_OnValueChanged", function(self) unitClassColors(self, self.unit) end)
@@ -99,7 +103,11 @@ local function CreateStatusBarText(name, parentName, parent, point, x, y)
 	fontString:SetPoint(point, parent, point, x, y)
 	return fontString
 end
-
+local function CreateDeadText(name, parentName, parent, point, x, y)
+	local fontString = parent:CreateFontString(parentName..name, nil, "GameFontNormalSmall")
+	fontString:SetPoint(point, parent, point, x, y)
+	return fontString
+end
 local function targetFrameStatusText()
 	if not mi2addon then
 		TargetFrameHealthBar.TextString = CreateStatusBarText("Text", "TargetFrameHealthBar", TargetFrameTextureFrame, "CENTER", 0, 0);
@@ -109,28 +117,55 @@ local function targetFrameStatusText()
 		TargetFrameManaBar.LeftText = CreateStatusBarText("TextLeft", "TargetFrameManaBar", TargetFrameTextureFrame, "LEFT", 5, 0);
 		TargetFrameManaBar.RightText = CreateStatusBarText("TextRight", "TargetFrameManaBar", TargetFrameTextureFrame, "RIGHT", -3, 0);
 	end
+	--TargetFrameTextureFrameGhostText = CreateDeadText("GhostText", "TargetFrameHealthBar", TargetFrameHealthBar, "CENTER", 0, 0);
+	--TargetFrameTextureFrameOfflineText = CreateDeadText("OfflineText", "TargetFrameHealthBar", TargetFrameHealthBar, "CENTER", 0, 0);
+	--PlayerFrameDeadText = CreateDeadText("DeadText", "PlayerFrame", PlayerFrameHealthBar, "CENTER", 0, 0);
+	--PlayerFrameGhostText = CreateDeadText("GhostText", "PlayerFrame", PlayerFrameHealthBar, "CENTER", 0, 0);
+
+	--PlayerFrameDeadText:SetText(DEAD);
+	--PlayerFrameGhostText:SetText(ghostText);
+	--TargetFrameTextureFrameGhostText:SetText(ghostText);
+	--TargetFrameTextureFrameOfflineText:SetText(offlineText);
 end
 targetFrameStatusText()
 
 -- NOTE: Blizzards API will return targets current and max healh as a percentage instead of exact value (ex. 100/100).
 --[[hooksecurefunc("TextStatusBar_UpdateTextStringWithValues",function(statusFrame, textString, value, valueMin, valueMax)
+	if( statusFrame.LeftText and statusFrame.RightText ) then
+		statusFrame.LeftText:SetText("");
+		statusFrame.RightText:SetText("");
+		statusFrame.LeftText:Hide();
+		statusFrame.RightText:Hide();
+	end
 	if ( ( tonumber(valueMax) ~= valueMax or valueMax > 0 ) and not ( statusFrame.pauseUpdates ) ) then
 		statusFrame:Show();
+		
+		if ( (statusFrame.cvar and GetCVar(statusFrame.cvar) == "1" and statusFrame.textLockable) or statusFrame.forceShow ) then
+			textString:Show();
+		elseif ( statusFrame.lockShow > 0 and (not statusFrame.forceHideText) ) then
+			textString:Show();
+		else
+			textString:SetText("");
+			textString:Hide();
+			return;
+		end
+
 		local k,m=1e3
 		local m=k*k
 		
-		valueDisplay	=	(( value >= 1e3 and value < 1e5 and format("%1.3f",value/k)) or
-							( value >= 1e5 and value < 1e6 and format("%1.0f K",value/k)) or
-							( value >= 1e6 and value < 1e9 and format("%1.1f M",value/m)) or
-							( value >= 1e9 and format("%1.1f M",value/m)) or value )
+		valueDisplay	=	(( value >= 1e3 and value < 1e5 and format("%1.3f",value/k)) or		--	1.000
+							( value >= 1e5 and value < 1e6 and format("%1.0f K",value/k)) or	--	100k
+							( value >= 1e6 and value < 1e7 and format("%1.1f M",value/m)) or	--	1.0M
+							( value >= 1e7 and format("%1.2f M",value/m)) or value )			--	10.00M +
 							
 		valueMaxDisplay	=	(( valueMax >= 1e3 and valueMax < 1e5 and format("%1.3f",valueMax/k)) or
 							( valueMax >= 1e5 and valueMax < 1e6 and format("%1.0f K",valueMax/k)) or
-							( valueMax >= 1e6 and valueMax < 1e9 and format("%1.1f M",valueMax/m)) or
-							( valueMax >= 1e9 and format("%1.1f M",valueMax/m)) or valueMax )
-
-		-- local valueDisplay = value;
-		-- local valueMaxDisplay = valueMax;
+							( valueMax >= 1e6 and valueMax < 1e7 and format("%1.1f M",valueMax/m)) or
+							( valueMax >= 1e7 and format("%1.2f M",valueMax/m)) or valueMax )
+							
+		xpValueDisplay	=	( xpValue >= 1e3 and format("%1.3f",xpValue/k))
+		
+		xpMaxValueDisplay	=	( xpMaxValue >= 1e3 and format("%1.3f",xpMaxValue/k))
 		
 		local textDisplay = GetCVar("statusTextDisplay");
 		if ( value and valueMax > 0 and ( (textDisplay ~= "NUMERIC" and textDisplay ~= "NONE") or statusFrame.showPercentage ) and not statusFrame.showNumeric) then
@@ -140,45 +175,28 @@ targetFrameStatusText()
 				textString:Show();
 			elseif ( textDisplay == "BOTH" and not statusFrame.showPercentage) then
 				if( statusFrame.LeftText and statusFrame.RightText ) then
-					if(not statusFrame.powerToken or statusFrame.powerToken == "MANA") then		-- both HP %
-						if value <= 1 then
-							statusFrame.LeftText:SetText("");
-						else
-							statusFrame.LeftText:SetText(math.ceil((value / valueMax) * 100) .. "%");
-						end
+					if(not statusFrame.powerToken or statusFrame.powerToken == "MANA") then
+						statusFrame.LeftText:SetText(math.ceil((value / valueMax) * 100) .. "%");	-- % both.
+						if value == 0 then statusFrame.LeftText:SetText(""); end
 						statusFrame.LeftText:Show();
-					-- end
 					end
-					if value <= 1 then
-						statusFrame.RightText:SetText("");
-					else
-						statusFrame.RightText:SetText(valueDisplay);
-					end
+					statusFrame.RightText:SetText(valueDisplay);	-- both rtext.
+					if value == 0 then statusFrame.RightText:SetText(""); end
 					statusFrame.RightText:Show();
 					textString:Hide();
 				else
-					if value <= 0 then
-						valueDisplay = "";
-					else
-						valueDisplay = "(" .. math.ceil((value / valueMax) * 100) .. "%) " .. valueDisplay .. " / " .. valueMaxDisplay;
-					end
+					valueDisplay = "(" .. math.ceil((value / valueMax) * 100) .. "%) " .. xpValueDisplay .. " / " .. xpMaxValueDisplay;	-- xp both.
+					if value == 0 then textString:SetText(""); end	
 				end
 				textString:SetText(valueDisplay);
 			else
 				valueDisplay = math.ceil((value / valueMax) * 100) .. "%";
 				if ( statusFrame.prefix and (statusFrame.alwaysPrefix or not (statusFrame.cvar and GetCVar(statusFrame.cvar) == "1" and statusFrame.textLockable) ) ) then
-					if value <= 1 then
-						textString:SetText("");
-					else
-						textString:SetText(statusFrame.prefix .. " " .. valueDisplay);
-					end
+					textString:SetText(statusFrame.prefix .. " " .. valueDisplay);	--	xp %.
 				else
-					if value <= 1 then
-						textString:SetText("");
-					else
-						textString:SetText(valueDisplay);
-					end
+					textString:SetText(valueDisplay);	-- %.
 				end
+				if value == 0 then textString:SetText(""); end
 			end
 		elseif ( value == 0 and statusFrame.zeroText ) then
 			textString:SetText(statusFrame.zeroText);
@@ -188,22 +206,82 @@ targetFrameStatusText()
 		else
 			statusFrame.isZero = nil;
 			if ( statusFrame.prefix and (statusFrame.alwaysPrefix or not (statusFrame.cvar and GetCVar(statusFrame.cvar) == "1" and statusFrame.textLockable) ) ) then
-				if value <= 1 then
-					textString:SetText("");
-				else
-					textString:SetText(statusFrame.prefix.." "..valueDisplay.." / "..valueMaxDisplay);
-				end
+				textString:SetText(statusFrame.prefix.." "..valueDisplay.." / "..valueMaxDisplay);		--	xp # / none, + none.
+				MainMenuBarExpText:SetText(statusFrame.prefix.." "..xpValueDisplay .. "  / " .. xpMaxValueDisplay);		-- xp override.
 			else
-				if value <= 1 then
-					textString:SetText("");
-				else
-					textString:SetText(valueDisplay.." / "..valueMaxDisplay);
-				end
+				textString:SetText(valueDisplay.." / "..valueMaxDisplay);		-- #.
 			end
+			if value == 0 then textString:SetText("") end
+		end
+	else
+		textString:Hide();
+		textString:SetText("");
+		if ( not statusFrame.alwaysShow ) then
+			statusFrame:Hide();
+		else
+			statusFrame:SetValue(0);
 		end
 	end
 end)]]
 
+-- Dead, Ghost and Offline text.
+--[[hooksecurefunc("TextStatusBar_UpdateTextStringWithValues",function(self)
+	local textDisplay = GetCVar("statusTextDisplay");
+	
+	if UnitIsDeadOrGhost("player") then
+		if textDisplay == "BOTH" then
+			PlayerFrameHealthBarTextLeft:Hide();
+			PlayerFrameHealthBarTextRight:Hide();
+			PlayerFrameManaBarTextLeft:Hide();
+			PlayerFrameManaBarTextRight:Hide();
+		else
+			PlayerFrameHealthBarText:Hide();
+			PlayerFrameManaBarText:Hide();
+		end
+	else
+	end
+	if UnitIsDead("player") then
+		PlayerFrameDeadText:Show();
+		PlayerFrameGhostText:Hide();
+	elseif UnitIsGhost("player") then
+		PlayerFrameDeadText:Hide();
+		PlayerFrameGhostText:Show();
+	else
+		PlayerFrameDeadText:Hide();
+		PlayerFrameGhostText:Hide();
+	end
+	
+	if UnitIsDeadOrGhost("target") or not UnitIsConnected("target") then
+		if textDisplay == "BOTH" then
+			TargetFrameHealthBarTextLeft:Hide();
+			TargetFrameHealthBarTextRight:Hide();
+			TargetFrameManaBarTextLeft:Hide();
+			TargetFrameManaBarTextRight:Hide();
+		else
+			TargetFrameHealthBarText:Hide();
+			TargetFrameManaBarText:Hide();
+		end
+	else
+	end
+	if UnitIsDead("target") then
+		TargetFrameTextureFrameDeadText:Show();
+		TargetFrameTextureFrameGhostText:Hide();
+	elseif UnitIsGhost("target") then
+		TargetFrameTextureFrameDeadText:Hide();
+		TargetFrameTextureFrameGhostText:Show();
+	else
+		TargetFrameTextureFrameDeadText:Hide();
+		TargetFrameTextureFrameGhostText:Hide();
+	end
+	if not UnitIsConnected("target") then
+		TargetFrameTextureFrameOfflineText:Show();
+		TargetFrameManaBar:Hide();
+		
+	else
+		TargetFrameTextureFrameOfflineText:Hide();
+	end
+	
+end)]]
 
 --	Player frame.
 local function playerFrame(self)
@@ -216,17 +294,13 @@ local function playerFrame(self)
 	--self.name:SetPoint("CENTER", PlayerFrame, "CENTER",50.5, 36);
 	self.healthbar:SetPoint("TOPLEFT",106,-24);
 	self.healthbar:SetHeight(28);
-	self.healthbar.LeftText:ClearAllPoints();
 	self.healthbar.LeftText:SetPoint("LEFT",self.healthbar,"LEFT",5,0);	
-	self.healthbar.RightText:ClearAllPoints();
 	self.healthbar.RightText:SetPoint("RIGHT",self.healthbar,"RIGHT",-5,0);
 	self.healthbar.TextString:SetPoint("CENTER", self.healthbar, "CENTER", 0, 0);
-	self.manabar.LeftText:ClearAllPoints();
+	self.manabar:SetPoint("TOPLEFT",108,-51);
 	self.manabar.LeftText:SetPoint("LEFT",self.manabar,"LEFT",5,-1)		;
-	self.manabar.RightText:ClearAllPoints();
 	self.manabar.RightText:SetPoint("RIGHT",self.manabar,"RIGHT",-4,-1);
 	self.manabar.TextString:SetPoint("CENTER",self.manabar,"CENTER",0,-1);
-	--PlayerFrameGroupIndicatorText:ClearAllPoints();
 	--PlayerFrameGroupIndicatorText:SetPoint("BOTTOMLEFT", PlayerFrame,"TOP",0,-20);
 	PlayerFrameGroupIndicatorLeft:Hide();
 	PlayerFrameGroupIndicatorMiddle:Hide();
@@ -245,16 +319,6 @@ function playerPvpIcon()
 	end
 end
 hooksecurefunc("PlayerFrame_UpdatePvPStatus", playerPvpIcon)
-
-
---[[hooksecurefunc("PlayerFrame_ToPlayerArt", function(self)
-		self.healthbar.LeftText:SetFontObject(SystemFont_Outline_Small);
-		self.healthbar.RightText:SetFontObject(SystemFont_Outline_Small);
-		self.manabar.LeftText:SetFontObject(SystemFont_Outline_Small);
-		self.manabar.RightText:SetFontObject(SystemFont_Outline_Small);
-		-- self.healthbar.TextString:SetFontObject(SystemFont_Outline_Small);
-		self.manabar.TextString:SetFontObject(SystemFont_Outline_Small);
-end)]]
 
 --	Player vehicle frame.
 hooksecurefunc("PlayerFrame_ToVehicleArt", function(self, vehicleType)
@@ -283,10 +347,10 @@ hooksecurefunc("PlayerFrame_ToPlayerArt", function()
 	PetFrameHealthBarTextRight:SetPoint("RIGHT",PetFrameHealthBar,"RIGHT",2,0);
 	PetFrameManaBarTextRight:SetPoint("RIGHT",PetFrameManaBar,"RIGHT",2,-5);
 		PetFrameHealthBarTextLeft:SetPoint("LEFT",PetFrameHealthBar,"LEFT",0,0);
-		PetFrameHealthBarTextRight:SetPoint("RIGHT",PetFrameHealthBar,"RIGHT",0,0);
+		PetFrameHealthBarTextRight:SetPoint("RIGHT",PetFrameHealthBar,"RIGHT",2,0);
 		PetFrameManaBarText:SetPoint("CENTER",PetFrameManaBar,"CENTER",0,-3);
 		PetFrameManaBarTextLeft:SetPoint("LEFT",PetFrameManaBar,"LEFT",0,-3);
-		PetFrameManaBarTextRight:SetPoint("RIGHT",PetFrameManaBar,"RIGHT",0,-3);
+		PetFrameManaBarTextRight:SetPoint("RIGHT",PetFrameManaBar,"RIGHT",2,-3);
 		PetFrameHealthBarText:SetFontObject(SystemFont_Outline_Small);
 		PetFrameHealthBarTextLeft:SetFontObject(SystemFont_Outline_Small);
 		PetFrameHealthBarTextRight:SetFontObject(SystemFont_Outline_Small);
@@ -461,7 +525,6 @@ local function totFrame()
 	TargetFrameToTTextureFrameUnconsciousText:ClearAllPoints();
 	TargetFrameToTTextureFrameUnconsciousText:SetPoint("CENTER", "TargetFrameToTHealthBar","CENTER",1, 0);
 	TargetFrameToTTextureFrameName:SetSize(65,10);
-	TargetFrameToTTextureFrameTexture:SetTexture("Interface\\Addons\\_ShiGuang\\Media\\Modules\\UFs\\UI-TargetofTargetFrame");
 	TargetFrameToTHealthBar:ClearAllPoints();
 	TargetFrameToTHealthBar:SetPoint("TOPLEFT", 45, -15);
     TargetFrameToTHealthBar:SetHeight(10);
@@ -471,52 +534,11 @@ local function totFrame()
 	TargetFrameToTBackground:SetSize(50,14);
 	TargetFrameToTBackground:ClearAllPoints();
 	TargetFrameToTBackground:SetPoint("CENTER", "TargetFrameToT","CENTER",20, 0);
+	TargetFrameToTTextureFrameTexture:SetTexture("Interface\\Addons\\_ShiGuang\\Media\\Modules\\UFs\\UI-TargetofTargetFrame");
+
 end
 hooksecurefunc("TargetofTarget_Update", totFrame)
 hooksecurefunc("TargetFrame_CheckClassification", totFrame)
 
 
-
---[[	Party Frames.
-function whoaPartyFrames()
-	local useCompact = GetCVarBool("useCompactPartyFrames");
-	if (GetCVarBool("useCompactPartyFrames") == false) and IsInGroup(player) and (not IsInRaid(player)) then 
-		for i = 1, 4 do
-		if UnitExists(unit) then
-			_G["PartyMemberFrame"..i.."Name"]:SetSize(80,12);
-			_G["PartyMemberFrame"..i.."Name"]:SetFont(STANDARD_TEXT_FONT, 12, "OUTLINE")
-			_G["PartyMemberFrame"..i.."Texture"]:SetTexture("Interface\\Addons\\_ShiGuang\\Media\\Modules\\UFs\\UI-PartyFrame");
-			_G["PartyMemberFrame"..i.."Flash"]:SetTexture("Interface\\Addons\\_ShiGuang\\Media\\Modules\\UFs\\UI-PARTYFRAME-FLASH");
-			_G["PartyMemberFrame"..i.."HealthBar"]:ClearAllPoints();
-			_G["PartyMemberFrame"..i.."HealthBar"]:SetPoint("TOPLEFT", 45, -13);
-			_G["PartyMemberFrame"..i.."HealthBar"]:SetHeight(12);
-			_G["PartyMemberFrame"..i.."ManaBar"]:ClearAllPoints();
-			_G["PartyMemberFrame"..i.."ManaBar"]:SetPoint("TOPLEFT", 45, -26);
-			_G["PartyMemberFrame"..i.."ManaBar"]:SetHeight(5);
-			--_G["PartyMemberFrame"..i.."HealthBarTextLeft"]:ClearAllPoints();
-			--_G["PartyMemberFrame"..i.."HealthBarTextLeft"]:SetPoint("LEFT", _G["PartyMemberFrame"..i.."HealthBar"], "LEFT", 0, 0);
-			--_G["PartyMemberFrame"..i.."HealthBarTextRight"]:ClearAllPoints();
-			--_G["PartyMemberFrame"..i.."HealthBarTextRight"]:SetPoint("RIGHT", _G["PartyMemberFrame"..i.."HealthBar"], "RIGHT", 0, 0);
-			--_G["PartyMemberFrame"..i.."ManaBarTextLeft"]:ClearAllPoints();
-			--_G["PartyMemberFrame"..i.."ManaBarTextLeft"]:SetPoint("LEFT", _G["PartyMemberFrame"..i.."ManaBar"], "LEFT", 0, 0);
-			--_G["PartyMemberFrame"..i.."ManaBarTextRight"]:ClearAllPoints();
-			--_G["PartyMemberFrame"..i.."ManaBarTextRight"]:SetPoint("RIGHT", _G["PartyMemberFrame"..i.."ManaBar"], "RIGHT", 0, 0);
-			--_G["PartyMemberFrame"..i.."HealthBarText"]:ClearAllPoints();
-			--_G["PartyMemberFrame"..i.."HealthBarText"]:SetPoint("LEFT", _G["PartyMemberFrame"..i.."HealthBar"], "RIGHT", 0, 0);
-			--_G["PartyMemberFrame"..i.."ManaBarText"]:ClearAllPoints();
-			--_G["PartyMemberFrame"..i.."ManaBarText"]:SetPoint("LEFT", _G["PartyMemberFrame"..i.."ManaBar"], "RIGHT", 0, 0);
-		end
-		end
-	end
-end
-hooksecurefunc("UnitFrame_Update", whoaPartyFrames)
-hooksecurefunc("PartyMemberFrame_ToPlayerArt", whoaPartyFrames)
-
-hooksecurefunc("TextStatusBar_UpdateTextStringWithValues", function()
-		for i = 1, 4 do
-				_G["PartyMemberFrame"..i.."ManaBarText"]:SetText(" ");
-				_G["PartyMemberFrame"..i.."ManaBarTextLeft"]:SetText(" ");
-				_G["PartyMemberFrame"..i.."ManaBarTextRight"]:SetText(" ");
-		end
-end)]]
 --------------------------------------------------------------------------------------whoa end

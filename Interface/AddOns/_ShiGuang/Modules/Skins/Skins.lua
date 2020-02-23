@@ -3,8 +3,6 @@ local M, R, U, I = unpack(ns)
 local S = M:RegisterModule("Skins")
 
 function S:OnLogin()
-	PlayerFrame:SetScale(MaoRUIPerDB["UFs"]["PlayerFrameScale"]) 
-	TargetFrame:SetScale(MaoRUIPerDB["UFs"]["PlayerFrameScale"])
 	local cr, cg, cb = 0, 0, 0
 	if MaoRUIPerDB["Skins"]["ClassLine"] then cr, cg, cb = I.r, I.g, I.b end
 
@@ -53,7 +51,6 @@ function S:OnLogin()
 	-- Add Skins
 	self:QuestTracker()
 	self:DBMSkin()
-	self:SkadaSkin()
 	self:BigWigsSkin()
 	self:LoadOtherSkins()
 	self:LootEx()		-- Ê°È¡ÔöÇ¿

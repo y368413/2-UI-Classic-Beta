@@ -292,17 +292,6 @@ function module:Chatbar()
 
 --Voice
 	-- Custom ChatMenu
-	Voice = CreateFrame("Button", nil, Chatbar)
-	Voice:SetSize(18, 18)
-	if GetCVar("portal") == "CN" then
-	Voice:SetPoint("LEFT", buttonList[11], "RIGHT", 3, 0)
-	else
-	Voice:SetPoint("LEFT", buttonList[10], "RIGHT", 3, 0)
-	end
-	Voice:SetNormalTexture("Interface\\AddOns\\_ShiGuang\\media\\Emotes\\zhuan_push_frame")
-	Voice:RegisterForClicks("AnyUp")
-	Voice:SetScript("OnClick",function(self) if VoiceFrame:IsShown() then VoiceFrame:Hide() else VoiceFrame:Show() end end)
-	
 	VoiceFrame = CreateFrame("Frame", nil, Chatbar)
 	VoiceFrame:SetSize(25, 100)
 	VoiceFrame:Hide()
@@ -316,6 +305,17 @@ function module:Chatbar()
 	_G.ChatFrameChannelButton:SetParent(VoiceFrame)
 	_G.ChatAlertFrame:ClearAllPoints()
 	_G.ChatAlertFrame:SetPoint("BOTTOMLEFT", _G.ChatFrame1Tab, "TOPLEFT", 6, 6)
+
+	Voice = CreateFrame("Button", nil, Chatbar)
+	Voice:SetSize(18, 18)
+	if GetCVar("portal") == "CN" then
+	Voice:SetPoint("LEFT", buttonList[11], "RIGHT", 3, 0)
+	else
+	Voice:SetPoint("LEFT", buttonList[10], "RIGHT", 3, 0)
+	end
+	Voice:SetNormalTexture("Interface\\AddOns\\_ShiGuang\\media\\Emotes\\zhuan_push_frame")
+	Voice:RegisterForClicks("AnyUp")
+	Voice:SetScript("OnClick",function(self) if VoiceFrame:IsShown() then VoiceFrame:Hide() else VoiceFrame:Show() end end)
 --end
 
 -------------------------- 處理聊天氣泡------------------------

@@ -20,15 +20,29 @@ local function DefaultSettings()
 	SetCVar("screenshotQuality", 10)
 	SetCVar("showTutorials", 0)
 	SetCVar("overrideArchive", 0)
-	SetCVar("WorldTextScale", 1)
 	SetCVar("showTargetOfTarget",1) --目标的目标
 	SetCVar("worldPreloadNonCritical", 0)								--加快蓝条，读完蓝条再载入游戏模组
-	setglobal("MAX_EQUIPMENT_SETS_PER_PLAYER",100)
-	--CompactRaidFrameContainer:SetScale(0.85)
+	--setglobal("MAX_EQUIPMENT_SETS_PER_PLAYER",100)
 	SetCVar("chatClassColorOverride", "0")
+	PlayerFrame:SetScale(MaoRUIPerDB["UFs"]["PlayerFrameScale"]) 
+	TargetFrame:SetScale(MaoRUIPerDB["UFs"]["PlayerFrameScale"])
 end
 
 local function ForceDefaultSettings()
+  PlayerFrame:ClearAllPoints() PlayerFrame:SetPoint("RIGHT",UIParent,"CENTER", -150, -250) PlayerFrame:SetUserPlaced(true)  --PlayerFrame:SetScale(0.8) 
+  TargetFrame:ClearAllPoints() TargetFrame:SetPoint("LEFT",UIParent,"CENTER", 150, -250) TargetFrame:SetUserPlaced(true)  --TargetFrame:SetScale(0.8) 
+  PartyMemberFrame1:ClearAllPoints() PartyMemberFrame1:SetPoint("TOPLEFT", 260, -143) PartyMemberFrame1:SetUserPlaced(true)
+  PartyMemberFrame1:SetScript("OnMouseDown", function() --按shift移动小队
+		if (IsShiftKeyDown()) then PartyMemberFrame1:ClearAllPoints() PartyMemberFrame1:StartMoving() end
+  end)
+  PartyMemberFrame1:SetScript("OnMouseUp", function()
+		PartyMemberFrame1:StopMovingOrSizing()
+  end)
+  TargetFrameToT:ClearAllPoints() TargetFrameToT:SetPoint("LEFT",TargetFrame,"BOTTOMRIGHT", -43, 21)
+  TargetFrameToTTextureFrameName:ClearAllPoints() TargetFrameToTTextureFrameName:SetPoint("LEFT",TargetFrameToT,"Top", -8, -43)
+  PetFrameHealthBarText:SetPoint("BOTTOMRIGHT", PetFrame, "LEFT", 3,-6)  
+  PetFrameManaBarText:SetPoint("TOPRIGHT", PetFrame, "LEFT", 3, -6)
+  PetFrameManaBarText:SetTextColor(0, 1, 1)
 	SetCVar("autoLootDefault", 1)
 	SetCVar("lootUnderMouse", 1)
 	SetCVar("autoSelfCast", 1)
@@ -76,7 +90,7 @@ local function ForceDefaultSettings()
 end
 
 local function ForceRaidFrame()
-		--CompactRaidFrameContainer:SetScale(0.85)
+	CompactRaidFrameContainer:SetScale(0.85)
 	if not CompactUnitFrameProfiles then return end
 	SetRaidProfileOption(CompactUnitFrameProfiles.selectedProfile, "useClassColors", true) --显示职业颜色
 	SetRaidProfileOption(CompactUnitFrameProfiles.selectedProfile, "displayPowerBar", false) --显示能量条 
@@ -212,7 +226,7 @@ end
 -- Skada
 local function ForceSkadaOptions()
 	if not IsAddOnLoaded("Skada") then return end
-	if SkadaDB then wipe(SkadaDB) end
+	if SkadaDB then return end  --wipe(SkadaDB)
 	SkadaDB = {
 		["hasUpgraded"] = true,
 		["profiles"] = {
@@ -238,7 +252,7 @@ local function ForceSkadaOptions()
 						},
 						["barfontflags"] = "OUTLINE",
 						["point"] = "BOTTOMRIGHT",
-						["mode"] = "伤害",
+						["mode"] = U["Damage"],
 						["barwidth"] = 285,
 						["barbgcolor"] = {
 							["a"] = 0.21,
@@ -361,8 +375,6 @@ end
 
 -- Tutorial
 local function YesTutor()
-	  DefaultSettings()
-			ForceDefaultSettings()
 			ForceRaidFrame()
 			ForceChatSettings()
 	  --MaoRUIDB["LockUIScale"] = true
@@ -372,8 +384,7 @@ local function YesTutor()
 			MaoRUIDB["BWRequest"] = true
 			ForceAddonSkins()
 			MaoRUIDB["ResetDetails"] = true
-			MaoRUIPerDB["Skins"]["ResetRecount"] = true
-			MaoRUIPerDB["Tutorial"]["Complete"] = true
+	MaoRUIDB["YesTutor"] = false
 end
 
 local welcome
@@ -425,8 +436,10 @@ local function HelloWorld()
 	LeftPic:SetScript("OnMouseDown", function(self) Sc(0.6) end)
 	LeftPic:SetScript("OnClick", function()
 		welcome:Hide()
-		YesTutor()
+		if MaoRUIDB["YesTutor"] then YesTutor() end
+		MaoRUIPerDB["Tutorial"]["Complete"] = true
 		ShiGuangPerDB["BHT"] = true
+		ForceDefaultSettings()
 		ReloadUI()
 	end)
 	SmallText1 = M:CreatStyleText(LeftPic, STANDARD_TEXT_FONT, 16, "OUTLINE", "[ 微美化界面 ]", "RIGHT",LeftPic,"LEFT",26,60, I.r, I.g, I.b)
@@ -444,8 +457,10 @@ local function HelloWorld()
 	RightPic:SetScript("OnMouseDown", function(self) Sc(0.6) end)
 	RightPic:SetScript("OnClick", function()
 		welcome:Hide()
-		YesTutor()
+		if MaoRUIDB["YesTutor"] then YesTutor() end
+		MaoRUIPerDB["Tutorial"]["Complete"] = true
 		ShiGuangPerDB["BHT"] = false
+		ForceDefaultSettings()
 		ReloadUI()
   end)
 	SmallText1 = M:CreatStyleText(LeftPic, STANDARD_TEXT_FONT, 16, "OUTLINE", "[ Classic " ..GetAddOnMetadata("_ShiGuang", "X-Support").. " v "..GetAddOnMetadata("_ShiGuang", "Version").." ]", "LEFT",RightPic,"RIGHT",-26,60, I.r, I.g, I.b)
