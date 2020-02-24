@@ -122,7 +122,7 @@ local function targetFrameStatusText()
 	TargetFrameTextureFrameGhostText:SetText(ghostText);
 	TargetFrameTextureFrameOfflineText:SetText(offlineText);
 end
---targetFrameStatusText()
+targetFrameStatusText()
 
 --[[hooksecurefunc("PlayerFrame_ToPlayerArt", function(self)
 		self.healthbar.LeftText:SetFontObject(SystemFont_Outline_Small);
@@ -247,7 +247,7 @@ end)]]
 end)]]
 
 -- Dead, Ghost and Offline text.
---[[hooksecurefunc("TextStatusBar_UpdateTextStringWithValues",function(self)
+hooksecurefunc("TextStatusBar_UpdateTextStringWithValues",function(self)
 	local textDisplay = GetCVar("statusTextDisplay");
 	
 	if UnitIsDeadOrGhost("player") then
@@ -303,7 +303,7 @@ end)]]
 		TargetFrameTextureFrameOfflineText:Hide();
 	end
 	
-end)]]
+end)
 
 --	Player frame.
 hooksecurefunc("PlayerFrame_ToPlayerArt", function(self)
@@ -411,8 +411,8 @@ hooksecurefunc("TargetFrame_CheckClassification", function(self, forceNormalText
 	local classification = UnitClassification(self.unit);
 	self.highLevelTexture:ClearAllPoints();
 	self.highLevelTexture:SetPoint("CENTER", self.levelText, "CENTER", 1,0);
-	self.deadText:SetFont(STANDARD_TEXT_FONT,21,"OUTLINE")
-	self.deadText:SetPoint("TOPLEFT", self.healthbar, "TOPRIGHT", 12, -8)
+	--self.deadText:SetFont(STANDARD_TEXT_FONT,21,"OUTLINE")
+	--self.deadText:SetPoint("TOPLEFT", self.healthbar, "TOPRIGHT", 12, -8)
 	self.unconsciousText:SetPoint("CENTER", self.manabar, "CENTER",0,0);
 	self.nameBackground:Hide();
 	if UnitIsCivilian(self.unit) then
