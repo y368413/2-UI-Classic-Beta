@@ -1,5 +1,3 @@
-local rmhAddon = IsAddOnLoaded("RealMobHealth");
-local mi2addon = IsAddOnLoaded("MobInfo2-Classic");
 local ghostText = "Ghost";	-- for manual localization of word when you are dead and in ghost shape.
 local offlineText = "Offline";
 local deadText = DEAD;
@@ -21,8 +19,6 @@ end
 CreateBarPctText(PlayerFrame, "RIGHT", "LEFT", -80, -8, "NumberFontNormalLarge", 36)
 CreateBarPctText(TargetFrame, "LEFT", "RIGHT", 80, -8, "NumberFontNormalLarge", 36)
 --CreateBarPctText(TargetFrameToT, "BOTTOMLEFT", "TOPRIGHT", 0, 5)
---CreateBarPctText(FocusFrame, "RIGHT", "LEFT", -3, -8, "NumberFontNormalLarge")
---CreateBarPctText(FocusFrameToT, "BOTTOMLEFT", "TOP", 24, 10)
 for i = 1, 4 do CreateBarPctText(_G["PartyMemberFrame"..i], "LEFT", "RIGHT", 6, 0, "NumberFontNormal", 16) end
 --for i = 1, MAX_BOSS_FRAMES do CreateBarPctText(_G["Boss"..i.."TargetFrame"], "LEFT", "RIGHT", 8, 30, "NumberFontNormal", 36) end	
 
@@ -67,35 +63,36 @@ hooksecurefunc("HealthBar_OnValueChanged", function(self) npcReactionColors(self
 ---------------------------------------------------------------------------------	Aura positioning constants.
 local LARGE_AURA_SIZE, SMALL_AURA_SIZE, AURA_OFFSET_Y, AURA_ROW_WIDTH, NUM_TOT_AURA_ROWS = 21, 16, 1, 128, 2   -- Set aura size.
 hooksecurefunc("TargetFrame_UpdateAuraPositions", function(self, auraName, numAuras, numOppositeAuras, largeAuraList, updateFunc, maxRowWidth, offsetX, mirrorAurasVertically)
-	local offsetY = AURA_OFFSET_Y;
-	local rowWidth = 0;
-	local firstBuffOnRow = 1;
-	for i=1, numAuras do
-		if ( largeAuraList[i] ) then
-			size = LARGE_AURA_SIZE;
-			offsetY = AURA_OFFSET_Y + AURA_OFFSET_Y;
-		else
-			size = SMALL_AURA_SIZE;
-		end
-		if ( i == 1 ) then
-			rowWidth = size;
-			self.auraRows = self.auraRows + 1;
-		else
-			rowWidth = rowWidth + size + offsetX;
-		end
-		if ( rowWidth > maxRowWidth ) then
-			updateFunc(self, auraName, i, numOppositeAuras, firstBuffOnRow, size, offsetX, offsetY, mirrorAurasVertically);
-			rowWidth = size;
-			self.auraRows = self.auraRows + 1;
-			firstBuffOnRow = i;
-			offsetY = AURA_OFFSET_Y;
-			if ( self.auraRows > NUM_TOT_AURA_ROWS ) then
-				maxRowWidth = AURA_ROW_WIDTH;
+		local size;
+		local offsetY = AURA_OFFSET_Y;
+		local rowWidth = 0;
+		local firstBuffOnRow = 1;
+		for i=1, numAuras do
+			if ( largeAuraList[i] ) then
+				size = LARGE_AURA_SIZE; --(cfg.largeAuraSize)
+				offsetY = AURA_OFFSET_Y + AURA_OFFSET_Y;
+			else
+				size = SMALL_AURA_SIZE;	--(cfg.smallAuraSize) --
 			end
-		else
-			updateFunc(self, auraName, i, numOppositeAuras, i - 1, size, offsetX, offsetY, mirrorAurasVertically);
+			if ( i == 1 ) then
+				rowWidth = size;
+				self.auraRows = self.auraRows + 1;
+			else
+				rowWidth = rowWidth + size + offsetX;
+			end
+			if ( rowWidth > maxRowWidth ) then
+				updateFunc(self, auraName, i, numOppositeAuras, firstBuffOnRow, size, offsetX, offsetY, mirrorAurasVertically);
+				rowWidth = size;
+				self.auraRows = self.auraRows + 1;
+				firstBuffOnRow = i;
+				offsetY = AURA_OFFSET_Y;
+				if ( self.auraRows > NUM_TOT_AURA_ROWS ) then
+					maxRowWidth = AURA_ROW_WIDTH;
+				end
+			else
+				updateFunc(self, auraName, i, numOppositeAuras, i - 1, size, offsetX, offsetY, mirrorAurasVertically);
+			end
 		end
-	end
 end)
 
 local function CreateStatusBarText(name, parentName, parent, point, x, y)
@@ -109,34 +106,59 @@ local function CreateDeadText(name, parentName, parent, point, x, y)
 	return fontString
 end
 local function targetFrameStatusText()
-	if not mi2addon then
-		TargetFrameHealthBar.TextString = CreateStatusBarText("Text", "TargetFrameHealthBar", TargetFrameTextureFrame, "CENTER", 0, 0);
-		TargetFrameHealthBar.LeftText = CreateStatusBarText("TextLeft", "TargetFrameHealthBar", TargetFrameTextureFrame, "LEFT", 5, 0);
-		TargetFrameHealthBar.RightText = CreateStatusBarText("TextRight", "TargetFrameHealthBar", TargetFrameTextureFrame, "RIGHT", -3, 0);
-		TargetFrameManaBar.TextString = CreateStatusBarText("Text", "TargetFrameManaBar", TargetFrameTextureFrame, "CENTER", 0, 0);
-		TargetFrameManaBar.LeftText = CreateStatusBarText("TextLeft", "TargetFrameManaBar", TargetFrameTextureFrame, "LEFT", 5, 0);
-		TargetFrameManaBar.RightText = CreateStatusBarText("TextRight", "TargetFrameManaBar", TargetFrameTextureFrame, "RIGHT", -3, 0);
-	end
-	--TargetFrameTextureFrameGhostText = CreateDeadText("GhostText", "TargetFrameHealthBar", TargetFrameHealthBar, "CENTER", 0, 0);
-	--TargetFrameTextureFrameOfflineText = CreateDeadText("OfflineText", "TargetFrameHealthBar", TargetFrameHealthBar, "CENTER", 0, 0);
-	--PlayerFrameDeadText = CreateDeadText("DeadText", "PlayerFrame", PlayerFrameHealthBar, "CENTER", 0, 0);
-	--PlayerFrameGhostText = CreateDeadText("GhostText", "PlayerFrame", PlayerFrameHealthBar, "CENTER", 0, 0);
+	TargetFrameHealthBar.TextString = CreateStatusBarText("Text", "TargetFrameHealthBar", TargetFrameTextureFrame, "CENTER", 0, 0);
+	TargetFrameHealthBar.LeftText = CreateStatusBarText("TextLeft", "TargetFrameHealthBar", TargetFrameTextureFrame, "LEFT", 5, 0);
+	TargetFrameHealthBar.RightText = CreateStatusBarText("TextRight", "TargetFrameHealthBar", TargetFrameTextureFrame, "RIGHT", -3, 0);
+	TargetFrameManaBar.TextString = CreateStatusBarText("Text", "TargetFrameManaBar", TargetFrameTextureFrame, "CENTER", 0, 0);
+	TargetFrameManaBar.LeftText = CreateStatusBarText("TextLeft", "TargetFrameManaBar", TargetFrameTextureFrame, "LEFT", 5, 0);
+	TargetFrameManaBar.RightText = CreateStatusBarText("TextRight", "TargetFrameManaBar", TargetFrameTextureFrame, "RIGHT", -3, 0);
+	TargetFrameTextureFrameGhostText = CreateDeadText("GhostText", "TargetFrameHealthBar", TargetFrameHealthBar, "CENTER", 0, 0);
+	TargetFrameTextureFrameOfflineText = CreateDeadText("OfflineText", "TargetFrameHealthBar", TargetFrameHealthBar, "CENTER", 0, 0);
+	PlayerFrameDeadText = CreateDeadText("DeadText", "PlayerFrame", PlayerFrameHealthBar, "CENTER", 0, 0);
+	PlayerFrameGhostText = CreateDeadText("GhostText", "PlayerFrame", PlayerFrameHealthBar, "CENTER", 0, 0);
 
-	--PlayerFrameDeadText:SetText(DEAD);
-	--PlayerFrameGhostText:SetText(ghostText);
-	--TargetFrameTextureFrameGhostText:SetText(ghostText);
-	--TargetFrameTextureFrameOfflineText:SetText(offlineText);
+	PlayerFrameDeadText:SetText(DEAD);
+	PlayerFrameGhostText:SetText(ghostText);
+	TargetFrameTextureFrameGhostText:SetText(ghostText);
+	TargetFrameTextureFrameOfflineText:SetText(offlineText);
 end
-targetFrameStatusText()
+--targetFrameStatusText()
+
+--[[hooksecurefunc("PlayerFrame_ToPlayerArt", function(self)
+		self.healthbar.LeftText:SetFontObject(SystemFont_Outline_Small);
+		self.healthbar.RightText:SetFontObject(SystemFont_Outline_Small);
+		self.manabar.LeftText:SetFontObject(SystemFont_Outline_Small);
+		self.manabar.RightText:SetFontObject(SystemFont_Outline_Small);
+		self.healthbar.TextString:SetFontObject(SystemFont_Outline_Small);
+		self.manabar.TextString:SetFontObject(SystemFont_Outline_Small);
+end)]]
+
+--[[hooksecurefunc("TargetFrame_CheckClassification", function(self)
+		self.healthbar.LeftText:SetFontObject(SystemFont_Outline_Small);
+		self.healthbar.RightText:SetFontObject(SystemFont_Outline_Small);
+		self.manabar.LeftText:SetFontObject(SystemFont_Outline_Small);
+		self.manabar.RightText:SetFontObject(SystemFont_Outline_Small);
+		self.healthbar.TextString:SetFontObject(SystemFont_Outline_Small);
+		self.manabar.TextString:SetFontObject(SystemFont_Outline_Small);
+end)]]
+
+--[[hooksecurefunc("TextStatusBar_UpdateTextStringWithValues", function(self)
+	if not mi2addon and (cfg.styleFont) then
+		MainMenuBarExpText:SetFontObject(SystemFont_Outline_Small);
+	end
+end)]]
 
 -- NOTE: Blizzards API will return targets current and max healh as a percentage instead of exact value (ex. 100/100).
 --[[hooksecurefunc("TextStatusBar_UpdateTextStringWithValues",function(statusFrame, textString, value, valueMin, valueMax)
+	local xpValue = UnitXP("player");
+	local xpMaxValue = UnitXPMax("player");
 	if( statusFrame.LeftText and statusFrame.RightText ) then
 		statusFrame.LeftText:SetText("");
 		statusFrame.RightText:SetText("");
 		statusFrame.LeftText:Hide();
 		statusFrame.RightText:Hide();
 	end
+	
 	if ( ( tonumber(valueMax) ~= valueMax or valueMax > 0 ) and not ( statusFrame.pauseUpdates ) ) then
 		statusFrame:Show();
 		
@@ -163,9 +185,9 @@ targetFrameStatusText()
 							( valueMax >= 1e6 and valueMax < 1e7 and format("%1.1f M",valueMax/m)) or
 							( valueMax >= 1e7 and format("%1.2f M",valueMax/m)) or valueMax )
 							
-		xpValueDisplay	=	( xpValue >= 1e3 and format("%1.3f",xpValue/k))
+		xpValueDisplay	=	( xpValue >= 1e3 and format("%1.3f",xpValue/k) or xpValue )
 		
-		xpMaxValueDisplay	=	( xpMaxValue >= 1e3 and format("%1.3f",xpMaxValue/k))
+		xpMaxValueDisplay	=	( xpMaxValue >= 1e3 and format("%1.3f",xpMaxValue/k) or xpMaxValue )
 		
 		local textDisplay = GetCVar("statusTextDisplay");
 		if ( value and valueMax > 0 and ( (textDisplay ~= "NUMERIC" and textDisplay ~= "NONE") or statusFrame.showPercentage ) and not statusFrame.showNumeric) then
@@ -284,13 +306,12 @@ end)]]
 end)]]
 
 --	Player frame.
-local function playerFrame(self)
+hooksecurefunc("PlayerFrame_ToPlayerArt", function(self)
 	PlayerStatusTexture:SetTexture("Interface\\AddOns\\_ShiGuang\\Media\\Modules\\UFs\\UI-Player-Status");
 	PlayerStatusTexture:ClearAllPoints();
 	PlayerStatusTexture:SetPoint("CENTER", PlayerFrame, "CENTER",16, 8);
 	PlayerFrameBackground:SetWidth(120);
 	self.name:Hide();
-	--self.name:ClearAllPoints();
 	--self.name:SetPoint("CENTER", PlayerFrame, "CENTER",50.5, 36);
 	self.healthbar:SetPoint("TOPLEFT",106,-24);
 	self.healthbar:SetHeight(28);
@@ -308,17 +329,15 @@ local function playerFrame(self)
 	PlayerFrameTexture:SetTexture("Interface\\Addons\\_ShiGuang\\Media\\Modules\\UFs\\UI-TargetingFrame");
 	PlayerPVPIcon:SetTexture("Interface\\Addons\\_ShiGuang\\Media\\Modules\\UFs\\UI-PVP-FFA");
 	--PlayerPVPIcon:SetTexture("Interface\\TargetingFrame\\UI-PVP-FFA");
+end)
 
-end
-hooksecurefunc("PlayerFrame_ToPlayerArt", playerFrame)
-function playerPvpIcon()
+hooksecurefunc("PlayerFrame_UpdatePvPStatus", function()
 	local factionGroup, factionName = UnitFactionGroup("player");
 	if ( factionGroup and factionGroup ~= "Neutral" and UnitIsPVP("player") ) then
 			PlayerPVPIcon:SetTexture("Interface\\Addons\\_ShiGuang\\Media\\Modules\\UFs\\UI-PVP-"..factionGroup);
 			--PlayerPVPIcon:SetTexture("Interface\\TargetingFrame\\UI-PVP-"..factionGroup);
 	end
-end
-hooksecurefunc("PlayerFrame_UpdatePvPStatus", playerPvpIcon)
+end)
 
 --	Player vehicle frame.
 hooksecurefunc("PlayerFrame_ToVehicleArt", function(self, vehicleType)

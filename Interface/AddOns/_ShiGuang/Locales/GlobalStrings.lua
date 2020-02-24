@@ -31,6 +31,7 @@ CHAT_FLAG_AFK = "[AFK]";
 CHAT_FLAG_DND = "[Busy]";
 CHAT_FLAG_GM = "[GM]";
   
+----------------------------------------------- ## Title: Better Loot Message ## Author: Atila00 / Atiloa ## Version: 1.04
 ITEM_CREATED_BY="|cFF00DDFF<Thanks For Using 2 UI>|r";
 CHAT_YOU_CHANGED_NOTICE = "=|Hchannel:%d|h[%s]|h";
 CHAT_YOU_CHANGED_NOTICE_BN = "=|Hchannel:CHANNEL:%d|h[%s]|h";

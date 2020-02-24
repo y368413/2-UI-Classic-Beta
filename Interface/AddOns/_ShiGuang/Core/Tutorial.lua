@@ -21,7 +21,6 @@ local function DefaultSettings()
 	SetCVar("showTutorials", 0)
 	SetCVar("overrideArchive", 0)
 	SetCVar("showTargetOfTarget",1) --目标的目标
-	SetCVar("worldPreloadNonCritical", 0)								--加快蓝条，读完蓝条再载入游戏模组
 	--setglobal("MAX_EQUIPMENT_SETS_PER_PLAYER",100)
 	SetCVar("chatClassColorOverride", "0")
 	PlayerFrame:SetScale(MaoRUIPerDB["UFs"]["PlayerFrameScale"]) 
@@ -59,12 +58,12 @@ local function ForceDefaultSettings()
   --InterfaceOptions_UpdateMultiActionBars() --刷新动作条
 	SetCVar("enableFloatingCombatText", 0)
 	SetCVar("floatingCombatTextCombatState", 0)
-	SetCVar("floatingCombatTextCombatDamage", 0)
+	--SetCVar("floatingCombatTextCombatDamage", 0)
 	--SetCVar("floatingCombatTextCombatHealing", 0)
 	SetCVar("floatingCombatTextCombatDamageDirectionalScale", 1)
 	SetCVar("floatingCombatTextFloatMode", 3) 
-  SetCVar("floatingCombatTextPetMeleeDamage", 0)   	 --寵物對目標傷害
-  SetCVar("floatingCombatTextPetSpellDamage", 0)   	 --寵物對目標傷害
+  --SetCVar("floatingCombatTextPetMeleeDamage", 0)   	 --寵物對目標傷害
+  --SetCVar("floatingCombatTextPetSpellDamage", 0)   	 --寵物對目標傷害
   --SetCVar("floatingCombatTextCombatHealingAbsorbTarget", 0)    --目標盾提示 
   --SetCVar("floatingCombatTextCombatHealingAbsorbSelf", 0)    --自身得盾/護甲提示 
   SetCVar("floatingCombatTextDodgeParryMiss", 0)    --閃招 
@@ -87,6 +86,7 @@ local function ForceDefaultSettings()
 	SetCVar("statusText",1) --状态文字
 	SetCVar("statusTextDisplay","NUMERIC")--头像状态文字形式："NUMERIC"数值"PERCENT"百分比"BOTH"同时显示
 	SetCVar("autoLootDefault",1) --自动拾取
+	SetCVar("worldPreloadNonCritical", 0) --加快蓝条，读完蓝条再载入游戏模组
 end
 
 local function ForceRaidFrame()
