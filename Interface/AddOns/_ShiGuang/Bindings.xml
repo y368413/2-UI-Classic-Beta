@@ -1,6 +1,5 @@
 ﻿<Bindings>
 	<Binding name="RELOADUI" description="Reloads the UI." header="ACE3" category="BINDING_HEADER_ACE3"> ReloadUI() </Binding>
-	<!--Binding name="CLICK solQuickShifter:LeftButton" header="solQuickShifter" category="BINDING_HEADER_ACE3"/-->
 	<Binding name="INSPECT" header="TARGETCLASSBUTTON" category="BINDING_HEADER_ACE3"> InspectUnit("target") </Binding>
 	<Binding name="TRADE" category="BINDING_HEADER_ACE3"> InitiateTrade("target") </Binding>
 	<Binding name="WHISPER" category="BINDING_HEADER_ACE3">
@@ -13,6 +12,5 @@
 		ChatFrame_SendTell(fullname)
 	</Binding>
 	<Binding name="FOLLOW" category="BINDING_HEADER_ACE3"> FollowUnit("target") </Binding>
-	<!--<Binding name="COMPARE_ACHIEVEMENTS"> InspectAchievements("target") </Binding>-->
 	<Binding name="Invite" category="BINDING_HEADER_ACE3"> InviteUnit("target") </Binding>
 </Bindings>

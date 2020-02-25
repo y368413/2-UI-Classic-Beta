@@ -59,9 +59,9 @@
 		</Scripts>
 	</Frame>
 	
-	<Script file="Mods.lua"/>
 	<Script file="Mingy.lua"/>
 	<Script file="PvPPP.lua"/>
+	<Script file="Charms.lua"/>
 	<Script file="rlTools.lua"/>
 	<Script file="Molinari.lua"/>
 	<Script file="AHhelper.lua"/>

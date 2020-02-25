@@ -60,7 +60,7 @@ function Bar:MicroMenu()
 	-- Order Positions
 	for i = 1, #buttonList do
 		if i == 1 then
-			buttonList[i]:SetPoint("TOPRIGHT", menubar, "TOPRIGHT", 2, 17)
+			buttonList[i]:SetPoint("TOPRIGHT", menubar, "TOPRIGHT", 1, 17)
 		else
 			buttonList[i]:SetPoint("CENTER", buttonList[i-1], "CENTER", 0, -21)
 		end

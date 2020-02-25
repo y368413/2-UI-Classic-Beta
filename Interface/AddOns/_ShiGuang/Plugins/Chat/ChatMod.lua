@@ -1,66 +1,5 @@
 ﻿local strfind, strrep, strmatch, pairs, C_Timer_After, ChatTypeInfo = string.find, string.rep, string.match, pairs, C_Timer.After, ChatTypeInfo
 --[[--------------------------------------------------------------------
-	ChatLinkTooltips	Written by Junxx EU-Khaz'goroth <addons@colordesigns.de>
-----------------------------------------------------------------------]]
-local showLinkType = {
-    -- 1 Normal tooltip things:
-    achievement = 1, enchant = 1, glyph = 1, item = 1, instancelock = 1, quest = 1, spell = 1, talent = 1, unit = 1, currency = 1, ptalent = 1,
-    -- 2 Special tooltip things:
-    battlepet = 2, battlePetAbil = 2, garrfollowerability = 2, garrfollower = 2, garrmission = 2,
-}
-local CompareShowing, currentLinkType, itemRefLink, itemRefText, itemRefFrame
-local function OnHyperlinkEnter(frame, link, text)
-    currentLinkType = showLinkType[link:match("(%a+):%d+")]
-    if currentLinkType == 1 then
-        GameTooltip:SetOwner(ChatFrame1Tab, "ANCHOR_TOPLEFT", 20, 20)
-        GameTooltip:SetHyperlink(link)
-        GameTooltip:Show()
-        CompareShowing = true
-    elseif currentLinkType == 2 then
-        -- Uses a special tooltip, just let the default function handle it.
-        -- Postitione
-        ItemRefTooltip:SetPoint("BOTTOMLEFT",ChatFrame1Tab,"TOPLEFT", 20, 20)
-        FloatingGarrisonMissionTooltip:SetPoint("BOTTOMLEFT",ChatFrame1Tab,"TOPLEFT", 20, 20)
-        FloatingGarrisonFollowerTooltip:SetPoint("BOTTOMLEFT",ChatFrame1Tab,"TOPLEFT", 20, 20)
-        FloatingGarrisonFollowerAbilityTooltip:SetPoint("BOTTOMLEFT",ChatFrame1Tab,"TOPLEFT", 20, 20)
-        SetItemRef(link, text, "LeftButton", frame)
-        itemRefLink, itemRefText, itemRefFrame = link, text, frame
-        CompareShowing = nil
-    end
-end
-local function OnHyperlinkLeave(frame, link, text)
-    if currentLinkType == 1 then
-        GameTooltip:Hide()
-        CompareShowing = nil
-    elseif currentLinkType == 2 then
-        -- Uses a special tooltip, just let the default function handle it.
-        SetItemRef(itemRefLink, itemRefText, "LeftButton", itemRefFrame)
-        itemRefLink, itemRefText, itemRefFrame = nil,nil,nil
-        CompareShowing = nil
-    end
-    currentLinkType = nil
-end
-local ChatLinkTooltips = CreateFrame("Frame")
-ChatLinkTooltips:RegisterEvent("MODIFIER_STATE_CHANGED")
-ChatLinkTooltips:SetScript("OnEvent", function(self, event, key, state)
-	if CompareShowing and (key == "LSHIFT" or key == "RSHIFT") and not GameTooltip:IsEquippedItem() then
-		if state == 1 then
-				GameTooltip_ShowCompareItem(GameTooltip)
-		else
-			ShoppingTooltip1:Hide()
-			ShoppingTooltip2:Hide()
-			--ShoppingTooltip3:Hide()
-		end
-	end
-end)
-for i = 1, NUM_CHAT_WINDOWS do
-	local frame = _G["ChatFrame"..i]
-	frame:SetScript("OnHyperlinkEnter", OnHyperlinkEnter)
-	frame:SetScript("OnHyperlinkLeave", OnHyperlinkLeave)
-end
-
-
---[[--------------------------------------------------------------------
 align
 ----------------------------------------------------------------------]]
 SLASH_EA1 = "/align"
@@ -185,10 +124,8 @@ local function showMessage(msg, button)
 end
 --獲取複製的信息
 local function getMessage(...)
-    local object
     for i = 1, select("#", ...) do
-        object = select(i, ...)
-        if (object:IsObjectType("FontString") and MouseIsOver(object)) then return object:GetText() end
+        if (select(i, ...):IsObjectType("FontString") and MouseIsOver(select(i, ...))) then return select(i, ...):GetText() end
     end
     return ""
 end

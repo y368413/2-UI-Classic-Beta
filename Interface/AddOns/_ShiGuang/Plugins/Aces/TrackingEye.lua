@@ -1,6 +1,5 @@
 --## Author: Linden Ryuujin ## Version: 1.1.1
 local TrackingEye = LibStub("AceAddon-3.0"):NewAddon("TrackingEye", "AceConsole-3.0", "AceEvent-3.0")
-
 function TrackingEye:Menu_Open()
 	local menu = {}
 	-- In level order, with racial/professions last
@@ -21,7 +20,6 @@ function TrackingEye:Menu_Open()
 		2580,	--Find Minerals
 		2481	--Find Treasure
 	}
-
 	for key,spellId in ipairs(spells) do
 		spellName = GetSpellInfo(spellId)
 		if IsPlayerSpell(spellId) then
@@ -54,13 +52,46 @@ local LDB = LibStub("LibDataBroker-1.1"):NewDataObject("TrackingEyeData",
 		end
 	end,
 })
-local LDBIcon = LibStub("LibDBIcon-1.0")
+
+--------- Isle of Thunder Weekly Check---- by Fluffies------DIY by y368413-------------------------------------------
+-- string colors
+local LIGHT_RED   = "|cffFF2020"
+local LIGHT_GREEN = "|cff20FF20"
+local LIGHT_BLUE  = "|cff00ddFF"
+local ZONE_BLUE   = "|cff00aacc"
+local GREY        = "|cff999999"
+local COORD_GREY  = "|cffBBBBBB"
+local GOLD        = "|cffffcc00"
+local WHITE       = "|cffffffff"
+local PINK        = "|cffFFaaaa"
+local function AddColor(str,color) return color..(str or " ^-^ ").."|r" end
+local function completedstring(arg)
+ if IsQuestFlaggedCompleted(arg) then return AddColor(COMPLETE,LIGHT_GREEN) else return AddColor(INCOMPLETE,LIGHT_RED) end
+end
+
+function LDB:OnEnter()
+   GameTooltip:SetOwner(self, "ANCHOR_NONE")
+   GameTooltip:SetPoint("TOPLEFT", self, "BOTTOMLEFT")
+   GameTooltip:ClearLines()
+   GameTooltip:AddDoubleLine(MINIMAP_TRACKING_TOOLTIP_NONE)
+   GameTooltip:AddLine(" ")
+   GameTooltip:AddLine("|TInterface\\CURSOR\\QUEST:12|t "..AddColor(BOSS_DEAD,GOLD))
+   for i = 1, GetNumSavedInstances() do
+	   local name, id, _, difficulty, locked, extended, instanceIDMostSig, isRaid, maxPlayers, level, total, progress = GetSavedInstanceInfo(i)
+	   GameTooltip:AddDoubleLine(AddColor(name.."("..level..")",WHITE), locked and AddColor(progress.."/"..total, LIGHT_GREEN) or AddColor(" 0/0 ", LIGHT_RED))
+   end
+   GameTooltip:Show()
+end
+
+function LDB:OnLeave()
+    GameTooltip:Hide()
+end
 
 function TrackingEye:OnInitialize()
 	--MiniMapTrackingFrame:SetScale(0.001) --hide frame permanently by making it tiny
-	LDBIcon:Register("TrackingEyeData", LDB)
-	--LDBIcon:GetMinimapButton("TrackingEyeData"):SetScale(1.13)
+	LibStub("LibDBIcon-1.0"):Register("TrackingEyeData", LDB)
+	--LibStub("LibDBIcon-1.0"):GetMinimapButton("TrackingEyeData"):SetScale(1.13)
 	LDB.icon = GetTrackingTexture() or "Interface\\AddOns\\_ShiGuang\\Media\\Modules\\Role\\bubbleTex"
 	--self:RegisterChatCommand("te", "MinimapButton_ToggleLock")
-	self:RegisterEvent("MINIMAP_UPDATE_TRACKING", function() LDB.icon = GetTrackingTexture() end)
+	self:RegisterEvent("MINIMAP_UPDATE_TRACKING", function() LDB.icon = GetTrackingTexture() or "Interface\\AddOns\\_ShiGuang\\Media\\Modules\\Role\\bubbleTex" end)
 end

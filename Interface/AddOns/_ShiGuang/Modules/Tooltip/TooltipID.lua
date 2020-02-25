@@ -58,33 +58,29 @@ function TT:AddLineForID(id, linkType, noadd)
 		local text = line:GetText()
 		if text and text == linkType then return end
 	end
-	--if not noadd then self:AddLine(" ") end
+	--if not noadd then return end
 
 	if linkType == types.item then
 		TT.UpdateItemSellPrice(self)
-		local bagCount = GetItemCount(id)
+		--[[local bagCount = GetItemCount(id)
 		local bankCount = GetItemCount(id, true) - bagCount
+		if bankCount > 0 then
+			self:AddDoubleLine(BAGSLOT.."/"..BANK..":", I.InfoColor..bagCount.."/"..bankCount)
+		elseif bagCount > 0 then
+			self:AddDoubleLine(BAGSLOT..":", I.InfoColor..bagCount)
+		end]]
 		local itemStackCount = select(8, GetItemInfo(id))
-		if not IsAddOnLoaded("Combuctor") then
-			if bagCount > 0 then
-				if bankCount > 0 then
-				self:AddDoubleLine(BAGSLOT.."/"..BANK..":", I.InfoColor..bagCount.."/"..bankCount)
-				elseif bagCount > 0 then
-				self:AddDoubleLine(BAGSLOT..":", I.InfoColor..bagCount)
+			if itemStackCount and itemStackCount > 1 then
+				if IsShiftKeyDown() or IsControlKeyDown() or IsAltKeyDown() then
+					self:AddDoubleLine(U["Stack Cap"]..":", I.InfoColor..itemStackCount)
 				end
 			end
-		end
-		if IsShiftKeyDown() or IsControlKeyDown() or IsAltKeyDown() then
-			if itemStackCount and itemStackCount > 1 then
-				self:AddDoubleLine(U["Stack Cap"]..":", I.InfoColor..itemStackCount)
-			end
-		end
 	end
 
 	if (IsShiftKeyDown() or IsControlKeyDown() or IsAltKeyDown()) then
 		self:AddDoubleLine(linkType, format(I.InfoColor.."%s|r", id))
-		self:Show()
 	end
+		self:Show()
 end
 
 function TT:SetHyperLinkID(link)

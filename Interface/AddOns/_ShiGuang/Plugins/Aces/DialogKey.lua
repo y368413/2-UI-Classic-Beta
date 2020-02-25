@@ -1,7 +1,5 @@
 ﻿--## Author: Foxthorn  ## Version: 1.7.3
-
 local DialogKey = LibStub("AceAddon-3.0"):NewAddon("DialogKey", "AceConsole-3.0", "AceTimer-3.0", "AceEvent-3.0")
-
 
 local defaults = {								-- Default settings
 	global = {

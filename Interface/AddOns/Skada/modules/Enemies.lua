@@ -73,7 +73,7 @@ Skada:AddLoadableModule("Enemies", nil, function(Skada, L)
 		local healing = math.max(0,amount - overheal) -- omit absorbs, which players inflict to mitigate healing
 		set.mobhdone = set.mobhdone + healing
 
-		if dmg.srcName then -- some enemy HoT's omit the true src (eg Cauterizing Bolt)
+		if dmg.srcName then -- some enemy HoT's omit the true src (eg Cauterizing Bolt) 
 			local smob = find_mob(set,dmg.srcName)
 			smob.hdone = smob.hdone + healing
 			log_healspell(smob, "hdonespell", spellname, healing, overheal, crit)

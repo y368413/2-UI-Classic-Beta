@@ -1,7 +1,7 @@
-﻿----------------Item Selling## Author: Spencer Sohn----------------------
+﻿--[[--------------Item Selling## Author: Spencer Sohn----------------------
 local ItemSelling = StaticPopupDialogs["CONFIRM_MERCHANT_TRADE_TIMER_REMOVAL"] 
 ItemSelling.OnAccept=nil 
-ItemSelling.OnShow=function() StaticPopup_Hide("CONFIRM_MERCHANT_TRADE_TIMER_REMOVAL"); SellCursorItem(); end
+ItemSelling.OnShow=function() StaticPopup_Hide("CONFIRM_MERCHANT_TRADE_TIMER_REMOVAL"); SellCursorItem(); end]]
 ----------------ArenaLeaveConfirmer----------------------
 hooksecurefunc(StaticPopupDialogs["CONFIRM_LEAVE_BATTLEFIELD"],"OnShow",function(self)
 	if IsActiveBattlefieldArena() or GetBattlefieldWinner() then self.button1:Click() end

@@ -1,4 +1,4 @@
---## Author: Wardz ## Version: v1.2.4
+--## Author: Wardz ## Version: v1.2.5
 local ClassicCastbars = {}
 local PoolManager = {}
 ClassicCastbars.PoolManager = PoolManager
@@ -163,7 +163,7 @@ local function GetPartyFrameForUnit(unitID)
     -- frames for custom addons
     for i = 1, 40 do
         local frame, frameName = GetUnitFrameForUnit("party", "party"..i, true)
-        if frame and frame.unit and UnitGUID(frame.unit) == guid and frame:IsVisible() then
+        if frame and ((frame.unit and UnitGUID(frame.unit) == guid) or frame.lastGUID == guid) and frame:IsVisible() then
             if useCompact then
                 if strfind(frameName, "PartyMemberFrame") == nil then
                     return frame
@@ -1790,7 +1790,6 @@ ClassicCastbars.stopCastOnDamageList = {
     [GetSpellInfo(3566)] = 1, -- Teleport: Thunder Bluff
     [GetSpellInfo(3563)] = 1, -- Teleport: Undercity
     [GetSpellInfo(556)] = 1, -- Astrall Recall
-    [GetSpellInfo(22563)] = 1, -- Recall
     -- First Aid not included here since we track aura removed
 }
 

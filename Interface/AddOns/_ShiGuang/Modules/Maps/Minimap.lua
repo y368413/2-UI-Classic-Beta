@@ -47,7 +47,7 @@ function module:CreatePulse()
 end
 
 function module:ReskinRegions()
-	-- Tracking icon
+	--[[ Tracking icon
 	MiniMapTrackingFrame:SetScale(.7)
 	MiniMapTrackingFrame:ClearAllPoints()
 	MiniMapTrackingFrame:SetPoint("TOPLEFT", Minimap, 0, 3)
@@ -55,7 +55,7 @@ function module:ReskinRegions()
 	MiniMapTrackingIcon:SetTexCoord(unpack(I.TexCoord))
 	local bg = M.CreateBG(MiniMapTrackingIcon)
 	M.CreateBD(bg)
-	bg:SetBackdropBorderColor(cr, cg, cb)
+	bg:SetBackdropBorderColor(cr, cg, cb)]]
 
 	-- Mail icon
 	MiniMapMailFrame:ClearAllPoints()
@@ -250,95 +250,6 @@ function module:ShowMinimapClock()
 	end
 end
 
-function module:TrackMenu_SetText(spellID)
-	local name = GetSpellInfo(spellID)
-	local texture = GetSpellTexture(spellID) or 136243
-	name = " |T"..texture..":12:12:0:0:50:50:4:46:4:46|t "..name
-	return name
-end
-
-function module:TrackMenu_OnClick(spellID)
-	CastSpellByID(spellID)
-end
-
-function module:TrackMenu_CheckStatus()
-	local texture = GetSpellTexture(self.arg1)
-	if texture == GetTrackingTexture() then
-		return true
-	end
-end
-
-function module:EasyTrackMenu()
-	local trackSpells = {
-		2383,	--Find Herbs
-		2580,	--Find Minerals
-		2481,	--Find Treasure
-		1494,	--Track Beasts
-		19883,	--Track Humanoids
-		19884,	--Track Undead
-		19885,	--Track Hidden
-		19880,	--Track Elementals
-		19878,	--Track Demons
-		19882,	--Track Giants
-		19879,	--Track Dragonkin
-		5225,	--Track Humanoids: Druid
-		5500,	--Sense Demons
-		5502,	--Sense Undead
-	}
-
-	local menuFrame = CreateFrame("Frame", "NDui_EasyTrackMenu", UIParent, "UIDropDownMenuTemplate")
-	menuFrame:SetFrameStrata("TOOLTIP")
-	menuFrame:Hide()
-	local menuList = {
-		[1] = {text = U["TrackMenu"], isTitle = true, notCheckable = true},
-	}
-
-	local function updateMenuList()
-		for i = 2, #menuList do
-			if menuList[i] then wipe(menuList[i]) end
-		end
-
-		local index = 2
-		for _, spellID in pairs(trackSpells) do
-			if IsPlayerSpell(spellID) then
-				if not menuList[index] then menuList[index] = {} end
-				menuList[index].arg1 = spellID
-				menuList[index].text = module:TrackMenu_SetText(spellID)
-				menuList[index].func = module.TrackMenu_OnClick
-				menuList[index].checked = module.TrackMenu_CheckStatus
-
-				index = index + 1
-			end
-		end
-
-		return index
-	end
-
-	local function toggleTrackMenu(self)
-		if DropDownList1:IsShown() then
-			DropDownList1:Hide()
-		else
-			local index = updateMenuList()
-			if index > 2 then
-				local offset = self:GetWidth()*self:GetScale()*.5
-				EasyMenu(menuList, menuFrame, self, -offset, offset, "MENU")
-			end
-		end
-	end
-
-	-- Click Func
-	Minimap:SetScript("OnMouseUp", function(self, btn)
-	    if btn == "LeftButton" then 
-     if IsAltKeyDown() or IsShiftKeyDown() or IsControlKeyDown() then toggleTrackMenu(self) --Alt+鼠标左键点击显示大地图
-     else Minimap_OnClick(self) --鼠标左键点击小地图显示Ping位置提示    --M:DropDown(MapMicromenu, MapMenuFrame, 0, 0)   显示系统菜单
-     end
-    elseif btn == "MiddleButton" then ToggleFrame(WorldMapFrame) --鼠标中键显示大地图系统菜单
-    elseif btn == "RightButton" then EasyMenu(SetMrbarMicromenu, SetMrbarMenuFrame, "cursor", 0, 0, "MENU", 2) --鼠标右键显示增强菜单
-    --else MSA_ToggleDropDownMenu(1, nil, MiniMapTrackingDropDown, self)
-    end
-	end)
-end
-
 function module:SetupMinimap()
 	-- Shape and Position
 	Minimap:ClearAllPoints()
@@ -366,6 +277,15 @@ function module:SetupMinimap()
 		end
 	end)
 
+	-- Click Func
+	Minimap:SetScript("OnMouseUp", function(self, btn)
+    if btn == "LeftButton" then Minimap_OnClick(self) --鼠标左键点击小地图显示Ping位置提示
+    elseif btn == "MiddleButton" then ToggleFrame(WorldMapFrame)  --M:DropDown(MapMicromenu, MapMenuFrame, 0, 0) --鼠标中键显示系统菜单
+    elseif btn == "RightButton" then EasyMenu(SetMrbarMicromenu, SetMrbarMenuFrame, "cursor", 0, 0, "MENU", 2) --鼠标右键显示增强菜单
+    --else MSA_ToggleDropDownMenu(1, nil, MiniMapTrackingDropDown, self)
+    end
+	end)
+	
 	-- Hide Blizz
 	local frames = {
 		"MinimapBorderTop",
@@ -378,6 +298,7 @@ function module:SetupMinimap()
 		"MiniMapMailBorder",
 		"MinimapToggleButton",
 		"GameTimeFrame",
+		"MiniMapTrackingFrame",
 	}
 
 	for _, v in pairs(frames) do
@@ -389,7 +310,6 @@ function module:SetupMinimap()
 	self:CreatePulse()
 	self:ReskinRegions()
 	self:WhoPingsMyMap()
-	self:EasyTrackMenu()
 
 	if LibDBIcon10_TownsfolkTracker then
 		LibDBIcon10_TownsfolkTracker:DisableDrawLayer("OVERLAY")

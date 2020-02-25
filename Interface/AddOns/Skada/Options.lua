@@ -48,7 +48,7 @@ Skada.windowdefaults = {
 	titleset = true,
 
 	set = "current",
-	mode = "伤害",
+	mode = L["Damage"],
 
 	display = "bar",
 	snapto = true,
