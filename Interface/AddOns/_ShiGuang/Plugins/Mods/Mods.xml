@@ -65,11 +65,13 @@
 	<Script file="rlTools.lua"/>
 	<Script file="Molinari.lua"/>
 	<Script file="AHhelper.lua"/>
+	<Script file="Merchant.lua"/>
 	<Script file="kAutoOpen.lua"/>
 	<Script file="Reminder.lua"/>
 	<Script file="HardYards.lua"/>
 	<Script file="WallpaperKit.lua"/>
 	<Script file="NeedsFoodBadly.lua"/>
+	<Script file="ShowActionCount.lua"/>
 	<Script file="MudmenItemColor.lua"/>
 	<Script file="TradeSkillSearch.lua"/>
 	<Script file="CharacterDurability.lua"/>

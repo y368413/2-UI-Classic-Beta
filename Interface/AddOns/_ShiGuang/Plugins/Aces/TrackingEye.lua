@@ -1,6 +1,6 @@
 --## Author: Linden Ryuujin ## Version: 1.1.1
 local TrackingEye = LibStub("AceAddon-3.0"):NewAddon("TrackingEye", "AceConsole-3.0", "AceEvent-3.0")
-function TrackingEye:Menu_Open()
+function TrackingEye:TrackingMenu_Open()
 	local menu = {}
 	-- In level order, with racial/professions last
 	local spells =
@@ -34,7 +34,7 @@ function TrackingEye:Menu_Open()
 		end
 	end
 
-	local menuFrame = CreateFrame("Frame", "ExampleMenuFrame", UIParent, "UIDropDownMenuTemplate")
+	local menuFrame = CreateFrame("Frame", "TrackingEyeTrackingMenu", UIParent, "UIDropDownMenuTemplate")
 	EasyMenu(menu, menuFrame, "cursor", 0 , 0, "MENU");
 end
 
@@ -46,7 +46,7 @@ local LDB = LibStub("LibDataBroker-1.1"):NewDataObject("TrackingEyeData",
 	icon = "Interface\\AddOns\\_ShiGuang\\Media\\Modules\\Role\\bubbleTex",
 	OnClick = function(_, msg)
 		if msg == "LeftButton" then
-			TrackingEye:Menu_Open();
+			TrackingEye:TrackingMenu_Open();
 		elseif msg == "RightButton" then
 			CancelTrackingBuff();
 		end

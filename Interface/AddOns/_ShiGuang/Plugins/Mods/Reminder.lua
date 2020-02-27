@@ -72,7 +72,6 @@ local failed = gsub(INSTANCE_RESET_FAILED, ".*%%s", "")
 local fail_offline = gsub(INSTANCE_RESET_FAILED_OFFLINE, ".*%%s", "")
 local fail_zone = gsub(INSTANCE_RESET_FAILED_ZONING, ".*%%s", "")
 
-
 local Echof = CreateFrame("Frame")
 Echof:RegisterEvent("CHAT_MSG_SYSTEM")
 Echof:SetScript("OnEvent", function(self, event, ...)
