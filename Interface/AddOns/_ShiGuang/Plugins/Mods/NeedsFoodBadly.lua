@@ -97,8 +97,8 @@ function NeedsFoodBadly:UpdateMacros()
         ["<manaBuff>"] = 'item:'..tostring(best.buffDrink[1] and best.buffDrink[1].id or 0),
         ["<mPotions>"] = self:BuildSequence(best.manaGem, best.mPotion)
     })
-    CreateOrUpdateMacro("NFB", foodMacro)
-    CreateOrUpdateMacro("NDB", drinkMacro)
+    CreateOrUpdateMacro(TUTORIAL_TITLE11, foodMacro)
+    CreateOrUpdateMacro(TUTORIAL_TITLE12, drinkMacro)
 end
 
 function NeedsFoodBadly:Sorted(t, f)

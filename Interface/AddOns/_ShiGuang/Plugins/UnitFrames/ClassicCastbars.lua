@@ -1,9 +1,19 @@
---## Author: Wardz ## Version: v1.2.5
+--## Author: Wardz ## Version: v1.2.8
 local ClassicCastbars = {}
 local PoolManager = {}
 ClassicCastbars.PoolManager = PoolManager
 
-local framePool = CreateFramePool("Statusbar", UIParent, "SmallCastingBarFrameTemplate", PoolManager.ResetterFunc)
+local function ResetterFunc(pool, frame)
+    frame:Hide()
+    frame:SetParent(nil)
+    frame:ClearAllPoints()
+
+    if frame._data then
+        frame._data = nil
+    end
+end
+
+local framePool = CreateFramePool("Statusbar", UIParent, "SmallCastingBarFrameTemplate", ResetterFunc)
 local framesCreated = 0
 local framesActive = 0
 
@@ -50,16 +60,6 @@ function PoolManager:InitializeNewFrame(frame)
     frame.Timer:SetTextColor(1, 1, 1)
     frame.Timer:SetFontObject("SystemFont_Shadow_Small")
     frame.Timer:SetPoint("RIGHT", frame, -6, 0)
-end
-
-function PoolManager:ResetterFunc(pool, frame)
-    frame:Hide()
-    frame:SetParent(nil)
-    frame:ClearAllPoints()
-
-    if frame._data then
-        frame._data = nil
-    end
 end
 
 function PoolManager:GetFramePool()
@@ -1936,9 +1936,8 @@ ClassicCastbars.unaffectedCastModsSpells = {
 
 -- Addon Savedvariables
 ClassicCastbars.defaultConfig = {
-    version = "15", -- settings version
+    version = "16", -- settings version
     pushbackDetect = true,
-    movementDetect = true,
     locale = GetLocale(),
 
     nameplate = {
@@ -1952,8 +1951,8 @@ ClassicCastbars.defaultConfig = {
         autoPosition = true,
         castFont = _G.STANDARD_TEXT_FONT,
         castFontSize = 8,
-        castStatusBar = "Interface\\Addons\\_ShiGuang\\Media\\normTex",  --"Interface\\TargetingFrame\\UI-StatusBar",
-        castBorder = "Interface\\Tooltips\\ChatBubble-Backdrop",  --"Interface\\CastingBar\\UI-CastingBar-Border-Small"
+        castStatusBar = "Interface\\Addons\\_ShiGuang\\Media\\normTex",
+        castBorder = "Interface\\Tooltips\\ChatBubble-Backdrop",
         hideIconBorder = false,
         position = { "CENTER", -1, -12 },
         iconPositionX = -3,
@@ -2099,6 +2098,7 @@ addon.activeTimers = activeTimers
 --ClassicCastbars = addon -- global ref for ClassicCastbars_Options
 
 -- upvalues for speed
+local gsub = _G.string.gsub
 local strfind = _G.string.find
 local pairs = _G.pairs
 local UnitGUID = _G.UnitGUID
@@ -2133,22 +2133,15 @@ function addon:CheckCastModifier(unitID, cast)
 
     -- Debuffs
     if not cast.isChanneled and not cast.hasCastSlowModified and not cast.skipCastSlowModifier then
-        local highestSlow = 0
-
         for i = 1, 16 do
             local _, _, _, _, _, _, _, _, _, spellID = UnitAura(unitID, i, "HARMFUL")
             if not spellID then break end -- no more debuffs
 
-            -- TODO: cast times reduced in multiplicative manner?
             local slow = castTimeIncreases[spellID]
-            if slow and slow > highestSlow then -- might be several slow debuffs
-                highestSlow = slow
+            if slow then -- note: multiple slows stack
+                cast.endTime = cast.timeStart + (cast.endTime - cast.timeStart) * ((slow / 100) + 1)
+                cast.hasCastSlowModified = true
             end
-        end
-
-        if highestSlow > 0 then
-            cast.endTime = cast.timeStart + (cast.endTime - cast.timeStart) * ((highestSlow / 100) + 1)
-            cast.hasCastSlowModified = true
         end
     end
 
@@ -2176,9 +2169,12 @@ function addon:CheckCastModifier(unitID, cast)
             elseif name == NATURES_GRACE and not cast.hasNaturesGraceModifier and not cast.isChanneled then
                 cast.endTime = cast.endTime - 0.5
                 cast.hasNaturesGraceModifier = true
-            elseif (name == MIND_QUICKENING or name == BLINDING_LIGHT or name == BERSERKING) and not cast.hasSpeedModifier then
-                cast.endTime = cast.endTime - ((cast.endTime - cast.timeStart) * ((name == BERSERKING and 10 or 33) / 100))
+            elseif (name == MIND_QUICKENING or name == BLINDING_LIGHT) and not cast.hasSpeedModifier and not cast.isChanneled then
+                cast.endTime = cast.endTime - ((cast.endTime - cast.timeStart) * 33 / 100)
                 cast.hasSpeedModifier = true
+            elseif name == BERSERKING and not cast.hasBerserkingModifier and not cast.isChanneled then -- put this seperate as it can stack with other modifiers
+                cast.endTime = cast.endTime - ((cast.endTime - cast.timeStart) * 0.1)
+                cast.hasBerserkingModifier = true
             elseif name == FOCUSED_CASTING then
                 cast.hasFocusedCastingModifier = true
             end
@@ -2250,11 +2246,12 @@ function addon:StoreCast(unitGUID, spellName, spellID, iconTexturePath, castTime
     cast.hasNaturesGraceModifier = nil
     cast.hasFocusedCastingModifier = nil
     cast.hasSpeedModifier = nil
+    cast.hasBerserkingModifier = nil
     cast.skipCastSlowModifier = nil
     cast.pushbackValue = nil
-    cast.showCastInfoOnly = nil
     cast.isInterrupted = nil
     cast.isCastComplete = nil
+    cast.isFailed = nil
 
     self:StartAllCasts(unitGUID)
 end
@@ -2266,7 +2263,7 @@ function addon:DeleteCast(unitGUID, isInterrupted, skipDeleteCache, isCastComple
     local cast = activeTimers[unitGUID]
     if cast then
         cast.isInterrupted = isInterrupted -- just so we can avoid passing it as an arg for every function call
-        cast.isCastComplete = isCastComplete
+        cast.isCastComplete = isCastComplete -- SPELL_CAST_SUCCESS detected
         self:StopAllCasts(unitGUID, noFadeOut)
         activeTimers[unitGUID] = nil
     end
@@ -2340,12 +2337,10 @@ function addon:ToggleUnitEvents(shouldReset)
         self:RegisterEvent("PLAYER_TARGET_CHANGED")
         if self.db.target.autoPosition then
             self:RegisterUnitEvent("UNIT_AURA", "target")
-            self:RegisterEvent("UNIT_TARGET")
         end
     else
         self:UnregisterEvent("PLAYER_TARGET_CHANGED")
         self:UnregisterEvent("UNIT_AURA")
-        self:UnregisterEvent("UNIT_TARGET")
     end
 
     if MaoRUIPerDB["Nameplate"]["ClassicCastbars"] then
@@ -2448,20 +2443,6 @@ function addon:UNIT_AURA()
         local parentFrame = self.AnchorManager:GetAnchor("target")
         if parentFrame then
             self:SetTargetCastbarPosition(activeFrames.target, parentFrame)
-        end
-    end
-end
-
-function addon:UNIT_TARGET(unitID)
-    if not self.db.target.autoPosition then return end
-
-    -- reanchor castbar when target of target is cleared or shown
-    if unitID == "target" or unitID == "player" then
-        if activeFrames.target and activeGUIDs.target then
-            local parentFrame = self.AnchorManager:GetAnchor("target")
-            if parentFrame then
-                self:SetTargetCastbarPosition(activeFrames.target, parentFrame)
-            end
         end
     end
 end
@@ -2581,7 +2562,7 @@ function addon:COMBAT_LOG_EVENT_UNFILTERED()
                 local cachedTime = npcCastTimeCache[srcName .. spellName]
                 if not cachedTime then
                     local cast = activeTimers[srcGUID]
-                    if not cast or (cast and not cast.hasCastSlowModified and not cast.hasSpeedModifier) then
+                    if not cast or (cast and not cast.hasCastSlowModified and not cast.hasSpeedModifier and not cast.hasBerserkingModifier) then
                         local restoredStartTime = npcCastTimeCacheStart[srcGUID]
                         if restoredStartTime then
                             local castTime = (GetTime() - restoredStartTime) * 1000
@@ -2614,8 +2595,9 @@ function addon:COMBAT_LOG_EVENT_UNFILTERED()
         -- We also check the expiration timer in OnUpdate script just incase this event doesn't trigger when i.e unit is no longer in range.
         return self:DeleteCast(srcGUID, nil, nil, true)
     elseif eventType == "SPELL_AURA_APPLIED" then
-        if crowdControls[spellName] then
+        if crowdControls[spellName] and activeTimers[dstGUID] then
             -- Aura that interrupts cast was applied
+            activeTimers[dstGUID].isFailed = true
             return self:DeleteCast(dstGUID)
         elseif castTimeIncreases[spellName] and activeTimers[dstGUID] then
             -- Cast modifiers doesnt modify already active casts, only the next time the player casts
@@ -2628,13 +2610,22 @@ function addon:COMBAT_LOG_EVENT_UNFILTERED()
             return self:DeleteCast(srcGUID, nil, nil, true)
         end
     elseif eventType == "SPELL_CAST_FAILED" then
-        if srcGUID == self.PLAYER_GUID then
-            -- Spamming cast keybinding triggers SPELL_CAST_FAILED so check if actually casting or not for the player
-            if not CastingInfo() then
-                return self:DeleteCast(srcGUID)
+        local cast = activeTimers[srcGUID]
+        if cast then
+            if srcGUID == self.PLAYER_GUID then
+                -- Spamming cast keybinding triggers SPELL_CAST_FAILED so check if actually casting or not for the player
+                if not CastingInfo() then
+                    if not cast.isChanneled then
+                        cast.isFailed = true
+                    end
+                    return self:DeleteCast(srcGUID, nil, nil, cast.isChanneled) -- note: channels shows finish anim on cast failed
+                end
+            else
+                if not cast.isChanneled then
+                    cast.isFailed = true
+                end
+                return self:DeleteCast(srcGUID, nil, nil, cast.isChanneled)
             end
-        else
-            return self:DeleteCast(srcGUID)
         end
     elseif eventType == "PARTY_KILL" or eventType == "UNIT_DIED" or eventType == "SPELL_INTERRUPT" then
         return self:DeleteCast(dstGUID, eventType == "SPELL_INTERRUPT")
@@ -2642,7 +2633,8 @@ function addon:COMBAT_LOG_EVENT_UNFILTERED()
         if bit_band(dstFlags, COMBATLOG_OBJECT_TYPE_PLAYER) > 0 then -- is player, and not pet
             local cast = activeTimers[dstGUID]
             if cast then
-                if stopCastOnDamageList[cast.spellName] then
+                if stopCastOnDamageList[cast.spellName] and activeTimers[dstGUID] then
+                    activeTimers[dstGUID].isFailed = true
                     return self:DeleteCast(dstGUID)
                 end
 
@@ -2659,27 +2651,32 @@ addon:SetScript("OnUpdate", function(self, elapsed)
     local currTime = GetTime()
     local pushbackEnabled = self.db.pushbackDetect
 
-    if self.db.movementDetect then
-        refresh = refresh - elapsed
-
-        -- Check if unit is moving to stop castbar, thanks to Cordankos for this idea
-        if refresh < 0 then
-            if next(activeGUIDs) then
-                for unitID, unitGUID in pairs(activeGUIDs) do
-                    if unitID ~= "focus" then
-                        local cast = activeTimers[unitGUID]
-                        -- Only stop cast for players since some mobs runs while casting, also because
-                        -- of lag we have to only stop it if the cast has been active for atleast 0.25 sec
-                        if cast and cast.isPlayer and currTime - cast.timeStart > 0.25 then
-                            if not castStopBlacklist[cast.spellName] and GetUnitSpeed(unitID) ~= 0 then
-                                self:DeleteCast(unitGUID)
+    refresh = refresh - elapsed
+    if refresh < 0 then
+        if next(activeGUIDs) then
+            -- Check if unit is moving to stop castbar, thanks to Cordankos for this idea
+            for unitID, unitGUID in pairs(activeGUIDs) do
+                if unitID ~= "focus" then
+                    local cast = activeTimers[unitGUID]
+                    -- Only stop cast for players since some mobs runs while casting, also because
+                    -- of lag we have to only stop it if the cast has been active for atleast 0.25 sec
+                    if cast and cast.isPlayer and currTime - cast.timeStart > 0.25 then
+                        if not castStopBlacklist[cast.spellName] and GetUnitSpeed(unitID) ~= 0 then
+                            local castAlmostFinishied = ((currTime - cast.timeStart) > cast.maxValue - 0.05)
+                            -- due to lag its possible that the cast is successfuly casted but still shows interrupted
+                            -- unless we ignore the last few miliseconds here
+                            if not castAlmostFinishied then
+                                if not cast.isChanneled then
+                                    cast.isFailed = true
+                                end
+                                self:DeleteCast(unitGUID, nil, nil, cast.isChanneled)
                             end
                         end
                     end
                 end
             end
-            refresh = 0.1
         end
+        refresh = 0.1
     end
 
     -- Update all shown castbars in a single OnUpdate call
@@ -2689,7 +2686,7 @@ addon:SetScript("OnUpdate", function(self, elapsed)
             local castTime = cast.endTime - currTime
 
             if (castTime > 0) then
-                if not cast.showCastInfoOnly then
+                if not castbar.showCastInfoOnly then
                     local maxValue = cast.endTime - cast.timeStart
                     local value = currTime - cast.timeStart
                     if cast.isChanneled then -- inverse
@@ -2707,10 +2704,30 @@ addon:SetScript("OnUpdate", function(self, elapsed)
                     castbar.Spark:SetPoint("CENTER", castbar, "LEFT", sparkPosition, 0)
                 end
             else
+                -- slightly adjust color of the castbar when its not 100% sure if the cast is casted or failed
+                -- (gotta put it here to run before fadeout anim)
+                if not cast.isCastComplete and not cast.isInterrupted and not cast.isFailed then
+                    castbar.Spark:SetAlpha(0)
+                    if not cast.isChanneled then
+                        local c = self.db[gsub(unit, "%d", "")].statusColor
+                        castbar:SetStatusBarColor(c[1], c[2] + 0.1, c[3], c[4])
+                        castbar:SetMinMaxValues(0, 1)
+                        castbar:SetValue(1)
+                    else
+                        castbar:SetValue(0)
+                    end
+                end
+
                 -- Delete cast incase stop event wasn't detected in CLEU
                 if castTime <= -0.25 then -- wait atleast 0.25s before deleting incase CLEU stop event is happening at same time
-                    local skipFade = ((currTime - cast.timeStart) > cast.maxValue + 0.25)
-                    self:DeleteCast(cast.unitGUID, false, true, false, skipFade)
+                    if cast.isChanneled and not cast.isCastComplete and not cast.isInterrupted and not cast.isFailed then
+                        -- show finish animation on channels that doesnt have CLEU stop event
+                        -- Note: channels always have finish animations on stop, even if it was an early stop
+                        self:DeleteCast(cast.unitGUID, false, true, true, false)
+                    else
+                        local skipFade = ((currTime - cast.timeStart) > cast.maxValue + 0.25)
+                        self:DeleteCast(cast.unitGUID, false, true, false, skipFade)
+                    end
                 end
             end
         end
@@ -2729,7 +2746,6 @@ local unpack = _G.unpack
 local min = _G.math.min
 local max = _G.math.max
 local ceil = _G.math.ceil
-local UnitExists = _G.UnitExists
 local InCombatLockdown = _G.InCombatLockdown
 
 function addon:GetCastbarFrame(unitID)
@@ -2748,18 +2764,10 @@ end
 function addon:SetTargetCastbarPosition(castbar, parentFrame)
     local auraRows = parentFrame.auraRows or 0
 
-    if parentFrame.haveToT or parentFrame.haveElite or UnitExists("targettarget") then -- TODO: test if works with custom unitframe
-        if parentFrame.buffsOnTop or auraRows <= 1 then
-            castbar:SetPoint("CENTER", parentFrame, -18, -75)
-        else
-            castbar:SetPoint("CENTER", parentFrame, -18, max(min(-75, -37.5 * auraRows), -150))
-        end
+    if parentFrame.buffsOnTop or auraRows <= 1 then
+        castbar:SetPoint("CENTER", parentFrame, -18, -75)
     else
-        if not parentFrame.buffsOnTop and auraRows > 0 then
-            castbar:SetPoint("CENTER", parentFrame, -18, max(min(-75, -37.5 * auraRows), -150))
-        else
-            castbar:SetPoint("CENTER", parentFrame, -18, -50)
-        end
+        castbar:SetPoint("CENTER", parentFrame, -18, max(min(-75, -38.5 * auraRows), -150))
     end
 end
 
@@ -2767,7 +2775,7 @@ function addon:SetCastbarIconAndText(castbar, cast, db)
     local spellName = cast.spellName
 
     if castbar.Text:GetText() ~= spellName then
-        if cast.icon == 136235 then
+        if cast.icon == 136235 then -- unknown texture
             cast.icon = 136243
         end
         castbar.Icon:SetTexture(cast.icon)
@@ -2787,11 +2795,13 @@ function addon:SetCastbarStyle(castbar, cast, db)
     castbar:SetFrameLevel(db.frameLevel)
 
     if db.showCastInfoOnly then
+        castbar.showCastInfoOnly = true
         castbar.Timer:SetText("")
         castbar:SetValue(0)
         castbar.Spark:SetAlpha(0)
     else
         castbar.Spark:SetAlpha(1)
+        castbar.showCastInfoOnly = false
     end
 
     if db.hideIconBorder then
@@ -2909,7 +2919,6 @@ function addon:DisplayCastbar(castbar, unitID)
     castbar.Background:SetColorTexture(unpack(db.statusBackgroundColor))
 
     local cast = castbar._data
-    cast.showCastInfoOnly = db.showCastInfoOnly
     if cast.isChanneled then
         castbar:SetStatusBarColor(unpack(db.statusColorChannel))
     else
@@ -2950,18 +2959,23 @@ function addon:HideCastbar(castbar, noFadeOut)
     end
 
     local cast = castbar._data
-    if cast and cast.isInterrupted then
-        castbar.Text:SetText(_G.INTERRUPTED)
+    if cast and (cast.isInterrupted or cast.isFailed) then
+        castbar.Text:SetText(cast.isInterrupted and _G.INTERRUPTED or _G.FAILED)
         castbar:SetStatusBarColor(castbar.failedCastColor:GetRGB())
         castbar:SetMinMaxValues(0, 1)
         castbar:SetValue(1)
         castbar.Spark:SetAlpha(0)
     end
 
-    if cast and cast.isCastComplete then
+    if cast and cast.isCastComplete then -- SPELL_CAST_SUCCESS
         if castbar.Border:GetAlpha() == 1 then -- not using LSM borders
             local tex = castbar.Border:GetTexture()
             if tex == "Interface\\CastingBar\\UI-CastingBar-Border" or tex == "Interface\\CastingBar\\UI-CastingBar-Border-Small" then
+                if not cast.isChanneled then
+                    castbar.Flash:SetVertexColor(1, 1, 1)
+                else
+                    castbar.Flash:SetVertexColor(0, 1, 0)
+                end
                 castbar.Flash:Show()
             end
         end
@@ -2977,7 +2991,13 @@ function addon:HideCastbar(castbar, noFadeOut)
     end
 
     if castbar:GetAlpha() > 0 and castbar.fade then
-        castbar.fade:SetDuration(cast and cast.isInterrupted and 1.5 or 0.3)
+        castbar.fade:SetStartDelay(0) -- reset
+        if cast then
+            if cast.isInterrupted or cast.isFailed then
+                castbar.fade:SetStartDelay(0.5)
+            end
+        end
+        castbar.fade:SetDuration(cast and cast.isInterrupted and 1.2 or 0.3)
         castbar.animationGroup:Play()
     end
 end
@@ -2990,13 +3010,19 @@ function addon:SkinPlayerCastbar()
         CastingBarFrame.Timer = CastingBarFrame:CreateFontString(nil, "OVERLAY")
         CastingBarFrame.Timer:SetTextColor(1, 1, 1)
         CastingBarFrame.Timer:SetFontObject("SystemFont_Shadow_Small")
-        CastingBarFrame.Timer:SetPoint("RIGHT", CastingBarFrame, -6, 0)
         CastingBarFrame:HookScript("OnUpdate", function(frame)
             if db.enabled and db.showTimer then
+                frame.Timer:SetPoint("RIGHT", CastingBarFrame, (frame.Text:GetText():len() >= 19) and 30 or -6, 0)
+
+                if frame.fadeOut or (not frame.casting and not frame.channeling) then
+                    -- just show no text at zero, the numbers looks kinda weird when Flash animation is playing
+                    return frame.Timer:SetText("")
+                end
+
                 if not frame.channeling then
-                    frame.Timer:SetFormattedText("%.1f", frame.casting and (frame.maxValue - frame.value) or 0)
+                    frame.Timer:SetFormattedText("%.1f", frame.maxValue - frame.value)
                 else
-                    frame.Timer:SetFormattedText("%.1f", frame.fadeOut and 0 or frame.value)
+                    frame.Timer:SetFormattedText("%.1f", frame.value)
                 end
             end
         end)
@@ -3025,7 +3051,7 @@ function addon:SkinPlayerCastbar()
         CastingBarFrame.Flash:SetSize(db.width + 61, db.height + 51)
         CastingBarFrame.Flash:SetPoint("TOP", 0, 26)
     else
-        CastingBarFrame.Flash:SetTexture(nil) -- hide it by deleting texture, SetAlpha() or Hide() wont work without messing with blizz code
+        CastingBarFrame.Flash:SetTexture(nil) -- hide it by removing texture, SetAlpha() or Hide() wont work without messing with blizz code
     end
 
     CastingBarFrame_SetStartCastColor(CastingBarFrame, unpack(db.statusColor))

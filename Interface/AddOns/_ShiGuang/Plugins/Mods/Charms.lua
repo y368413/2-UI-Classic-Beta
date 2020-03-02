@@ -8,6 +8,33 @@ hooksecurefunc(StaticPopupDialogs["CONFIRM_LEAVE_BATTLEFIELD"],"OnShow",function
 end)
 --------------------------------------Hide the left/right end cap------------------------
 MainMenuBarLeftEndCap:Hide()  MainMenuBarRightEndCap:Hide()   
+
+--[[local DressUpTargetBtn = CreateFrame("Button",nil,DressUpModelFrame,"UIPanelButtonTemplate") 
+DressUpTargetBtn:SetSize(80, 21)
+DressUpTargetBtn:SetText(CHARMS_TARGET)
+DressUpTargetBtn:SetPoint("RIGHT", DressUpFrameResetButton, "LEFT", 0,0)
+DressUpTargetBtn:Disable()
+DressUpTargetBtn:SetScript("OnClick", function()
+	DressUpModelFrame:SetUnit("target")
+end)
+DressUpTargetBtn:RegisterEvent("PLAYER_TARGET_CHANGED")
+DressUpTargetBtn:SetScript("OnEvent", function()
+	if UnitExists("target") and UnitIsPlayer("target") then
+		DressUpTargetBtn:Enable() 
+	else 
+		DressUpTargetBtn:Disable() 
+	end
+end)
+-- Undress button
+local UndressButton = CreateFrame("Button", nil, DressUpModelFrame, "UIPanelButtonTemplate")
+UndressButton:SetSize(80, 21)
+UndressButton:SetText(CHARMS_NAKEDIZE)
+UndressButton:SetPoint("RIGHT", DressUpTargetBtn, "LEFT", 0, 0)
+UndressButton:SetScript("OnClick", function()
+    DressUpModelFrame:Undress()
+    PlaySound(SOUNDKIT.GS_TITLE_OPTION_OK)
+end)]]
+
 ------------------------------------------------------------------------------- NiceDamage
 --Local NiceDamage = CreateFrame("Frame", "NiceDamage");
 --function NiceDamage:ApplySystemDamageFonts() DAMAGE_TEXT_FONT = "Interface\\AddOns\\_ShiGuang\\Media\\Fonts\\RedCircl.ttf"; end
@@ -41,3 +68,38 @@ if event == 'START_LOOT_ROLL' then
 end
 if event == 'CONFIRM_LOOT_ROLL' then ConfirmLootRoll(id, rt) end
 end)
+
+
+
+local helmcb = CreateFrame("CheckButton", nil, PaperDollFrame) 
+helmcb:ClearAllPoints() 
+helmcb:SetSize(21,21) 
+helmcb:SetFrameLevel(10) 
+helmcb:SetPoint("TOPLEFT", CharacterHeadSlot, "TOPRIGHT", 0, 6) 
+helmcb:SetScript("OnClick", function() ShowHelm(not ShowingHelm()) end) 
+--helmcb:SetScript("OnEnter", function(self) GameTooltip:SetText("显示/隐藏 头部") end) 
+--helmcb:SetScript("OnLeave", function() GameTooltip:Hide() end) 
+helmcb:SetScript("OnEvent", function() helmcb:SetChecked(ShowingHelm()) end) 
+helmcb:SetNormalTexture("Interface\\Buttons\\UI-CheckBox-Up") 
+helmcb:SetPushedTexture("Interface\\Buttons\\UI-CheckBox-Down") 
+helmcb:SetHighlightTexture("Interface\\Buttons\\UI-CheckBox-Highlight") 
+helmcb:SetDisabledCheckedTexture("Interface\\Buttons\\UI-CheckBox-Check-Disabled") 
+helmcb:SetCheckedTexture("Interface\\Buttons\\UI-CheckBox-Check") 
+helmcb:RegisterEvent("UNIT_MODEL_CHANGED") 
+helmcb:SetChecked(ShowingHelm()) 
+local cloakcb = CreateFrame("CheckButton", nil, PaperDollFrame) 
+cloakcb:ClearAllPoints() 
+cloakcb:SetSize(21,21) 
+cloakcb:SetFrameLevel(10) 
+cloakcb:SetPoint("TOPLEFT", CharacterBackSlot, "TOPRIGHT", 0, 6) 
+cloakcb:SetScript("OnClick", function() ShowCloak(not ShowingCloak()) end) 
+--cloakcb:SetScript("OnEnter", function(self) GameTooltip:SetText("显示/隐藏 披风") end) 
+--cloakcb:SetScript("OnLeave", function() GameTooltip:Hide() end) 
+cloakcb:SetScript("OnEvent", function() cloakcb:SetChecked(ShowingCloak()) end) 
+cloakcb:SetNormalTexture("Interface\\Buttons\\UI-CheckBox-Up") 
+cloakcb:SetPushedTexture("Interface\\Buttons\\UI-CheckBox-Down") 
+cloakcb:SetHighlightTexture("Interface\\Buttons\\UI-CheckBox-Highlight") 
+cloakcb:SetDisabledCheckedTexture("Interface\\Buttons\\UI-CheckBox-Check-Disabled") 
+cloakcb:SetCheckedTexture("Interface\\Buttons\\UI-CheckBox-Check") 
+cloakcb:RegisterEvent("UNIT_MODEL_CHANGED") 
+cloakcb:SetChecked(ShowingCloak())

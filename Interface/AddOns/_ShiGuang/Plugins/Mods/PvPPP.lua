@@ -134,3 +134,37 @@ end
 
 handlerFrame:SetScript("OnEvent", function(self, event, ...) return self[event] and self[event](self, ...) end)
 handlerFrame:RegisterEvent("ADDON_LOADED")]]
+local EventFrame = CreateFrame("Frame") 
+EventFrame:RegisterEvent("PLAYER_LOGIN") 
+EventFrame:SetScript("OnEvent", function() 
+local _ 
+-- Get the player's character GUID 
+local playerid = UnitGUID("player") 
+-- Create the alert frame 
+local msg = CreateFrame("MessageFrame", "KilledItMessageFrame", UIParent) 
+msg:SetWidth(512); 
+msg:SetHeight(200); 
+msg:SetPoint("TOP", 0, -200, "CENTER", 0, 200); 
+msg:SetHeight(44) 
+msg:SetInsertMode("TOP") 
+msg:SetFrameStrata("HIGH") 
+msg:SetTimeVisible(1.0) 
+msg:SetFadeDuration(0.7) 
+msg:SetScale(1.1) 
+msg:SetFont(STANDARD_TEXT_FONT, 30, "OUTLINE") 
+-- Create the combat log event filter to check for party kills 
+local tracker = CreateFrame("FRAME") 
+tracker:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED") 
+tracker:SetScript("OnEvent", function(_, _, _, event, _, guid, _, _, _, killguid) 
+if event == "PARTY_KILL" then 
+local playerflag = tonumber(killguid:sub(5,5), 16); 
+if playerflag then 
+local maskedflag = playerflag % 8 
+if guid == playerid and maskedflag == 0 then 
+--msg:AddMessage(classcolorhex..sourceName.."|r 成功击杀: "..destName,1, 0, 0) 
+msg:AddMessage("KILLING BLOW!", 1, 0, 0) 
+end 
+end 
+end 
+end) 
+end)

@@ -227,3 +227,20 @@ CombatNotificationAlertFrame:SetScript("OnEvent", function(self, event)
     end
     CombatNotificationAlertFrame:Show()
 end)
+--[[	Author: Zack Youngren	License: GNU AGPLv3  ]]
+local LootMethodAlerter_EventFrame = CreateFrame("FRAME", "FooAddonFrame");
+LootMethodAlerter_EventFrame:RegisterEvent("PARTY_LOOT_METHOD_CHANGED");
+local loot_method_strings = {
+  ["needbeforegreed"] = "需求优先",
+  ["group"] = "队伍分配",
+  ["master"] = "队长分配",
+  ["roundrobin"] = "轮流拾取",
+  ["freeforall"] = "自由拾取",
+};
+LootMethodAlerter_EventFrame:SetScript("OnEvent", function(self, event, ...)
+  if IsInRaid() then return; end
+  PlaySound(8959) -- RAID_WARNING;
+  local warning_message = "拾取模式已设为: " .. loot_method_strings[GetLootMethod()];
+	--RaidNotice_AddMessage(RaidWarningFrame, "|cffff0000!!!|r" .. warning_message, ChatTypeInfo["RAID_WARNING"]);
+  Print("|cffff0000!!!|r" .. warning_message);
+end);

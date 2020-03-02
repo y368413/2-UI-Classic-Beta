@@ -1149,7 +1149,7 @@ end
 
 function CSC_CharacterBlock_OnEnter(self)
 	
-	if CharacterStatsClassicDB.useBlizzardBlockValue then
+	if UISettingsGlobal.useBlizzardBlockValue then
 		self.blockValue = GetShieldBlock();
 	else
 		self.blockValue = CSC_GetBlockValue("player");

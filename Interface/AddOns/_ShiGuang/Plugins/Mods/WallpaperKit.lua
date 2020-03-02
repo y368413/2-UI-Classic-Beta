@@ -1,6 +1,7 @@
 ﻿----- Configuration file for Wallpaper_Kit Version 0.3 -----
 --object container
 local WallpaperKitcfg = {}
+local total, afk_minutes, afk_seconds, update, interval = 0, 0, 0, 0, 1.0
 -- DISPLAY
 WallpaperKitcfg.show = {
 	name = true, guild = true,	-- TEXT
@@ -30,7 +31,7 @@ WallpaperKitcfg.text ={
 -- CENTER AURA
 WallpaperKitcfg.aura = {classcolor = true, size = 0.15, texture = "Interface\\AddOns\\_ShiGuang\\Media\\Modules\\Wallpaper\\AuraWings", color = {1,1,1,1},pos = { point = "CENTER", X = 0, Y = 0, },}
 -- CENTER CLASSICON
-WallpaperKitcfg.classicon = { size = 21, font = "Interface\\Addons\\_ShiGuang\\Media\\Fonts\\RedCircl.ttf", text = "--- |cFFFFFF00 2 |r|cFFFF0000 UI|r ---", pos = { point = "BOTTOM", X = 0, Y = 43, },}
+WallpaperKitcfg.classicon = { size = 21, font = "Interface\\Addons\\_ShiGuang\\Media\\Fonts\\RedCircl.ttf", text = "--- |cFFFFFF00 2|r|cFFFF0000 UI|r ---", pos = { point = "BOTTOM", X = 0, Y = 43, },}
 -- FACTION ICON
 WallpaperKitcfg.factionicon = { size = 0.8, pos = { point = "CENTER", X = -310, Y = -21, },}
 ------------------------------- FUNCTIONS-----------------------------
@@ -137,13 +138,18 @@ function WallpaperKit:UpdateModel()
 		local guildName, guildRankName = GetGuildInfo("player");
 		if faction == "Horde" then WallpaperKit.textguild:SetText("|cffffd200"..guildRankName.."|cff9d9d9d  <|cffffd200 "..guildName.." |cff9d9d9d>  |cffE60D12"..GetRealmName())
 		elseif faction == "Alliance" then WallpaperKit.textguild:SetText("|cffffd200"..guildRankName.."|cff9d9d9d  <|cffffd200 "..guildName.." |cff9d9d9d>  |cff4A54E8"..GetRealmName())
-    else return end
+  else return end
 	else
 		if faction == "Horde" then WallpaperKit.textguild:SetText("|cff9d9d9d |cffE60D12"..GetRealmName())
 		elseif faction == "Alliance" then WallpaperKit.textguild:SetText("|cff9d9d9d |cff4A54E8"..GetRealmName())
 		else WallpaperKit.textguild:SetText("|cff9d9d9d |cff20ff20"..GetRealmName()) end
 	end else return end
 end
+-- TIME
+WallpaperKit.texttime = WallpaperKit:CreateFontString(nil, "OVERLAY", "GameFontNormalHuge")
+WallpaperKit.texttime:SetText("0:00") 
+WallpaperKit.texttime:SetFont("Interface\\Addons\\_ShiGuang\\Media\\Fonts\\Pixel.ttf", WallpaperKitcfg.classicon.size-6, "OUTLINE")
+WallpaperKit.texttime:SetPoint("BOTTOM", WallpaperKit, "BOTTOM", 6, 21) 
 -- NAME 
 WallpaperKit.textname = WallpaperKit:CreateFontString(nil, "OVERLAY")
 WallpaperKit.textname:SetFont(STANDARD_TEXT_FONT, WallpaperKitcfg.text.name.size, WallpaperKitcfg.text.name.flag)
@@ -184,13 +190,34 @@ function WallpaperKit:Enable() WallpaperKit:Show() WallpaperKit:UpdateModel() Wa
 -- canvas disable func
 function WallpaperKit:Disable() WallpaperKit.fadeOut:Play() end  --UIParent:Show()
 
+function frame_OnUpdate(self, elapsed) 
+    update = update + elapsed 
+    if update > interval then 
+      total = total + 1 
+  local minutes = afk_minutes 
+  local seconds = afk_seconds 
+  if total >= 60 then 
+    minutes = floor(total / 60) 
+    seconds = tostring(total - (minutes * 60)) 
+    WallpaperKit.texttime:SetText(tostring(minutes)..":"..string.format("%02d", tostring(seconds)))
+  else 
+    minutes = 0 
+    seconds = total 
+    WallpaperKit.texttime:SetText(tostring(minutes)..":"..string.format("%02d", tostring(seconds)))
+  end 
+  afk_minutes = tostring(minutes) 
+  afk_seconds = tostring(seconds) 
+      update = 0 
+    end 
+end
+
 WallpaperKit:RegisterEvent("PLAYER_FLAGS_CHANGED")
 WallpaperKit:RegisterEvent("PLAYER_ENTERING_WORLD")
 WallpaperKit:RegisterEvent("PLAYER_LEAVING_WORLD")
-WallpaperKit:SetScript("OnEvent",function(WallpaperKit)
+WallpaperKit:SetScript("OnEvent",function()
   if not MaoRUIPerDB["Misc"]["WallpaperKit"] then return end
 	if WallpaperKit:IsShown() then WallpaperKit:Disable() end
-	if UnitIsAFK("player") then WallpaperKit:Enable() end
+	if UnitIsAFK("player") then WallpaperKit:Enable() hour, minute = GetGameTime() WallpaperKit:SetScript("OnUpdate", frame_OnUpdate) end  
 end)
 
 --UIParent:HookScript("OnShow", function() OnEvent(WallpaperKit) end)

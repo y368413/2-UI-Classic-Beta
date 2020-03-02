@@ -77,5 +77,5 @@
 	<Script file="CharacterDurability.lua"/>
 	<Script file="CharacterStatsClass.lua"/>
 	<Script file="ItemTooltipProfession.lua"/>
-	<!--Script file="FriendGroups.lua"/-->
+	<Script file="SX_ImprovingDressup.lua"/>
 </Ui>
