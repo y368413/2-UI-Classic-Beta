@@ -33,3 +33,14 @@ hooksecurefunc("ActionButton_UpdateCount", function(actionButton)
     -- print(GetText('SPELL_REAGENTS'))
     -- for k,v in pairs(resourceList) do print(k,v) end
 end)
+
+
+local function updateCount(self)
+	local actionType, id, subType = GetActionInfo(self.action)
+	if (actionType ~= 'item' and (id == 2480 or id == 7918 or id == 7919)) then  -- 弓箭射击 枪械射击 弩射击
+		local count = GetInventoryItemCount('player', 0)
+		self.Count:SetText((count == 1 and '0') or count)
+	end
+end
+hooksecurefunc("ActionButton_UpdateCount", function(self) updateCount(self) end)	-- hook ActionButton_UpdateCount
+hooksecurefunc("ActionButton_OnEvent", function(self) updateCount(self) end)		-- hook ActionButton_OnEvent

@@ -473,6 +473,12 @@ FOM_Foods = {
 	},
 	[FOM_DIET_BREAD] = {
 		-- Mists and before
+		[ 5349] = F.CONJURED,
+		[ 1113] = F.CONJURED,
+		[ 1114] = F.CONJURED,
+		[ 1487] = F.CONJURED,
+		[ 8075] = F.CONJURED,
+		[ 8076] = F.CONJURED,
 		[ 34062] = F.CONJURED,
 		[ 43518] = F.CONJURED,
 		[ 43523] = F.CONJURED,

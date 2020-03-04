@@ -74,9 +74,9 @@ function LDB:OnEnter()
    GameTooltip:SetPoint("TOPLEFT", self, "BOTTOMLEFT")
    GameTooltip:ClearLines()
    GameTooltip:AddDoubleLine(MINIMAP_TRACKING_TOOLTIP_NONE)
-   GameTooltip:AddLine(" ")
-   GameTooltip:AddLine("|TInterface\\CURSOR\\QUEST:12|t "..AddColor(BOSS_DEAD,GOLD))
    for i = 1, GetNumSavedInstances() do
+      GameTooltip:AddLine(" ")
+      GameTooltip:AddLine("|TInterface\\CURSOR\\QUEST:12|t "..AddColor(BOSS_DEAD,GOLD))
 	   local name, id, _, difficulty, locked, extended, instanceIDMostSig, isRaid, maxPlayers, level, total, progress = GetSavedInstanceInfo(i)
 	   GameTooltip:AddDoubleLine(AddColor(name.."("..level..")",WHITE), locked and AddColor(progress.."/"..total, LIGHT_GREEN) or AddColor(" 0/0 ", LIGHT_RED))
    end
@@ -91,7 +91,7 @@ function TrackingEye:OnInitialize()
 	--MiniMapTrackingFrame:SetScale(0.001) --hide frame permanently by making it tiny
 	LibStub("LibDBIcon-1.0"):Register("TrackingEyeData", LDB)
 	--LibStub("LibDBIcon-1.0"):GetMinimapButton("TrackingEyeData"):SetScale(1.13)
-	LDB.icon = GetTrackingTexture() or "Interface\\AddOns\\_ShiGuang\\Media\\Modules\\Role\\bubbleTex"
+	LDB.icon = GetTrackingTexture() or "Interface\\AddOns\\_ShiGuang\\Media\\2UI"
 	--self:RegisterChatCommand("te", "MinimapButton_ToggleLock")
-	self:RegisterEvent("MINIMAP_UPDATE_TRACKING", function() LDB.icon = GetTrackingTexture() or "Interface\\AddOns\\_ShiGuang\\Media\\Modules\\Role\\bubbleTex" end)
+	self:RegisterEvent("MINIMAP_UPDATE_TRACKING", function() LDB.icon = GetTrackingTexture() or "Interface\\AddOns\\_ShiGuang\\Media\\2UI" end)
 end

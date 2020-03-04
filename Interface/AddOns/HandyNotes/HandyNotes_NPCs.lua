@@ -3196,6 +3196,9 @@ nodes[1453] = {
 		name = L["Jasper Fel"],
 		npcID = 1325,
 		category = "vendors",
+		subcategories = {
+			poison = true,
+		},
 		description = L["Shady Dealer"],
 		faction = "Alliance",
 	},
@@ -5372,6 +5375,9 @@ nodes[1455] = {
 		name = L["Tynnus Venomsprout"],
 		npcID = 5169,
 		category = "vendors",
+		subcategories = {
+			poison = true,
+		},
 		description = L["Shady Dealer"],
 		faction = "Alliance",
 	},
@@ -39086,6 +39092,9 @@ nodes[1437] = {
 		name = L["Samor Festivus"],
 		npcID = 1457,
 		category = "vendors",
+		subcategories = {
+			poison = true,
+		},
 		description = L["Shady Dealer"],
 		faction = "Alliance",
 	},

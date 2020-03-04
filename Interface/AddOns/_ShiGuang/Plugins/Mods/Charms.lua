@@ -69,8 +69,30 @@ end
 if event == 'CONFIRM_LOOT_ROLL' then ConfirmLootRoll(id, rt) end
 end)
 
+-----------------------------------------------------------------------------QuestFrameFixer
+local titleLines = {}
+local questIconTextures = {}
+for i = 1, MAX_NUM_QUESTS do
+    local titleLine = _G["QuestTitleButton" .. i]
+    tinsert(titleLines, titleLine)
+    tinsert(questIconTextures, _G[titleLine:GetName() .. "QuestIcon"])
+end
+QuestFrameGreetingPanel:HookScript("OnShow",
+    function()
+        for i, titleLine in ipairs(titleLines) do
+            if (titleLine:IsVisible()) then
+                local bulletPointTexture = questIconTextures[i]
+                if (titleLine.isActive == 1) then
+                    bulletPointTexture:SetTexture("Interface\\GossipFrame\\ActiveQuestIcon")
+                else
+                    bulletPointTexture:SetTexture("Interface\\GossipFrame\\AvailableQuestIcon")
+                end
+            end
+        end
+    end
+)
 
-
+-----------------------------------------------------------------------------
 local helmcb = CreateFrame("CheckButton", nil, PaperDollFrame) 
 helmcb:ClearAllPoints() 
 helmcb:SetSize(21,21) 

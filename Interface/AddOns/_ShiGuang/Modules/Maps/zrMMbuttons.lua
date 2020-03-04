@@ -165,7 +165,7 @@ function zrMM:CreateButtonFrame()
 				Minimap.buttonFrame:SetPoint("TOPLEFT", Minimap, "TOPRIGHT", 6, 0)
 			elseif (MaoRUIPerDB["Map"]["zrMMbuttonpos"] == "Bottom") then
 				Minimap.buttonFrame:SetSize(Minimap:GetWidth(),MaoRUIPerDB["Map"]["zrMMbuttonsize"])
-				Minimap.buttonFrame:SetPoint("TOPRIGHT", Minimap, "BOTTOMRIGHT", -3, -6)
+				Minimap.buttonFrame:SetPoint("TOPRIGHT", Minimap, "BOTTOMRIGHT", -2, -6)
 			elseif (MaoRUIPerDB["Map"]["zrMMbuttonpos"] == "Left") then
 				Minimap.buttonFrame:SetSize(MaoRUIPerDB["Map"]["zrMMbuttonsize"],Minimap:GetHeight())
 				Minimap.buttonFrame:SetPoint("TOPRIGHT", Minimap, "TOPLEFT", -6, 0)		
