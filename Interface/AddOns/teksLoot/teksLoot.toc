@@ -1,0 +1,18 @@
+## Interface: 11302
+## Title: teksLoot
+## Notes: Minimalistic group roll frames.
+## Author: cloud.y修改版
+## Version: 3.3.0.9
+## X-Credits: Xuerian's XLootGroup
+## X-Website: http://www.tekkub.net/
+## X-Email: tekkub-wow@googlegroups.com
+## X-Category: Interface Enhancements
+## SavedVariables: teksLootDB
+## X-Mush-Project-Name: teksLoot
+## X-Mush-Packaged-Version: 3.2.0.8
+## X-Mush-UpdateVer: 15
+## X-WoWBox-Ver: 1
+## X-WoWBox-ID: 3025
+
+Locale.lua
+teksLoot.lua

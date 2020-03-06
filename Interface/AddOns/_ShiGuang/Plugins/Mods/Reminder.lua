@@ -25,7 +25,7 @@ Saythanks:SetScript("OnEvent", function()
 	for key, value in pairs(thanksspells) do
 		if spell == key and value == true and player == UnitName("player") and buffer ~= UnitName("player") and subEvent == "SPELL_CAST_SUCCESS" then
 			--SendChatMessage("Thanks:"....GetSpellLink(spell)..", "..buffer:gsub("%-[^|]+", ""), "WHISPER", nil, buffer)
-			print(GetSpellLink(spell)..SHIGUANG_Gets..buffer)
+			DEFAULT_CHAT_FRAME:AddMessage(GetSpellLink(spell)..SHIGUANG_Gets..buffer)
 			DoEmote("cheer", buffer)
 		end
 	end
@@ -37,7 +37,7 @@ BattleResAlert:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
 BattleResAlert:SetScript("OnEvent",function(a,b,c,event, d,e,sourceName, f,g,h,destName, i,j,spellId)
 	if (((spellId == 95750) or (spellId == 20484) or (spellId == 113269) or (spellId == 61999) or (spellId == 126393)) and (event == "SPELL_CAST_SUCCESS") and (destName == UnitName("player"))) then
 		DEFAULT_CHAT_FRAME:AddMessage("战复 "..sourceName..".")
-		--PlaySound("ReadyCheck", "Master")
+		PlaySound(SOUNDKIT.READY_CHECK, "Master")
 	end
 end)
 
@@ -45,7 +45,7 @@ end)
 local HideFishingBobberTooltip = CreateFrame("Frame")
 HideFishingBobberTooltip:RegisterEvent("PLAYER_LOGIN")
 HideFishingBobberTooltip:SetScript("OnEvent", function()
-  local L = {
+  local Fish = {
     deDE = "Angelschwimmer",
     enUS = "Fishing Bobber",
     esES = "Corcho de pesca",
@@ -58,12 +58,9 @@ HideFishingBobberTooltip:SetScript("OnEvent", function()
     zhCN = "鱼漂",
     zhTW = "魚漂",
   }
-  local localized = L[GetLocale()]
   GameTooltip:HookScript("OnShow", function()
     local tooltipText = GameTooltipTextLeft1
-    if tooltipText and tooltipText:GetText() == localized then
-      GameTooltip:Hide()
-    end
+    if tooltipText and tooltipText:GetText() == Fish[GetLocale()] then GameTooltip:Hide() end
   end)
 end)
 ------------------------------------------------------     重置副本提示     -----------------------------------------------------
@@ -178,7 +175,6 @@ end)
 
 --------------------------------------------------------------------------- CrazyCatLady
 local CrazyCatLady = CreateFrame("Frame") 
-CrazyCatLady:RegisterEvent("UNIT_AURA") 
 CrazyCatLady:RegisterEvent("PLAYER_DEAD")
 CrazyCatLady:RegisterEvent("PLAYER_UNGHOST")
 CrazyCatLady:SetScript("OnEvent", function(self, event, ...) 
@@ -192,6 +188,7 @@ end)
 local CombatNotificationAlertFrame = CreateFrame("Frame", "CombatNotificationAlertFrame", UIParent)
 CombatNotificationAlertFrame:RegisterEvent("PLAYER_REGEN_ENABLED")
 CombatNotificationAlertFrame:RegisterEvent("PLAYER_REGEN_DISABLED")
+CombatNotificationAlertFrame:RegisterEvent("PARTY_LOOT_METHOD_CHANGED");
 CombatNotificationAlertFrame:SetSize(360, 43)
 CombatNotificationAlertFrame:SetPoint("TOP", 0, -260)
 CombatNotificationAlertFrame.Bg = CombatNotificationAlertFrame:CreateTexture(nil, "BACKGROUND")
@@ -218,18 +215,7 @@ CombatNotificationAlertFrame:SetScript("OnUpdate", function(self, elapsed)
         CombatNotificationAlertFrame:SetAlpha(1 - CombatNotificationAlertFrame.timer / CombatNotificationAlertFrame.totalTime)
     end
 end)
-CombatNotificationAlertFrame:SetScript("OnEvent", function(self, event)
-    CombatNotificationAlertFrame:Hide()
-    if (event == "PLAYER_REGEN_DISABLED") then
-        CombatNotificationAlertFrame.text:SetText("|cFFFF0000"..COMBATNOTIFICATIONINFO_combat_enter.."|r")
-    elseif (event == "PLAYER_REGEN_ENABLED") then
-        CombatNotificationAlertFrame.text:SetText("|cff00ff00"..COMBATNOTIFICATIONINFO_combat_leave.."|r")
-    end
-    CombatNotificationAlertFrame:Show()
-end)
 --[[	Author: Zack Youngren	License: GNU AGPLv3  ]]
-local LootMethodAlerter_EventFrame = CreateFrame("FRAME", "FooAddonFrame");
-LootMethodAlerter_EventFrame:RegisterEvent("PARTY_LOOT_METHOD_CHANGED");
 local loot_method_strings = {
   ["needbeforegreed"] = "需求优先",
   ["group"] = "队伍分配",
@@ -237,10 +223,17 @@ local loot_method_strings = {
   ["roundrobin"] = "轮流拾取",
   ["freeforall"] = "自由拾取",
 };
-LootMethodAlerter_EventFrame:SetScript("OnEvent", function(self, event, ...)
-  if IsInRaid() then return; end
-  PlaySound(8959) -- RAID_WARNING;
-  local warning_message = "拾取模式已设为: " .. loot_method_strings[GetLootMethod()];
-	--RaidNotice_AddMessage(RaidWarningFrame, "|cffff0000!!!|r" .. warning_message, ChatTypeInfo["RAID_WARNING"]);
-  Print("|cffff0000!!!|r" .. warning_message);
-end);
+CombatNotificationAlertFrame:SetScript("OnEvent", function(self, event)
+    CombatNotificationAlertFrame:Hide()
+    if (event == "PLAYER_REGEN_DISABLED") then
+        CombatNotificationAlertFrame.text:SetText("|cFFFF0000"..COMBATNOTIFICATIONINFO_combat_enter.."|r")
+    elseif (event == "PLAYER_REGEN_ENABLED") then
+        CombatNotificationAlertFrame.text:SetText("|cff00ff00"..COMBATNOTIFICATIONINFO_combat_leave.."|r")
+    elseif (event == "PARTY_LOOT_METHOD_CHANGED") then
+        if IsInRaid() then return; end
+        PlaySound(8959) -- RAID_WARNING;
+        local warning_message = "拾取模式已设为: |r" .. loot_method_strings[GetLootMethod()];
+        CombatNotificationAlertFrame.text:SetText("|cFFFF0000"..warning_message)
+    end
+    CombatNotificationAlertFrame:Show()
+end)

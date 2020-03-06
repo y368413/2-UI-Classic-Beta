@@ -1,4 +1,4 @@
---## Author: Wardz ## Version: v1.2.8
+--## Author: Wardz ## Version: v1.2.9
 local ClassicCastbars = {}
 local PoolManager = {}
 ClassicCastbars.PoolManager = PoolManager
@@ -1936,7 +1936,7 @@ ClassicCastbars.unaffectedCastModsSpells = {
 
 -- Addon Savedvariables
 ClassicCastbars.defaultConfig = {
-    version = "16", -- settings version
+    version = "17", -- settings version
     pushbackDetect = true,
     locale = GetLocale(),
 
@@ -1959,6 +1959,7 @@ ClassicCastbars.defaultConfig = {
         iconPositionY = 0,
         borderColor = { 1, 0.8, 0, 1 },
         statusColor = { 1, 0.7, 0, 1 },
+        statusColorFailed = { 1, 0, 0 },
         statusColorChannel = { 0, 1, 0, 1 },
         textColor = { 1, 1, 1, 1 },
         textPositionX = 6,
@@ -1986,6 +1987,7 @@ ClassicCastbars.defaultConfig = {
         iconPositionY = 0,
         borderColor = { 1, 1, 1, 1 },
         statusColor = { 1, 0.7, 0, 1 },
+        statusColorFailed = { 1, 0, 0 },
         statusColorChannel = { 0, 1, 0, 1 },
         textColor = { 1, 1, 1, 1 },
         textPositionX = 6,
@@ -2013,6 +2015,7 @@ ClassicCastbars.defaultConfig = {
         iconPositionY = 0,
         borderColor = { 1, 1, 1, 1 },
         statusColor = { 1, 0.7, 0, 1 },
+        statusColorFailed = { 1, 0, 0 },
         statusColorChannel = { 0, 1, 0, 1 },
         textColor = { 1, 1, 1, 1 },
         textPositionX = 6,
@@ -2040,6 +2043,7 @@ ClassicCastbars.defaultConfig = {
         iconPositionY = 0,
         borderColor = { 1, 1, 1, 1 },
         statusColor = { 1, 0.7, 0, 1 },
+        statusColorFailed = { 1, 0, 0 },
         statusColorChannel = { 0, 1, 0, 1 },
         textColor = { 1, 1, 1, 1 },
         textPositionX = 0,
@@ -2067,6 +2071,7 @@ ClassicCastbars.defaultConfig = {
         iconPositionY = 0,
         borderColor = { 1, 1, 1, 1 },
         statusColor = { 1, 0.7, 0, 1 },
+        statusColorFailed = { 1, 0, 0 },
         statusColorChannel = { 0, 1, 0, 1 },
         textColor = { 1, 1, 1, 1 },
         textPositionX = 0,
@@ -2199,7 +2204,7 @@ function addon:StopCast(unitID, noFadeOut)
     if not castbar then return end
 
     if not castbar.isTesting then
-        self:HideCastbar(castbar, noFadeOut)
+        self:HideCastbar(castbar, unitID, noFadeOut)
     end
 
     castbar._data = nil
@@ -2503,7 +2508,7 @@ local stopCastOnDamageList = ClassicCastbars.stopCastOnDamageList
 local ARCANE_MISSILES = GetSpellInfo(5143)
 
 function addon:COMBAT_LOG_EVENT_UNFILTERED()
-    local _, eventType, _, srcGUID, srcName, srcFlags, _, dstGUID,  _, dstFlags, _, _, spellName = CombatLogGetCurrentEventInfo()
+    local _, eventType, _, srcGUID, srcName, srcFlags, _, dstGUID, _, dstFlags, _, _, spellName = CombatLogGetCurrentEventInfo()
 
     if eventType == "SPELL_CAST_START" then
         local spellID = castedSpells[spellName]
@@ -2662,7 +2667,7 @@ addon:SetScript("OnUpdate", function(self, elapsed)
                     -- of lag we have to only stop it if the cast has been active for atleast 0.25 sec
                     if cast and cast.isPlayer and currTime - cast.timeStart > 0.25 then
                         if not castStopBlacklist[cast.spellName] and GetUnitSpeed(unitID) ~= 0 then
-                            local castAlmostFinishied = ((currTime - cast.timeStart) > cast.maxValue - 0.05)
+                            local castAlmostFinishied = ((currTime - cast.timeStart) > cast.maxValue - 0.1)
                             -- due to lag its possible that the cast is successfuly casted but still shows interrupted
                             -- unless we ignore the last few miliseconds here
                             if not castAlmostFinishied then
@@ -2723,7 +2728,8 @@ addon:SetScript("OnUpdate", function(self, elapsed)
                     if cast.isChanneled and not cast.isCastComplete and not cast.isInterrupted and not cast.isFailed then
                         -- show finish animation on channels that doesnt have CLEU stop event
                         -- Note: channels always have finish animations on stop, even if it was an early stop
-                        self:DeleteCast(cast.unitGUID, false, true, true, false)
+                        local skipFade = ((currTime - cast.timeStart) > cast.maxValue + 0.4) -- skips fade anim on castbar being RESHOWN if the cast is expired
+                        self:DeleteCast(cast.unitGUID, false, true, true, skipFade)
                     else
                         local skipFade = ((currTime - cast.timeStart) > cast.maxValue + 0.25)
                         self:DeleteCast(cast.unitGUID, false, true, false, skipFade)
@@ -2813,7 +2819,7 @@ function addon:SetCastbarStyle(castbar, cast, db)
     castbar.Spark:SetHeight(db.height * 2.1)
     castbar.Icon:SetShown(db.showIcon)
     castbar.Icon:SetSize(db.iconSize, db.iconSize)
-    castbar.Icon:SetPoint("BOTTOMLEFT", castbar, db.iconPositionX - db.iconSize, db.iconPositionY)
+    castbar.Icon:SetPoint("LEFT", castbar, db.iconPositionX - db.iconSize, db.iconPositionY)
     castbar.Border:SetVertexColor(unpack(db.borderColor))
 
     castbar.Flash:ClearAllPoints()
@@ -2951,7 +2957,7 @@ function addon:DisplayCastbar(castbar, unitID)
     castbar:Show()
 end
 
-function addon:HideCastbar(castbar, noFadeOut)
+function addon:HideCastbar(castbar, unitID, noFadeOut)
     if noFadeOut then
         castbar:SetAlpha(0)
         castbar:Hide()
@@ -2961,7 +2967,7 @@ function addon:HideCastbar(castbar, noFadeOut)
     local cast = castbar._data
     if cast and (cast.isInterrupted or cast.isFailed) then
         castbar.Text:SetText(cast.isInterrupted and _G.INTERRUPTED or _G.FAILED)
-        castbar:SetStatusBarColor(castbar.failedCastColor:GetRGB())
+        castbar:SetStatusBarColor(unpack(self.db[gsub(unitID, "%d", "")].statusColorFailed))
         castbar:SetMinMaxValues(0, 1)
         castbar:SetValue(1)
         castbar.Spark:SetAlpha(0)
@@ -3058,7 +3064,7 @@ function addon:SkinPlayerCastbar()
 	CastingBarFrame_SetStartChannelColor(CastingBarFrame, unpack(db.statusColorChannel))
 	--CastingBarFrame_SetFinishedCastColor(CastingBarFrame, unpack(db.statusColor))
 	--CastingBarFrame_SetNonInterruptibleCastColor(CastingBarFrame, 0.7, 0.7, 0.7)
-    --CastingBarFrame_SetFailedCastColor(CastingBarFrame, 1.0, 0.0, 0.0)
+    CastingBarFrame_SetFailedCastColor(CastingBarFrame, unpack(db.statusColorFailed))
     if CastingBarFrame.isTesting then
         CastingBarFrame:SetStatusBarColor(CastingBarFrame.startCastColor:GetRGB())
     end

@@ -1,0 +1,26 @@
+tag 3.3.0.9-Beta
+cb3babdc7bdec069f828c199472c05fa527234b2
+tekkub <tekkub@gmail.com>
+2010-01-03 22:17:55 -0700
+
+Weekly build
+
+
+--------------------
+
+tekkub:
+	- Weekly build 3.3.0.9-Beta
+	- Update changelog for 3.3.0.9-Beta
+	- Updating TOC to 30300
+	- In soviet russia addon localizes you!
+	- deDE locale update for 3.3
+	Closes #2
+	- Meh, textmate defaults to UTF8, we might as well actually use it
+	- zhTW locale update
+	Closes #3
+	- Move locale out into it's own file
+	- Remove 3.2 backcompat
+unknown:
+	- ruRU locale added
+tekkub:
+	- Up, down, what do we care?
