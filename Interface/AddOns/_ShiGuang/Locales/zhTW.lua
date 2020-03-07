@@ -288,6 +288,126 @@ InboxMailBag_RETURNED_1 = "%s 從 %s |cffFF2020 將返回於 %s 後|r";
 InboxMailBag_RETURNED_7 = "%s 從 %s |cffFFA020 將返回於 %d |4日:日; 後|r";
 InboxMailBag_TOTAL = "總計訊息: %d";
 InboxMailBag_TOTAL_MORE = "總計訊息: %d (%d)";
+
+FOM_TITLE = "|cff7fff7f[獵人]|r一鍵餵養";
+-- Diet names. These should be the seven possible diets returned from GetPetFoodTypes() and shown in the Pet tab of the character window (when mousing over the food icon). 
+-- (Want to get them all nice and quick for your localization? Go tame a bear or boar... they eat anything.)
+-- THESE STRINGS MUST BE LOCALIZED for Feed-O-Matic to work properly in other locales.
+FOM_DIET_MEAT                   = "肉";
+FOM_DIET_FISH                   = "魚";
+FOM_DIET_BREAD                  = "麵包";
+FOM_DIET_CHEESE                 = "乳酪";
+FOM_DIET_FRUIT                  = "水果";
+FOM_DIET_FUNGUS                 = "蘑菇";
+-- Beast family names; we use these to provide optional pet-specific feeding emotes (see FeedOMatic_Emotes.lua)
+FOM_BAT                         = "蝙蝠";                 
+FOM_BEAR                        = "熊";                    
+FOM_BOAR                        = "野豬";                  
+FOM_CARRION_BIRD                = "禿鷹";           
+FOM_CAT                         = "貓";                        
+FOM_CRAB                        = "螃蟹";                   
+FOM_CROCOLISK                   = "鱷魚";               
+FOM_GORILLA                     = "猩猩";                   
+FOM_HYENA                       = "土狼";                   
+FOM_OWL                         = "貓頭鷹";                      
+FOM_RAPTOR                      = "迅猛龍";                  
+FOM_SCORPID                     = "蠍子";                   
+FOM_SPIDER                      = "蜘蛛";                   
+FOM_TALLSTRIDER                 = "陸行鳥";              
+FOM_TURTLE                      = "烏龜";                   
+FOM_WIND_SERPENT                = "風蛇";           
+FOM_WOLF                        = "狼";                    
+FOM_DRAGONHAWK                  = "龍鷹";                  -- BC
+FOM_NETHER_RAY                  = "虛空鰭刺";                -- BC
+FOM_RAVAGER                     = "破壞者";             -- BC
+FOM_SERPENT                     = "毒蛇";                  -- BC
+FOM_SPOREBAT                    = "孢子蝙蝠";                -- BC
+FOM_WARP_STALKER                = "扭曲行者";                -- BC
+FOM_WORM                        = "蠕虫";                  -- WotLK exotic
+FOM_SPIRIT_BEAST                = "灵魂兽";             -- WotLK exotic
+FOM_WASP                        = "巨蜂";                  -- WotLK
+FOM_SILITHID                    = "异种虫";             -- WotLK exotic
+FOM_MOTH                        = "蛾子";                  -- WotLK exotic
+FOM_DEVILSAUR                   = "魔暴龙";             -- WotLK exotic
+FOM_CHIMAERA                    = "奇美拉";             -- WotLK exotic
+FOM_CORE_HOUND                  = "熔岩犬";             -- WotLK exotic
+FOM_BIRD_OF_PREY                = "猛禽";                  -- WotLK
+FOM_SHALE_SPIDER                = "页岩蛛";             -- Cataclysm exotic
+FOM_MONKEY                      = "猴子";                  -- Cataclysm
+FOM_FOX                         = "狐狸";                  -- Cataclysm
+FOM_DOG                         = "狗";                   -- Cataclysm
+FOM_BEETLE                      = "甲虫";                  -- Cataclysm
+FOM_BASILISK                    = "石化蜥蜴";                -- Mists
+FOM_CLEFTHOOF                   = "裂蹄牛";             -- Warlords
+FOM_CRANE                       = "鹤";                   -- Mists
+FOM_DIREHORN                    = "恐角龙";             -- Warlords
+FOM_GOAT                        = "山羊";                  -- Mists
+FOM_HYDRA                       = "九头蛇";             -- Warlords
+FOM_MECHANICAL                  = "机械";                  -- Legion special
+FOM_OXEN                        = "牛";                   -- Legion
+FOM_PORCUPINE                   = "箭猪";                  -- Mists
+FOM_QUILEN                      = "魁麟";                  -- Mists exotic
+FOM_RIVERBEAST                  = "淡水兽";             -- Warlords
+FOM_RYLAK                       = "双头飞龙";                -- Warlords
+FOM_SCALEHIDE                   = "鳞甲类";             -- Legion
+FOM_STAG                        = "雄鹿";                  -- Warlords
+FOM_WATER_STRIDER               = "水黾";                  -- Mists exotic
+
+    FOM_BUTTON_TOOLTIP1             = "左鍵點擊餵養寵物:";
+    FOM_BUTTON_TOOLTIP1_FALLBACK    = "Alt-左鍵點擊餵養寵物:";
+    FOM_BUTTON_TOOLTIP2             = "<右鍵點擊進行設置>";
+    FOM_BUTTON_TOOLTIP_NOFOOD       = "不能餵養寵物";
+    FOM_BUTTON_TOOLTIP_DIET         = "%s 吃:";
+    -- Used in tooltips to indicate food quality.
+    FOM_QUALITY_UNDER               = "%s 不喜歡這種食物。";
+    FOM_QUALITY_WILL                = "%s 可以吃這種食物。";
+    FOM_QUALITY_LIKE                = "%s 願意吃這種食物。";
+    FOM_QUALITY_LOVE                = "%s 喜歡吃這種食物。";
+    -- User-visible errors
+    FOM_ERROR_NO_FOOD               = "沒有食物給 %s。";
+    FOM_ERROR_NO_FOOD_NO_FALLBACK   = "沒有食物給 %s （還未指定需要避免的食物）。";
+    FOM_FALLBACK_MESSAGE            = "按住 Alt 再點擊餵養按鈕或使用快速鍵。";
+    -- Feeding status messages
+    FOM_FEEDING_EAT                 = "喂 %s %s...";
+    FOM_FEEDING_FEED                = "喂 %s %s。";
+    -- Options panel
+    FOM_OPTIONS_GENERAL             = "常規選項";
+    FOM_OPTIONS_PROFILE             = "選項配置";
+    FOM_OPTIONS_SUBTEXT             = "餵養寵物時請按一下寵物血條旁邊的按鈕，或為餵養寵物綁定一個快速鍵，或將'/ click FOM_FeedButton'放在宏中。";
+    FOM_FOOD_QUALITY_INFO           = "接近寵物等級的食物可以恢復更多的生命值。\n";
+    FOM_OPTIONS_TOOLTIP             = "在滑鼠提示中顯示食品品質";
+    FOM_OPTIONS_TOOLTIP_TIP         = FOM_FOOD_QUALITY_INFO.."開啟後滑鼠提示中講顯示該食物可以恢復寵物多少生命值。";
+    FOM_OPTIONS_LOW_LVL_1ST         = "優先使用低等級食物";
+    FOM_OPTIONS_LOW_LVL_1ST_TIP     = FOM_FOOD_QUALITY_INFO.."開啟後將預設使用低等級食物（需要更頻繁地餵食）。\n禁用後將可以減少餵食頻率（無法更快清空低等級食物）。";
+    FOM_OPTIONS_AVOID_QUEST         = "避免任務所需物品";
+    FOM_OPTIONS_AVOID_QUEST_TIP     = "有些任務所需物品也可以用於餵養寵物。開啟後可以防止餵養寵物干擾任務進度。";
+    FOM_OPTIONS_NO_BUTTON           = "隱藏寵物餵養按鈕";
+    FOM_OPTIONS_NO_BUTTON_TIP       = "不要在寵物血條邊顯示寵物餵養按鈕。\n(用於有插件改變/隱藏系統預設寵物頭像時。)";
+    FOM_OPTIONS_FEED_NOTIFY         = "餵養時提示:";
+    FOM_OPTIONS_NOTIFY_EMOTE        = "通過表情";
+    FOM_OPTIONS_NOTIFY_TEXT         = "通過聊天視窗";
+    FOM_OPTIONS_NOTIFY_NONE         = "不提示";
+    FOM_OPTIONS_FOODS_TITLE         = "食物偏好";
+    FOM_OPTIONS_FOODS_TEXT          = "取消下面選中的食物（或食物類別），可以避免將它們喂給寵物。\n否則將優先使用更接近列表頂部類別的食物。";
+    FOM_OPTIONS_FOODS_NAME          = "食物";
+    FOM_OPTIONS_FOODS_COOKING       = "成分";
+    FOM_OPTIONS_FOODS_CONJURED      = "魔法制造物";
+    FOM_OPTIONS_FOODS_CONJ_COMBO    = "同時恢復法力的食物";
+    FOM_OPTIONS_FOODS_BASIC         = "普通食物";
+    FOM_OPTIONS_FOODS_COMBO         = "恢復法力的食物";
+    FOM_OPTIONS_FOODS_BONUS         = "能喂飽的食物";
+    FOM_OPTIONS_FOODS_INEDIBLE      = "生食";
+    FOM_OPTIONS_FOODS_ONLY_PET      = "僅顯示餵養寵物的食物";
+    FOM_OPTIONS_FOODS_ONLY_PET_TIP  = "只顯示%d級 %s 可以吃的食物"; -- e.g. level 80 Gorilla
+    FOM_OPTIONS_FOODS_ONLY_LVL_TIP  = "只顯示%d寵物可以吃的食物";
+    FOM_OPTIONS_FOODS_ONLY_INV      = "僅顯示包裹裡的食物";
+    FOM_DIFFICULTY_HEADER           = "配方狀態:";
+    FOM_DIFFICULTY_1                = "不重要的";
+    FOM_DIFFICULTY_2                = "容易的";
+    FOM_DIFFICULTY_3                = "中等的";
+    FOM_DIFFICULTY_4                = "困難的";
+    FOM_DIFFICULTY_5                = "未知的";
+    
 U["Damage"] = "傷害"  
 
   
