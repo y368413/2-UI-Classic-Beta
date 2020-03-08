@@ -147,7 +147,7 @@ function WallpaperKit:UpdateModel()
 end
 -- TIME
 WallpaperKit.texttime = WallpaperKit:CreateFontString(nil, "OVERLAY", "GameFontNormalHuge")
-WallpaperKit.texttime:SetText("0:00") 
+WallpaperKit.texttime:SetText("00:00") 
 WallpaperKit.texttime:SetFont("Interface\\Addons\\_ShiGuang\\Media\\Fonts\\Pixel.ttf", WallpaperKitcfg.classicon.size-6, "OUTLINE")
 WallpaperKit.texttime:SetPoint("BOTTOM", WallpaperKit, "BOTTOM", 6, 21) 
 -- NAME 

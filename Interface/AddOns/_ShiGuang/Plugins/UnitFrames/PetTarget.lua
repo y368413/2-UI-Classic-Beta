@@ -4,7 +4,7 @@ ToPetFrame:SetFrameLevel(8);
 ToPetFrame:SetWidth(96);
 ToPetFrame:SetHeight(48);
 ToPetFrame:ClearAllPoints();
-ToPetFrame:SetPoint("TOP", PetFrame, "BOTTOM", 12, 21);
+ToPetFrame:SetPoint("TOP", PetFrame, "BOTTOM", 3, 16);
 
 ToPetFrame:SetAttribute("unit", "pettarget");
 RegisterUnitWatch(ToPetFrame);

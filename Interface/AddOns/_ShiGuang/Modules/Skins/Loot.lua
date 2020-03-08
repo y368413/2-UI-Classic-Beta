@@ -86,12 +86,12 @@ hooksecurefunc("LootFrame_Show", function(self, ...)
 	LootFrame_Update();
 end)
 
-	local chn = { "say", "guild", "party", "raid"}
+	local chn = { "raid", "party", "guild", "say"}
 	local chncolor = {
-		say = { 1, 1, 1},
-		guild = { .25, 1, .25},
-		party = { 2/3, 2/3, 1},
 		raid = { 1, .5, 0},
+		party = { 2/3, 2/3, 1},
+		guild = { .25, 1, .25},
+		say = { 1, 1, 1},
 	}
 
 	local function Announce(chn)

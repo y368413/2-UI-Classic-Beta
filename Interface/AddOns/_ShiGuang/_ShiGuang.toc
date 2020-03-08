@@ -3,7 +3,7 @@
 ## Author: ShiGuang、TuTu、Siweia
 ## Notes: Time Flies...
 ## Version: 0.4.6
-## SavedVariables: MaoRUIDB,ShiGuangDB,CastbarsDB,DialogKeyDB
+## SavedVariables: MaoRUIDB,ShiGuangDB,CastbarsDB,DialogKeyDB,GFW_FeedOMatic_DB,FOM_Cooking
 ## SavedVariablesPerCharacter: MaoRUIPerDB,ShiGuangPerDB,DEX_SAVE
 
 ## X-Support: Classic
