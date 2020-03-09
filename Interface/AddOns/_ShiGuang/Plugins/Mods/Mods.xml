@@ -63,7 +63,7 @@
 	<Script file="PvPPP.lua"/>
 	<Script file="Charms.lua"/>
 	<Script file="rlTools.lua"/>
-	<!--Script file="Molinari.lua"/-->
+	<Script file="ChatLoot.lua"/>
 	<Script file="AHhelper.lua"/>
 	<Script file="Merchant.lua"/>
 	<Script file="kAutoOpen.lua"/>

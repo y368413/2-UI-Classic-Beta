@@ -248,6 +248,16 @@ Announcer_Sap = ">>>被闷棍<<<";
 Announcer_RocketPP = "漏油!!!救命啊~";
 Announcer_Purgatory = "要死啦要死啦~";
 Announcer_SpellIDnof = "<法术链接(ID)没有找到>";
+	DEL_DES  = "删除对话？";
+	DEL_BTN  = "左键：删除对话\n右键：复制文本";
+	CALL_BTN = "密语屏";
+	OFFLINE  = "已离线。";
+	NOTFIND  = "未找到。";
+	DIFFSRV  = "不属于当前服务器。";
+	CLEAR_ALL= "清空所有对话";
+	DEL_CFM  = "删除对话确认";
+	BTN_TIP  = "按钮鼠标提示";
+	MSG_ANC  = "新消息提示音";
 ----------------Chat----------------------
 REPAIR_COST = "修理：";
 Chatbar_ChatMiniMizeButtonText = "缩";

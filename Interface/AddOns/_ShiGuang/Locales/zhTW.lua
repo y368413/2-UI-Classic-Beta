@@ -250,6 +250,16 @@ Announcer_Interrupted = "打斷→";
 Announcer_Disperse = "驅散→";
 Announcer_Stole = "偷取→";
 Announcer_SpellIDnof = "<法術鏈接(ID)沒有找到>";
+	DEL_DES  = "刪除對話？";
+	DEL_BTN  = "左鍵：刪除對話\n右鍵：複製文本";
+	CALL_BTN = "密語屏";
+	OFFLINE  = "已離線。";
+	NOTFIND  = "未找到。";
+	DIFFSRV  = "不屬於當前伺服器。";
+	CLEAR_ALL= "清空所有對話";
+	DEL_CFM  = "刪除對話確認";
+	BTN_TIP  = "按鈕滑鼠提示";
+	MSG_ANC  = "新消息提示音";
 ----------------Chat----------------------
 REPAIR_COST = "修理：";
 Chatbar_ChatMiniMizeButtonText = "縮";

@@ -124,8 +124,8 @@ function S:CharacterStatsClassic()
 
 	-- Expand button
 	local bu = CreateFrame("Button", nil, PaperDollFrame)
-	bu:SetSize(17, 17)
-	bu:SetPoint("RIGHT", CharacterFrameCloseButton, "LEFT", -3, 0)
+	bu:SetSize(21, 21)
+	bu:SetPoint("TOPLEFT", PaperDollFrame, "TOPLEFT", 72, -15)
 	bu:SetNormalTexture("Interface\\Buttons\\UI-MinusButton-Up")
 	--F.ReskinExpandOrCollapse(bu)
 	--bu.bg:SetSize(17, 17)

@@ -3,8 +3,8 @@
 ## Author: ShiGuang、TuTu、Siweia
 ## Notes: Time Flies...
 ## Version: 0.4.7
-## SavedVariables: MaoRUIDB,ShiGuangDB,CastbarsDB,DialogKeyDB,GFW_FeedOMatic_DB,FOM_Cooking
-## SavedVariablesPerCharacter: MaoRUIPerDB,ShiGuangPerDB,DEX_SAVE
+## SavedVariables: MaoRUIDB,ShiGuangDB,CastbarsDB,DialogKeyDB,GFW_FeedOMatic_DB,FOM_Cooking,WhisperTableDB
+## SavedVariablesPerCharacter: MaoRUIPerDB,ShiGuangPerDB,DEX_SAVE,WhisperTablePlayer
 
 ## X-Support: Classic
 ## X-Repple: 2 UI

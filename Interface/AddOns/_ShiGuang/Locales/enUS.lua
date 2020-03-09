@@ -234,7 +234,17 @@ Announcer_Interrupted = "Interrupted→";
 Announcer_Disperse = "Disperse→";
 Announcer_Stole = "Stole→";
 Announcer_SpellIDnof = "<Spelllink(ID) not found>";
-
+	DEL_DES  = "Delete Dialog?";
+	DEL_BTN  = "LEFT: Delete Dialog\nRight: Copy text";
+	CALL_BTN = "WhisperTable";
+	OFFLINE  = " is offline.";
+	NOTFIND  = " does not exist.";
+	DIFFSRV  = " does not belong to the current server.";
+	CLEAR_ALL= "Clear All";
+	DEL_CFM  = "Del confirm";
+	BTN_TIP  = "Button tip";
+	MSG_ANC  = "Announce";
+	
 REPAIR_COST = "repair：";			
 Chatbar_ChatMiniMizeButtonText = "-";
 Chatbar_rollText = "R";
