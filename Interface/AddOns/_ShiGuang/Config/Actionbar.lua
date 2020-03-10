@@ -47,7 +47,7 @@ R.bars = {
     },
     -- PETBAR 宠物动作条
     petbar = {
-		size	            = 21,		-- 动作条大小
+		size	            = 26,		-- 动作条大小
 		fader				= nil,		-- 鼠标悬停显隐
     },
     -- STANCE + POSSESSBAR 姿态条

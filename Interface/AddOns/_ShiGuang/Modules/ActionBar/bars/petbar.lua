@@ -13,11 +13,11 @@ function Bar:CreatePetbar()
 	frame:SetWidth(num*cfg.size + (num-1)*margin + 2*padding)
 	frame:SetHeight(cfg.size + 2*padding)
 	if MaoRUIPerDB["Actionbar"]["Style"] == 3 then
-		frame.Pos = {"BOTTOM", UIParent, "BOTTOM", 355, 85}
+		frame.Pos = {"BOTTOM", UIParent, "BOTTOM", 355, 84}
 	elseif (MaoRUIPerDB["Actionbar"]["Style"] == 4) or (MaoRUIPerDB["Actionbar"]["Style"] == 8) then
 	  frame.Pos = {"BOTTOM", UIParent, "BOTTOM", 80, 120}
 	else
-		frame.Pos = {"BOTTOM", UIParent, "BOTTOM", 100, 90}
+		frame.Pos = {"BOTTOM", UIParent, "BOTTOM", 100, 84}
 	end
 
 	--move the buttons into position and reparent them
