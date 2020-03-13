@@ -1,7 +1,7 @@
 ﻿local _, ns = ...
 local M, R, U, I = unpack(ns)
 local module = M:GetModule("Chat")
-local gsub, gmatch, tinsert, pairs = string.gsub, string.gmatch, table.insert, pairs
+local gsub, tinsert, pairs, select = string.gsub, table.insert, pairs, select
 
  --------------------------------------- 聊天表情-- Author:M-------------------------------------
 -- key為圖片名
@@ -164,8 +164,6 @@ function module:Chatbar()
         Emote_button:SetHighlightTexture("Interface\\Buttons\\UI-Common-MouseHilight", "ADD")
         Emote_button:SetPoint("TOPLEFT", 8+(index%column)*(Emote_width+space), -8 - floor(index/column)*(Emote_height+space))
         Emote_button:SetScript("OnMouseUp", EmoteButton_OnClick)
-        --Emote_button:SetScript("OnEnter", EmoteButton_OnEnter)
-        --Emote_button:SetScript("OnLeave", EmoteButton_OnLeave)
         index = index + 1
     end
     Emote_IconPanel:SetHeight(ceil(index/column)*(Emote_height+space) +8)
@@ -319,40 +317,57 @@ function module:Chatbar()
 --end
 
 -------------------------- 處理聊天氣泡------------------------
-    if (GetCVarBool("chatBubbles")) then
-    local frame = CreateFrame("Frame", nil, UIParent)
     --替換文字為表情
     local function TextToEmote(text)
         text = text:gsub("%{.-%}", ReplaceEmote)
         return text
     end
     --找出氣泡框
-    local function FindAndReplaceBubble(self)
-        local b, v, f
-        for i = 2, WorldFrame:GetNumChildren() do
-            v = select(i, WorldFrame:GetChildren())
-            if (v:IsForbidden()) then return end
-            b = v:GetBackdrop()
-            if (v:IsShown() and b and b.bgFile == "Interface\\Tooltips\\ChatBubble-Background") then
-                for j = 1, v:GetNumRegions() do
-                    f = select(j, v:GetRegions())
-                    if f:GetObjectType() == "FontString" then
-                        local text = f:GetText() or ""
-                        local after = TextToEmote(text)
-                        if (after ~= text) then
-                            f:SetText(after)
-                        end
-                    end
-                end
-            end
-        end
-    end
-    frame:SetScript("OnUpdate", function(self, elapsed)
-        self.timer = (self.timer or 0) + elapsed
-        if (not self.paused and self.timer > 0.16) then
-            self.timer = 0
-            FindAndReplaceBubble(self)
-        end
-    end)
-    end
+	local function findChatBubble(msg)
+		local chatbubbles = C_ChatBubbles.GetAllChatBubbles()
+		for index = 1, #chatbubbles do
+			local chatbubble = chatbubbles[index]
+			for i = 1, chatbubble:GetNumRegions() do
+				local region = select(i, chatbubble:GetRegions())
+				if region:GetObjectType() == "FontString" and region:GetText() == msg then
+					local text = region:GetText() or ""
+					local after = TextToEmote(text)
+					if (after ~= text) then
+						region:SetText(after)
+					end
+				end
+			end
+		end
+	end
+
+	local events = {
+		CHAT_MSG_SAY = "chatBubbles",
+		CHAT_MSG_YELL = "chatBubbles",
+		CHAT_MSG_MONSTER_SAY = "chatBubbles",
+		CHAT_MSG_MONSTER_YELL = "chatBubbles",
+		CHAT_MSG_PARTY = "chatBubblesParty",
+		CHAT_MSG_PARTY_LEADER = "chatBubblesParty",
+		CHAT_MSG_MONSTER_PARTY = "chatBubblesParty",
+	}
+
+	local bubbleHook = CreateFrame("Frame")
+	for event in next, events do
+		bubbleHook:RegisterEvent(event)
+	end
+	bubbleHook:SetScript("OnEvent", function(self, event, msg)
+		if GetCVarBool(events[event]) then
+			self.elapsed = 0
+			self.msg = msg
+			self:Show()
+		end
+	end)
+
+	bubbleHook:SetScript("OnUpdate", function(self, elapsed)
+		self.elapsed = self.elapsed + elapsed
+		if self.elapsed > .1 then
+			findChatBubble(self.msg)
+			self:Hide()
+		end
+	end)
+	bubbleHook:Hide()
 end

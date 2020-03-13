@@ -58,7 +58,7 @@ function TT:AddLineForID(id, linkType, noadd)
 		local text = line:GetText()
 		if text and text == linkType then return end
 	end
-	--if not noadd then return end
+	--if not noadd then self:AddLine(" ") end
 
 	if linkType == types.item then
 		TT.UpdateItemSellPrice(self)

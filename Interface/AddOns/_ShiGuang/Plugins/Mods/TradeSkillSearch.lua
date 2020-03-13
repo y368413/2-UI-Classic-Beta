@@ -94,7 +94,7 @@ local function SetupCraftWidgets()
 	local f = CreateFrame("Frame", "TSSCraftSearchFrame", CraftFrame)
 	local text = f:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
 	text:SetPoint("LEFT")
-	text:SetText("Search:")
+	text:SetText(SEARCH..":")
 	f:SetPoint("TOPLEFT", CraftFrame, "TOPLEFT", TSS.x - 7, TSS.y)
 	f:SetSize(TSS.w, TSS.h)
 	-- Create search box

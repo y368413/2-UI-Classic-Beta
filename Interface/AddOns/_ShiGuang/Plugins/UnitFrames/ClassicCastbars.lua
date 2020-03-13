@@ -1,4 +1,4 @@
---## Author: Wardz ## Version: v1.2.10
+--## Author: Wardz ## Version: v1.2.11
 local ClassicCastbars = {}
 local PoolManager = {}
 ClassicCastbars.PoolManager = PoolManager
@@ -1370,6 +1370,7 @@ local castSpellIDs = {
     --1002, -- Eyes of the Beast
     --1510, -- Volley
     136, -- Mend Pet
+    7268, -- Arcane Missile
     5143, -- Arcane Missiles
     --10, -- Blizzard
     12051, -- Evocation
@@ -1445,6 +1446,7 @@ ClassicCastbars.channeledSpells = {
 
     -- MAGE
     [GetSpellInfo(5143)] = 5000,      -- Arcane Missiles
+    [GetSpellInfo(7268)] = 3000,      -- Arcane Missile
     [GetSpellInfo(10)] = 8000,        -- Blizzard
     [GetSpellInfo(12051)] = 8000,     -- Evocation
 
@@ -2119,6 +2121,7 @@ local next = _G.next
 local floor = _G.math.floor
 local GetUnitSpeed = _G.GetUnitSpeed
 local CastingInfo = _G.CastingInfo
+local ChannelInfo = _G.ChannelInfo
 local castTimeIncreases = ClassicCastbars.castTimeIncreases
 local pushbackBlacklist = ClassicCastbars.pushbackBlacklist
 local unaffectedCastModsSpells = ClassicCastbars.unaffectedCastModsSpells
@@ -2129,6 +2132,17 @@ local NATURES_GRACE = GetSpellInfo(16886)
 local MIND_QUICKENING = GetSpellInfo(23723)
 local BLINDING_LIGHT = GetSpellInfo(23733)
 local BERSERKING = GetSpellInfo(20554)
+
+function addon:GetUnitType(unitID)
+    local unit = gsub(unitID or "", "%d", "")
+    if unit == "nameplate-testmode" then
+        unit = "nameplate"
+    elseif unit == "party-testmode" then
+        unit = "party"
+    end
+
+    return unit
+end
 
 function addon:CheckCastModifier(unitID, cast)
     if unitID == "focus" then return end
@@ -2506,6 +2520,7 @@ local crowdControls = ClassicCastbars.crowdControls
 local castedSpells = ClassicCastbars.castedSpells
 local stopCastOnDamageList = ClassicCastbars.stopCastOnDamageList
 local ARCANE_MISSILES = GetSpellInfo(5143)
+local ARCANE_MISSILE = GetSpellInfo(7268)
 
 function addon:COMBAT_LOG_EVENT_UNFILTERED()
     local _, eventType, _, srcGUID, srcName, srcFlags, _, dstGUID, _, dstFlags, _, _, spellName = CombatLogGetCurrentEventInfo()
@@ -2591,7 +2606,9 @@ function addon:COMBAT_LOG_EVENT_UNFILTERED()
         -- Also there's no castTime returned from GetSpellInfo for channeled spells so we need to get it from our own list
         if channelCast then
             -- Arcane Missiles triggers this event for every tick so ignore after first tick has been detected
-            if spellName == ARCANE_MISSILES and activeTimers[srcGUID] and activeTimers[srcGUID].spellName == ARCANE_MISSILES then return end
+            if (spellName == ARCANE_MISSILES or spellName == ARCANE_MISSILE) and activeTimers[srcGUID] then
+                if activeTimers[srcGUID].spellName == ARCANE_MISSILES or activeTimers[srcGUID].spellName == ARCANE_MISSILE then return end
+            end
 
             return self:StoreCast(srcGUID, spellName, spellID, GetSpellTexture(spellID), channelCast, isPlayer, true)
         end
@@ -2619,7 +2636,8 @@ function addon:COMBAT_LOG_EVENT_UNFILTERED()
         if cast then
             if srcGUID == self.PLAYER_GUID then
                 -- Spamming cast keybinding triggers SPELL_CAST_FAILED so check if actually casting or not for the player
-                if not CastingInfo() then
+                -- Using Arcane Missiles on a target that is currenly LoS also seem to trigger SPELL_CAST_FAILED for some reason...
+                if not CastingInfo() and not ChannelInfo() then
                     if not cast.isChanneled then
                         cast.isFailed = true
                     end
@@ -2714,7 +2732,7 @@ addon:SetScript("OnUpdate", function(self, elapsed)
                 if not cast.isCastComplete and not cast.isInterrupted and not cast.isFailed then
                     castbar.Spark:SetAlpha(0)
                     if not cast.isChanneled then
-                        local c = self.db[gsub(unit, "%d", "")].statusColor
+                        local c = self.db[self:GetUnitType(unit)].statusColor
                         castbar:SetStatusBarColor(c[1], c[2] + 0.1, c[3], c[4])
                         castbar:SetMinMaxValues(0, 1)
                         castbar:SetValue(1)
@@ -2746,7 +2764,6 @@ local PoolManager = ClassicCastbars.PoolManager
 
 --local addon = ClassicCastbars.addon
 local activeFrames = addon.activeFrames
-local gsub = _G.string.gsub
 local strfind = _G.string.find
 local unpack = _G.unpack
 local min = _G.math.min
@@ -2901,12 +2918,7 @@ function addon:DisplayCastbar(castbar, unitID)
     local parentFrame = AnchorManager:GetAnchor(unitID)
     if not parentFrame then return end
 
-    local db = self.db[gsub(unitID, "%d", "")] -- nameplate1 -> nameplate
-    if unitID == "nameplate-testmode" then
-        db = self.db.nameplate
-    elseif unitID == "party-testmode" then
-        db = self.db.party
-    end
+    local db = self.db[self:GetUnitType(unitID)]
 
     if not castbar.animationGroup then
         castbar.animationGroup = castbar:CreateAnimationGroup()
@@ -2967,7 +2979,7 @@ function addon:HideCastbar(castbar, unitID, noFadeOut)
     local cast = castbar._data
     if cast and (cast.isInterrupted or cast.isFailed) then
         castbar.Text:SetText(cast.isInterrupted and _G.INTERRUPTED or _G.FAILED)
-        castbar:SetStatusBarColor(unpack(self.db[gsub(unitID, "%d", "")].statusColorFailed))
+        castbar:SetStatusBarColor(unpack(self.db[self:GetUnitType(unitID)].statusColorFailed))
         castbar:SetMinMaxValues(0, 1)
         castbar:SetValue(1)
         castbar.Spark:SetAlpha(0)
