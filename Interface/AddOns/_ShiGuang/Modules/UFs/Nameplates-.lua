@@ -210,7 +210,7 @@ local function UpdateHealth(unitFrame)
 
 	if MaoRUIPerDB["Nameplate"]["FullHealth"] and RealMobHealth and RealMobHealth.UnitHasHealthData(unit) then
 		local value, max = RealMobHealth.GetUnitHealth(unit)
-		unitFrame.healthBar.value:SetText(M.Numb(value))  --.." | "..M.Numb(max)
+		unitFrame.healthBar.value:SetText(M.Numb(value))  --.."/"..M.Numb(max)
 	else
 		if minHealth == maxHealth or UnitIsUnit(unit, "player") then
 		  unitFrame.healthBar.value:SetText("")

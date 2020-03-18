@@ -45,7 +45,7 @@ function UF:SetupCVars()
 	SetCVar("nameplateSelectedAlpha", 1)
 
 	UF:UpdatePlateScale()
-	SetCVar("nameplateSelectedScale", 1)
+	SetCVar("nameplateSelectedScale", 1.25)
 	SetCVar("nameplateLargerScale", 1)
 
 	UF:UpdateClickableSize()
@@ -174,22 +174,27 @@ function UF:UpdateTargetIndicator(self)
 	else
 		if style == 2 then
 			element.TopArrow:Show()
+			element.LeftArrow:Hide()
 			element.RightArrow:Hide()
 			element.Glow:Hide()
 		elseif style == 3 then
 			element.TopArrow:Hide()
+			element.LeftArrow:Show()
 			element.RightArrow:Show()
 			element.Glow:Hide()
 		elseif style == 4 then
 			element.TopArrow:Hide()
+			element.LeftArrow:Hide()
 			element.RightArrow:Hide()
 			element.Glow:Show()
 		elseif style == 5 then
 			element.TopArrow:Show()
+			element.LeftArrow:Hide()
 			element.RightArrow:Hide()
 			element.Glow:Show()
 		elseif style == 6 then
 			element.TopArrow:Hide()
+			element.LeftArrow:Show()
 			element.RightArrow:Show()
 			element.Glow:Show()
 		end
@@ -203,15 +208,24 @@ function UF:AddTargetIndicator(self)
 	frame:SetFrameLevel(0)
 	frame:SetAlpha(0)
 
-	frame.TopArrow = frame:CreateTexture(nil, "BACKGROUND", nil, -5)
-	frame.TopArrow:SetSize(40, 40)
+	frame.TopArrow = frame:CreateTexture(nil, "BACKGROUND", nil, -6)
+	frame.TopArrow:SetSize(36, 36)
 	frame.TopArrow:SetTexture(I.arrowTex)
-	frame.TopArrow:SetPoint("BOTTOM", frame, "TOP", 0, 10)
-
-	frame.RightArrow = frame:CreateTexture(nil, "BACKGROUND", nil, -5)
-	frame.RightArrow:SetSize(40, 40)
+	frame.TopArrow:SetVertexColor(1, 0, 0, 1)
+	frame.TopArrow:SetPoint("BOTTOM", frame, "TOP", 0, 21)
+	
+	frame.LeftArrow = frame:CreateTexture(nil, "BACKGROUND", nil, -6)
+	frame.LeftArrow:SetSize(21, 21)
+	frame.LeftArrow:SetTexture(I.arrowTex)
+	frame.LeftArrow:SetVertexColor(1, 0, 0, 1)
+	frame.LeftArrow:SetPoint("RIGHT", frame, "LEFT", -1, 0)
+	frame.LeftArrow:SetRotation(rad(90))
+	
+	frame.RightArrow = frame:CreateTexture(nil, "BACKGROUND", nil, -6)
+	frame.RightArrow:SetSize(21, 21)
 	frame.RightArrow:SetTexture(I.arrowTex)
-	frame.RightArrow:SetPoint("LEFT", frame, "RIGHT", 3, 0)
+	frame.RightArrow:SetVertexColor(1, 0, 0, 1)
+	frame.RightArrow:SetPoint("LEFT", frame, "RIGHT", 1, 0)
 	frame.RightArrow:SetRotation(rad(-90))
 
 	frame.Glow = CreateFrame("Frame", nil, frame)
@@ -275,7 +289,7 @@ function UF:UpdateQuestUnit(_, unit)
 					elseif progress then
 						progress = tonumber(progress)
 						if progress and progress < 100 then
-							questProgress = progress.."%"
+							questProgress = 100 - progress
 							break
 						end
 					else
@@ -289,12 +303,13 @@ function UF:UpdateQuestUnit(_, unit)
 
 	if questProgress then
 		self.questCount:SetText(questProgress)
-		self.questIcon:SetAtlas(I.objectTex)
-		self.questIcon:Show()
+		--self.questIcon:SetTexture("Interface/WorldMap/UI-WorldMap-QuestIcon")		--self.questIcon:SetAtlas(I.objectTex)
+		--self.questIcon:SetTexCoord(0, 0.56, 0.5, 1)
+		--self.questIcon:Show()
 	else
 		self.questCount:SetText("")
 		if isLootQuest then
-			self.questIcon:SetAtlas(I.questTex)
+			self.questIcon:SetAtlas('Banker')			--self.questIcon:SetAtlas(I.questTex)
 			self.questIcon:Show()
 		else
 			self.questIcon:Hide()
@@ -393,13 +408,18 @@ function UF:AddQuestIcon(self)
 	if not MaoRUIPerDB["Nameplate"]["QuestIndicator"] then return end
 
 	local qicon = self:CreateTexture(nil, "OVERLAY", nil, 2)
-	qicon:SetPoint("LEFT", self, "RIGHT", 2, 0)
-	qicon:SetSize(16, 16)
-	qicon:SetAtlas(I.questTex)
+	qicon:SetPoint("RIGHT", self, "LEFT", 0, 0)
+	qicon:SetSize(26, 26)
+	--qicon:SetAtlas(I.questTex)
+	qicon:SetTexture("Interface/WorldMap/UI-WorldMap-QuestIcon")
+	qicon:SetTexCoord(0, 0.56, 0.5, 1)
 	qicon:Hide()
-	local count = M.CreateFS(self, 12, "", nil, "LEFT", 0, 0)
-	count:SetPoint("LEFT", qicon, "RIGHT", -2, 0)
-	count:SetTextColor(.6, .8, 1)
+	--local count = M.CreateFS(self, 18, "", nil, "LEFT", 0, 0)
+	local count = self:CreateFontString(nil, 'OVERLAY')
+	count:SetPoint("RIGHT", qicon, "LEFT", 12, 2)
+	count:SetShadowOffset(1, -1)
+	count:SetFont("Interface\\AddOns\\_ShiGuang\\Media\\Fonts\\Infinity.ttf", 16, "OUTLINE")
+	count:SetTextColor(1,.82,0)
 
 	self.questIcon = qicon
 	self.questCount = count
@@ -409,10 +429,10 @@ end
 
 -- Unit classification
 local classify = {
-	rare = {1, 1, 1, true},
-	elite = {1, 1, 1},
-	rareelite = {1, .1, .1},
-	worldboss = {0, 1, 0},
+	rare = {"Interface\\MINIMAP\\ObjectIcons", .391, .487, .644, .74},  --rare = {1, 1, 1, true},
+	elite = {"Interface\\MINIMAP\\Minimap_skull_elite", 0, 1, 0, 1},	--elite = {1, 1, 1},
+	rareelite = {"Interface\\MINIMAP\\ObjectIcons", .754, .875, .624, .749},	--rareelite = {1, .1, .1},
+	worldboss = {"Interface\\MINIMAP\\ObjectIcons", .879, 1, .754, .879},	  --worldboss = {0, 1, 0},
 }
 
 function UF:AddCreatureIcon(self)
@@ -422,8 +442,8 @@ function UF:AddCreatureIcon(self)
 
 	local icon = iconFrame:CreateTexture(nil, "ARTWORK")
 	icon:SetAtlas("VignetteKill")
-	icon:SetPoint("BOTTOMLEFT", self, "LEFT", 0, -4)
-	icon:SetSize(18, 18)
+	icon:SetPoint("BOTTOM", self, "LEFT", -3, -1)
+	icon:SetSize(21, 21)
 	icon:Hide()
 
 	self.creatureIcon = icon
@@ -431,12 +451,21 @@ end
 
 function UF:UpdateUnitClassify(unit)
 	local class = UnitClassification(unit)
+	local level = UnitLevel(unit)
 	if self.creatureIcon then
 		if class and classify[class] then
-			local r, g, b, desature = unpack(classify[class])
-			self.creatureIcon:SetVertexColor(r, g, b)
-			self.creatureIcon:SetDesaturated(desature)
-			self.creatureIcon:Show()
+			local tex, r, g, b, desature = unpack(classify[class])
+			--self.creatureIcon:SetVertexColor(r, g, b)
+			--self.creatureIcon:SetDesaturated(desature)
+			if level and level < UnitLevel("player") then  -- or level == -1
+			    if class == elite then
+			        self.creatureIcon:Hide()
+			    end
+			else
+			    self.creatureIcon:SetTexture(tex)
+		      self.creatureIcon:SetTexCoord(r, g, b, desature)
+			    self.creatureIcon:Show()
+			end
 		else
 			self.creatureIcon:Hide()
 		end
@@ -469,8 +498,11 @@ function UF:MouseoverIndicator(self)
 	highlight:SetAllPoints(self)
 	highlight:Hide()
 	local texture = highlight:CreateTexture(nil, "ARTWORK")
-	texture:SetAllPoints()
-	texture:SetColorTexture(1, 1, 1, .25)
+	texture:SetPoint("BOTTOM", self, "BOTTOM", 0, 0)
+	texture:SetSize(MaoRUIPerDB["Nameplate"]["PlateWidth"]+8, MaoRUIPerDB["Nameplate"]["PlateHeight"]+8)
+	texture:SetTexture("Interface\\AddOns\\_ShiGuang\\Media\\Modules\\UFs\\hlglow")
+	texture:SetTexCoord(0, 1, 1, 0)
+	texture:SetVertexColor(1, 1, 0)
 
 	self:RegisterEvent("UPDATE_MOUSEOVER_UNIT", UF.UpdateMouseoverShown, true)
 
@@ -546,9 +578,9 @@ function UF:CreatePlates()
 	UF:CreateAuras(self)
 	--UF:CreateThreatColor(self)
 
-	self.powerText = M.CreateFS(self, 15)
+	self.powerText = M.CreateFS(self, 16)
 	self.powerText:ClearAllPoints()
-	self.powerText:SetPoint("TOP", self.Castbar, "BOTTOM", 0, -4)
+	self.powerText:SetPoint("TOP", self.Castbar, "BOTTOM", 0, -3)
 	self:Tag(self.powerText, "[nppp]")
 
 	UF:MouseoverIndicator(self)
@@ -568,9 +600,9 @@ function UF:UpdateClassPowerAnchor()
 	local nameplate = C_NamePlate.GetNamePlateForUnit("target")
 	if nameplate then
 		bar:SetParent(nameplate.unitFrame)
-		bar:SetScale(.7)
+		bar:SetScale(.75)
 		bar:ClearAllPoints()
-		bar:SetPoint("BOTTOM", nameplate.unitFrame, "TOP", 0, 26)
+		bar:SetPoint("TOP", nameplate.unitFrame, "BOTTOM", 0, 1)
 		bar:Show()
 	else
 		bar:Hide()

@@ -608,49 +608,6 @@ local function createOptionSlider(parent, title, minV, maxV, x, y, value, func)
 	slider:SetScript("OnValueChanged", sliderValueChanged)
 end
 
-function G:SetupUnitFrame(parent)
-	toggleExtraGUI("NDuiGUI_UnitFrameSetup")
-	if unitframeGUI then return end
-
-	unitframeGUI = createExtraGUI(parent, "NDuiGUI_UnitFrameSetup", U["UnitFrame Size"].."*")
-
-	local scroll = G:CreateScroll(unitframeGUI, 260, 540)
-
-	local sliderRange = {
-		["Player"] = {200, 300},
-		["Pet"] = {100, 200},
-	}
-
-	local defaultValue = {
-		["Player"] = {245, 24, 4},
-		["Pet"] = {120, 18, 2},
-	}
-
-	local function createOptionGroup(parent, title, offset, value, func)
-		createOptionTitle(parent, title, offset)
-		createOptionSlider(parent, U["Health Width"].."("..defaultValue[value][1]..")", sliderRange[value][1], sliderRange[value][2], 30, offset-60, value.."Width", func)
-		createOptionSlider(parent, U["Health Height"].."("..defaultValue[value][2]..")", 15, 50, 30, offset-130, value.."Height", func)
-		createOptionSlider(parent, U["Power Height"].."("..defaultValue[value][3]..")", 2, 30, 30, offset-200, value.."PowerHeight", func)
-	end
-
-	local mainFrames = {_G.oUF_Player, _G.oUF_Target}
-	local function updatePlayerSize()
-		for _, frame in pairs(mainFrames) do
-			frame:SetSize(MaoRUIPerDB["UFs"]["PlayerWidth"], MaoRUIPerDB["UFs"]["PlayerHeight"])
-			frame.Power:SetHeight(MaoRUIPerDB["UFs"]["PlayerPowerHeight"])
-		end
-	end
-	createOptionGroup(scroll.child, U["Player&Target"], -10, "Player", updatePlayerSize)
-
-	local subFrames = {_G.oUF_Pet, _G.oUF_ToT}
-	local function updatePetSize()
-		for _, frame in pairs(subFrames) do
-			frame:SetSize(MaoRUIPerDB["UFs"]["PetWidth"], MaoRUIPerDB["UFs"]["PetHeight"])
-			frame.Power:SetHeight(MaoRUIPerDB["UFs"]["PetPowerHeight"])
-		end
-	end
-	createOptionGroup(scroll.child, U["Pet&*Target"], -270, "Pet", updatePetSize)
-end
 
 function G:SetupRaidFrame(parent)
 	toggleExtraGUI("NDuiGUI_RaidFrameSetup")
@@ -674,9 +631,9 @@ function G:SetupRaidFrame(parent)
 
 	local function createOptionGroup(parent, title, offset, value, func)
 		createOptionTitle(parent, title, offset)
-		createOptionSlider(parent, U["Health Width"].."("..defaultValue[value][1]..")", minRange[value][1], 200, 30, offset-60, value.."Width", func)
+		createOptionSlider(parent, U["Health Width"].."("..defaultValue[value][1]..")", minRange[value][1], 300, 30, offset-60, value.."Width", func)
 		createOptionSlider(parent, U["Health Height"].."("..defaultValue[value][2]..")", minRange[value][2], 60, 30, offset-130, value.."Height", func)
-		createOptionSlider(parent, U["Power Height"].."("..defaultValue[value][3]..")", 2, 30, 30, offset-200, value.."PowerHeight", func)
+		createOptionSlider(parent, U["Power Height"].."("..defaultValue[value][3]..")", 2, 20, 30, offset-200, value.."PowerHeight", func)
 	end
 
 	local function resizeRaidFrame()
@@ -730,7 +687,7 @@ function G:SetupCastbar(parent)
 	local scroll = G:CreateScroll(castbarGUI, 260, 540)
 
 	createOptionTitle(scroll.child, U["Castbar Colors"], -10)
-	createOptionSwatch(scroll.child, "", MaoRUIPerDB["UFs"]["CastingColor"], 120, -55)
+	createOptionSwatch(scroll.child, "", MaoRUIPerDB["UFs"]["CastingColor"], 40, -40)
 
 	local defaultValue = {
 		["Player"] = {300, 20},

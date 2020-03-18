@@ -35,7 +35,6 @@ R.WhiteList = {
 	[263246]	= true,		-- 闪电之盾，风暴神殿
 	[263276]	= true,		-- 掩护，矿区
 	[257597]	= true,		-- 艾泽里特的灌注，矿区
-	[269302]	= true,		-- 淬毒之刃，矿区
 	[260805]	= true,		-- 聚焦之虹，庄园
 	[264027]	= true,		-- 结界蜡烛，庄园
 	[258653]	= true,		-- 魂能壁垒，阿塔达萨
@@ -53,21 +52,6 @@ R.WhiteList = {
 	[302419]	= true,		-- 虚空视界
 	[302421]	= true,		-- 女王法令：隐藏
 	-- Raids
-	[312266]	= true,		-- 烟幕，拉希奥
-	[313175]	= true,		-- 硬化核心
-	[305675]	= true,		-- 黑暗屏障，玛乌特
-	[312154]	= true,		-- 禁忌转生
-	[313208]	= true,		-- 无形幻象，先知斯基特拉
-	[307637]	= true,		-- 突变进化，主脑
-	[307213]	= true,		-- 虚空灌注
-	[307583]	= true,		-- 不稳定的喷发
-	[312595]	= true,		-- 易爆腐蚀，德雷阿佳丝
-	[317672]	= true,		-- 血性狂乱，伊格诺斯
-	[307729]	= true,		-- 狂热晋升，维克修娜
-	[312750]	= true,		-- 召唤梦魇，虚无者莱登
-	[306990]	= true,		-- 适化外膜，恩佐斯外壳
-	[310134]	= true,		-- 疯狂聚现，恩佐斯
-
 	[296389]	= true,		-- 上旋气流，艾萨拉之辉
 	[296650]	= true,		-- 硬化甲壳，艾什凡女勋爵
 	[296914]	= true,		-- 混乱生长，奥戈佐亚
@@ -142,8 +126,8 @@ R.WhiteList = {
 -- 法术黑名单
 R.BlackList = {
 	[15407]		= true,		-- 精神鞭笞
-	--[1490]	= true,		-- 混乱烙印
-	--[113746]	= true,		-- 玄秘掌
+	[1490]		= true,		-- 混乱烙印
+	[113746]	= true,		-- 玄秘掌
 	[51714]		= true,		-- 锋锐之霜
 	[199721]	= true,		-- 腐烂光环
 	[214968]	= true,		-- 死灵光环
@@ -159,10 +143,6 @@ local function GetSectionInfo(id)
 	return C_EncounterJournal.GetSectionInfo(id).title
 end
 
-R.CustomBommUnits = {
-	[120651] = true, -- 爆炸物
-}
-
 -- 特殊单位的染色列表
 R.CustomUnits = {
 	[120651] = true, -- 爆炸物
@@ -171,42 +151,10 @@ R.CustomUnits = {
 	[155432] = true, -- 魔力使者
 	[155433] = true, -- 虚触使者
 	[155434] = true, -- 潮汐使者
-	[161895] = true, -- 彼岸之物
-
-	[GetSectionInfo(14544)] = true,	-- 海拉加尔观雾者
-	[GetSectionInfo(14595)] = true,	-- 深渊追猎者
-	[GetSectionInfo(16588)] = true,	-- 尖啸反舌鸟
-	[GetSectionInfo(16350)] = true,	-- 瓦里玛萨斯之影
-
-	[GetSectionInfo(18540)] = true,	-- 纳兹曼尼鲜血妖术师
-	[GetSectionInfo(18104)] = true,	-- 散疫触须
-	[GetSectionInfo(18232)] = true,	-- 艾什凡炮手
-	[GetSectionInfo(18499)] = true,	-- 凝结之血
-	[GetSectionInfo(18078)] = true,	-- 蛛魔编织者
-	[GetSectionInfo(18007)] = true,	-- 瘟疫聚合体
-	[GetSectionInfo(18053)] = true,	-- 灵魂荆棘
-	[GetSectionInfo(18312)] = true,	-- 血面兽
-	[GetSectionInfo(18890)] = true,	-- 夏尔扎克斯
-	[GetSectionInfo(18321)] = true,	-- 缠绕的蛇群
-	[GetSectionInfo(18271)] = true,	-- 爆裂图腾
-	[GetSectionInfo(17026)] = true,	-- 眩晕酒桶
-	[GetSectionInfo(19656)] = true,	-- 僵尸尘图腾
-	[GetSectionInfo(19393)] = true,	-- 雪怒之魂
-	[GetSectionInfo(19279)] = true,	-- 谄媚海妖
-	[GetSectionInfo(19019)] = true,	-- 贪婪的追猎者
-	["爆裂工虫"] = true,
-	[GetSectionInfo(21209)] = true,	-- 亚基掠夺者
-	[GetSectionInfo(20561)] = true,	-- 惊魂淤血
-	[GetSectionInfo(21329)] = true,	-- 聚合增生
 }
 
 -- 显示能量值的单位
 R.ShowPowerList = {
 	[155432] = true, -- 魔力使者
-	[152703] = true, -- 步行震击者X1型，麦卡贡
-	[163746] = true, -- 步行震击者X1型
-	[GetSectionInfo(13015)] = true,	-- 清扫器
-	[GetSectionInfo(15903)] = true,	-- 泰沙拉克的余烬
-	[GetSectionInfo(18540)] = true,	-- 纳兹曼尼鲜血妖术师
-	[GetSectionInfo(18539)] = true,	-- 碾压者
+	[152703] = true, -- 步行震击者X1型，困难麦卡贡
 }

@@ -8,78 +8,24 @@ local format, tostring = string.format, tostring
 -- Units
 local function CreatePlayerStyle(self)
 	self.mystyle = "player"
-	self:SetSize(MaoRUIPerDB["UFs"]["PlayerWidth"], MaoRUIPerDB["UFs"]["PlayerHeight"])
-
-	UF:CreateHeader(self)
-	UF:CreateHealthBar(self)
-	UF:CreateHealthText(self)
-	UF:CreatePowerBar(self)
-	UF:CreatePowerText(self)
-	UF:CreatePortrait(self)
 	UF:CreateCastBar(self)
-	UF:CreateRaidMark(self)
-	UF:CreateIcons(self)
-	UF:CreatePrediction(self)
-	UF:CreateFCT(self)
-	UF:CreateAddPower(self)
-
-	if not MaoRUIPerDB["Nameplate"]["ShowPlayerPlate"] or MaoRUIPerDB["Nameplate"]["ClassPowerOnly"] then
-		UF:CreateEneryTicker(self)
-	end
 	if MaoRUIPerDB["UFs"]["Castbars"] then
 		UF:ReskinMirrorBars()
 		--UF:ReskinTimerTrakcer(self)
 	end
-	if MaoRUIPerDB["UFs"]["ClassPower"] and not MaoRUIPerDB["Nameplate"]["ShowPlayerPlate"] then
-		UF:CreateClassPower(self)
-		UF:StaggerBar(self)
-	end
+	--if MaoRUIPerDB["UFs"]["ClassPower"] and not MaoRUIPerDB["Nameplate"]["ShowPlayerPlate"] then
+		--UF:CreateClassPower(self)
+		--UF:StaggerBar(self)
+	--end
 	if not MaoRUIPerDB["Misc"]["ExpRep"] then UF:CreateExpRepBar(self) end
-	if MaoRUIPerDB["UFs"]["PlayerDebuff"] then UF:CreateDebuffs(self) end
 	if MaoRUIPerDB["UFs"]["SwingBar"] then UF:CreateSwing(self) end
 end
 
 local function CreateTargetStyle(self)
 	self.mystyle = "target"
-	self:SetSize(MaoRUIPerDB["UFs"]["PlayerWidth"], MaoRUIPerDB["UFs"]["PlayerHeight"])
-
-	UF:CreateHeader(self)
-	UF:CreateHealthBar(self)
-	UF:CreateHealthText(self)
-	UF:CreatePowerBar(self)
-	UF:CreatePowerText(self)
-	UF:CreatePortrait(self)
 	UF:CreateCastBar(self)
-	UF:CreateRaidMark(self)
-	UF:CreateIcons(self)
-	UF:CreatePrediction(self)
-	UF:CreateFCT(self)
-	UF:CreateAuras(self)
 end
 
-local function CreateToTStyle(self)
-	self.mystyle = "tot"
-	self:SetSize(MaoRUIPerDB["UFs"]["PetWidth"], MaoRUIPerDB["UFs"]["PetHeight"])
-
-	UF:CreateHeader(self)
-	UF:CreateHealthBar(self)
-	UF:CreateHealthText(self)
-	UF:CreatePowerBar(self)
-	UF:CreateRaidMark(self)
-
-	if MaoRUIPerDB["UFs"]["ToTAuras"] then UF:CreateAuras(self) end
-end
-
-local function CreatePetStyle(self)
-	self.mystyle = "pet"
-	self:SetSize(MaoRUIPerDB["UFs"]["PetWidth"], MaoRUIPerDB["UFs"]["PetHeight"])
-
-	UF:CreateHeader(self)
-	UF:CreateHealthBar(self)
-	UF:CreateHealthText(self)
-	UF:CreatePowerBar(self)
-	UF:CreateRaidMark(self)
-end
 
 local function CreateRaidStyle(self)
 	self.mystyle = "raid"
@@ -155,40 +101,23 @@ function UF:OnLogin()
 		oUF:RegisterStyle("PlayerPlate", UF.CreatePlayerPlate)
 		oUF:SetActiveStyle("PlayerPlate")
 		local plate = oUF:Spawn("player", "oUF_PlayerPlate", true)
-		M.Mover(plate, U["PlayerNP"], "PlayerPlate", R.UFs.PlayerPlate, plate:GetWidth(), 20)
+		M.Mover(plate, U["PlayerNP"], "PlayerPlate", R.UFs.PlayerPlate, plate:GetWidth(), 21)
 
 		UF:TogglePlayerPlateElements()
 	end
 
 	-- Default Clicksets for RaidFrame
 	self:DefaultClickSets()
-
-	if MaoRUIPerDB["UFs"]["Enable"] then
-		-- Register
 		oUF:RegisterStyle("Player", CreatePlayerStyle)
 		oUF:RegisterStyle("Target", CreateTargetStyle)
-		oUF:RegisterStyle("ToT", CreateToTStyle)
-		oUF:RegisterStyle("Pet", CreatePetStyle)
 
 		-- Loader
 		oUF:SetActiveStyle("Player")
 		local player = oUF:Spawn("player", "oUF_Player")
-		M.Mover(player, U["PlayerUF"], "PlayerUF", R.UFs.PlayerPos)
-
 		oUF:SetActiveStyle("Target")
 		local target = oUF:Spawn("target", "oUF_Target")
-		M.Mover(target, U["TargetUF"], "TargetUF", R.UFs.TargetPos)
-
-		oUF:SetActiveStyle("ToT")
-		local targettarget = oUF:Spawn("targettarget", "oUF_ToT")
-		M.Mover(targettarget, U["TotUF"], "TotUF", R.UFs.ToTPos)
-
-		oUF:SetActiveStyle("Pet")
-		local pet = oUF:Spawn("pet", "oUF_Pet")
-		M.Mover(pet, U["PetUF"], "PetUF", R.UFs.PetPos)
 
 		UF:UpdateTextScale()
-	end
 
 	if MaoRUIPerDB["UFs"]["RaidFrame"] then
 		UF:AddClickSetsListener()
@@ -228,7 +157,7 @@ function UF:OnLogin()
 			self:SetHeight(%d)
 			]]):format(partyWidth, partyHeight))
 
-			local partyMover = M.Mover(party, U["PartyFrame"], "PartyFrame", {"LEFT", UIParent, 350, 0}, moverWidth, moverHeight)
+			local partyMover = M.Mover(party, U["PartyFrame"], "PartyFrame", {"TOPLEFT", UIParent, 310, -120}, moverWidth, moverHeight)
 			party:ClearAllPoints()
 			party:SetPoint("BOTTOMLEFT", partyMover)
 
@@ -284,7 +213,7 @@ function UF:OnLogin()
 				"groupBy", groupBy,
 				"sortMethod", sortMethod,
 				"maxColumns", 2,
-				"unitsPerColumn", 20,
+				"unitsPerColumn", 25,
 				"columnSpacing", 5,
 				"point", "TOP",
 				"columnAnchorPoint", "LEFT",
@@ -310,8 +239,8 @@ function UF:OnLogin()
 
 			local group = CreateGroup("oUF_Raid", groupFilter)
 			local moverWidth = numGroups > 4 and (100*scale*2 + 5) or 100
-			local moverHeight = 20*scale*20 + 10*19
-			raidMover = M.Mover(group, U["RaidFrame"], "RaidFrame", {"TOPLEFT", UIParent, 35, -50}, moverWidth, moverHeight)
+			local moverHeight = 25*scale*20 + 10*19
+			raidMover = M.Mover(group, U["RaidFrame"], "RaidFrame", {"TOPLEFT", UIParent, 3, -26}, moverWidth, moverHeight)
 		else
 			local function CreateGroup(name, i)
 				local group = oUF:SpawnHeader(name, nil, "solo,party,raid",

@@ -227,7 +227,7 @@ function TT:StatusBar_OnValueChanged(value)
 		self.text:SetFormattedText("%d%%", value*100)
 	else
 		local unit = TT.GetUnit(GameTooltip)
-		self.text:SetText(M.Numb(value).." | "..M.Numb(max))
+		self.text:SetText(M.Numb(value).."/"..M.Numb(max))
 	end
 end
 

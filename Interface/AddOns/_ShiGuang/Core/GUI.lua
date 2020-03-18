@@ -32,7 +32,6 @@ local defaultSettings = {
 		Scale = 1,
 		BindType = 1,
 		OverrideWA = false,
-		MicroMenu = true,
 	},
 	Auras = {
 		Reminder = true,
@@ -57,7 +56,7 @@ local defaultSettings = {
 		--Portrait = true,
 		--PlayerDebuff = false,
 		--ToTAuras = false,
-		Castbars = false,
+		Castbars = true,
 		SwingBar = false,
 		SwingTimer = false,
 		RaidFrame = true,
@@ -163,8 +162,8 @@ local defaultSettings = {
 		TankMode = false,
 		TargetIndicator = 3,
 		Distance = 42,
-		PlateWidth = 168,
-		PlateHeight = 9,
+		PlateWidth = 121,
+		PlateHeight = 6,
 		CustomUnitColor = true,
 		CustomColor = {r=0, g=.8, b=.3},
 		UnitList = "",
@@ -190,31 +189,10 @@ local defaultSettings = {
 		ColorBorder = true,
 		QuestIndicator = true,
 		ClassPowerOnly = false,
-		Numberstyle = false,
-		ColorBorder = true,
-		PlayerAura = false,
-		maxAuras = 6,
-		AuraSize = 18,
-		AuraFilter = 2,
-		OtherFilter = 2,
-		FriendlyCC = false,
-		HostileCC = true,
-		TankMode = false,
-		Arrow = true,
-		InsideView = true,
-		MinAlpha = .6,
-		Distance = 42,
-		Width = 106,
-		Height = 6,
-		FullHealth = false,
-    HighlightTarget = true,
-    HighlightFocus = true,
-    ClassicCastbars = true,
-    TargetClassicCastbars = true,
 	},
 	Skins = {
 		DBM = true,
-		MicroMenu = false,
+		MicroMenu = true,
 		--Skada = false,
 		Bigwigs = true,
 		RM = true,
@@ -375,9 +353,6 @@ loader:SetScript("OnEvent", function(self, _, addon)
 end)
 
 -- Callbacks
-local function setupCastbar()
-	G:SetupCastbar(guiPage[4])
-end
 
 local function setupRaidFrame()
 	G:SetupRaidFrame(guiPage[3])
@@ -395,25 +370,18 @@ local function setupBuffIndicator()
 	G:SetupBuffIndicator(guiPage[3])
 end
 
-local function setupPartyWatcher()
-	G:SetupPartyWatcher(guiPage[3])
-end
-
 local function setupNameplateFilter()
 	G:SetupNameplateFilter(guiPage[2])
+end
+
+
+local function setupCastbar()
+	G:SetupCastbar(guiPage[3])
 end
 
 local function setupAuraWatch()
 	f:Hide()
 	SlashCmdList["NDUI_AWCONFIG"]()
-end
-
-local function updateBagSortOrder()
-	SetSortBagsRightToLeft(not MaoRUIPerDB["Bags"]["ReverseSort"])
-end
-
-local function updateBagStatus()
-	M:GetModule("Bags"):UpdateAllBags()
 end
 
 local function updateActionbarScale()
@@ -538,11 +506,11 @@ end
 local tabList = {
 	U["Actionbar"],
 	U["Nameplate"],
+	U["RaidFrame"],
 	U["Auras"],
 	U["ChatFrame"],
 	U["Skins"],
 	U["Misc"],
-	U["UI Settings"],
 }
 
 local optionList = {		-- type, key, value, name, horizon, horizon2, doubleline
@@ -557,35 +525,89 @@ local optionList = {		-- type, key, value, name, horizon, horizon2, doubleline
 		{1, "Actionbar", "Hotkeys", U["Actionbar Hotkey"]},
 		{1, "Actionbar", "Macro", U["Actionbar Macro"], true},
 		{1, "Actionbar", "Count", U["Actionbar Item Counts"], true, true},
-		{1, "Actionbar", "MicroMenu", U["Micromenu"]},
+		{1, "Skins", "MicroMenu", U["Micromenu"]},
 		{1, "Actionbar", "Classcolor", U["ClassColor BG"], true},
 		{1, "Actionbar", "Bar4Fade", U["Bar4 Fade"]},
 		{1, "Actionbar", "Bar5Fade", U["Bar5 Fade"], true},
+		{1, "UFs", "SwingBar", U["UFs SwingBar"], true},
+		{1, "UFs", "SwingTimer", U["UFs SwingTimer"], true, true, nil, nil, U["SwingTimer Tip"]},
+		{3, "ACCOUNT", "UIScale", U["Setup UIScale"], true, false, {.4, 1.15, 1}},
+		{3, "UFs", "PlayerFrameScale", U["PlayerFrame Scale"], false, false, {0.6, 1.2, 1}},
+		{3, "Tooltip", "Scale", U["Tooltip Scale"].."*", true, false, {.5, 1.5, 1}},
+		{3, "Map", "MapScale", U["Map Scale"], false, false, {0.25, 2, 1}},
+		{3, "Map", "MinimapScale", U["Minimap Scale"].."*", true, false, {1, 2, 1}, updateMinimapScale},
 	},
 	[2] = {
-		{1, "Nameplate", "Enable", "|cff00cc4c"..U["Enable Nameplate"]},
-		{1, "Nameplate", "Numberstyle", "数字模式", true},
-		--{1, "Nameplate", "nameonly", "友方仅显示名字", true, true},
-		{1, "Nameplate", "ColorBorder", U["ColorBorder"].."*", true, true},
-		{1, "Nameplate", "TankMode", "|cff00cc4c"..U["Tank Mode"].."*"},
-		{1, "Nameplate", "FriendlyCC", U["Friendly CC"].."*", true},
-		{1, "Nameplate", "HostileCC", U["Hostile CC"].."*", true, true},
-		{1, "Nameplate", "InsideView", U["Nameplate InsideView"]},
-		{1, "Nameplate", "FullHealth", U["Show FullHealth"], true},
-		{1, "Nameplate", "ClassicCastbars", "|cff00cc4c"..U["UFs Castbar"]},
-		{1, "Nameplate", "TargetClassicCastbars", "|cff00cc4c"..U["Target Castbar"], true},
-		{1, "UFs", "UFFade", U["UFFade"]},
-		{1, "UFs", "UFClassIcon", U["UFClassIcon"], true},
-		{1, "UFs", "UFPctText", U["UFPctText"], true, true},
-		{3, "Nameplate", "MinAlpha", U["Nameplate MinAlpha"], false, false, {0, 1, 1}},
+		{1, "Nameplate", "Enable", "|cff00cc4c"..U["Enable Nameplate"], nil, nil, setupNameplateFilter},
+		{1, "Nameplate", "FullHealth", U["Show FullHealth"].."*", true, nil, nil, refreshNameplates},
+		{4, "Nameplate", "TargetIndicator", U["TargetIndicator"].."*", true, true, {DISABLE, U["TopArrow"], U["RightArrow"], U["TargetGlow"], U["TopNGlow"], U["RightNGlow"]}, refreshNameplates},
+		{1, "Nameplate", "FriendlyCC", U["Friendly CC"].."*"},
+		{1, "Nameplate", "HostileCC", U["Hostile CC"].."*", true},
+		--{1, "Nameplate", "InsideView", U["Nameplate InsideView"].."*", nil, nil, nil, updatePlateInsideView},
+		--{1, "Nameplate", "QuestIndicator", U["QuestIndicator"], true, true},
+		{1, "Nameplate", "CustomUnitColor", "|cff00cc4c"..U["CustomUnitColor"].."*", nil, nil, nil, updateCustomUnitList},
+		{1, "Nameplate", "TankMode", "|cff00cc4c"..U["Tank Mode"].."*", true},
+		--{3, "Nameplate", "VerticalSpacing", U["NP VerticalSpacing"].."*", false, nil, {.5, 1.5, 1}, updatePlateSpacing},
+		{1, "Nameplate", "ColorBorder", U["ColorBorder"].."*", false, false, nil, refreshNameplates},
+		{3, "Nameplate", "Distance", U["Nameplate Distance"].."*", false, false, {20, 100, 0}, updatePlateRange},
+		{3, "Nameplate", "MinScale", U["Nameplate MinScale"].."*", true, false, {.5, 1, 1}, updatePlateScale},
+		{3, "Nameplate", "MinAlpha", U["Nameplate MinAlpha"].."*", true, true, {.5, 1, 1}, updatePlateAlpha},
+		{3, "Nameplate", "PlateWidth", U["NP Width"].."*", false, false, {50, 250, 0}, refreshNameplates},
+		{3, "Nameplate", "PlateHeight", U["NP Height"].."*", true, false, {5, 30, 0}, refreshNameplates},
+		{3, "Nameplate", "NameTextSize", U["NameTextSize"].."*", true, true, {10, 30, 0}, refreshNameplates},
+		{3, "Nameplate", "HealthTextSize", U["HealthTextSize"].."*", false, false, {10, 30, 0}, refreshNameplates},
 		{3, "Nameplate", "maxAuras", U["Max Auras"], true, false, {0, 10, 0}},
-		{3, "Nameplate", "AuraSize", U["Auras Size"], true, true, {12, 36, 0}},
-		{},--blank
-		{3, "Nameplate", "Distance", U["Nameplate Distance"], false, false, {20, 100, 0}},
-		{3, "Nameplate", "Width", U["NP Width"], true, false, {60, 160, 0}},
-		{3, "Nameplate", "Height", U["NP Height"], true, true, {3, 16, 0}},
+		{3, "Nameplate", "AuraSize", U["Auras Size"], true, true, {18, 40, 0}},
+		{2, "Nameplate", "UnitList", U["UnitColor List"].."*", nil, nil, nil, updateCustomUnitList, U["CustomUnitTips"]},
+		{2, "Nameplate", "ShowPowerList", U["ShowPowerList"].."*", true, nil, nil, updatePowerUnitList, U["CustomUnitTips"]},
+		{5, "Nameplate", "SecureColor", U["Secure Color"].."*"},
+		{5, "Nameplate", "CustomColor", U["Custom Color"].."*", 4},
+		--{1, "Nameplate", "Numberstyle", "数字模式", true},
+		--{1, "Nameplate", "nameonly", "友方仅显示名字", true, true},
+		--{1, "Nameplate", "TankMode", "|cff00cc4c"..U["Tank Mode"].."*"},
+		--{1, "Nameplate", "FriendlyCC", U["Friendly CC"].."*", true},
+		--{1, "Nameplate", "HostileCC", U["Hostile CC"].."*", true, true},
+		--{1, "Nameplate", "BommIcon", "|cff00cc4c"..U["BommIcon"]},
+		--{1, "Nameplate", "HighlightTarget", "血条高亮鼠标指向", true},
+		--{1, "Nameplate", "HighlightFocus", "血条高亮焦点指向", true, true},
+		--{1, "Nameplate", "FullHealth", U["Show FullHealth"]},
+		--{1, "Nameplate", "InsideView", U["Nameplate InsideView"], true},
+		--{},--blank
+		--{2, "Nameplate", "ShowPowerList", U["ShowPowerList"].."*", true, true, nil, nil, U["CustomUnitTips"]},
+		--{3, "Nameplate", "MinAlpha", U["Nameplate MinAlpha"], false, false, {0, 1, 1}},
+		--{3, "Nameplate", "maxAuras", U["Max Auras"], true, false, {0, 10, 0}},
+		--{3, "Nameplate", "AuraSize", U["Auras Size"], true, true, {12, 36, 0}},
+		--{3, "Nameplate", "Distance", U["Nameplate Distance"], false, false, {20, 100, 0}},
+		--{3, "Nameplate", "Width", U["NP Width"], true, false, {60, 160, 0}},
+		--{3, "Nameplate", "Height", U["NP Height"], true, true, {3, 16, 0}},
 	},
 	[3] = {
+		{1, "UFs", "Castbars", "|cff00cc4c"..U["UFs Castbar"], nil, false, setupCastbar},
+		{1, "UFs", "LagString", U["Castbar LagString"], true, false},
+		{1, "UFs", "RaidFrame", "|cff00cc4c"..U["UFs RaidFrame"], false, false, setupRaidFrame, nil, U["RaidFrameTip"]},
+		{1, "UFs", "PartyFrame", "|cff00cc4c"..U["UFs PartyFrame"], true},
+		{1, "UFs", "PartyPetFrame", "|cff00cc4c"..U["UFs PartyPetFrame"], true, true},
+		{1, "UFs", "SimpleMode", "|cff00cc4c"..U["Simple RaidFrame"], true},
+		{1, "UFs", "SimpleModeSortByRole", U["SimpleMode SortByRole"], true, true},
+		{1, "UFs", "ShowTeamIndex", U["RaidFrame TeamIndex"]},
+		{1, "UFs", "RaidClassColor", U["ClassColor RaidFrame"], true},
+		{1, "UFs", "PWOnRight", U["PartyWatcherOnRight"], true, true},
+		{1, "UFs", "HorizonParty", U["Horizon PartyFrame"]},
+		{1, "UFs", "HorizonRaid", U["Horizon RaidFrame"], true},		
+		{1, "UFs", "RaidClickSets", "|cff00cc4c"..U["Enable ClickSets"], nil, nil, setupClickCast},
+		{1, "UFs", "InstanceAuras", "|cff00cc4c"..U["Instance Auras"], true, nil, setupRaidDebuffs},
+		{1, "UFs", "RaidBuffIndicator", "|cff00cc4c"..U["RaidBuffIndicator"], true, true, setupBuffIndicator, nil, U["RaidBuffIndicatorTip"]},
+		{1, "UFs", "AurasClickThrough", U["RaidAuras ClickThrough"], true},
+		{},--blank
+		{4, "UFs", "RaidHPMode", U["RaidHPMode"].."*", false, false, {U["DisableRaidHP"], U["RaidHPPercent"], U["RaidHPCurrent"], U["RaidHPLost"]}, updateRaidNameText},
+		{4, "UFs", "HealthColor", U["HealthColor"], true, false, {U["Default Dark"], U["ClassColorHP"], U["GradientHP"]}},
+		{4, "UFs", "BuffIndicatorType", U["BuffIndicatorType"].."*", true, true, {U["BI_Blocks"], U["BI_Icons"], U["BI_Numbers"]}, refreshRaidFrameIcons},
+		{3, "UFs", "BuffIndicatorScale", U["BuffIndicatorScale"].."*", false, false, {1, 2, 1}, refreshRaidFrameIcons},
+		{3, "UFs", "RaidDebuffScale", U["RaidDebuffScale"].."*", true, false, {1, 2, 1}, refreshRaidFrameIcons},
+		{3, "UFs", "NumGroups", U["Num Groups"], true, true, {4, 8, 0}},
+		--{3, "UFs", "UFTextScale", U["UFTextScale"], true, {.8, 2, 2}, updateUFTextScale},
+	},
+	[4] = {
 		{1, "AuraWatch", "Enable", "|cff00cc4c"..U["Enable AuraWatch"], false, false, setupAuraWatch},
 		{1, "AuraWatch", "WatchSpellRank", U["AuraWatch WatchSpellRank"], true},
 		{1, "AuraWatch", "ClickThrough", U["AuraWatch ClickThrough"], true, true},
@@ -599,7 +621,7 @@ local optionList = {		-- type, key, value, name, horizon, horizon2, doubleline
 		{3, "Auras", "DebuffsPerRow", U["DebuffsPerRow"], true, false, {10, 16, 0}},
 		{3, "AuraWatch", "IconScale", U["AuraWatch IconScale"], true, true, {.8, 2, 1}},
 	},
-	[4] = {
+	[5] = {
 		{1, "Chat", "Outline", U["Font Outline"]},
 		{1, "ACCOUNT", "Timestamp", U["Timestamp"], true, false, nil, updateTimestamp},
 		{1, "Chat", "Sticky", U["Chat Sticky"].."*", true, true, nil, updateChatSticky},
@@ -620,7 +642,7 @@ local optionList = {		-- type, key, value, name, horizon, horizon2, doubleline
 		{2, "ACCOUNT", "ChatFilterList", U["Filter List"].."*", true, false, nil, updateFilterList},
 		{2, "Chat", "Keyword", U["Whisper Keyword"].."*", true, true, nil, updateWhisperList},
 	},
-	[5] = {
+	[6] = {
 		{1, "ACCOUNT", "AutoBubbles", U["AutoBubbles"]},
 		{1, "Skins", "DBM", U["DBM Skin"], true},
 		--{1, "Skins", "BarLine", U["Bar Line"]},
@@ -653,8 +675,11 @@ local optionList = {		-- type, key, value, name, horizon, horizon2, doubleline
 		{1, "Map", "Clock", U["Minimap Clock"], true, true, nil, showMinimapClock},
 		--{1, "Map", "CombatPulse", U["Minimap Pulse"]},
 		--{1, "Map", "WhoPings", U["Show WhoPings"]},
+		{4, "ACCOUNT", "TexStyle", U["Texture Style"], true, false, {U["Highlight"], U["Gradient"], U["Flat"]}},
+		{4, "ACCOUNT", "NumberFormat", U["Numberize"], true, true, {U["Number Type1"], U["Number Type2"], U["Number Type3"]}},
+		{2, "Skins", "DBMCount", U["Countdown Sec"].."*"},
 	},
-	[6] = {
+	[7] = {
 		{1, "Misc", "QuestNotifier", "|cff00cc4c"..U["QuestNotifier"].."*", false, false, nil, updateQuestNotifier},
 		{1, "Misc", "QuestProgress", U["QuestProgress"].."*", true},
 		{1, "Misc", "OnlyCompleteRing", U["OnlyCompleteRing"].."*", true, true},
@@ -680,19 +705,7 @@ local optionList = {		-- type, key, value, name, horizon, horizon2, doubleline
 		{1, "Misc", "Mail", U["Mail Tool"], true},
 		{1, "Misc", "FasterLoot", U["Faster Loot"], true, true, nil, updateFasterLoot},
 	},
-	[7] = {
-		{2, "Skins", "DBMCount", U["Countdown Sec"].."*"},
-		{4, "ACCOUNT", "TexStyle", U["Texture Style"], true, false, {U["Highlight"], U["Gradient"], U["Flat"]}},
-		{4, "ACCOUNT", "NumberFormat", U["Numberize"], true, true, {U["Number Type1"], U["Number Type2"], U["Number Type3"]}},
-		{},--blank
-		{1, "ACCOUNT", "LockUIScale", "|cff00cc4c"..U["Lock UIScale"]},
-		{3, "ACCOUNT", "UIScale", U["Setup UIScale"], true, false, {.4, 1.15, 1}},
-		{},--blank
-		{3, "UFs", "PlayerFrameScale", U["PlayerFrame Scale"], false, false, {0.6, 1.2, 1}},
-		{3, "Tooltip", "Scale", U["Tooltip Scale"].."*", true, false, {.5, 1.5, 1}},
-		{3, "Map", "MapScale", U["Map Scale"], false, false, {0.25, 2, 1}},
-		{3, "Map", "MinimapScale", U["Minimap Scale"].."*", true, false, {1, 2, 1}, updateMinimapScale},
-	},
+
 }
 
 local function SelectTab(i)

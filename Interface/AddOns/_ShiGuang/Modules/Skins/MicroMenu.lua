@@ -1,19 +1,20 @@
 local _, ns = ...
 local M, R, U, I = unpack(ns)
-local Bar = M:GetModule("Actionbar")
+local S = M:GetModule("Skins")
 
 local _G = getfenv(0)
 local tinsert, pairs, type = table.insert, pairs, type
 local buttonList = {}
 
-function Bar:MicroButton_SetupTexture(icon, texture)
+function S:MicroButton_SetupTexture(icon, texture)
 	icon:SetAllPoints()
 	icon:SetTexture("Interface\\BUTTONS\\"..texture)
 	icon:SetVertexColor(1, 1, 1)
 end
 
-function Bar:MicroButton_Create(parent, data)
+function S:MicroButton_Create(parent, data)
 	local texture, tip, func = unpack(data)
+
 	local bu = CreateFrame("Button", nil, parent)
 	tinsert(buttonList, bu)
 	bu:SetSize(21, 36)
@@ -22,16 +23,16 @@ function Bar:MicroButton_Create(parent, data)
 	M.AddTooltip(bu, "ANCHOR_RIGHT", tip)
 	
 	local icon = bu:CreateTexture(nil, "ARTWORK")
-	Bar:MicroButton_SetupTexture(icon, texture)
+	S:MicroButton_SetupTexture(icon, texture)
 	bu:SetHighlightTexture("Interface\\BUTTONS\\"..texture)
 	
 	local hl = bu:GetHighlightTexture()
-	Bar:MicroButton_SetupTexture(hl, texture)
+	S:MicroButton_SetupTexture(hl, texture)
 	hl:SetVertexColor(1, 1, 1)
 end
 
-function Bar:MicroMenu()
-	if not MaoRUIPerDB["Actionbar"]["MicroMenu"] then return end
+function S:MicroMenu()
+	if not MaoRUIPerDB["Skins"]["MicroMenu"] then return end
 	local menubar = CreateFrame("Frame", nil, UIParent)
 	menubar:SetSize(21, 186)  --*MaoRUIPerDB["Map"]["MinimapScale"]
 	M.Mover(menubar, U["Menubar"], "Menubar", R.Skins.MicroMenuPos)
@@ -54,7 +55,7 @@ function Bar:MicroMenu()
 		{"UI-MicroButton-Raid-Up", MicroButtonTooltipText(CHARACTER_BUTTON, "TOGGLECHARACTER0"), function() ToggleFrame(CharacterFrame) end},
 	}
 	for _, info in pairs(buttonInfo) do
-		Bar:MicroButton_Create(menubar, info)
+		S:MicroButton_Create(menubar, info)
 	end
 
 	-- Order Positions

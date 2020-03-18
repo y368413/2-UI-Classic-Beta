@@ -144,7 +144,6 @@ local Cache_GetItemBind = function(button)
 end
 
 local Cache_GetItemGarbage = function(button)
-	
 	local Icon = button.icon or _G[button:GetName().."IconTexture"]
 
 	local ItemGarbage = button:CreateTexture()
@@ -158,29 +157,22 @@ local Cache_GetItemGarbage = function(button)
 		if ItemGarbage.tempLocked then 
 			return
 		end
-
 		ItemGarbage.tempLocked = true
-
 			local itemLink = button:GetItem()
 			if itemLink then 
 				local _, _, itemRarity, iLevel, _, _, _, _, itemEquipLoc = GetItemInfo(itemLink)
 				local texture, itemCount, locked, quality, readable, _, _, isFiltered, noValue, itemID = GetContainerItemInfo(button:GetBag(), button:GetID())
-			
 				local isBattlePet, battlePetLevel, battlePetRarity = GetBattlePetInfo(itemLink)
 				if isBattlePet then 
 					itemRarity = battlePetRarity
 				end
-
 				if not(((quality and (quality > 0)) or (itemRarity and (itemRarity > 0))) and (not locked)) then
 					Icon:SetDesaturated(true)
 				end 
 			end
-
 		ItemGarbage.tempLocked = false
 	end)
-
 	Cache_ItemGarbage[button] = ItemGarbage
-
 	return ItemGarbage
 end
 
@@ -302,7 +294,6 @@ local Update = function(self)
 
 		if Icon then 
 			local texture, itemCount, locked, quality, readable, _, _, isFiltered, noValue, itemID = GetContainerItemInfo(self:GetBag(), self:GetID())
-
 			local notGarbage = ((quality and (quality > 0)) or (itemRarity and (itemRarity > 0))) and (not locked) 
 			if notGarbage then
 				if (not locked) then 

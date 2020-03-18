@@ -4,8 +4,8 @@ local M, R, U, I = unpack(ns)
 local unpack = unpack
 local GetTime, UnitIsUnit = GetTime, UnitIsUnit
 
-local CastbarCompleteColor = {.1, .8, 0}
-local CastbarFailColor = {1, .1, 0}
+local CastbarCompleteColor = {.2, .6, .8}  --.1, .8, 0
+local CastbarFailColor = {0.1, 0.6, 0.9}  --1, .1, 0
 local NotInterruptColor = {r=1, g=.5, b=.5}
 
 local channelingTicks = { -- ElvUI data
@@ -144,18 +144,18 @@ function M:OnCastbarUpdate(elapsed)
 
 		if self.__owner.unit == "player" then
 			if self.delay ~= 0 then
-				self.Time:SetFormattedText(decimal.." | |cffff0000"..decimal, duration, self.casting and self.max + self.delay or self.max - self.delay)
+				self.Time:SetFormattedText(decimal.."/|cffff0000"..decimal, duration, self.casting and self.max + self.delay or self.max - self.delay)
 			else
-				self.Time:SetFormattedText(decimal.." | "..decimal, duration, self.max)
+				self.Time:SetFormattedText(decimal.."/"..decimal, duration, self.max)
 				if self.Lag and self.SafeZone and self.SafeZone.timeDiff and self.SafeZone.timeDiff ~= 0 then
 					self.Lag:SetFormattedText("%d ms", self.SafeZone.timeDiff * 1000)
 				end
 			end
 		else
 			if duration > 1e4 then
-				self.Time:SetText("∞ | ∞")
+				self.Time:SetText("∞")
 			else
-				self.Time:SetFormattedText(decimal.." | "..decimal, duration, self.casting and self.max + self.delay or self.max - self.delay)
+				self.Time:SetFormattedText(decimal.."/"..decimal, duration, self.casting and self.max + self.delay or self.max - self.delay)
 			end
 		end
 		self.duration = duration

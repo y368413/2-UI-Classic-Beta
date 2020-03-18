@@ -111,7 +111,7 @@ function UF:CreateHealthText(self)
 	elseif mystyle == "nameplate" then
 		name:SetWidth(self:GetWidth()*.85)
 		name:ClearAllPoints()
-		name:SetPoint("BOTTOMLEFT", self, "TOPLEFT", 0, 5)
+		name:SetPoint("BOTTOMLEFT", self, "TOPLEFT", 3, 6)
 	else
 		name:SetWidth(self:GetWidth()*.55)
 	end
@@ -139,7 +139,7 @@ function UF:CreateHealthText(self)
 		end
 		self:Tag(hpval, "[raidhp]")
 	elseif mystyle == "nameplate" then
-		hpval:SetPoint("RIGHT", self, 0, 5)
+		hpval:SetPoint("RIGHT", self, 0, 8)
 		self:Tag(hpval, "[nphp]")
 	else
 		self:Tag(hpval, "[hp]")
@@ -237,8 +237,8 @@ function UF:UpdateTextScale()
 	for _, frame in pairs(oUF.objects) do
 		local style = frame.mystyle
 		if style and textScaleFrames[style] then
-			frame.nameText:SetScale(scale)
-			frame.healthValue:SetScale(scale)
+			--frame.nameText:SetScale(scale)
+			--frame.healthValue:SetScale(scale)
 			if frame.powerText then frame.powerText:SetScale(scale) end
 		end
 	end
@@ -342,30 +342,30 @@ function UF:CreateCastBar(self)
 	if mystyle ~= "nameplate" and not MaoRUIPerDB["UFs"]["Castbars"] then return end
 
 	local cb = CreateFrame("StatusBar", "oUF_Castbar"..mystyle, self)
-	cb:SetHeight(20)
-	cb:SetWidth(self:GetWidth() - 22)
-	M.CreateSB(cb, true, .3, .7, 1)
+	cb:SetHeight(21)
+	cb:SetWidth(self:GetWidth() - 21)
+	M.CreateSB(cb, true, .2, .8, 1)
 
-	if mystyle == "player" then
-		cb:SetSize(MaoRUIPerDB["UFs"]["PlayerCBWidth"], MaoRUIPerDB["UFs"]["PlayerCBHeight"])
-		createBarMover(cb, U["Player Castbar"], "PlayerCB", R.UFs.Playercb)
-	elseif mystyle == "target" then
-		cb:SetSize(MaoRUIPerDB["UFs"]["TargetCBWidth"], MaoRUIPerDB["UFs"]["TargetCBHeight"])
-		createBarMover(cb, U["Target Castbar"], "TargetCB", R.UFs.Targetcb)
-	elseif mystyle == "nameplate" then
-		cb:SetPoint("TOPLEFT", self, "BOTTOMLEFT", 0, -5)
-		cb:SetPoint("TOPRIGHT", self, "BOTTOMRIGHT", 0, -5)
+	--if mystyle == "player" then
+		--cb:SetSize(MaoRUIPerDB["UFs"]["PlayerCBWidth"], MaoRUIPerDB["UFs"]["PlayerCBHeight"])
+		--createBarMover(cb, U["Player Castbar"], "PlayerCB", R.UFs.Playercb)
+	--elseif mystyle == "target" then
+		--cb:SetSize(MaoRUIPerDB["UFs"]["TargetCBWidth"], MaoRUIPerDB["UFs"]["TargetCBHeight"])
+		--createBarMover(cb, U["Target Castbar"], "TargetCB", R.UFs.Targetcb)
+	if mystyle == "nameplate" then
+		cb:SetPoint("TOPLEFT", self, "BOTTOMLEFT", 0, -2)
+		cb:SetPoint("TOPRIGHT", self, "BOTTOMRIGHT", 0, -2)
 		cb:SetHeight(self:GetHeight())
 	end
 
-	local timer = M.CreateFS(cb, retVal(self, 12, 12, 12, MaoRUIPerDB["Nameplate"]["NameTextSize"]), "", false, "RIGHT", -2, 0)
-	local name = M.CreateFS(cb, retVal(self, 12, 12, 12, MaoRUIPerDB["Nameplate"]["NameTextSize"]), "", false, "LEFT", 2, 0)
-	name:SetPoint("RIGHT", timer, "LEFT", -5, 0)
+	local timer = M.CreateFS(cb, retVal(self, 12, 12, 12, 12, MaoRUIPerDB["Nameplate"]["NameTextSize"]-2), "", false, "RIGHT", -2, 0)
+	local name = M.CreateFS(cb, retVal(self, 12, 12, 12, 12, MaoRUIPerDB["Nameplate"]["NameTextSize"]-1), "", false, "LEFT", 2, 0)
+	name:SetPoint("RIGHT", timer, "LEFT", -6, 0)
 	name:SetJustifyH("LEFT")
 
 	cb.Icon = cb:CreateTexture(nil, "ARTWORK")
 	cb.Icon:SetSize(cb:GetHeight(), cb:GetHeight())
-	cb.Icon:SetPoint("BOTTOMRIGHT", cb, "BOTTOMLEFT", -5, 0)
+	cb.Icon:SetPoint("BOTTOMRIGHT", cb, "BOTTOMLEFT", -3, 0)
 	cb.Icon:SetTexCoord(unpack(I.TexCoord))
 	M.CreateSD(cb.Icon, 3, 3)
 
@@ -384,25 +384,25 @@ function UF:CreateCastBar(self)
 			self:RegisterEvent("CURRENT_SPELL_CAST_CHANGED", M.OnCastSent, true)
 		end
 	elseif mystyle == "nameplate" then
-		name:SetPoint("LEFT", cb, 0, -5)
-		timer:SetPoint("RIGHT", cb, 0, -5)
+		name:SetPoint("LEFT", cb, 6, -3)
+		timer:SetPoint("RIGHT", cb, 0, -3)
 
 		local shield = cb:CreateTexture(nil, "OVERLAY")
 		shield:SetAtlas("nameplates-InterruptShield")
-		shield:SetSize(14, 14)
-		shield:SetPoint("CENTER", 0, -5)
+		shield:SetSize(21, 21)
+		shield:SetPoint("CENTER", cb, 21, -3)  --"CENTER", 0, -5
 		cb.Shield = shield
 
-		local iconSize = self:GetHeight()*2 + 5
+		local iconSize = self:GetHeight()*2 + 3
 		cb.Icon:SetSize(iconSize, iconSize)
 		cb.timeToHold = .5
 	end
 
-	if mystyle == "nameplate" then
+	--if mystyle == "nameplate" then
 		cb.decimal = "%.1f"
-	else
-		cb.decimal = "%.2f"
-	end
+	--else
+		--cb.decimal = "%.2f"
+	--end
 
 	cb.Time = timer
 	cb.Text = name
@@ -496,7 +496,7 @@ function UF.PostUpdateIcon(element, unit, button, index, _, duration, expiration
 
 	local style = element.__owner.mystyle
 	if style == "nameplate" then
-		button:SetSize(element.size, element.size - 4)
+		button:SetSize(element.size, element.size)  --element.size - 4
 	else
 		button:SetSize(element.size, element.size)
 	end
@@ -589,7 +589,7 @@ function UF:CreateAuras(self)
 	bu.gap = true
 	bu.initialAnchor = "TOPLEFT"
 	bu["growth-y"] = "DOWN"
-	bu.spacing = 5
+	bu.spacing = 3
 	if mystyle == "target" then
 		bu:SetPoint("TOPLEFT", self.Power, "BOTTOMLEFT", 0, -10)
 		bu.numBuffs = 20
@@ -619,9 +619,9 @@ function UF:CreateAuras(self)
 		bu.initialAnchor = "BOTTOMLEFT"
 		bu["growth-y"] = "UP"
 		if MaoRUIPerDB["Nameplate"]["ShowPlayerPlate"] and MaoRUIPerDB["Nameplate"]["NameplateClassPower"] then
-			bu:SetPoint("BOTTOMLEFT", self, "TOPLEFT", 0, 20 + _G.oUF_ClassPowerBar:GetHeight())
+			bu:SetPoint("BOTTOMLEFT", self, "TOPLEFT", 0, 6 + _G.oUF_ClassPowerBar:GetHeight())
 		else
-			bu:SetPoint("BOTTOMLEFT", self, "TOPLEFT", 0, 20)
+			bu:SetPoint("BOTTOMLEFT", self, "TOPLEFT", 0, 6)
 		end
 		bu.numTotal = MaoRUIPerDB["Nameplate"]["maxAuras"]
 		bu.spacing = 3
@@ -656,7 +656,7 @@ function UF:CreateBuffs(self)
 	bu["growth-x"] = "RIGHT"
 	bu["growth-y"] = "UP"
 	bu.num = 6
-	bu.spacing = 5
+	bu.spacing = 3
 	bu.iconsPerRow = 6
 	bu.onlyShowPlayer = false
 
@@ -675,7 +675,7 @@ end
 function UF:CreateDebuffs(self)
 	local mystyle = self.mystyle
 	local bu = CreateFrame("Frame", nil, self)
-	bu.spacing = 5
+	bu.spacing = 3
 	bu.initialAnchor = "TOPRIGHT"
 	bu["growth-x"] = "LEFT"
 	bu["growth-y"] = "DOWN"
@@ -922,12 +922,13 @@ function UF:CreateAddPower(self)
 end
 
 function UF:CreateSwing(self)
-	if not MaoRUIPerDB["UFs"]["Castbars"] then return end
+	--if not MaoRUIPerDB["UFs"]["Castbars"] then return end
 
 	local bar = CreateFrame("Frame", nil, self)
 	local width = MaoRUIPerDB["UFs"]["PlayerCBWidth"] - MaoRUIPerDB["UFs"]["PlayerCBHeight"] - 5
 	bar:SetSize(width, 3)
-	bar:SetPoint("TOP", self.Castbar.mover, "BOTTOM", 0, -5)
+	createBarMover(bar, U["UFs SwingBar"], "Swing", {"CENTER", UIParent, "CENTER", 0, -250})
+	--bar:SetPoint("TOP", self.Castbar.mover, "BOTTOM", 0, -5)
 
 	local two = CreateFrame("StatusBar", nil, bar)
 	two:Hide()
@@ -952,9 +953,9 @@ function UF:CreateSwing(self)
 	M.CreateSB(off, true, .8, .8, .8)
 
 	if MaoRUIPerDB["UFs"]["SwingTimer"] then
-		bar.Text = M.CreateFS(bar, 12, "")
-		bar.TextMH = M.CreateFS(main, 12, "")
-		bar.TextOH = M.CreateFS(off, 12, "", false, "CENTER", 1, -5)
+		bar.Text = M.CreateFS(bar, 11, "")
+		bar.TextMH = M.CreateFS(main, 11, "")
+		bar.TextOH = M.CreateFS(off, 11, "", false, "CENTER", 1, -5)
 	end
 
 	self.Swing = bar
@@ -963,36 +964,6 @@ function UF:CreateSwing(self)
 	self.Swing.Offhand = off
 	self.Swing.bg = bg
 	self.Swing.hideOoc = true
-end
-
-function UF:CreateFCT(self)
-	if not MaoRUIPerDB["UFs"]["CombatText"] then return end
-
-	local parentFrame = CreateFrame("Frame", nil, UIParent)
-	local fcf = CreateFrame("Frame", "oUF_CombatTextFrame", parentFrame)
-	fcf:SetSize(32, 32)
-	if self.mystyle == "player" then
-		M.Mover(fcf, U["CombatText"], "PlayerCombatText", {"BOTTOM", self, "TOPLEFT", 0, 120})
-	else
-		M.Mover(fcf, U["CombatText"], "TargetCombatText", {"BOTTOM", self, "TOPRIGHT", 0, 120})
-	end
-
-	for i = 1, 36 do
-		fcf[i] = parentFrame:CreateFontString("$parentText", "OVERLAY")
-	end
-
-	fcf.font = I.Font[1]
-	fcf.fontFlags = I.Font[3]
-	fcf.showPets = MaoRUIPerDB["UFs"]["PetCombatText"]
-	fcf.showHots = MaoRUIPerDB["UFs"]["HotsDots"]
-	fcf.showAutoAttack = MaoRUIPerDB["UFs"]["AutoAttack"]
-	fcf.showOverHealing = MaoRUIPerDB["UFs"]["FCTOverHealing"]
-	fcf.abbreviateNumbers = true
-	self.FloatingCombatFeedback = fcf
-
-	-- Default CombatText
-	--SetCVar("enableFloatingCombatText", 0)
-	--M.HideOption(InterfaceOptionsCombatPanelEnableFloatingCombatText)
 end
 
 function UF:CreateEneryTicker(self)

@@ -27,7 +27,7 @@ end
 
 local function ValueAndPercent(cur, per)
 	if per < 100 then
-		return M.Numb(cur).." | "..ColorPercent(per)
+		return M.Numb(cur).."/"..ColorPercent(per)
 	else
 		return M.Numb(cur)
 	end
@@ -53,7 +53,7 @@ oUF.Tags.Methods["power"] = function(unit)
 	local per = oUF.Tags.Methods["perpp"](unit) or 0
 	if unit == "player" or unit == "target" then
 		if per < 100 and UnitPowerType(unit) == 0 then
-			return M.Numb(cur).." | "..per
+			return M.Numb(cur).."/"..per
 		else
 			return M.Numb(cur)
 		end
@@ -110,7 +110,7 @@ oUF.Tags.Methods["fulllevel"] = function(unit)
 	if level > 0 then
 		level = color..level.."|r"
 	else
-		level = "|cffff0000??|r"
+		level = "|cffff0000+|r " --"|cffff0000??|r"
 	end
 	local str = level
 
@@ -154,7 +154,8 @@ oUF.Tags.Methods["nphp"] = function(unit)
 	local per = oUF.Tags.Methods["perhp"](unit) or 0
 	if MaoRUIPerDB["Nameplate"]["FullHealth"] then
 		local cur = UnitHealth(unit)
-		return ValueAndPercent(cur, per)
+		--return ValueAndPercent(cur, per)
+		return M.Numb(cur)
 	elseif per < 100 then
 		return ColorPercent(per)
 	end
@@ -183,7 +184,7 @@ oUF.Tags.Methods["nplevel"] = function(unit)
 		if level > 0 then
 			level = M.HexRGB(GetCreatureDifficultyColor(level))..level.."|r "
 		else
-			level = "|cffff0000??|r "
+			level = "|cffff0000+|r " --"|cffff0000??|r "
 		end
 	else
 		level = ""
@@ -220,6 +221,6 @@ oUF.Tags.Methods["monkstagger"] = function(unit)
 	local cur = UnitStagger(unit) or 0
 	local perc = cur / UnitHealthMax(unit)
 	if cur == 0 then return end
-	return M.Numb(cur).." | "..I.MyColor..floor(perc*100 + .5).."%"
+	return M.Numb(cur).."/"..I.MyColor..floor(perc*100 + .5).."%"
 end
 oUF.Tags.Events["monkstagger"] = "UNIT_MAXHEALTH UNIT_AURA"

@@ -1,9 +1,0 @@
-<Ui xmlns="http://www.blizzard.com/wow/ui/">
-	<Include file="Ace\Ace.xml"/>
-	<Script file="GetTotemInfo.lua"/>
-	<Script file="LibAuraTypes.lua"/>
-	<Script file="LibSpellLocks.lua"/>
-	<Include file="LibClassicDurations\LibClassicDurations.xml"/>
-	<Script file="LibButtonGlow.lua"/>
-	<Script file="LibBase64.lua"/>
-</Ui>

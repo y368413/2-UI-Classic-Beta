@@ -185,18 +185,8 @@ function BagBrother:SaveBag(bag, onlyItems, saveSize)
 	local size = GetContainerNumSlots(bag)
 	if size > 0 then
 		local items = {}
-		local pets = {}
 		for slot = 1, size do
-			local _, count, _, _, _, _, link = GetContainerItemInfo(bag, slot)
-			if link then
-				local itemID = tonumber(link:match("item:(%d+)"))
-				if itemID == nil then
-					local _, speciesID, level, breedQuality, maxHealth, power, speed, battlePetID = strsplit(":", link)
-					if speciesID then
-						count = 1
-					end
-				end
-			end
+			local _, count, _,_,_,_, link = GetContainerItemInfo(bag, slot)
 			items[slot] = self:ParseItem(link, count)
 		end
 

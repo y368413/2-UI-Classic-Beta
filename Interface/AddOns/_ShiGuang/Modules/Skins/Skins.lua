@@ -49,6 +49,7 @@ function S:OnLogin()
    end
 
 	-- Add Skins
+	self:MicroMenu()
 	self:QuestTracker()
 	self:TradeSkillSkin()
 	self:DBMSkin()

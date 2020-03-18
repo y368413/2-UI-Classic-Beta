@@ -1,5 +1,5 @@
 local _, ns = ...
-local M, R, U, I, F = unpack(ns)
+local M, R, U, I = unpack(ns)
 local S = M:GetModule("Skins")
 
 local skinIndex = 0
@@ -132,19 +132,6 @@ function S:EnhancedTradeSkill()
 	TradeSkillInvSlotDropDown:SetPoint("TOPLEFT", TradeSkillFrame, "TOPLEFT", 510, -40)
 	TradeSkillSubClassDropDown:ClearAllPoints()
 	TradeSkillSubClassDropDown:SetPoint("RIGHT", TradeSkillInvSlotDropDown, "LEFT", 0, 0)
-
-	-- AuroraClassic
-	if F then
-		regions[2]:Hide()
-		regions[3]:Hide()
-		RecipeInset:Hide()
-		DetailsInset:Hide()
-		TradeSkillFrame:SetHeight(512)
-		TradeSkillCancelButton:ClearAllPoints()
-		TradeSkillCancelButton:SetPoint("BOTTOMRIGHT", TradeSkillFrame, "BOTTOMRIGHT", -42, 78)
-		TradeSkillRankFrame:ClearAllPoints()
-		TradeSkillRankFrame:SetPoint("TOPLEFT", TradeSkillFrame, "TOPLEFT", 24, -44)
-	end
 end
 
 function S:EnhancedCraft()
@@ -259,16 +246,4 @@ function S:EnhancedCraft()
 	-- Position close box
 	CraftFrameCloseButton:ClearAllPoints()
 	CraftFrameCloseButton:SetPoint("TOPRIGHT", CraftFrame, "TOPRIGHT", -30, -8)
-
-	if F then
-		regions[2]:Hide()
-		regions[3]:Hide()
-		RecipeInset:Hide()
-		DetailsInset:Hide()
-		CraftFrame:SetHeight(512)
-		CraftCancelButton:ClearAllPoints()
-		CraftCancelButton:SetPoint("BOTTOMRIGHT", CraftFrame, "BOTTOMRIGHT", -42, 78)
-		CraftRankFrame:ClearAllPoints()
-		CraftRankFrame:SetPoint("TOPLEFT", CraftFrame, "TOPLEFT", 24, -44)
-	end
 end
