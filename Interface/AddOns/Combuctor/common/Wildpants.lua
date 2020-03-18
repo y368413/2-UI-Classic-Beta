@@ -51,8 +51,8 @@ local FrameDefaults = {
 
 	rules = AsArray({
 		'all', 'all/trade', 'all/reagent', 'all/keys', 'all/quiver',  --, 'all/normal'
-		'equip', 'equip/armor', 'equip/weapon', 'equip/trinket',
 		'binding', 'binding/account', 'binding/equip', 'binding/use', 'binding/all', "binding/soulbound",
+		'equip', 'equip/armor', 'equip/weapon', 'equip/trinket',
 		'use', 'use/consume', 'use/enhance',
 		'trade', 'trade/goods', 'trade/gem', 'trade/glyph', 'trade/recipe',
 		'quest', 'misc',

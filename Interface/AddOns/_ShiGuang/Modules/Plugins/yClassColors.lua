@@ -1,6 +1,6 @@
 local _, ns = ...
 local M, R, U, I = unpack(ns)
-
+local oUF = ns.oUF
 ------------------------------ yClassColors, by yleaf-- NDui MOD----------------------------
 local format, ipairs, tinsert, strsplit = string.format, ipairs, table.insert, string.split
 
@@ -34,29 +34,8 @@ local repColor = {
 	0, 0, 1,
 }
 
-local function colorsAndPercent(a, b, ...)
-	if(a <= 0 or b == 0) then
-		return nil, ...
-	elseif(a >= b) then
-		return nil, select(-3, ...)
-	end
-
-	local num = select('#', ...) / 3
-	local segment, relperc = math.modf((a / b) * (num - 1))
-	return
-end
-	
-local function RGBColorGradient(...)
-	local relperc, r1, g1, b1, r2, g2, b2 = colorsAndPercent(...)
-	if(relperc) then
-		return r1 + (r2 - r1) * relperc, g1 + (g2 - g1) * relperc, b1 + (b2 - b1) * relperc
-	else
-		return r1, g1, b1
-	end
-end
-
 local function smoothColor(cur, max, color)
-	local r, g, b = RGBColorGradient(cur, max, unpack(color))
+	local r, g, b = oUF:RGBColorGradient(cur, max, unpack(color))
 	return M.HexRGB(r, g, b)
 end
 
@@ -87,7 +66,7 @@ hooksecurefunc("GuildStatus_Update", function()
 			if fullName and online then
 				local r, g, b = classColor(class, true)
 				_G["GuildFrameGuildStatusButton"..i.."Name"]:SetTextColor(r, g, b)
-				local lr, lg, lb = RGBColorGradient(rankIndex, 10, unpack(rankColor))
+				local lr, lg, lb = oUF:RGBColorGradient(rankIndex, 10, unpack(rankColor))
 				if lr then
 					_G["GuildFrameGuildStatusButton"..i.."Rank"]:SetTextColor(lr, lg, lb)
 				end

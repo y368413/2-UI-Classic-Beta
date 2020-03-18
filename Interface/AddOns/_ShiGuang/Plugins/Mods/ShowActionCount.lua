@@ -1,6 +1,6 @@
 --## Version: 1.00  ## Author: prozhong
 -- local resourceList = {}
-local reagentsString = GetText('SPELL_REAGENTS')..'(.+)'
+--[[local reagentsString = GetText('SPELL_REAGENTS')..'(.+)'
 local reagentsString2 = GetText('SPELL_REAGENTS')..'|cffff2020(.+)|r'
 local SACTooltip = CreateFrame("GameTooltip", "SACTooltip", UIParent, "GameTooltipTemplate")
 SACTooltip:SetOwner(UIParent, "ANCHOR_NONE")
@@ -32,7 +32,7 @@ hooksecurefunc("ActionButton_UpdateCount", function(actionButton)
     end
     -- print(GetText('SPELL_REAGENTS'))
     -- for k,v in pairs(resourceList) do print(k,v) end
-end)
+end)]]
 
 
 local function updateCount(self)

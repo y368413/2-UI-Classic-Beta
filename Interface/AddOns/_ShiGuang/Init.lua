@@ -70,6 +70,8 @@ end
 
 -- Init
 M:RegisterEvent("PLAYER_LOGIN", function()
+	M:SetSmoothingAmount(MaoRUIPerDB["UFs"]["SmoothAmount"])
+
 	for _, module in next, initQueue do
 		if module.OnLogin then
 			module:OnLogin()

@@ -13,6 +13,7 @@ local defaultSettings = {
 	Mover = {},
 	InternalCD = {},
 	AuraWatchMover = {},
+	RaidClickSets = {},
 	TempAnchor = {},
 	AuraWatchList = {
 		Switcher = {},
@@ -52,6 +53,67 @@ local defaultSettings = {
 		WatchSpellRank = true,
 	},
 	UFs = {
+		--Enable = false,
+		--Portrait = true,
+		--PlayerDebuff = false,
+		--ToTAuras = false,
+		Castbars = false,
+		SwingBar = false,
+		SwingTimer = false,
+		RaidFrame = true,
+		NumGroups = 8,
+		SimpleMode = true,
+		SimpleModeSortByRole = true,
+		InstanceAuras = true,
+		RaidDebuffScale = 1,
+		--SpecRaidPos = false,
+		RaidClassColor = true,
+		HorizonRaid = false,
+		HorizonParty = false,
+		SimpleRaidScale = 12,
+		RaidWidth = 88,
+		RaidHeight = 16,
+		RaidPowerHeight = 2,
+		RaidHPMode = 1,
+		AurasClickThrough = false,
+		CombatText = true,
+		HotsDots = true,
+		AutoAttack = true,
+		FCTOverHealing = false,
+		PetCombatText = true,
+		RaidClickSets = true,
+		ShowTeamIndex = false,
+		ClassPower = true,
+		LagString = false,
+		RaidBuffIndicator = true,
+		PartyFrame = true,
+		PWOnRight = true,
+		PartyWidth = 120,
+		PartyHeight = 26,
+		PartyPowerHeight = 6,
+		PartyPetFrame = false,
+		PartyPetWidth = 120,
+		PartyPetHeight = 16,
+		PartyPetPowerHeight = 2,
+		HealthColor = 2,
+		BuffIndicatorType = 2,
+		BuffIndicatorScale = 1,
+		EnergyTicker = true,
+		UFTextScale = 1,
+		SmoothAmount = .3,
+
+		PlayerWidth = 245,
+		PlayerHeight = 24,
+		PlayerPowerHeight = 4,
+		PetWidth = 120,
+		PetHeight = 18,
+		PetPowerHeight = 3,
+
+		CastingColor = {r=.8, g=.6, b=.1},  --r=.3, g=.7, b=1
+		PlayerCBWidth = 240,
+		PlayerCBHeight = 16,
+		TargetCBWidth = 280,
+		TargetCBHeight = 21,
 		PlayerFrameScale = 0.9,
 		UFPctText = true,
 		UFClassIcon = true,
@@ -68,7 +130,7 @@ local defaultSettings = {
 		EnableFilter = true,
 		Matches = 1,
 		BlockAddonAlert = true,
-		ChatMenu = true,
+		ChatMenu = false,
 		WhisperColor = true,
 		ChatItemLevel = true,
 		Chatbar = true,
@@ -85,7 +147,7 @@ local defaultSettings = {
 		MinimapScale = 1,
 		ShowRecycleBin = false,
 		WhoPings = true,
-		MapReveal = true,
+		MapReveal = false,
 		MapFader = false,
 		zrMMbordersize = 2,
 		zrMMbuttonsize = 16,
@@ -94,6 +156,40 @@ local defaultSettings = {
 	},
 	Nameplate = {
 		Enable = true,
+		maxAuras = 6,
+		AuraSize = 26,
+		FriendlyCC = false,
+		HostileCC = true,
+		TankMode = false,
+		TargetIndicator = 3,
+		Distance = 42,
+		PlateWidth = 168,
+		PlateHeight = 9,
+		CustomUnitColor = true,
+		CustomColor = {r=0, g=.8, b=.3},
+		UnitList = "",
+		ShowPowerList = "",
+		VerticalSpacing = .6,
+		ShowPlayerPlate = true,
+		PPHeight = 1,
+		PPPHeight = 8,
+		PPPowerText = true,
+		FullHealth = false,
+		SecureColor = {r=1, g=0, b=1},
+		--TransColor = {r=1, g=.8, b=0},
+		--InsecureColor = {r=1, g=0, b=0},
+		--OffTankColor = {r=.2, g=.7, b=.5},
+		--DPSRevertThreat = false,
+		PPIconSize = 36,
+		PPHideOOC = true,
+		NameplateClassPower = false,
+		NameTextSize = 14,
+		HealthTextSize = 16,
+		MinScale = 1,
+		MinAlpha = 0.8,
+		ColorBorder = true,
+		QuestIndicator = true,
+		ClassPowerOnly = false,
 		Numberstyle = false,
 		ColorBorder = true,
 		PlayerAura = false,
@@ -119,7 +215,7 @@ local defaultSettings = {
 	Skins = {
 		DBM = true,
 		MicroMenu = false,
-		Skada = false,
+		--Skada = false,
 		Bigwigs = true,
 		RM = true,
 		RMRune = false,
@@ -128,9 +224,9 @@ local defaultSettings = {
 		TMW = true,
 		CastBarstyle = true,
 		WeakAuras = true,
-		BarLine = true,
-		InfobarLine = false,
-		ChatLine = true,
+		BarLine = false,
+		InfobarLine = true,
+		ChatLine = false,
 		MenuLine = true,
 		ClassLine = true,
 		Details = true,
@@ -144,7 +240,7 @@ local defaultSettings = {
 	Tooltip = {
 		CombatHide = true,
 		Cursor = true,
-		ClassColor = false,
+		ClassColor = true,
 		HideRank = false,
 		FactionIcon = true,
 		TargetBy = true,
@@ -165,7 +261,7 @@ local defaultSettings = {
 		Interrupt = true,
 		OwnInterrupt = true,
 		InterruptSound = true,
-		AlertInInstance = true,
+		AlertInInstance = false,
 		BrokenSpell = false,
 		FasterLoot = true,
 		AutoQuest = true,
@@ -180,7 +276,7 @@ local defaultSettings = {
 		AutoMark = true,
 		QuestNotifier = true,
 		QuestProgress = false,
-		OnlyCompleteRing = true,
+		OnlyCompleteRing = false,
 		ExplosiveCache = {},
 		PlacedItemAlert = false,
 		RareAlertInWild = false,
@@ -201,6 +297,8 @@ local accountSettings = {
 	ChatFilterList = "%*",
 	ChatFilterWhiteList = "",
 	Timestamp = false,
+	NameplateFilter = {[1]={}, [2]={}},
+	RaidDebuffs = {},
 	Changelog = {},
 	totalGold = {},
 	RepairType = 1,
@@ -216,6 +314,8 @@ local accountSettings = {
 	DBMRequest = false,
 	SkadaRequest = false,
 	BWRequest = false,
+	RaidAuraWatch = {},
+	CornerBuffs = {},
 	TexStyle = 3,
 	KeystoneInfo = {},
 	AutoBubbles = false,
@@ -274,6 +374,35 @@ loader:SetScript("OnEvent", function(self, _, addon)
 	self:UnregisterAllEvents()
 end)
 
+-- Callbacks
+local function setupCastbar()
+	G:SetupCastbar(guiPage[4])
+end
+
+local function setupRaidFrame()
+	G:SetupRaidFrame(guiPage[3])
+end
+
+local function setupRaidDebuffs()
+	G:SetupRaidDebuffs(guiPage[3])
+end
+
+local function setupClickCast()
+	G:SetupClickCast(guiPage[3])
+end
+
+local function setupBuffIndicator()
+	G:SetupBuffIndicator(guiPage[3])
+end
+
+local function setupPartyWatcher()
+	G:SetupPartyWatcher(guiPage[3])
+end
+
+local function setupNameplateFilter()
+	G:SetupNameplateFilter(guiPage[2])
+end
+
 local function setupAuraWatch()
 	f:Hide()
 	SlashCmdList["NDUI_AWCONFIG"]()
@@ -326,6 +455,55 @@ end
 local function updateToggleDirection()
 	M:GetModule("Skins"):RefreshToggleDirection()
 end
+
+local function updatePlateSpacing()
+	M:GetModule("UnitFrames"):UpdatePlateSpacing()
+end
+
+local function updatePlateRange()
+	M:GetModule("UnitFrames"):UpdatePlateRange()
+end
+
+local function updateCustomUnitList()
+	M:GetModule("UnitFrames"):CreateUnitTable()
+end
+
+local function updatePowerUnitList()
+	M:GetModule("UnitFrames"):CreatePowerUnitTable()
+end
+
+local function refreshNameplates()
+	M:GetModule("UnitFrames"):RefreshAllPlates()
+end
+
+local function updatePlateScale()
+	M:GetModule("UnitFrames"):UpdatePlateScale()
+end
+
+local function updatePlateAlpha()
+	M:GetModule("UnitFrames"):UpdatePlateAlpha()
+end
+
+local function updateRaidNameText()
+	M:GetModule("UnitFrames"):UpdateRaidNameText()
+end
+
+local function updatePlayerPlate()
+	M:GetModule("UnitFrames"):ResizePlayerPlate()
+end
+
+local function updateUFTextScale()
+	M:GetModule("UnitFrames"):UpdateTextScale()
+end
+
+local function refreshRaidFrameIcons()
+	M:GetModule("UnitFrames"):RefreshRaidFrameIcons()
+end
+
+local function updateSmoothingAmount()
+	M:SetSmoothingAmount(MaoRUIPerDB["UFs"]["SmoothAmount"])
+end
+
 local function updateMapFader()
 	M:GetModule("Maps"):MapFader()
 end
@@ -771,7 +949,34 @@ local function exportData()
 	end
 
 	for KEY, VALUE in pairs(MaoRUIDB) do
-		if KEY == "ContactList" then
+		if KEY == "RaidAuraWatch" then
+			text = text..";ACCOUNT:"..KEY
+			for spellID in pairs(VALUE) do
+				text = text..":"..spellID
+			end
+		elseif KEY == "RaidDebuffs" then
+			for instName, value in pairs(VALUE) do
+				for spellID, prio in pairs(value) do
+					text = text..";ACCOUNT:"..KEY..":"..instName..":"..spellID..":"..prio
+				end
+			end
+		elseif KEY == "NameplateFilter" then
+			for index, value in pairs(VALUE) do
+				text = text..";ACCOUNT:"..KEY..":"..index
+				for spellID in pairs(value) do
+					text = text..":"..spellID
+				end
+			end
+		elseif KEY == "CornerBuffs" then
+			for class, value in pairs(VALUE) do
+				for spellID, data in pairs(value) do
+					if not bloodlustFilter[spellID] and class == I.MyClass then
+						local anchor, color, filter = unpack(data)
+						text = text..";ACCOUNT:"..KEY..":"..class..":"..spellID..":"..anchor..":"..color[1]..":"..color[2]..":"..color[3]..":"..tostring(filter or false)
+					end
+				end
+			end
+		elseif KEY == "ContactList" then
 			for name, color in pairs(VALUE) do
 				text = text..";ACCOUNT:"..KEY..":"..name..":"..color
 			end
@@ -840,6 +1045,10 @@ local function importData()
 			x = tonumber(x)
 			y = tonumber(y)
 			MaoRUIPerDB[key][value] = {relFrom, parent, relTo, x, y}
+		elseif key == "RaidClickSets" then
+			if I.MyClass == class then
+				MaoRUIPerDB[key][value] = {select(3, strsplit(":", option))}
+			end
 		elseif key == "InternalCD" then
 			local spellID, duration, indicator, unit, itemID = select(3, strsplit(":", option))
 			spellID = tonumber(spellID)
@@ -852,6 +1061,24 @@ local function importData()
 				for _, spellID in next, spells do
 					MaoRUIDB[value][tonumber(spellID)] = true
 				end
+			elseif value == "RaidDebuffs" then
+				local instName, spellID, priority = select(3, strsplit(":", option))
+				if not MaoRUIDB[value][instName] then MaoRUIDB[value][instName] = {} end
+				MaoRUIDB[value][instName][tonumber(spellID)] = tonumber(priority)
+			elseif value == "NameplateFilter" then
+				local spells = {select(4, strsplit(":", option))}
+				for _, spellID in next, spells do
+					MaoRUIDB[value][tonumber(arg1)][tonumber(spellID)] = true
+				end
+			elseif value == "CornerBuffs" then
+				local class, spellID, anchor, r, g, b, filter = select(3, strsplit(":", option))
+				spellID = tonumber(spellID)
+				r = tonumber(r)
+				g = tonumber(g)
+				b = tonumber(b)
+				filter = toBoolean(filter)
+				if not MaoRUIDB[value][class] then MaoRUIDB[value][class] = {} end
+				MaoRUIDB[value][class][spellID] = {anchor, {r, g, b}, filter}
 			elseif value == "ContactList" then
 				local name, r, g, b = select(3, strsplit(":", option))
 				MaoRUIDB["ContactList"][name] = r..":"..g..":"..b

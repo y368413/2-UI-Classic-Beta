@@ -3,7 +3,12 @@
 	<Script file="GetTotemInfo.lua"/>
 	<Script file="LibAuraTypes.lua"/>
 	<Script file="LibSpellLocks.lua"/>
+	<Script file="LibClassicCasterino.lua"/>
 	<Include file="LibClassicDurations\LibClassicDurations.xml"/>
+	<Include file="LibHealComm-4.0\LibHealComm-4.0.xml"/>
+
+	<Include file="cargBags\cargBags.xml"/>
+	<Include file="oUF\oUF.xml"/>
 	<Script file="LibButtonGlow.lua"/>
 	<Script file="LibBase64.lua"/>
 </Ui>

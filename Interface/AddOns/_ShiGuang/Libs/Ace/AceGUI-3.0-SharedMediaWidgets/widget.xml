@@ -1,5 +1,4 @@
 <Ui xmlns="http://www.blizzard.com/wow/ui/">
-
 	<Script file="prototypes.lua" />
 	<Script file="FontWidget.lua" />
 	<Script file="SoundWidget.lua" />

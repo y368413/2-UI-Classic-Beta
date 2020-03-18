@@ -1,594 +1,709 @@
-﻿local _, ns = ...
+local _, ns = ...
 local M, R, U, I = unpack(ns)
-------------------------------- Nameplate, by paopao001-- NDui MOD-----------------------------
-local LCD = I.LibClassicDurations
--- Auras
-local function CreateAuraIcon(parent)
-	local button = CreateFrame("Frame", nil, parent)
-	button:SetSize(MaoRUIPerDB["Nameplate"]["AuraSize"], MaoRUIPerDB["Nameplate"]["AuraSize"])
-	M.CreateSD(button, 3, 3)
+local UF = M:GetModule("UnitFrames")
 
-	button.icon = button:CreateTexture(nil, "OVERLAY", nil, 3)
-	button.icon:SetAllPoints()
-	button.icon:SetTexCoord(unpack(I.TexCoord))
+local _G = getfenv(0)
+local strmatch, tonumber, pairs, type, unpack, next, rad = string.match, tonumber, pairs, type, unpack, next, math.rad
+local UnitThreatSituation, UnitIsTapDenied, UnitPlayerControlled, UnitIsUnit = UnitThreatSituation, UnitIsTapDenied, UnitPlayerControlled, UnitIsUnit
+local UnitReaction, UnitIsConnected, UnitIsPlayer, UnitSelectionColor = UnitReaction, UnitIsConnected, UnitIsPlayer, UnitSelectionColor
+local GetInstanceInfo, UnitClassification, UnitExists, InCombatLockdown = GetInstanceInfo, UnitClassification, UnitExists, InCombatLockdown
+local C_NamePlate_GetNamePlates = C_NamePlate.GetNamePlates
+local UnitGUID, GetPlayerInfoByGUID, Ambiguate, UnitName = UnitGUID, GetPlayerInfoByGUID, Ambiguate, UnitName
+local SetCVar, UIFrameFadeIn, UIFrameFadeOut = SetCVar, UIFrameFadeIn, UIFrameFadeOut
+local UNKNOWN, INTERRUPTED = UNKNOWN, INTERRUPTED
 
-	button.cd = CreateFrame("Cooldown", nil, button, "CooldownFrameTemplate")
-	button.cd:SetAllPoints(button)
-	button.cd:SetReverse(true)
-	button.count = M.CreateFS(button, 12, "", false, "BOTTOMRIGHT", 2, -2)
-
-	return button
+-- Init
+function UF:UpdatePlateScale()
+	SetCVar("namePlateMinScale", MaoRUIPerDB["Nameplate"]["MinScale"])
+	SetCVar("namePlateMaxScale", MaoRUIPerDB["Nameplate"]["MinScale"])
 end
 
-local function UpdateAuraIcon(button, unit, index, filter, customIcon)
-	local name, icon, count, debuffType, _, _, caster, _, _, spellID = LCD:UnitAura(unit, index, filter)
-	duration, expirationTime = LCD:GetAuraDurationByUnit(unit, spellID, caster, name)
-
-	button.expirationTime = expirationTime
-	button.duration = duration
-	button.spellID = spellID
-
-	local color = DebuffTypeColor[debuffType] or DebuffTypeColor.none
-	if MaoRUIPerDB["Nameplate"]["ColorBorder"] then
-		button.Shadow:SetBackdropBorderColor(color.r, color.g, color.b)
-	else
-		button.Shadow:SetBackdropBorderColor(0, 0, 0)
-	end
-
-	if duration and duration > 0 then
-		button.cd:SetCooldown(expirationTime - duration, duration)
-	else
-		button.cd:SetCooldown(0, 0)
-	end
-
-	if count and count > 1 then
-		button.count:SetText(count)
-	else
-		button.count:SetText("")
-	end
-
-	if customIcon then
-		button.icon:SetTexture(R.CustomIcons[customIcon]) 
-	else
-		button.icon:SetTexture(icon)
-	end
-
-	button:Show()
+function UF:UpdatePlateAlpha()
+	SetCVar("nameplateMinAlpha", GetCVarDefault("nameplateMinAlpha"))
+	SetCVar("nameplateMaxAlpha", GetCVarDefault("nameplateMaxAlpha"))
 end
 
-local function AuraFilter(caster, spellID, unit)
-	if caster == "player" then
-		--1:none, 2:all, 3:white, 4:black, 5:aurawatch
-		if MaoRUIPerDB["Nameplate"]["AuraFilter"] == 1 then
-			return false
-		elseif MaoRUIPerDB["Nameplate"]["AuraFilter"] == 2 then
-			return true
-		elseif MaoRUIPerDB["Nameplate"]["AuraFilter"] == 3 and R.WhiteList[spellID] then
-			return true
-		elseif MaoRUIPerDB["Nameplate"]["AuraFilter"] == 4 and not R.BlackList[spellID] then
-			return true
-		elseif MaoRUIPerDB["Nameplate"]["AuraFilter"] == 5 then
-			local auraList = R.AuraWatchList[I.MyClass]
-			if auraList then
-				for _, value in pairs(auraList) do
-					if value.Name == "Target Aura" then
-						for _, v in pairs(value.List) do
-							if v.AuraID == spellID then
-								return true
-							end
-						end
-					end
-				end
-			end
-		end
-	else
-		--1:none, 2:white
-		if MaoRUIPerDB["Nameplate"]["OtherFilter"] == 1 then
-			return false
-		elseif MaoRUIPerDB["Nameplate"]["OtherFilter"] == 2 and R.WhiteList[spellID] then
-			return true
-		end
-	end
+function UF:UpdatePlateRange()
+	SetCVar("nameplateMaxDistance", GetCVarDefault("nameplateMaxDistance"))
 end
 
-local function UpdateBuffs(unitFrame)
-	local unit = unitFrame.displayedUnit
-	local iconsFrame = unitFrame.iconsFrame
-
-	if not iconsFrame or not unit then return end
-	if UnitIsUnit(unit, "player") and not MaoRUIPerDB["Nameplate"]["PlayerAura"] then
-		iconsFrame:Hide()
-		return
-	else
-		iconsFrame:Show()
-	end
-
-	local i = 1
-	for index = 1, 15 do
-		if i <= MaoRUIPerDB["Nameplate"]["maxAuras"] then
-			local name, _, _, _, _, _, caster, _, _, spellID = LCD:UnitAura(unit, index, "HELPFUL")
-			local matchbuff, customIcon = AuraFilter(caster, spellID, unit)
-			if name and matchbuff then
-				if not unitFrame.icons[i] then
-					unitFrame.icons[i] = CreateAuraIcon(iconsFrame)
-				end
-				UpdateAuraIcon(unitFrame.icons[i], unit, index, "HELPFUL", customIcon)
-				if i ~= 1 then
-					if i == 6 then
-						unitFrame.icons[6]:SetPoint("BOTTOM", unitFrame.icons[1], "TOP", 0, 4)
-					else
-						unitFrame.icons[i]:SetPoint("LEFT", unitFrame.icons[i-1], "RIGHT", 4, 0)
-					end
-				end
-				i = i + 1
-			end
-		end
-	end
-
-	for index = 1, 20 do
-		if i <= MaoRUIPerDB["Nameplate"]["maxAuras"] then
-			local name, _, _, _, _, _, caster, _, _, spellID = LCD:UnitAura(unit, index, "HARMFUL")
-			local matchdebuff, customIcon = AuraFilter(caster, spellID, unit)
-			if name and matchdebuff then
-				if not unitFrame.icons[i] then
-					unitFrame.icons[i] = CreateAuraIcon(iconsFrame)
-				end
-				UpdateAuraIcon(unitFrame.icons[i], unit, index, "HARMFUL", customIcon)
-				if i ~= 1 then
-					if i == 6 then
-						unitFrame.icons[6]:SetPoint("BOTTOM", unitFrame.icons[1], "TOP", 0, 4)
-					else
-						unitFrame.icons[i]:SetPoint("LEFT", unitFrame.icons[i-1], "RIGHT", 4, 0)
-					end
-				end
-				i = i + 1
-			end
-		end
-	end
-	unitFrame.iconnumber = i - 1
-
-	if i > 1 then
-		local count = i > 5 and 5 or unitFrame.iconnumber
-		unitFrame.icons[1]:SetPoint("LEFT", iconsFrame, "LEFT", 0, -3)
-	end
-	for index = i, #unitFrame.icons do unitFrame.icons[index]:Hide() end
+function UF:UpdatePlateSpacing()
+	SetCVar("nameplateOverlapV", MaoRUIPerDB["Nameplate"]["VerticalSpacing"])
 end
 
--- Unitframe
-local classtex = {
-	rare = {"Interface\\MINIMAP\\ObjectIcons", .391, .487, .644, .74},
-	--elite = {"Interface\\MINIMAP\\Minimap_skull_elite", 0, 1, 0, 1},
-	rareelite = {"Interface\\MINIMAP\\ObjectIcons", .754, .875, .624, .749},
-	worldboss = {"Interface\\MINIMAP\\ObjectIcons", .879, 1, .754, .879},
-}
+function UF:UpdateClickableSize()
+	if InCombatLockdown() then return end
+	C_NamePlate.SetNamePlateEnemySize(MaoRUIPerDB["Nameplate"]["PlateWidth"], MaoRUIPerDB["Nameplate"]["PlateHeight"]+40)
+	C_NamePlate.SetNamePlateFriendlySize(MaoRUIPerDB["Nameplate"]["PlateWidth"], MaoRUIPerDB["Nameplate"]["PlateHeight"]+40)
+end
 
-local function UpdateName(unitFrame)
-	local unit = unitFrame.displayedUnit
-	local level = UnitLevel(unit)
-	local name = GetUnitName(unit, false) or UNKNOWN
-	local class = UnitClassification(unit)
+function UF:SetupCVars()
+	SetCVar("nameplateOverlapH", .8)
+	UF:UpdatePlateSpacing()
+	UF:UpdatePlateRange()
+	UF:UpdatePlateAlpha()
+	SetCVar("nameplateSelectedAlpha", 1)
 
-	if level and level ~= UnitLevel("player") then
-		if level == -1 then
-			level = "|cffff0000+|r "
-		else 
-			level = M.HexRGB(GetCreatureDifficultyColor(level))..level.."|r "
+	UF:UpdatePlateScale()
+	SetCVar("nameplateSelectedScale", 1)
+	SetCVar("nameplateLargerScale", 1)
+
+	UF:UpdateClickableSize()
+	hooksecurefunc(NamePlateDriverFrame, "UpdateNamePlateOptions", UF.UpdateClickableSize)
+end
+
+function UF:BlockAddons()
+	if not DBM or not DBM.Nameplate then return end
+
+	function DBM.Nameplate:SupportedNPMod()
+		return true
+	end
+
+	local function showAurasForDBM(_, _, _, spellID)
+		if not tonumber(spellID) then return end
+		if not R.WhiteList[spellID] then
+			R.WhiteList[spellID] = true
 		end
-	else
-		level = ""
 	end
+	hooksecurefunc(DBM.Nameplate, "Show", showAurasForDBM)
+end
 
-	if name then
-		if UnitIsUnit(unit, "player") then
-			unitFrame.name:SetText("")
-		else
-			unitFrame.name:SetText(level..name)
-		end
-	end
-  
-	if name and name == R.CustomUnits[UnitName(unit)] then
-		unitFrame.creatureBoomIcon:SetTexture("Interface\\MINIMAP\\Minimap_skull_elite")
-		unitFrame.creatureBoomIcon:SetTexCoord(0, 1, 0, 1)
+-- Elements
+local customUnits = {}
+function UF:CreateUnitTable()
+	wipe(customUnits)
+	if not MaoRUIPerDB["Nameplate"]["CustomUnitColor"] then return end
+	M.CopyTable(R.CustomUnits, customUnits)
+	M.SplitList(customUnits, MaoRUIPerDB["Nameplate"]["UnitList"])
+end
+
+local showPowerList = {}
+function UF:CreatePowerUnitTable()
+	wipe(showPowerList)
+	M.CopyTable(R.ShowPowerList, showPowerList)
+	M.SplitList(showPowerList, MaoRUIPerDB["Nameplate"]["ShowPowerList"])
+end
+
+function UF:UpdateUnitPower()
+	local unitName = self.unitName
+	local npcID = self.npcID
+	local shouldShowPower = showPowerList[unitName] or showPowerList[npcID]
+	if shouldShowPower then
+		self.powerText:Show()
 	else
-		unitFrame.creatureBoomIcon:SetTexture(nil)
-	end
-	
-	if class and classtex[class] then
-		local tex, a, b, c, d = unpack(classtex[class])
-		unitFrame.creatureIcon:SetTexture(tex)
-		unitFrame.creatureIcon:SetTexCoord(a, b, c, d)
-	else
-		unitFrame.creatureIcon:SetTexture(nil)
+		self.powerText:Hide()
 	end
 end
 
-local function UpdateHealth(unitFrame)
-	local unit = unitFrame.displayedUnit
-	local minHealth, maxHealth = UnitHealth(unit), UnitHealthMax(unit)
-	local p = minHealth/maxHealth * 100
-	unitFrame.healthBar:SetValue(p/100)
-
-	if MaoRUIPerDB["Nameplate"]["FullHealth"] and RealMobHealth and RealMobHealth.UnitHasHealthData(unit) then
-		local value, max = RealMobHealth.GetUnitHealth(unit)
-		unitFrame.healthBar.value:SetText(M.Numb(value))  --.." | "..M.Numb(max)
-	else
-		if minHealth == maxHealth or UnitIsUnit(unit, "player") then
-		  unitFrame.healthBar.value:SetText("")
-	  else
-			unitFrame.healthBar.value:SetText(string.format("%d", p))
-		end
-	end
-	if p <= 50 and p >= 35 then
-		unitFrame.healthBar.value:SetTextColor(253/255, 238/255, 80/255)
-	elseif p < 35 and p >= 20 then
-		unitFrame.healthBar.value:SetTextColor(250/255, 130/255, 0/255)
-	elseif p < 20 then
-		unitFrame.healthBar.value:SetTextColor(200/255, 20/255, 40/255)
-	else
-		unitFrame.healthBar.value:SetTextColor(1, 1, 1)
-	end
-end
-
-local function IsTapDenied(unitFrame)
-	return UnitIsTapDenied(unitFrame.unit) and not UnitPlayerControlled(unitFrame.unit)
-end
-
-local function UpdateHealthColor(unitFrame)
-	local hp = unitFrame.healthBar
-	local unit = unitFrame.displayedUnit or false
+-- Update unit color
+function UF.UpdateColor(element, unit)
+	local self = element.__owner
+	local name = self.unitName
+	local npcID = self.npcID
+	local isCustomUnit = customUnits[name] or customUnits[npcID]
+	local isPlayer = UnitIsPlayer(unit)
+	local isTargeting = UnitIsUnit(unit.."target", "player")
+	local reaction = UnitReaction(unit, "player")
+	local customColor = MaoRUIPerDB["Nameplate"]["CustomColor"]
+	local secureColor = MaoRUIPerDB["Nameplate"]["SecureColor"]
 	local r, g, b
 
 	if not UnitIsConnected(unit) then
 		r, g, b = .7, .7, .7
 	else
-		if UnitIsPlayer(unit) and UnitReaction(unit, "player") >= 5 then
+		if isCustomUnit then
+			r, g, b = customColor.r, customColor.g, customColor.b
+		elseif isPlayer and (reaction and reaction >= 5) then
 			if MaoRUIPerDB["Nameplate"]["FriendlyCC"] then
 				r, g, b = M.UnitColor(unit)
 			else
 				r, g, b = .3, .3, 1
 			end
-		elseif UnitIsPlayer(unit) and UnitReaction(unit, "player") <= 4 and MaoRUIPerDB["Nameplate"]["HostileCC"] then
+		elseif isPlayer and (reaction and reaction <= 4) and MaoRUIPerDB["Nameplate"]["HostileCC"] then
 			r, g, b = M.UnitColor(unit)
-		elseif IsTapDenied(unitFrame) then
+		elseif UnitIsTapDenied(unit) and not UnitPlayerControlled(unit) then
 			r, g, b = .6, .6, .6
 		else
 			r, g, b = UnitSelectionColor(unit, true)
+			if MaoRUIPerDB["Nameplate"]["TankMode"] and isTargeting then
+				r, g, b = secureColor.r, secureColor.g, secureColor.b
+			end
 		end
 	end
 
-	if r ~= unitFrame.r or g ~= unitFrame.g or b ~= unitFrame.b then
-		hp:SetStatusBarColor(r, g, b)
-		unitFrame.r, unitFrame.g, unitFrame.b = r, g, b
+	if r or g or b then
+		element:SetStatusBarColor(r, g, b)
 	end
 
-	if not MaoRUIPerDB["Nameplate"]["TankMode"] and I.Role ~= "Tank" then
-			hp.Shadow:SetBackdropBorderColor(0, 0, 0)
+	if (not MaoRUIPerDB["Nameplate"]["TankMode"] or isCustomUnit or isPlayer) and UnitCanAttack(unit, "player") and isTargeting then
+		element.Shadow:SetBackdropBorderColor(1, 0, 0)
 	else
-		hp.Shadow:SetBackdropBorderColor(0, 0, 0)
+		element.Shadow:SetBackdropBorderColor(0, 0, 0)
 	end
 end
 
-local function UpdateSelectionHighlight(unitFrame)
-	local unit = unitFrame.displayedUnit
-	local redarrowleft, redarrowright, glow, line = unitFrame.redarrowleft, unitFrame.redarrowright, unitFrame.glowBorder, unitFrame.underLine
+function UF:UpdateThreatColor(_, unit)
+	if unit ~= self.unit then return end
 
-	if UnitIsUnit(unit, "target") and not UnitIsUnit(unit, "player") and MaoRUIPerDB["Nameplate"]["Arrow"] then
-		unitFrame.redarrowleft:Show()
-		unitFrame.redarrowright:Show()
-		if glow then glow:Show() end
-	else
-		unitFrame.redarrowleft:Hide()
-		unitFrame.redarrowright:Hide()
-		if glow then glow:Hide() end
-	end
-
-	--if not MaoRUIPerDB["Nameplate"]["Numberstyle"] then	
-			unitFrame.redarrowleft:SetRotation(math.rad(90))
-			unitFrame.redarrowleft:SetPoint("RIGHT", unitFrame.healthBar, "LEFT", 1, 0)
-			unitFrame.redarrowright:SetRotation(math.rad(-90))
-			unitFrame.redarrowright:SetPoint("LEFT", unitFrame.healthBar, "RIGHT", -1, 0)
-	--else
-			--unitFrame.redarrowleft:SetPoint("BOTTOM", unitFrame.name, "TOP", 0, 0)
-	--end
+	UF.UpdateColor(self.Health, unit)
 end
 
-local function UpdateRaidTarget(unitFrame)
-	local rtf = unitFrame.RaidTargetFrame
-	local icon = rtf.RaidTargetIcon
-	local unit = unitFrame.displayedUnit
-
-	local index = GetRaidTargetIndex(unit)
-	if index and not UnitIsUnit(unit, "player") then
-		SetRaidTargetIconTexture(icon, index)
-		icon:Show()
-	else
-		icon:Hide()
-	end
-		rtf:SetPoint("TOP", unitFrame.name, "LEFT", -15, 15)
+function UF:CreateThreatColor(self)
+	local frame = CreateFrame("Frame", nil, self)
+	self.ThreatIndicator = frame
+	self.ThreatIndicator.Override = UF.UpdateThreatColor
 end
 
-local function UpdateNamePlateEvents(unitFrame)
-	-- These are events affected if unit is in a vehicle
-	local unit = unitFrame.unit
-	local displayedUnit
-	if unit ~= unitFrame.displayedUnit then
-		displayedUnit = unitFrame.displayedUnit
-	end
-	unitFrame:RegisterUnitEvent("UNIT_HEALTH_FREQUENT", unit, displayedUnit)
-	unitFrame:RegisterUnitEvent("UNIT_AURA", unit, displayedUnit)
-	--unitFrame:RegisterUnitEvent("UNIT_THREAT_LIST_UPDATE", unit, displayedUnit)
-	if R.ShowPowerList[UnitName(unitFrame.displayedUnit)] then
-		unitFrame:RegisterUnitEvent("UNIT_POWER_FREQUENT", unit, displayedUnit)
-		unitFrame.power:Show()
+-- Target indicator
+function UF:UpdateTargetChange()
+	local element = self.TargetIndicator
+	if MaoRUIPerDB["Nameplate"]["TargetIndicator"] == 1 then return end
+
+	if UnitIsUnit(self.unit, "target") and not UnitIsUnit(self.unit, "player") then
+		element:SetAlpha(1)
 	else
-		unitFrame:UnregisterEvent("UNIT_POWER_FREQUENT")
-		unitFrame.power:Hide()
+		element:SetAlpha(0)
 	end
 end
 
-local function BlockAddons()
-	if DBM and DBM.Nameplate then
-		function DBM.Nameplate:SupportedNPMod()
-			return true
+function UF:UpdateTargetIndicator(self)
+	local style = MaoRUIPerDB["Nameplate"]["TargetIndicator"]
+	local element = self.TargetIndicator
+	if style == 1 then
+		element:Hide()
+	else
+		if style == 2 then
+			element.TopArrow:Show()
+			element.RightArrow:Hide()
+			element.Glow:Hide()
+		elseif style == 3 then
+			element.TopArrow:Hide()
+			element.RightArrow:Show()
+			element.Glow:Hide()
+		elseif style == 4 then
+			element.TopArrow:Hide()
+			element.RightArrow:Hide()
+			element.Glow:Show()
+		elseif style == 5 then
+			element.TopArrow:Show()
+			element.RightArrow:Hide()
+			element.Glow:Show()
+		elseif style == 6 then
+			element.TopArrow:Hide()
+			element.RightArrow:Show()
+			element.Glow:Show()
 		end
+		element:Show()
 	end
 end
 
-local function UpdateAll(unitFrame)
-	local unit = unitFrame.displayedUnit
+function UF:AddTargetIndicator(self)
+	local frame = CreateFrame("Frame", nil, self)
+	frame:SetAllPoints()
+	frame:SetFrameLevel(0)
+	frame:SetAlpha(0)
 
-	if UnitExists(unit) then
-		UpdateSelectionHighlight(unitFrame)
-		UpdateName(unitFrame)
-		UpdateHealthColor(unitFrame)
-		UpdateHealth(unitFrame)
-		UpdateBuffs(unitFrame)
-		UpdateRaidTarget(unitFrame)
-	end
+	frame.TopArrow = frame:CreateTexture(nil, "BACKGROUND", nil, -5)
+	frame.TopArrow:SetSize(40, 40)
+	frame.TopArrow:SetTexture(I.arrowTex)
+	frame.TopArrow:SetPoint("BOTTOM", frame, "TOP", 0, 10)
+
+	frame.RightArrow = frame:CreateTexture(nil, "BACKGROUND", nil, -5)
+	frame.RightArrow:SetSize(40, 40)
+	frame.RightArrow:SetTexture(I.arrowTex)
+	frame.RightArrow:SetPoint("LEFT", frame, "RIGHT", 3, 0)
+	frame.RightArrow:SetRotation(rad(-90))
+
+	frame.Glow = CreateFrame("Frame", nil, frame)
+	frame.Glow:SetPoint("TOPLEFT", frame, -6, 6)
+	frame.Glow:SetPoint("BOTTOMRIGHT", frame, 6, -6)
+	frame.Glow:SetBackdrop({edgeFile = I.glowTex, edgeSize = 5})
+	frame.Glow:SetBackdropBorderColor(1, 1, 1)
+	frame.Glow:SetFrameLevel(0)
+
+	self.TargetIndicator = frame
+	UF:UpdateTargetIndicator(self)
+	self:RegisterEvent("PLAYER_TARGET_CHANGED", UF.UpdateTargetChange, true)
 end
 
-local function NamePlate_OnEvent(self, event, ...)
-	if not MaoRUIPerDB["Nameplate"]["Enable"] then
-		self:UnregisterAllEvents()
+-- Quest progress
+local isInInstance
+local function CheckInstanceStatus()
+	isInInstance = IsInInstance()
+end
+
+function UF:QuestIconCheck()
+	if not MaoRUIPerDB["Nameplate"]["QuestIndicator"] then return end
+
+	CheckInstanceStatus()
+	M:RegisterEvent("PLAYER_ENTERING_WORLD", CheckInstanceStatus)
+end
+
+local unitTip = CreateFrame("GameTooltip", "NDuiQuestUnitTip", nil, "GameTooltipTemplate")
+function UF:UpdateQuestUnit(_, unit)
+	if not MaoRUIPerDB["Nameplate"]["QuestIndicator"] then return end
+	if isInInstance then
+		self.questIcon:Hide()
+		self.questCount:SetText("")
 		return
 	end
 
-	local arg1 = ...
-	if event == "PLAYER_TARGET_CHANGED" then
-		UpdateName(self)
-		UpdateSelectionHighlight(self)
-	elseif event == "PLAYER_ENTERING_WORLD" then
-		UpdateAll(self)
-	elseif arg1 == self.unit or arg1 == self.displayedUnit then
-		if event == "UNIT_HEALTH_FREQUENT" then
-			UpdateHealth(self)
-			UpdateSelectionHighlight(self)
-		elseif event == "UNIT_AURA" then
-			UpdateBuffs(self)
-			UpdateSelectionHighlight(self)
-		--elseif event == "UNIT_THREAT_LIST_UPDATE" then
-			--UpdateHealthColor(self)
-		elseif event == "UNIT_NAME_UPDATE" then
-			UpdateName(self)
-		elseif event == "UNIT_PET" then
-			UpdateAll(self)
+	unit = unit or self.unit
+
+	local isLootQuest, questProgress
+	unitTip:SetOwner(UIParent, "ANCHOR_NONE")
+	unitTip:SetUnit(unit)
+
+	for i = 2, unitTip:NumLines() do
+		local textLine = _G[unitTip:GetName().."TextLeft"..i]
+		local text = textLine:GetText()
+		if textLine and text then
+			local r, g, b = textLine:GetTextColor()
+			local unitName, progressText = strmatch(text, "^ ([^ ]-) ?%- (.+)$")
+			if r > .99 and g > .82 and b == 0 then
+				isLootQuest = true
+			elseif unitName and progressText then
+				isLootQuest = false
+				if unitName == "" or unitName == I.MyName then
+					local current, goal = strmatch(progressText, "(%d+)/(%d+)")
+					local progress = strmatch(progressText, "([%d%.]+)%%")
+					if current and goal then
+						if tonumber(current) < tonumber(goal) then
+							questProgress = goal - current
+							break
+						end
+					elseif progress then
+						progress = tonumber(progress)
+						if progress and progress < 100 then
+							questProgress = progress.."%"
+							break
+						end
+					else
+						isLootQuest = true
+						break
+					end
+				end
+			end
+		end
+	end
+
+	if questProgress then
+		self.questCount:SetText(questProgress)
+		self.questIcon:SetAtlas(I.objectTex)
+		self.questIcon:Show()
+	else
+		self.questCount:SetText("")
+		if isLootQuest then
+			self.questIcon:SetAtlas(I.questTex)
+			self.questIcon:Show()
+		else
+			self.questIcon:Hide()
 		end
 	end
 end
 
-local function RegisterNamePlateEvents(unitFrame)
-	unitFrame:RegisterEvent("UNIT_NAME_UPDATE")
-	unitFrame:RegisterEvent("PLAYER_ENTERING_WORLD")
-	unitFrame:RegisterEvent("PLAYER_TARGET_CHANGED")
-	unitFrame:RegisterEvent("UNIT_PET")
-	--unitFrame:RegisterEvent("UNIT_ENTERED_VEHICLE")
-	--unitFrame:RegisterEvent("UNIT_EXITED_VEHICLE")
-	UpdateNamePlateEvents(unitFrame)
-	unitFrame:SetScript("OnEvent", NamePlate_OnEvent)
+function UF:UpdateForQuestie(name)
+	local data = name and QuestieTooltips.tooltipLookup["u_"..name]
+	if data then
+		local foundObjective, progressText
+		for _, tooltip in pairs(data) do
+			local questID = tooltip.Objective.QuestData.Id
+			QuestieQuest:UpdateQuest(questID)
+			if qCurrentQuestlog[questID] then
+				foundObjective = true
+				if tooltip.Objective.Needed then
+					progressText = tooltip.Objective.Needed - tooltip.Objective.Collected
+					if progressText == 0 then
+						foundObjective = nil
+					end
+					break
+				end
+			end
+		end
+		if foundObjective then
+			self.questIcon:Show()
+			self.questCount:SetText(progressText)
+		end
+	end
 end
 
-local function UnregisterNamePlateEvents(unitFrame)
-	unitFrame:UnregisterAllEvents()
-	unitFrame:SetScript("OnEvent", nil)
+function UF:UpdateCodexQuestUnit(name)
+	if name and CodexMap.tooltips[name] then
+		for _, meta in pairs(CodexMap.tooltips[name]) do
+			local questData = meta["quest"]
+			local quests = CodexDB.quests.loc
+
+			if questData then
+				for questIndex = 1, GetNumQuestLogEntries() do
+					local _, _, _, header, _, _, _, questId = GetQuestLogTitle(questIndex)
+					if not header and quests[questId] and questData == quests[questId].T then
+						local objectives = GetNumQuestLeaderBoards(questIndex)
+						local foundObjective, progressText = nil
+						if objectives then
+							for i = 1, objectives do
+								local text, type = GetQuestLogLeaderBoard(i, questIndex)
+								if type == "monster" then
+									local _, _, monsterName, objNum, objNeeded = strfind(text, Codex:SanitizePattern(QUEST_MONSTERS_KILLED))
+									if meta["spawn"] == monsterName then
+										progressText = objNeeded - objNum
+										foundObjective = true
+										break
+									end
+								elseif table.getn(meta["item"]) > 0 and type == "item" and meta["dropRate"] then
+									local _, _, itemName, objNum, objNeeded = strfind(text, Codex:SanitizePattern(QUEST_OBJECTS_FOUND))
+									for _, item in pairs(meta["item"]) do
+										if item == itemName then
+											progressText = objNeeded - objNum
+											foundObjective = true
+											break
+										end
+									end
+								end
+							end
+						end
+
+						if foundObjective and progressText > 0 then
+							self.questIcon:Show()
+							self.questCount:SetText(progressText)
+						elseif not foundObjective then
+							self.questIcon:Show()
+						end
+					end
+				end
+			end
+		end
+	end
 end
 
-local function SetUnit(unitFrame, unit)
-	unitFrame.unit = unit
-	unitFrame.displayedUnit = unit	 -- For vehicles
-	unitFrame.inVehicle = false
-	if unit then
-		RegisterNamePlateEvents(unitFrame)
+function UF:UpdateQuestIndicator()
+	if not MaoRUIPerDB["Nameplate"]["QuestIndicator"] then return end
+
+	self.questIcon:Hide()
+	self.questCount:SetText("")
+
+	local name = self.unitName
+	if CodexMap then
+		UF.UpdateCodexQuestUnit(self, name)
+	elseif QuestieTooltips then
+		UF.UpdateForQuestie(self, name)
+	end
+end
+
+function UF:AddQuestIcon(self)
+	if not MaoRUIPerDB["Nameplate"]["QuestIndicator"] then return end
+
+	local qicon = self:CreateTexture(nil, "OVERLAY", nil, 2)
+	qicon:SetPoint("LEFT", self, "RIGHT", 2, 0)
+	qicon:SetSize(16, 16)
+	qicon:SetAtlas(I.questTex)
+	qicon:Hide()
+	local count = M.CreateFS(self, 12, "", nil, "LEFT", 0, 0)
+	count:SetPoint("LEFT", qicon, "RIGHT", -2, 0)
+	count:SetTextColor(.6, .8, 1)
+
+	self.questIcon = qicon
+	self.questCount = count
+	--self:RegisterEvent("QUEST_LOG_UPDATE", UF.UpdateQuestUnit, true)
+	self:RegisterEvent("QUEST_LOG_UPDATE", UF.UpdateQuestIndicator, true)
+end
+
+-- Unit classification
+local classify = {
+	rare = {1, 1, 1, true},
+	elite = {1, 1, 1},
+	rareelite = {1, .1, .1},
+	worldboss = {0, 1, 0},
+}
+
+function UF:AddCreatureIcon(self)
+	local iconFrame = CreateFrame("Frame", nil, self)
+	iconFrame:SetAllPoints()
+	iconFrame:SetFrameLevel(self:GetFrameLevel() + 2)
+
+	local icon = iconFrame:CreateTexture(nil, "ARTWORK")
+	icon:SetAtlas("VignetteKill")
+	icon:SetPoint("BOTTOMLEFT", self, "LEFT", 0, -4)
+	icon:SetSize(18, 18)
+	icon:Hide()
+
+	self.creatureIcon = icon
+end
+
+function UF:UpdateUnitClassify(unit)
+	local class = UnitClassification(unit)
+	if self.creatureIcon then
+		if class and classify[class] then
+			local r, g, b, desature = unpack(classify[class])
+			self.creatureIcon:SetVertexColor(r, g, b)
+			self.creatureIcon:SetDesaturated(desature)
+			self.creatureIcon:Show()
+		else
+			self.creatureIcon:Hide()
+		end
+	end
+end
+
+-- Mouseover indicator
+function UF:IsMouseoverUnit()
+	if not self or not self.unit then return end
+
+	if self:IsVisible() and UnitExists("mouseover") then
+		return UnitIsUnit("mouseover", self.unit)
+	end
+	return false
+end
+
+function UF:UpdateMouseoverShown()
+	if not self or not self.unit then return end
+
+	if self:IsShown() and UnitIsUnit("mouseover", self.unit) then
+		self.HighlightIndicator:Show()
+		self.HighlightUpdater:Show()
 	else
-		UnregisterNamePlateEvents(unitFrame)
+		self.HighlightUpdater:Hide()
 	end
 end
 
--- Driver frame
-local function NamePlates_UpdateNamePlateOptions()
-	-- Called at VARIABLES_LOADED and by "Larger Nameplates" interface options checkbox
-	local baseNamePlateWidth = MaoRUIPerDB["Nameplate"]["Width"]
-	local baseNamePlateHeight = 40
-	local horizontalScale = tonumber(GetCVar("NamePlateHorizontalScale"))
-	C_NamePlate.SetNamePlateEnemySize(baseNamePlateWidth * horizontalScale, baseNamePlateHeight)
-	C_NamePlate.SetNamePlateFriendlySize(baseNamePlateWidth * horizontalScale, baseNamePlateHeight)
-	C_NamePlate.SetNamePlateSelfSize(baseNamePlateWidth, baseNamePlateHeight)
+function UF:MouseoverIndicator(self)
+	local highlight = CreateFrame("Frame", nil, self.Health)
+	highlight:SetAllPoints(self)
+	highlight:Hide()
+	local texture = highlight:CreateTexture(nil, "ARTWORK")
+	texture:SetAllPoints()
+	texture:SetColorTexture(1, 1, 1, .25)
 
-	for i, namePlate in ipairs(C_NamePlate.GetNamePlates()) do
-		local unitFrame = namePlate.UnitFrame
-		UpdateAll(unitFrame)
+	self:RegisterEvent("UPDATE_MOUSEOVER_UNIT", UF.UpdateMouseoverShown, true)
+
+	local f = CreateFrame("Frame", nil, self)
+	f:SetScript("OnUpdate", function(_, elapsed)
+		f.elapsed = (f.elapsed or 0) + elapsed
+		if f.elapsed > .1 then
+			if not UF.IsMouseoverUnit(self) then
+				f:Hide()
+			end
+			f.elapsed = 0
+		end
+	end)
+	f:HookScript("OnHide", function()
+		highlight:Hide()
+	end)
+
+	self.HighlightIndicator = highlight
+	self.HighlightUpdater = f
+end
+
+-- NazjatarFollowerXP
+function UF:AddFollowerXP(self)
+	local bar = CreateFrame("StatusBar", nil, self)
+	bar:SetSize(MaoRUIPerDB["Nameplate"]["PlateWidth"]*.75, MaoRUIPerDB["Nameplate"]["PlateHeight"])
+	bar:SetPoint("TOP", self.Castbar, "BOTTOM", 0, -5)
+	M.CreateSB(bar, false, 0, .7, 1)
+	bar.progressText = M.CreateFS(bar, 9)
+
+	self.NazjatarFollowerXP = bar
+end
+
+-- Interrupt info on castbars
+local guidToPlate = {}
+function UF:UpdateCastbarInterrupt(...)
+	local _, eventType, _, sourceGUID, sourceName, _, _, destGUID = ...
+	if eventType == "SPELL_INTERRUPT" and destGUID and sourceName and sourceName ~= "" then
+		local nameplate = guidToPlate[destGUID]
+		if nameplate and nameplate.Castbar then
+			local _, class = GetPlayerInfoByGUID(sourceGUID)
+			local r, g, b = M.ClassColor(class)
+			local color = M.HexRGB(r, g, b)
+			local sourceName = Ambiguate(sourceName, "short")
+			nameplate.Castbar.Text:SetText(INTERRUPTED.." > "..color..sourceName)
+			nameplate.Castbar.Time:SetText("")
+		end
 	end
 end
 
-local function HideBlizzard()
-	NamePlateDriverFrame:UnregisterAllEvents()
-	NamePlateDriverFrame.SetupClassNameplateBars = M.Dummy
-	NamePlateDriverFrame.UpdateNamePlateOptions = M.Dummy
-	--hooksecurefunc(NamePlateDriverFrame, "SetupClassNameplateBar", function()
-		--NamePlateTargetResourceFrame:Hide()
-		--NamePlatePlayerResourceFrame:Hide()
-	--end)
+function UF:AddInterruptInfo()
+	M:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED", self.UpdateCastbarInterrupt)
+end
 
-	-- CVars (Default: .08, .1, 60, .8, 1.1, .5)
-	if MaoRUIPerDB["Nameplate"]["InsideView"] then
-		SetCVar("nameplateOtherTopInset", .05)
-		SetCVar("nameplateOtherBottomInset", .08)
+-- Create Nameplates
+local platesList = {}
+function UF:CreatePlates()
+	self.mystyle = "nameplate"
+	self:SetSize(MaoRUIPerDB["Nameplate"]["PlateWidth"], MaoRUIPerDB["Nameplate"]["PlateHeight"])
+	self:SetPoint("CENTER")
+
+	local health = CreateFrame("StatusBar", nil, self)
+	health:SetAllPoints()
+	M.CreateSB(health)
+	M:SmoothBar(health)
+	self.Health = health
+	self.Health.frequentUpdates = true
+	self.Health.UpdateColor = UF.UpdateColor
+
+	UF:CreateHealthText(self)
+	UF:CreateCastBar(self)
+	UF:CreateRaidMark(self)
+	UF:CreatePrediction(self)
+	UF:CreateAuras(self)
+	--UF:CreateThreatColor(self)
+
+	self.powerText = M.CreateFS(self, 15)
+	self.powerText:ClearAllPoints()
+	self.powerText:SetPoint("TOP", self.Castbar, "BOTTOM", 0, -4)
+	self:Tag(self.powerText, "[nppp]")
+
+	UF:MouseoverIndicator(self)
+	UF:AddTargetIndicator(self)
+	UF:AddCreatureIcon(self)
+	UF:AddQuestIcon(self)
+
+	platesList[self] = self:GetName()
+end
+
+-- Classpower on target nameplate
+local isTargetClassPower
+function UF:UpdateClassPowerAnchor()
+	if not isTargetClassPower then return end
+
+	local bar = _G.oUF_ClassPowerBar
+	local nameplate = C_NamePlate.GetNamePlateForUnit("target")
+	if nameplate then
+		bar:SetParent(nameplate.unitFrame)
+		bar:SetScale(.7)
+		bar:ClearAllPoints()
+		bar:SetPoint("BOTTOM", nameplate.unitFrame, "TOP", 0, 26)
+		bar:Show()
 	else
-		SetCVar("nameplateOtherTopInset", -1)
-		SetCVar("nameplateOtherBottomInset", -1)
-	end
-	--fix fps drop(距離縮放與描邊功能會引起掉幀)
-	SetCVar("namePlateMinScale", 1)  --default is 0.8
-	SetCVar("namePlateMaxScale", 1)
-	
-	SetCVar("nameplateMaxDistance", "6e1")
-	SetCVar("nameplateOverlapH", .5)
-	SetCVar("nameplateOverlapV", .7)
-	SetCVar("nameplateMinAlpha", MaoRUIPerDB["Nameplate"]["MinAlpha"])
-
-	C_NamePlate.SetNamePlateFriendlyClickThrough(false)
-	SetCVar("nameplateSelectedScale", 1.43)
-end
-
-local function OnUnitFactionChanged(unit)
-	-- This would make more sense as a unitFrame:RegisterUnitEvent
-	local namePlate = C_NamePlate.GetNamePlateForUnit(unit)
-	if namePlate then
-		UpdateName(namePlate.UnitFrame)
-		UpdateHealthColor(namePlate.UnitFrame)
+		bar:Hide()
 	end
 end
 
-local function OnRaidTargetUpdate()
-	for _, namePlate in pairs(C_NamePlate.GetNamePlates()) do
-		UpdateRaidTarget(namePlate.UnitFrame)
-	end
-end
+function UF:UpdateTargetClassPower()
+	local bar = _G.oUF_ClassPowerBar
+	local playerPlate = _G.oUF_PlayerPlate
+	if not bar or not playerPlate then return end
 
-local function OnNamePlateCreated(namePlate)
-	local unitFrame = CreateFrame("Button", "$parentUnitFrame", namePlate)
-	unitFrame:SetAllPoints(namePlate)
-	unitFrame:SetFrameLevel(namePlate:GetFrameLevel())
-	unitFrame.name = M.CreateFS(unitFrame, 11, "", false, "TOPLEFT", 5, -5)
-	unitFrame.name:SetPoint("BOTTOMRIGHT", unitFrame, "TOPRIGHT", -5, -15)
-	namePlate.UnitFrame = unitFrame
-
-	local hp = CreateFrame("StatusBar", nil, unitFrame)
-	hp:SetHeight(MaoRUIPerDB["Nameplate"]["Height"])
-	hp:SetPoint("TOPLEFT", 0, -20)
-	hp:SetPoint("TOPRIGHT", 0, -20)
-	hp:SetMinMaxValues(0, 1)
-	M.CreateSB(hp)
-	M.SmoothBar(hp)
-	if MaoRUIPerDB["Nameplate"]["FullHealth"] then
-	  hp.value = M.CreateFS(hp, 9, "", false, "TOPRIGHT", 2, 6)
+	if MaoRUIPerDB["Nameplate"]["NameplateClassPower"] then
+		isTargetClassPower = true
+		UF:UpdateClassPowerAnchor()
 	else
-	  hp.value = M.CreateFS(hp, 12, "", false, "TOPRIGHT", 0, 8)
+		isTargetClassPower = false
+		if MaoRUIPerDB["Nameplate"]["ClassPowerOnly"] then
+			bar:SetParent(UIParent)
+		else
+			bar:SetParent(playerPlate.Health)
+		end
+		bar:SetScale(1)
+		bar:ClearAllPoints()
+		bar:SetPoint("BOTTOMLEFT", playerPlate.Health, "TOPLEFT", 0, 3)
+		bar:Show()
 	end
-	unitFrame.healthBar = hp
-
-	unitFrame.power = M.CreateFS(hp, 15, "", false, "LEFT", 0, 0)
-	unitFrame.power:SetPoint("LEFT", hp, "RIGHT", 2, 0)
-
-	local cicon = hp:CreateTexture(nil, "OVERLAY")
-	cicon:SetPoint("LEFT", hp, "TOPLEFT", 0, 3)
-	cicon:SetSize(21, 21)
-	cicon:SetAlpha(.8)
-	unitFrame.creatureIcon = cicon
-	
-	local Boomicon = hp:CreateTexture(nil, "OVERLAY")
-	Boomicon:SetPoint("BOTTOM", hp, "TOP", 0, 3)
-	Boomicon:SetSize(66, 66)
-	unitFrame.creatureBoomIcon = Boomicon
-
-	local rtf = CreateFrame("Frame", nil, unitFrame)
-	rtf:SetSize(30, 30)
-	rtf:SetPoint("TOP", unitFrame.name, "LEFT", -15, 15)
-	unitFrame.RaidTargetFrame = rtf
-
-	local ricon = rtf:CreateTexture(nil, "OVERLAY")
-	ricon:SetTexture([[Interface\TargetingFrame\UI-RaidTargetingIcons]])
-	ricon:SetAllPoints()
-	ricon:Hide()
-	rtf.RaidTargetIcon = ricon
-
-	if MaoRUIPerDB["Nameplate"]["Arrow"] then
-		local redarrowleft = unitFrame:CreateTexture(nil, "OVERLAY")
-		redarrowleft:SetSize(21, 21)
-		redarrowleft:SetTexture("Interface\\Addons\\_ShiGuang\\Media\\Modules\\Raid\\textureArrowAbove")
-		redarrowleft:SetPoint("RIGHT", namePlate.UnitFrame.healthBar, "LEFT", 1, 0)
-		redarrowleft:Hide()
-		unitFrame.redarrowleft = redarrowleft
-		local redarrowright = unitFrame:CreateTexture(nil, "OVERLAY")
-		redarrowright:SetSize(21, 21)
-		redarrowright:SetTexture("Interface\\Addons\\_ShiGuang\\Media\\Modules\\Raid\\textureArrowAbove")
-		redarrowright:SetPoint("LEFT", namePlate.UnitFrame.healthBar, "RIGHT", -1, 0)
-		redarrowright:Hide()
-		unitFrame.redarrowright = redarrowright
-	else
-		local glow = CreateFrame("Frame", nil, hp)
-		glow:SetPoint("TOPLEFT", hp, -5, 5)
-		glow:SetPoint("BOTTOMRIGHT", hp, 5, -5)
-		glow:SetBackdrop({edgeFile = I.glowTex, edgeSize = 4})
-		glow:SetBackdropBorderColor(1, 1, 1)
-		glow:SetFrameLevel(0)
-		unitFrame.glowBorder = glow
-	end
-
-	local icons = CreateFrame("Frame", nil, unitFrame)
-	icons:SetPoint("BOTTOM", unitFrame, "TOP", 3, 0)
-	icons:SetSize(126, 25)
-	icons:SetFrameLevel(unitFrame:GetFrameLevel() + 2)
-	unitFrame.iconsFrame = icons
-	unitFrame.icons = {}
-
-	unitFrame:EnableMouse(false)
 end
 
-local function OnNamePlateAdded(unit)
-	local namePlate = C_NamePlate.GetNamePlateForUnit(unit)
-	local unitFrame = namePlate.UnitFrame
-	SetUnit(unitFrame, unit)
-	UpdateAll(unitFrame)
-end
-
-local function OnNamePlateRemoved(unit)
-	local namePlate = C_NamePlate.GetNamePlateForUnit(unit)
-	local unitFrame = namePlate.UnitFrame
-	SetUnit(unitFrame, nil)
-end
-
-local function NamePlates_OnEvent(self, event, ...)
-	if not MaoRUIPerDB["Nameplate"]["Enable"] then
-		self:UnregisterAllEvents()
-		return
+function UF:RefreshAllPlates()
+	for nameplate in pairs(platesList) do
+		nameplate:SetSize(MaoRUIPerDB["Nameplate"]["PlateWidth"], MaoRUIPerDB["Nameplate"]["PlateHeight"])
+		nameplate.nameText:SetFont(I.Font[1], MaoRUIPerDB["Nameplate"]["NameTextSize"], I.Font[3])
+		nameplate.Castbar.Time:SetFont(I.Font[1], MaoRUIPerDB["Nameplate"]["NameTextSize"], I.Font[3])
+		nameplate.Castbar.Text:SetFont(I.Font[1], MaoRUIPerDB["Nameplate"]["NameTextSize"], I.Font[3])
+		nameplate.healthValue:SetFont(I.Font[1], MaoRUIPerDB["Nameplate"]["HealthTextSize"], I.Font[3])
+		nameplate.healthValue:UpdateTag()
+		nameplate.Auras.showDebuffType = MaoRUIPerDB["Nameplate"]["ColorBorder"]
+		UF:UpdateClickableSize()
+		UF:UpdateTargetIndicator(nameplate)
 	end
+end
 
-	local arg1 = ...
-	if event == "VARIABLES_LOADED" then
-		HideBlizzard()
-		BlockAddons()
-		NamePlates_UpdateNamePlateOptions()
-	elseif event == "NAME_PLATE_CREATED" then
-		OnNamePlateCreated(arg1)
-	elseif event == "NAME_PLATE_UNIT_ADDED" then
-		OnNamePlateAdded(arg1)
+function UF:PostUpdatePlates(event, unit)
+	if not self then return end
+
+	if event == "NAME_PLATE_UNIT_ADDED" then
+		self.unitName = UnitName(unit)
+		self.unitGUID = UnitGUID(unit)
+		if self.unitGUID then
+			guidToPlate[self.unitGUID] = self
+		end
+		self.npcID = M.GetNPCID(self.unitGUID)
 	elseif event == "NAME_PLATE_UNIT_REMOVED" then
-		OnNamePlateRemoved(arg1)
-	elseif event == "RAID_TARGET_UPDATE" then
-		OnRaidTargetUpdate()
-	elseif event == "DISPLAY_SIZE_CHANGED" then
-		NamePlates_UpdateNamePlateOptions()
-	elseif event == "UNIT_FACTION" then
-		OnUnitFactionChanged(arg1)
+		if self.unitGUID then
+			guidToPlate[self.unitGUID] = nil
+		end
+	end
+
+	UF.UpdateUnitPower(self)
+	UF.UpdateTargetChange(self)
+	--UF.UpdateQuestUnit(self, event, unit)
+	UF.UpdateQuestIndicator(self)
+	UF.UpdateUnitClassify(self, unit)
+	UF:UpdateClassPowerAnchor()
+end
+
+-- Player Nameplate
+local auras = M:GetModule("Auras")
+
+function UF:PlateVisibility(event)
+	if (event == "PLAYER_REGEN_DISABLED" or InCombatLockdown()) and UnitIsUnit("player", self.unit) then
+		UIFrameFadeIn(self.Health, .3, self.Health:GetAlpha(), 1)
+		UIFrameFadeIn(self.Health.bg, .3, self.Health.bg:GetAlpha(), 1)
+		UIFrameFadeIn(self.Power, .3, self.Power:GetAlpha(), 1)
+		UIFrameFadeIn(self.Power.bg, .3, self.Power.bg:GetAlpha(), 1)
+	else
+		UIFrameFadeOut(self.Health, 2, self.Health:GetAlpha(), .1)
+		UIFrameFadeOut(self.Health.bg, 2, self.Health.bg:GetAlpha(), .1)
+		UIFrameFadeOut(self.Power, 2, self.Power:GetAlpha(), .1)
+		UIFrameFadeOut(self.Power.bg, 2, self.Power.bg:GetAlpha(), .1)
 	end
 end
 
-local EventFrame = CreateFrame("Frame")
-EventFrame:RegisterEvent("VARIABLES_LOADED")
-EventFrame:RegisterEvent("NAME_PLATE_CREATED")
-EventFrame:RegisterEvent("NAME_PLATE_UNIT_ADDED")
-EventFrame:RegisterEvent("NAME_PLATE_UNIT_REMOVED")
-EventFrame:RegisterEvent("RAID_TARGET_UPDATE")
-EventFrame:RegisterEvent("DISPLAY_SIZE_CHANGED")
-EventFrame:RegisterEvent("UNIT_FACTION")
-EventFrame:SetScript("OnEvent", NamePlates_OnEvent)
+function UF:ResizePlayerPlate()
+	local plate = _G.oUF_PlayerPlate
+	if plate then
+		plate:SetHeight(MaoRUIPerDB["Nameplate"]["PPHeight"])
+		plate.Power:SetHeight(MaoRUIPerDB["Nameplate"]["PPPHeight"])
+		local bars = plate.ClassPower
+		if bars then
+			for i = 1, 6 do
+				bars[i]:SetHeight(MaoRUIPerDB["Nameplate"]["PPHeight"])
+			end
+		end
+	end
+end
+
+function UF:TogglePlayerPlateElements()
+	if not MaoRUIPerDB["Nameplate"]["ClassPowerOnly"] then return end
+
+	local plate = _G.oUF_PlayerPlate
+	if plate then
+		plate:DisableElement("Health")
+		plate:DisableElement("Power")
+	end
+end
+
+function UF:CreatePlayerPlate()
+	self.mystyle = "PlayerPlate"
+	local iconSize, margin = MaoRUIPerDB["Nameplate"]["PPIconSize"], 2
+	self:SetSize(iconSize*5 + margin*4, MaoRUIPerDB["Nameplate"]["PPHeight"])
+	self:EnableMouse(false)
+	self.iconSize = iconSize
+
+	UF:CreateHealthBar(self)
+	UF:CreatePowerBar(self)
+	UF:CreateClassPower(self)
+	UF:StaggerBar(self)
+	if MaoRUIPerDB["Auras"]["ClassAuras"] and not I.isClassic then auras:CreateLumos(self) end
+	if not MaoRUIPerDB["Nameplate"]["ClassPowerOnly"] then UF:CreateEneryTicker(self) end
+
+	if MaoRUIPerDB["Nameplate"]["PPPowerText"] then
+		local textFrame = CreateFrame("Frame", nil, self.Power)
+		textFrame:SetAllPoints()
+		local power = M.CreateFS(textFrame, 14, "")
+		self:Tag(power, "[pppower]")
+	end
+
+	UF:UpdateTargetClassPower()
+
+	if MaoRUIPerDB["Nameplate"]["PPHideOOC"] and not MaoRUIPerDB["Nameplate"]["ClassPowerOnly"] then
+		self:RegisterEvent("PLAYER_REGEN_ENABLED", UF.PlateVisibility, true)
+		self:RegisterEvent("PLAYER_REGEN_DISABLED", UF.PlateVisibility, true)
+		self:RegisterEvent("PLAYER_ENTERING_WORLD", UF.PlateVisibility, true)
+	end
+end

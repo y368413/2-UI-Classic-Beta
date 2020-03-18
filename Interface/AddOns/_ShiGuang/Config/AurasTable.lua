@@ -62,7 +62,69 @@ function module:AddNewAuraWatch(class, list)
 	end
 end
 
+-- RaidFrame spells
+local RaidBuffs = {}
+function module:AddClassSpells(list)
+	for class, value in pairs(list) do
+		if class == "ALL" then
+			if not RaidBuffs[class] then RaidBuffs[class] = {} end
+			for spellID in pairs(value) do
+				local name = GetSpellInfo(spellID)
+				if name then
+					RaidBuffs[class][name] = true
+				end
+			end
+		end
+	end
+end
+
+-- RaidFrame debuffs
+local RaidDebuffs = {}
+function module:AddRaidDebuffs(list)
+	for instType, value in pairs(list) do
+		for spellID, prio in pairs(value) do
+			if not RaidDebuffs[instType] then RaidDebuffs[instType] = {} end
+			if prio > 6 then prio = 6 end
+			RaidDebuffs[instType][spellID] = prio
+		end
+	end
+end
+
+function module:BuildNameListFromID()
+	if not R.CornerBuffsByName then R.CornerBuffsByName = {} end
+	wipe(R.CornerBuffsByName)
+
+	local myCornerBuffs = MaoRUIDB["CornerBuffs"][I.MyClass]
+	if not myCornerBuffs then return end
+
+	for spellID, value in pairs(myCornerBuffs) do
+		local name = GetSpellInfo(spellID)
+		if name then
+			R.CornerBuffsByName[name] = value
+		end
+	end
+end
 
 function module:OnLogin()
+	-- Cleanup data
+	if next(MaoRUIDB["RaidDebuffs"]) and not MaoRUIDB["RaidDebuffs"]["raid"] and not MaoRUIDB["RaidDebuffs"]["other"] then
+		wipe(MaoRUIDB["RaidDebuffs"])
+	end
+	for instType, value in pairs(RaidDebuffs) do
+		for spellID, prio in pairs(value) do
+			if MaoRUIDB["RaidDebuffs"][instType] and MaoRUIDB["RaidDebuffs"][instType][spellID] and MaoRUIDB["RaidDebuffs"][instType][spellID] == prio then
+				MaoRUIDB["RaidDebuffs"][instType][spellID] = nil
+			end
+		end
+	end
+
 	R.AuraWatchList = AuraWatchList
+	R.RaidBuffs = RaidBuffs
+	R.RaidDebuffs = RaidDebuffs
+
+	if not MaoRUIDB["CornerBuffs"][I.MyClass] then MaoRUIDB["CornerBuffs"][I.MyClass] = {} end
+	if not next(MaoRUIDB["CornerBuffs"][I.MyClass]) then
+		M.CopyTable(R.CornerBuffs[I.MyClass], MaoRUIDB["CornerBuffs"][I.MyClass])
+	end
+	self:BuildNameListFromID()
 end

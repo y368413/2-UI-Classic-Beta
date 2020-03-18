@@ -2,6 +2,7 @@
 	<Script file="Skins.lua"/>
 	<Script file="ObjectiveTracker.lua"/>
 	<Script file="Loot.lua"/>
+	<Script file="TradeSkillFrame.lua"/>
 	<Script file="AddOns\Bigwigs.lua"/>
 	<Script file="AddOns\DBM.lua"/>
 	<Script file="AddOns\TMW.lua"/>

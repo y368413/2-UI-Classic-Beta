@@ -32,8 +32,14 @@ I.r, I.g, I.b = I.ClassColors[I.MyClass].r, I.ClassColors[I.MyClass].g, I.ClassC
 I.MyColor = format("|cff%02x%02x%02x", I.r*255, I.g*255, I.b*255)
 I.InfoColor = "|cff99ccff"
 I.GreyColor = "|cff7b8489"  --cff808080
-BAG_ITEM_QUALITY_COLORS[LE_ITEM_QUALITY_POOR] = {r = .61, g = .61, b = .61}
-BAG_ITEM_QUALITY_COLORS[LE_ITEM_QUALITY_COMMON] = {r = 0, g = 0, b = 0}
+I.QualityColors = {}
+local qualityColors = BAG_ITEM_QUALITY_COLORS
+for index, value in pairs(qualityColors) do
+	I.QualityColors[index] = {r = value.r, g = value.g, b = value.b}
+end
+I.QualityColors[-1] = {r = 0, g = 0, b = 0}
+I.QualityColors[LE_ITEM_QUALITY_POOR] = {r = .61, g = .61, b = .61}
+I.QualityColors[LE_ITEM_QUALITY_COMMON] = {r = 0, g = 0, b = 0}
 
 -- Fonts
 I.Font = {STANDARD_TEXT_FONT, 12, "OUTLINE"}

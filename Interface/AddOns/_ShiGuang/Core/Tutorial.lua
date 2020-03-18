@@ -533,14 +533,5 @@ function module:OnLogin()
 	DefaultSettings()
 	ForceAddonSkins()
 	if not MaoRUIPerDB["Tutorial"]["Complete"] then HelloWorld() end
-			
-	if (ShiGuangPerDB["BHT"] == true) then
-	      sendCmd("/bht on")
-	      PlayerFrame:SetAlpha(0)
-	      TargetFrame:SetAlpha(0)  	      
-    else
-	      sendCmd("/bht off")
-	      PlayerFrame:SetAlpha(1)
-        TargetFrame:SetAlpha(1)
-	  end	
+	if (ShiGuangPerDB["BHT"] == true) then sendCmd("/bht on") else sendCmd("/bht off") end
 end

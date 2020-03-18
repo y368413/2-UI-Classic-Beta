@@ -29,6 +29,17 @@ R.Auras = {
 	InternalPos		= {"RIGHT", UIParent, "CENTER", -450, -250},	        -- 法术内置冷却分组
 }
 
+-- 头像相关
+R.UFs = {
+	Playercb		= {"CENTER", UIParent, "CENTER", 0, -250},			-- 玩家施法条默认位置
+	Targetcb		= {"CENTER", UIParent, "CENTER", 0, -145},			-- 目标施法条默认位置
+	Focuscb			= {"CENTER", UIParent, "CENTER", 0, -130},			-- 焦点施法条默认位置
+	PlayerPlate		= {"CENTER", UIParent, "CENTER", 0, -188},			-- 玩家姓名板默认位置
+	BarPoint		= {"CENTER", UIParent, "CENTER", 0, -176},								-- 资源条位置（以自身头像为基准）
+	BarSize			= {150, 5},											-- 资源条的尺寸（宽，长）
+	BarMargin		= 3,												-- 资源条间隔
+}
+
 -- 小地图
 R.Minimap = {
 	Pos				= {"TOPRIGHT", UIParent, "TOPRIGHT", 0, 0},	-- 小地图位置
@@ -36,8 +47,8 @@ R.Minimap = {
 
 -- 美化及皮肤
 R.Skins = {
-	MicroMenuPos 	= {"TOPRIGHT", Minimap, "TOPLEFT", 0, -3},			-- 微型菜单默认坐标
-	RMPos  			= {"LEFT", UIParent, "BOTTOMLEFT", 3, 210},					-- 团队工具默认坐标
+	MicroMenuPos 	= {"TOPRIGHT", Minimap, "TOPLEFT", -1, -3},			-- 微型菜单默认坐标
+	RMPos  			= {"LEFT", UIParent, "BOTTOMLEFT", 3, 330},					-- 团队工具默认坐标
 	PMPos  			= {"TOPLEFT", UIParent, "TOPLEFT", 310, -160},					-- 小队默认坐标
 }
 

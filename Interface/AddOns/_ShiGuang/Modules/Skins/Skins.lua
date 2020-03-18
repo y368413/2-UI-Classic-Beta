@@ -50,6 +50,7 @@ function S:OnLogin()
 
 	-- Add Skins
 	self:QuestTracker()
+	self:TradeSkillSkin()
 	self:DBMSkin()
 	self:BigWigsSkin()
 	self:LoadOtherSkins()

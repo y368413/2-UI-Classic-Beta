@@ -4,7 +4,7 @@ if I.Client ~= "zhCN" then return end
 
 local strsplit, pairs = string.split, pairs
 
-local quest = {
+local UIQuestsandHelp = {
    "更多设置请|cFF00DDFF右键小地图|r",
  	 "任何你不喜欢的，请你控制台关了它.|cff3399FF        自己去下载自己喜欢的",
  	 "|cff3399FF头像样式一就仅只有你看到这些.    无任何施法条、连击点和更多其它",
@@ -65,7 +65,7 @@ local function Helplist()
     bgTexture:SetTexture("Interface\\PETBATTLES\\Weather-StaticField");
     bgTexture:SetAllPoints();
     bgTexture:SetAlpha(.6)
-	f:SetPoint("TOPLEFT", 360, -100)
+	f:SetPoint("TOPLEFT", 260, -60)
 	f:SetScale(1.1)
 	f:SetFrameStrata("HIGH")
 	M.CreateMF(f)
@@ -73,7 +73,7 @@ local function Helplist()
 	M.CreateFS(f, 30, "2 UI", true, "TOPLEFT", 43, 16)
 	M.CreateFS(f, 16, I.Version, true, "TOPLEFT", 112, 6)
 	local offset = 0
-	for n, t in pairs(quest) do
+	for n, t in pairs(UIQuestsandHelp) do
 		M.CreateFS(f, 14, n..": "..t, false, "TOPLEFT", 21, -(21 + offset))
 		offset = offset + 21
 	end

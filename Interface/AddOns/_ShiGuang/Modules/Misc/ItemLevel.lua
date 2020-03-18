@@ -6,7 +6,6 @@ local pairs, select, next, wipe = pairs, select, next, wipe
 local UnitGUID, GetItemInfo = UnitGUID, GetItemInfo
 local GetContainerItemLink, GetInventoryItemLink = GetContainerItemLink, GetInventoryItemLink
 local EquipmentManager_UnpackLocation, EquipmentManager_GetItemInfoByLocation = EquipmentManager_UnpackLocation, EquipmentManager_GetItemInfoByLocation
-local BAG_ITEM_QUALITY_COLORS = BAG_ITEM_QUALITY_COLORS
 local C_Timer_After = C_Timer.After
 
 local inspectSlots = {
@@ -89,7 +88,7 @@ function MISC:RefreshButtonInfo()
 			if link then
 				local quality, level = select(3, GetItemInfo(link))
 				if quality then
-					local color = BAG_ITEM_QUALITY_COLORS[quality]
+					local color = I.QualityColors[quality]
 					MISC:ItemBorderSetColor(slotFrame, color.r, color.g, color.b)
 					if MaoRUIPerDB["Misc"]["ShowItemLevel"] and level and level > 1 and quality > 1 then
 						slotFrame.iLvlText:SetText(level)
@@ -133,7 +132,7 @@ function MISC:ItemLevel_SetupLevel(frame, strType, unit)
 				if link then
 					local quality, level = select(3, GetItemInfo(link))
 					if quality then
-						local color = BAG_ITEM_QUALITY_COLORS[quality]
+						local color = I.QualityColors[quality]
 						MISC:ItemBorderSetColor(slotFrame, color.r, color.g, color.b)
 						if MaoRUIPerDB["Misc"]["ShowItemLevel"] and level and level > 1 and quality > 1 then
 							slotFrame.iLvlText:SetText(level)

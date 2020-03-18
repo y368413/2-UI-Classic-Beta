@@ -1,6 +1,7 @@
-﻿--## Author: Peter Getov  ## Version: 3.3.1
+﻿--## Author: Peter Getov  ## Version: 3.3.3
 -- core - table (namespace) shared between every lua file
-local CharacterStatsClassic_UIConfig = {};
+local CharacterStatsClassic = {};
+CharacterStatsClassic.UIConfig = {};
 
 -- Defaults
 local UISettingsGlobal = {
@@ -12,9 +13,9 @@ local UISettingsCharacter = {
     selectedRightStatsCategory = 2;
 }
 
--- for easier referencing the core config
-local UIConfig = CharacterStatsClassic_UIConfig;
-local CSC_UIFrame = CharacterStatsClassic_UIConfig;
+-- for easier referencing the CharacterStatsClassic config
+local UIConfig = CharacterStatsClassic.UIConfig;
+local CSC_UIFrame = CharacterStatsClassic.UIConfig;
 local CSC_ConfigFrame = { };
 
 local statsDropdownList = {
@@ -218,7 +219,7 @@ characterStatsClassicEventFrame:RegisterEvent("SKILL_LINES_CHANGED");
 
 characterStatsClassicEventFrame:SetScript("OnEvent",
     function(self, event, ...)
-        CharacterStatsClassic_UIConfig:UpdateStats();
+        CharacterStatsClassic.UIConfig:UpdateStats();
     end)
     
     --[[
@@ -966,30 +967,46 @@ end
 local function CSC_GetBlockValue(unit)
 	CSC_ScanTooltip:ClearLines();
 
-	local blockFromShield = 0;
+	local blockValueFromItems = 0;
 	local firstItemslotIndex = 1;
 	local lastItemslotIndex = 18;
 
 	local blockValueIDs = { ITEM_MOD_BLOCK_RATING_SHORT, ITEM_MOD_BLOCK_RATING, ITEM_MOD_BLOCK_VALUE };
 
+	local equippedMightSetItems = 0;
+	local battlegearOfMightIDs = { [16861] = 16861, 
+								   [16862] = 16862, 
+								   [16863] = 16863, 
+								   [16864] = 16864, 
+								   [16865] = 16865, 
+								   [16866] = 16866, 
+								   [16867] = 16867, 
+								   [16868] = 16868
+								};
+
 	for itemslot=firstItemslotIndex, lastItemslotIndex do
 		local hasItem = CSC_ScanTooltip:SetInventoryItem(unit, itemslot);
 		if hasItem then
-			local maxLines = CSC_ScanTooltip:NumLines();
-			for line=1, maxLines do
-				local leftText = getglobal(CSC_ScanTooltipPrefix.."TextLeft"..line);
-				if leftText:GetText() then
-					for blockValueID=1, 3 do
-						local valueTxt = string.match(leftText:GetText(), "%d+ "..blockValueIDs[blockValueID]);
-						if not valueTxt then
-							valueTxt = string.match(leftText:GetText(), string.sub( blockValueIDs[blockValueID], 1, -5).." %d+");
-						end
-						if valueTxt then
-							valueTxt = string.match(valueTxt, "%d+");
+			local itemId = GetInventoryItemID(unit, itemslot);
+			if (itemId == battlegearOfMightIDs[itemId]) then
+				equippedMightSetItems = equippedMightSetItems + 1;
+			else
+				local maxLines = CSC_ScanTooltip:NumLines();
+				for line=1, maxLines do
+					local leftText = getglobal(CSC_ScanTooltipPrefix.."TextLeft"..line);
+					if leftText:GetText() then
+						for blockValueID=1, 3 do
+							local valueTxt = string.match(leftText:GetText(), "%d+ "..blockValueIDs[blockValueID]);
+							if not valueTxt then
+								valueTxt = string.match(leftText:GetText(), string.sub( blockValueIDs[blockValueID], 1, -5).." %d+");
+							end
 							if valueTxt then
-								local numValue = tonumber(valueTxt);
-								if numValue then
-									blockFromShield = blockFromShield+numValue;
+								valueTxt = string.match(valueTxt, "%d+");
+								if valueTxt then
+									local numValue = tonumber(valueTxt);
+									if numValue then
+										blockValueFromItems = blockValueFromItems + numValue;
+									end
 								end
 							end
 						end
@@ -1001,7 +1018,12 @@ local function CSC_GetBlockValue(unit)
 
 	local strStatIndex = 1;
 	local strength = select(2, UnitStat(unit, strStatIndex));
-	local blockValue = blockFromShield + (strength / 20);
+	local blockValue = blockValueFromItems + (strength / 20);
+	
+	local requiredMightSetItems = 3;
+	if (equippedMightSetItems >= requiredMightSetItems) then
+		blockValue = blockValue + 30; -- Set bonus reached
+	end
 
 	return blockValue;
 end
