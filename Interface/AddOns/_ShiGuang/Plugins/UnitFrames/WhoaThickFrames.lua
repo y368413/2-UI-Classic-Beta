@@ -1,6 +1,17 @@
-local ghostText = "Ghost";	-- for manual localization of word when you are dead and in ghost shape.
-local offlineText = "Offline";
-local deadText = DEAD;
+﻿local _, ns = ...
+local M, R, U, I = unpack(ns)
+
+hooksecurefunc("TextStatusBar_UpdateTextString", function(bar)   ----	  血量百分比数字 
+	local value = bar:GetValue()
+	local _, max = bar:GetMinMaxValues()
+	if bar.pctText then
+		bar.pctText:SetText(value==0 and "" or tostring(math.ceil((value / max) * 100)))  --(value==0 and "" or tostring(math.ceil((value / max) * 100)) .. "%")
+		if not MaoRUIPerDB["UFs"]["UFPctText"] or value == max then bar.pctText:Hide()
+		elseif GetCVarBool("statusTextPercentage") and ( bar.unit == PlayerFrame.unit or bar.unit == "target" or bar.unit == "focus" ) then bar.pctText:Hide()
+		else bar.pctText:Show()
+		end
+	end
+end)
 
 function CreateBarPctText(frame, ap, rp, x, y, font, fontsize)
 	local bar = frame.healthbar 
@@ -24,6 +35,19 @@ for i = 1, 4 do CreateBarPctText(_G["PartyMemberFrame"..i], "LEFT", "RIGHT", 6, 
 
 --	Player class colors HP.
 function unitClassColors(healthbar, unit)
+	if healthbar and not healthbar.lockValues and unit == healthbar.unit then
+		local min, max = healthbar:GetMinMaxValues()
+		local value = healthbar:GetValue()
+		if max > min then value = (value - min) / (max - min) else value = 0 end
+		if value > 0.5 then r, g, b = 2*(1-value), 1, 0 else r, g, b = 1, 2*value, 0 end
+			--if UnitIsPlayer(unit) and UnitClass(unit) then  --按职业着色
+				--local color = RAID_CLASS_COLORS[select(2, UnitClass(unit))]
+				--healthbar:SetStatusBarColor(color.r, color.g, color.b)
+			--else
+				--healthbar:SetStatusBarColor(r, g, b)
+			--end
+		if healthbar.pctText then	healthbar.pctText:SetTextColor(r, g, b) end
+	end
 	if UnitIsPlayer(unit) and UnitClass(unit) then
 		_, class = UnitClass(unit);
 		local class = CUSTOM_CLASS_COLORS and CUSTOM_CLASS_COLORS[class] or RAID_CLASS_COLORS[class];
@@ -38,7 +62,7 @@ hooksecurefunc("UnitFrameHealthBar_Update", unitClassColors)
 hooksecurefunc("HealthBar_OnValueChanged", function(self) unitClassColors(self, self.unit) end)
 
   
---	Whoa's customs target unit reactions HP colors.
+--	Whoa′s customs target unit reactions HP colors.
 local function npcReactionColors(healthbar, unit)
 		if UnitExists(unit) and (not UnitIsPlayer(unit)) then
 			local reaction = FACTION_BAR_COLORS[UnitReaction(unit,"player")];
@@ -118,9 +142,9 @@ local function targetFrameStatusText()
 	PlayerFrameGhostText = CreateDeadText("GhostText", "PlayerFrame", PlayerFrameHealthBar, "CENTER", 0, 0);
 
 	PlayerFrameDeadText:SetText(DEAD);
-	PlayerFrameGhostText:SetText(ghostText);
-	TargetFrameTextureFrameGhostText:SetText(ghostText);
-	TargetFrameTextureFrameOfflineText:SetText(offlineText);
+	PlayerFrameGhostText:SetText("Ghost");
+	TargetFrameTextureFrameGhostText:SetText("Ghost");
+	TargetFrameTextureFrameOfflineText:SetText("Offline");
 end
 targetFrameStatusText()
 
@@ -143,15 +167,14 @@ end)]]
 end)]]
 
 --[[hooksecurefunc("TextStatusBar_UpdateTextStringWithValues", function(self)
-	if not mi2addon and (cfg.styleFont) then
 		MainMenuBarExpText:SetFontObject(SystemFont_Outline_Small);
-	end
 end)]]
 
 -- NOTE: Blizzards API will return targets current and max healh as a percentage instead of exact value (ex. 100/100).
---[[hooksecurefunc("TextStatusBar_UpdateTextStringWithValues",function(statusFrame, textString, value, valueMin, valueMax)
+hooksecurefunc("TextStatusBar_UpdateTextStringWithValues",function(statusFrame, textString, value, valueMin, valueMax)
 	local xpValue = UnitXP("player");
 	local xpMaxValue = UnitXPMax("player");
+	
 	if( statusFrame.LeftText and statusFrame.RightText ) then
 		statusFrame.LeftText:SetText("");
 		statusFrame.RightText:SetText("");
@@ -171,23 +194,11 @@ end)]]
 			textString:Hide();
 			return;
 		end
-
-		local k,m=1e3
-		local m=k*k
 		
-		valueDisplay	=	(( value >= 1e3 and value < 1e5 and format("%1.3f",value/k)) or		--	1.000
-							( value >= 1e5 and value < 1e6 and format("%1.0f K",value/k)) or	--	100k
-							( value >= 1e6 and value < 1e7 and format("%1.1f M",value/m)) or	--	1.0M
-							( value >= 1e7 and format("%1.2f M",value/m)) or value )			--	10.00M +
-							
-		valueMaxDisplay	=	(( valueMax >= 1e3 and valueMax < 1e5 and format("%1.3f",valueMax/k)) or
-							( valueMax >= 1e5 and valueMax < 1e6 and format("%1.0f K",valueMax/k)) or
-							( valueMax >= 1e6 and valueMax < 1e7 and format("%1.1f M",valueMax/m)) or
-							( valueMax >= 1e7 and format("%1.2f M",valueMax/m)) or valueMax )
-							
-		xpValueDisplay	=	( xpValue >= 1e3 and format("%1.3f",xpValue/k) or xpValue )
-		
-		xpMaxValueDisplay	=	( xpMaxValue >= 1e3 and format("%1.3f",xpMaxValue/k) or xpMaxValue )
+	valueDisplay	=	M.Numb(value)
+	valueMaxDisplay	=	M.Numb(valueMax)	
+	xpValueDisplay	=	M.Numb(xpValue)
+	xpMaxValueDisplay	=	M.Numb(xpMaxValue)							
 		
 		local textDisplay = GetCVar("statusTextDisplay");
 		if ( value and valueMax > 0 and ( (textDisplay ~= "NUMERIC" and textDisplay ~= "NONE") or statusFrame.showPercentage ) and not statusFrame.showNumeric) then
@@ -230,6 +241,8 @@ end)]]
 			if ( statusFrame.prefix and (statusFrame.alwaysPrefix or not (statusFrame.cvar and GetCVar(statusFrame.cvar) == "1" and statusFrame.textLockable) ) ) then
 				textString:SetText(statusFrame.prefix.." "..valueDisplay.." / "..valueMaxDisplay);		--	xp # / none, + none.
 				MainMenuBarExpText:SetText(statusFrame.prefix.." "..xpValueDisplay .. "  / " .. xpMaxValueDisplay);		-- xp override.
+			elseif valueMax == value then
+			  textString:SetText(valueMaxDisplay)
 			else
 				textString:SetText(valueDisplay.." / "..valueMaxDisplay);		-- #.
 			end
@@ -244,7 +257,7 @@ end)]]
 			statusFrame:SetValue(0);
 		end
 	end
-end)]]
+end)
 
 -- Dead, Ghost and Offline text.
 hooksecurefunc("TextStatusBar_UpdateTextStringWithValues",function(self)
@@ -307,13 +320,14 @@ end)
 
 --	Player frame.
 hooksecurefunc("PlayerFrame_ToPlayerArt", function(self)
+	self.healthbar:SetStatusBarTexture("Interface\\Addons\\_ShiGuang\\Media\\Modules\\UFs\\UI-StatusBar");
 	PlayerStatusTexture:SetTexture("Interface\\AddOns\\_ShiGuang\\Media\\Modules\\UFs\\UI-Player-Status");
 	PlayerStatusTexture:ClearAllPoints();
 	PlayerStatusTexture:SetPoint("CENTER", PlayerFrame, "CENTER",16, 8);
 	PlayerFrameBackground:SetWidth(120);
 	self.name:Hide();
 	--self.name:SetPoint("CENTER", PlayerFrame, "CENTER",50.5, 36);
-	self.healthbar:SetPoint("TOPLEFT",106,-24);
+	self.healthbar:SetPoint("TOPLEFT",108,-24);
 	self.healthbar:SetHeight(28);
 	self.healthbar.LeftText:SetPoint("LEFT",self.healthbar,"LEFT",5,0);	
 	self.healthbar.RightText:SetPoint("RIGHT",self.healthbar,"RIGHT",-5,0);
@@ -411,8 +425,7 @@ hooksecurefunc("TargetFrame_CheckClassification", function(self, forceNormalText
 	local classification = UnitClassification(self.unit);
 	self.highLevelTexture:ClearAllPoints();
 	self.highLevelTexture:SetPoint("CENTER", self.levelText, "CENTER", 1,0);
-	--self.deadText:SetFont(STANDARD_TEXT_FONT,21,"OUTLINE")
-	--self.deadText:SetPoint("TOPLEFT", self.healthbar, "TOPRIGHT", 12, -8)
+	self.deadText:SetPoint("CENTER", self.healthbar, "CENTER",0,0);
 	self.unconsciousText:SetPoint("CENTER", self.manabar, "CENTER",0,0);
 	self.nameBackground:Hide();
 	if UnitIsCivilian(self.unit) then
@@ -494,6 +507,8 @@ hooksecurefunc("TargetFrame_CheckClassification", function(self, forceNormalText
 		end		
 	end
 	self.healthbar.lockColor = true;
+	self.healthbar:SetStatusBarTexture("Interface\\Addons\\_ShiGuang\\Media\\Modules\\UFs\\UI-StatusBar");
+	
 	if ( self.showPVP ) then
 		local factionGroup = UnitFactionGroup(self.unit);
 		if ( UnitIsPVPFreeForAll(self.unit) ) then
@@ -512,17 +527,6 @@ hooksecurefunc("TargetFrame_CheckClassification", function(self, forceNormalText
 	end
 end)
 
-
---[[hooksecurefunc("TargetFrame_CheckClassification", function(self)
-	if not mi2addon then
-		self.healthbar.LeftText:SetFontObject(SystemFont_Outline_Small);
-		self.healthbar.RightText:SetFontObject(SystemFont_Outline_Small);
-		self.manabar.LeftText:SetFontObject(SystemFont_Outline_Small);
-		self.manabar.RightText:SetFontObject(SystemFont_Outline_Small);
-		self.healthbar.TextString:SetFontObject(SystemFont_Outline_Small);
-		self.manabar.TextString:SetFontObject(SystemFont_Outline_Small);
-	end
-end)]]
 
 -- Mana texture
 hooksecurefunc("UnitFrameManaBar_UpdateType", function(manaBar)

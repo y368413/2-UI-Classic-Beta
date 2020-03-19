@@ -76,6 +76,7 @@
 	<Script file="ShowActionCount.lua"/>
 	<Script file="MudmenItemColor.lua"/>
 	<Script file="TradeSkillSearch.lua"/>
+	<Script file="ChatLinkIcons.lua"/>
 	<Script file="CharacterDurability.lua"/>
 	<Script file="CharacterStatsClass.lua"/>
 	<Script file="ItemTooltipProfession.lua"/>

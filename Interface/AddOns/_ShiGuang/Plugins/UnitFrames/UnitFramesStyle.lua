@@ -1,34 +1,4 @@
 ----------------------------------- iFrame  -----------------------------------------
-hooksecurefunc("TextStatusBar_UpdateTextString", function(bar)   ----	  血量百分比数字 
-	local value = bar:GetValue()
-	local _, max = bar:GetMinMaxValues()
-	if bar.pctText then
-		bar.pctText:SetText(value==0 and "" or tostring(math.ceil((value / max) * 100)))  --(value==0 and "" or tostring(math.ceil((value / max) * 100)) .. "%")
-		if not MaoRUIPerDB["UFs"]["UFPctText"] or value == max then bar.pctText:Hide()
-		elseif GetCVarBool("statusTextPercentage") and ( bar.unit == PlayerFrame.unit or bar.unit == "target" or bar.unit == "focus" ) then bar.pctText:Hide()
-		else bar.pctText:Show()
-		end
-	end
-end)
-
-local function colorHPBar(bar, unit)
-	if bar and not bar.lockValues and unit == bar.unit then
-		local min, max = bar:GetMinMaxValues()
-		local value = bar:GetValue()
-		if max > min then value = (value - min) / (max - min) else value = 0 end
-		if value > 0.5 then r, g, b = 2*(1-value), 1, 0 else r, g, b = 1, 2*value, 0 end
-			--if UnitIsPlayer(unit) and UnitClass(unit) then  --按职业着色
-				--local color = RAID_CLASS_COLORS[select(2, UnitClass(unit))]
-				--bar:SetStatusBarColor(color.r, color.g, color.b)
-			--else
-				--bar:SetStatusBarColor(r, g, b)
-			--end
-		if bar.pctText then	bar.pctText:SetTextColor(r, g, b) end
-	end
-end
-hooksecurefunc("UnitFrameHealthBar_Update", colorHPBar)
-hooksecurefunc("HealthBar_OnValueChanged", function(self) colorHPBar(self, self.unit) end)
-
 hooksecurefunc("UnitFrame_Update", function(self)
 	if self.name and self.unit then
 		local color = RAID_CLASS_COLORS[select(2, UnitClass(self.unit))] or NORMAL_FONT_COLOR

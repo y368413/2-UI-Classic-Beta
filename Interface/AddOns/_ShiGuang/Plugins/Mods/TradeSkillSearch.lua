@@ -1,15 +1,6 @@
 -------------------------------------------------------------------------------
 -- TradeSkillSearch  ## Version: 7  ## Author: glitschen
 -------------------------------------------------------------------------------
-
-TradeSkillSearch = {}
-local TSS = {}
-TSS.x = 80
-TSS.y = -50
-TSS.w = 210
-TSS.h = 21
-TSS.rowHeight = 16
-
 local function SearchTradeSkillsInner(s)
 	-- Search tradeskill list for first match.
 	for i=1,GetNumTradeSkills() do
@@ -18,7 +9,7 @@ local function SearchTradeSkillsInner(s)
 			skillName = skillName:lower()
 			if skillName:find(s, 1, true) ~= nil then
 				--SelectTradeSkill(i)
-				TradeSkillListScrollFrameScrollBar:SetValue((i-1) * TSS.rowHeight) 
+				TradeSkillListScrollFrameScrollBar:SetValue((i-1) * 16) 
 				--TradeSkillListScrollFrame.offset = i - 1
 				TradeSkillFrame_SetSelection(i)
 				--TradeSkillFrame_Update()
@@ -44,7 +35,7 @@ local function SearchCraftsInner(s)
 			craftName = craftName:lower()
 			if craftName:find(s, 1, true) ~= nil then
 				--SelectCraft(i)
-				CraftListScrollFrameScrollBar:SetValue((i-1) * TSS.rowHeight) 
+				CraftListScrollFrameScrollBar:SetValue((i-1) * 16) 
 				CraftFrame_SetSelection(i)
 				--CraftFrame_Update()
 				return
@@ -67,14 +58,14 @@ local function SetupTradeSkillWidgets()
 	local text = f:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
 	text:SetPoint("LEFT")
 	text:SetText(SEARCH..":")
-	f:SetPoint("TOPLEFT", TradeSkillFrame, "TOPLEFT", TSS.x - 7, TSS.y)
-	f:SetSize(TSS.w, TSS.h)
+	f:SetPoint("TOPLEFT", TradeSkillFrame, "TOPLEFT", 80 - 7, -50)
+	f:SetSize(210, 21)
 	-- Create search box
 	local f = CreateFrame("EditBox", "TSSTradeSkillSearchBox", TradeSkillFrame, "InputBoxTemplate")
 	f:SetFrameLevel(4)
 	f:SetPoint("CENTER")
-	f:SetPoint("TOPLEFT", TradeSkillFrame, "TOPLEFT", TSS.x + text:GetWidth(), TSS.y)
-	f:SetSize(TSS.w, TSS.h)
+	f:SetPoint("TOPLEFT", TradeSkillFrame, "TOPLEFT", 80 + text:GetWidth(), -50)
+	f:SetSize(210, 21)
 	f:SetAutoFocus(false)
 	-- Search when editbox contents change
 	f:HookScript("OnTextChanged", SearchTradeSkills)
@@ -95,14 +86,14 @@ local function SetupCraftWidgets()
 	local text = f:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
 	text:SetPoint("LEFT")
 	text:SetText(SEARCH..":")
-	f:SetPoint("TOPLEFT", CraftFrame, "TOPLEFT", TSS.x - 7, TSS.y)
-	f:SetSize(TSS.w, TSS.h)
+	f:SetPoint("TOPLEFT", CraftFrame, "TOP", 21 - 7, -46)
+	f:SetSize(210, 21)
 	-- Create search box
 	local f = CreateFrame("EditBox", "TSSCraftSearchBox", CraftFrame, "InputBoxTemplate")
 	f:SetFrameLevel(4)
 	f:SetPoint("CENTER")
-	f:SetPoint("TOPLEFT", CraftFrame, "TOPLEFT", TSS.x + text:GetWidth(), TSS.y)
-	f:SetSize(TSS.w, TSS.h)
+	f:SetPoint("TOPLEFT", CraftFrame, "TOP", 21 + text:GetWidth(), -46)
+	f:SetSize(210, 21)
 	f:SetAutoFocus(false)
 	-- Search when editbox contents change
 	f:HookScript("OnTextChanged", SearchCrafts)
