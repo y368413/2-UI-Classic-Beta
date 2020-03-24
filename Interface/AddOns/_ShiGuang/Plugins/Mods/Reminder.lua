@@ -98,78 +98,27 @@ frameBSC:SetScript("OnEvent",function(event,arg1)  --Event Handlers
   end
 end)
 
---  CtrlIndicator    Author: 图图   --用途: 用于检测Ctrl是否卡住,Ctrl按下4.5秒之后就会提示
-UIParent:CreateFontString("CtrlIndicatorTextCtrl", "OVERLAY")
-UIParent:CreateFontString("CtrlIndicatorTextAlt", "OVERLAY")
-UIParent:CreateFontString("CtrlIndicatorTextShift", "OVERLAY")
-
-CtrlIndicatorTextCtrl:SetPoint("TOP", 0, -88)
-CtrlIndicatorTextCtrl:SetFont(STANDARD_TEXT_FONT, 21,"OUTLINE")
-CtrlIndicatorTextCtrl:SetText("|cffffffff你的Ctrl可能卡啦!|r")
-UIParent:CreateTexture("CtrlIndicatorCtrlBG")
-CtrlIndicatorCtrlBG:SetPoint("CENTER", CtrlIndicatorTextCtrl, "CENTER", 0, 0)
-CtrlIndicatorCtrlBG:SetAtlas("OBJFX-BarGlow", true)
-
-CtrlIndicatorTextAlt:SetPoint("TOP", 0, -88)
-CtrlIndicatorTextAlt:SetFont(STANDARD_TEXT_FONT, 21,"OUTLINE")
-CtrlIndicatorTextAlt:SetText("|cffffffff你的Alt可能卡啦!|r")
-UIParent:CreateTexture("CtrlIndicatorAltBG")
-CtrlIndicatorAltBG:SetPoint("CENTER", CtrlIndicatorTextAlt, "CENTER", 0, 0);
-CtrlIndicatorAltBG:SetAtlas("OBJFX-BarGlow", true)
-
-CtrlIndicatorTextShift:SetPoint("TOP", 0, -88)
-CtrlIndicatorTextShift:SetFont(STANDARD_TEXT_FONT, 21,"OUTLINE")
-CtrlIndicatorTextShift:SetText("|cffffffff你的Shift可能卡啦!|r")
-UIParent:CreateTexture("CtrlIndicatorShiftBG")
-CtrlIndicatorShiftBG:SetPoint("CENTER", CtrlIndicatorTextAlt, "CENTER", 0, 0)
-CtrlIndicatorShiftBG:SetAtlas("OBJFX-BarGlow", true)
-
+--  CtrlIndicator    Author: 图图   --检测Ctrl是否卡住,Ctrl按下4.5秒之后就会提示
 local ctrlCnt, AltCnt, ShiftCnt = 0, 0, 0;
 C_Timer.NewTicker(0.1, function()
-    if IsControlKeyDown() then
-        ctrlCnt=ctrlCnt+1
-    else    
-        ctrlCnt = 0
-        CtrlIndicatorTextCtrl:Hide();
-    end
+    if not MaoRUIPerDB["Misc"]["CtrlIndicator"] then return end
+    if IsControlKeyDown() then ctrlCnt=ctrlCnt+1 else ctrlCnt = 0 end
     if ctrlCnt==45 then
-        print("|cffff0000你的Ctrl可能卡啦!|r")
-        CtrlIndicatorTextCtrl:Show();
+        PlaySoundFile("Interface\\AddOns\\_ShiGuang\\Media\\Sounds\\Legendary.ogg", "Master")
+        UIErrorsFrame:AddMessage("你的Ctrl可能卡啦!",1,0,0,5)
+        --RaidNotice_AddMessage(RaidWarningFrame, "|cffff0000你的Ctrl可能卡啦!|r", ChatTypeInfo["RAID_WARNING"])
     end
-    if ctrlCnt > 45 then
-        CtrlIndicatorCtrlBG:SetAlpha(0.69+math.sin((ctrlCnt%20)/20*2*3.1415926535898)/3.3333333);
-    else
-        CtrlIndicatorCtrlBG:SetAlpha(0);
-    end
-    if IsAltKeyDown() then
-        AltCnt=AltCnt+1
-    else    
-        AltCnt = 0
-        CtrlIndicatorTextAlt:Hide();
-    end
+    if IsAltKeyDown() then AltCnt=AltCnt+1 else AltCnt = 0 end
     if AltCnt==45 then
-        print("|cffff0000你的Alt可能卡啦!|r")
-        CtrlIndicatorTextAlt:Show();
+        PlaySoundFile("Interface\\AddOns\\_ShiGuang\\Media\\Sounds\\Legendary.ogg", "Master")
+        UIErrorsFrame:AddMessage("你的Alt可能卡啦!",1,0,0,5)
+        --RaidNotice_AddMessage(RaidWarningFrame, "|cffff0000你的Alt可能卡啦!|r", ChatTypeInfo["RAID_WARNING"])
     end
-    if AltCnt > 45 then
-        CtrlIndicatorAltBG:SetAlpha(0.69+math.sin((AltCnt%20)/20*2*3.1415926535898)/3.3333333);
-    else
-        CtrlIndicatorAltBG:SetAlpha(0);
-    end
-    if IsShiftKeyDown() then
-        ShiftCnt=ShiftCnt+1
-    else    
-        ShiftCnt = 0
-        CtrlIndicatorTextShift:Hide();
-    end
+    if IsShiftKeyDown() then ShiftCnt=ShiftCnt+1 else ShiftCnt = 0 end
     if ShiftCnt==45 then
-        print("|cffff0000你的Shift可能卡啦!|r")
-        CtrlIndicatorTextShift:Show();
-    end
-    if ShiftCnt > 45 then
-        CtrlIndicatorShiftBG:SetAlpha(0.69+math.sin((ShiftCnt%20)/20*2*3.1415926535898)/3.3333333);
-    else
-        CtrlIndicatorShiftBG:SetAlpha(0);
+        PlaySoundFile("Interface\\AddOns\\_ShiGuang\\Media\\Sounds\\Legendary.ogg", "Master")
+        UIErrorsFrame:AddMessage("你的Shift可能卡啦!",1,0,0,5)
+        --RaidNotice_AddMessage(RaidWarningFrame, "|cffff0000你的Shift可能卡啦!|r", ChatTypeInfo["RAID_WARNING"])
     end
 end)
 

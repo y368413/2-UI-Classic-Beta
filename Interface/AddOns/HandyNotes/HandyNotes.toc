@@ -1,4 +1,4 @@
-﻿## Interface: 11303
+## Interface: 11304
 ## Author: Xinhuan + Revel of Pagle
 ## Version: v1.5.9 +1.17
 ## Title: HandyNotes_NPCs

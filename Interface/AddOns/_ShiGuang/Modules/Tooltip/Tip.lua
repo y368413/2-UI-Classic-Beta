@@ -202,7 +202,7 @@ function TT:OnTooltipSetUnit()
 
 			if GameTooltipStatusBar.text then
 				local value, max = UnitHealth(unit), UnitHealthMax(unit)
-				GameTooltipStatusBar.text:SetText(M.Numb(value).." / "..M.Numb(max))
+				GameTooltipStatusBar.text:SetText(M.Numb(value).."/"..M.Numb(max))
 			end
 		else
 			GameTooltipStatusBar:Hide()

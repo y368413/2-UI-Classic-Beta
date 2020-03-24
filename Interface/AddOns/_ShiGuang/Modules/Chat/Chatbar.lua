@@ -117,18 +117,45 @@ end
  
 function module:Chatbar()
 	if not MaoRUIPerDB["Chat"]["Chatbar"] then return end
+
 	ChatFrameFilter()
-	
 	local chatFrame = SELECTED_DOCK_FRAME
 	local editBox = chatFrame.editBox
 	local width, height, padding, buttonList = 16, 18, 6, {}
 	local tinsert, pairs = table.insert, pairs
+	
 	local Chatbar = CreateFrame("Frame", nil, UIParent)
 	Chatbar:SetSize(width, height)
 	Chatbar:SetPoint("TOPLEFT", _G.ChatFrame1, "BOTTOMLEFT", 0, 0)
+
+	-- Custom ChatMenu
+	VoiceFrame = CreateFrame("Frame", nil, UIParent)
+	VoiceFrame:SetSize(26, 100)
+	VoiceFrame:SetPoint("TOPRIGHT", _G.ChatFrame1, 22, 0)
+	VoiceFrame:SetShown(MaoRUIPerDB["Chat"]["ChatMenu"])
+	
+	_G.ChatFrameMenuButton:ClearAllPoints()
+	_G.ChatFrameMenuButton:SetPoint("TOP", VoiceFrame)	
+	_G.ChatFrameMenuButton:SetParent(VoiceFrame)
+	_G.ChatFrameChannelButton:ClearAllPoints()
+	_G.ChatFrameChannelButton:SetPoint("TOP", _G.ChatFrameMenuButton, "BOTTOM", 0, -2)
+	_G.ChatFrameChannelButton:SetParent(VoiceFrame)
+	_G.ChatAlertFrame:SetClampedToScreen(true)
+	_G.ChatAlertFrame:ClearAllPoints()
+	_G.ChatAlertFrame:SetPoint("BOTTOMLEFT", _G.ChatFrame1Tab, "TOPLEFT", 6, 21)
+
+	local Voice = CreateFrame("Button", nil, Chatbar)
+	Voice:SetSize(18, 18)
+	Voice:SetPoint("LEFT", Chatbar, "LEFT", 0, -2)
+	Voice.Icon = Voice:CreateTexture(nil, "ARTWORK")
+	Voice.Icon:SetAllPoints()
+	Voice.Icon:SetTexture("Interface\\AddOns\\_ShiGuang\\media\\Emotes\\zhuan_push_frame")
+	Voice:RegisterForClicks("AnyUp")
+	Voice:SetScript("OnClick",function(self) M:TogglePanel(VoiceFrame) MaoRUIPerDB["Chat"]["ChatMenu"] = VoiceFrame:IsShown() end)
+
 	Emote_CallButton=CreateFrame("Button","Emote_CallButton",Chatbar)
- 	Emote_CallButton:SetSize(18, 18)
- 	Emote_CallButton:SetPoint("LEFT", Chatbar, "LEFT", 0, 0)
+ 	Emote_CallButton:SetSize(16, 16)
+ 	Emote_CallButton:SetPoint("LEFT", Voice, "RIGHT", 3, 0)
  	Emote_CallButton:SetNormalTexture("Interface\\AddOns\\_ShiGuang\\media\\Emotes\\suprise")
 	Emote_CallButton:SetParent(Chatbar)
  	Emote_CallButton:RegisterForClicks("AnyUp")
@@ -282,92 +309,47 @@ function module:Chatbar()
 	-- Order Postions
 	for i = 1, #buttonList do
 		if i == 1 then
-			buttonList[i]:SetPoint("LEFT", Emote_CallButton, "RIGHT", 4, -2)
+			buttonList[i]:SetPoint("LEFT", Emote_CallButton, "RIGHT", 6, -2)
 		else
 			buttonList[i]:SetPoint("LEFT", buttonList[i-1], "RIGHT", padding, 0)
 		end
 	end
 
---Voice
-	-- Custom ChatMenu
-	VoiceFrame = CreateFrame("Frame", nil, Chatbar)
-	VoiceFrame:SetSize(25, 100)
-	VoiceFrame:Hide()
-	VoiceFrame:SetPoint("TOPRIGHT", _G.ChatFrame1, 22, 0)
-	
-	_G.ChatFrameMenuButton:ClearAllPoints()
-	_G.ChatFrameMenuButton:SetPoint("TOP", VoiceFrame)	
-	_G.ChatFrameMenuButton:SetParent(VoiceFrame)
-	_G.ChatFrameChannelButton:ClearAllPoints()
-	_G.ChatFrameChannelButton:SetPoint("TOP", _G.ChatFrameMenuButton, "BOTTOM", 0, -2)
-	_G.ChatFrameChannelButton:SetParent(VoiceFrame)
-	_G.ChatAlertFrame:ClearAllPoints()
-	_G.ChatAlertFrame:SetPoint("BOTTOMLEFT", _G.ChatFrame1Tab, "TOPLEFT", 6, 6)
-
-	Voice = CreateFrame("Button", nil, Chatbar)
-	Voice:SetSize(18, 18)
-	if GetCVar("portal") == "CN" then
-	Voice:SetPoint("LEFT", buttonList[11], "RIGHT", 3, 0)
-	else
-	Voice:SetPoint("LEFT", buttonList[10], "RIGHT", 3, 0)
-	end
-	Voice:SetNormalTexture("Interface\\AddOns\\_ShiGuang\\media\\Emotes\\zhuan_push_frame")
-	Voice:RegisterForClicks("AnyUp")
-	Voice:SetScript("OnClick",function(self) if VoiceFrame:IsShown() then VoiceFrame:Hide() else VoiceFrame:Show() end end)
---end
-
 -------------------------- 處理聊天氣泡------------------------
+    if (GetCVarBool("chatBubbles")) then
+    local frame = CreateFrame("Frame", nil, UIParent)
     --替換文字為表情
     local function TextToEmote(text)
         text = text:gsub("%{.-%}", ReplaceEmote)
         return text
     end
     --找出氣泡框
-	local function findChatBubble(msg)
-		local chatbubbles = C_ChatBubbles.GetAllChatBubbles()
-		for index = 1, #chatbubbles do
-			local chatbubble = chatbubbles[index]
-			for i = 1, chatbubble:GetNumRegions() do
-				local region = select(i, chatbubble:GetRegions())
-				if region:GetObjectType() == "FontString" and region:GetText() == msg then
-					local text = region:GetText() or ""
-					local after = TextToEmote(text)
-					if (after ~= text) then
-						region:SetText(after)
-					end
-				end
-			end
-		end
-	end
-
-	local events = {
-		CHAT_MSG_SAY = "chatBubbles",
-		CHAT_MSG_YELL = "chatBubbles",
-		CHAT_MSG_MONSTER_SAY = "chatBubbles",
-		CHAT_MSG_MONSTER_YELL = "chatBubbles",
-		CHAT_MSG_PARTY = "chatBubblesParty",
-		CHAT_MSG_PARTY_LEADER = "chatBubblesParty",
-		CHAT_MSG_MONSTER_PARTY = "chatBubblesParty",
-	}
-
-	local bubbleHook = CreateFrame("Frame")
-	for event in next, events do
-		bubbleHook:RegisterEvent(event)
-	end
-	bubbleHook:SetScript("OnEvent", function(self, event, msg)
-		if GetCVarBool(events[event]) then
-			self.elapsed = 0
-			self.msg = msg
-			self:Show()
-		end
-	end)
-
-	bubbleHook:SetScript("OnUpdate", function(self, elapsed)
-		self.elapsed = self.elapsed + elapsed
-		if self.elapsed > .1 then
-			findChatBubble(self.msg)
-			self:Hide()
-		end
-	end)
-	bubbleHook:Hide()
+    local function FindAndReplaceBubble(self)
+        local b, v, f
+        for i = 2, WorldFrame:GetNumChildren() do
+            v = select(i, WorldFrame:GetChildren())
+            if (v:IsForbidden()) then return end
+            b = v:GetBackdrop()
+            if (v:IsShown() and b and b.bgFile == "Interface\\Tooltips\\ChatBubble-Background") then
+                for j = 1, v:GetNumRegions() do
+                    f = select(j, v:GetRegions())
+                    if f:GetObjectType() == "FontString" then
+                        local text = f:GetText() or ""
+                        local after = TextToEmote(text)
+                        if (after ~= text) then
+                            f:SetText(after)
+                        end
+                    end
+                end
+            end
+        end
+    end
+    frame:SetScript("OnUpdate", function(self, elapsed)
+        self.timer = (self.timer or 0) + elapsed
+        if (not self.paused and self.timer > 0.16) then
+            self.timer = 0
+            FindAndReplaceBubble(self)
+        end
+    end)
+    end
 end

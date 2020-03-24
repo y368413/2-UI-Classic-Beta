@@ -346,13 +346,13 @@ function UF:CreateCastBar(self)
 	cb:SetWidth(self:GetWidth() - 21)
 	M.CreateSB(cb, true, .2, .8, 1)
 
-	--if mystyle == "player" then
-		--cb:SetSize(MaoRUIPerDB["UFs"]["PlayerCBWidth"], MaoRUIPerDB["UFs"]["PlayerCBHeight"])
-		--createBarMover(cb, U["Player Castbar"], "PlayerCB", R.UFs.Playercb)
-	--elseif mystyle == "target" then
-		--cb:SetSize(MaoRUIPerDB["UFs"]["TargetCBWidth"], MaoRUIPerDB["UFs"]["TargetCBHeight"])
-		--createBarMover(cb, U["Target Castbar"], "TargetCB", R.UFs.Targetcb)
-	if mystyle == "nameplate" then
+	if mystyle == "player" then
+		cb:SetSize(MaoRUIPerDB["UFs"]["PlayerCBWidth"], MaoRUIPerDB["UFs"]["PlayerCBHeight"])
+		createBarMover(cb, U["Player Castbar"], "PlayerCB", R.UFs.Playercb)
+	elseif mystyle == "target" then
+		cb:SetSize(MaoRUIPerDB["UFs"]["TargetCBWidth"], MaoRUIPerDB["UFs"]["TargetCBHeight"])
+		createBarMover(cb, U["Target Castbar"], "TargetCB", R.UFs.Targetcb)
+	elseif mystyle == "nameplate" then
 		cb:SetPoint("TOPLEFT", self, "BOTTOMLEFT", 0, -2)
 		cb:SetPoint("TOPRIGHT", self, "BOTTOMRIGHT", 0, -2)
 		cb:SetHeight(self:GetHeight())
@@ -919,6 +919,7 @@ function UF:CreateAddPower(self)
 	self.AdditionalPower.bg = bg
 	self.AdditionalPower.Text = text
 	self.AdditionalPower.PostUpdate = UF.PostUpdateAddPower
+	self.AdditionalPower.frequentUpdates = true
 end
 
 function UF:CreateSwing(self)
@@ -927,8 +928,8 @@ function UF:CreateSwing(self)
 	local bar = CreateFrame("Frame", nil, self)
 	local width = MaoRUIPerDB["UFs"]["PlayerCBWidth"] - MaoRUIPerDB["UFs"]["PlayerCBHeight"] - 5
 	bar:SetSize(width, 3)
-	createBarMover(bar, U["UFs SwingBar"], "Swing", {"CENTER", UIParent, "CENTER", 0, -250})
-	--bar:SetPoint("TOP", self.Castbar.mover, "BOTTOM", 0, -5)
+	--createBarMover(bar, U["UFs SwingBar"], "Swing", {"CENTER", UIParent, "CENTER", 0, -250})
+	bar:SetPoint("TOP", self.Castbar.mover, "BOTTOM", 0, -5)
 
 	local two = CreateFrame("StatusBar", nil, bar)
 	two:Hide()

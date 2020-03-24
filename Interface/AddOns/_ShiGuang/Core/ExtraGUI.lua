@@ -450,7 +450,7 @@ function G:SetupBuffIndicator(parent)
 
 	local frameData = {
 		[1] = {text = U["RaidBuffWatch"].."*", offset = -25, width = 160, barList = {}},
-		[2] = {text = U["BuffIndicator"].."*", offset = -315, width = 70, barList = {}},
+		[2] = {text = U["BuffIndicator"].."*", offset = -315, width = 50, barList = {}},
 	}
 	local decodeAnchor = {
 		["TL"] = "TOPLEFT",
@@ -464,7 +464,7 @@ function G:SetupBuffIndicator(parent)
 	}
 	local anchors = {"TL", "T", "TR", "U", "R", "BL", "M", "BR"}
 
-	local function createBar(parent, index, spellID, anchor, r, g, b)
+	local function createBar(parent, index, spellID, anchor, r, g, b, showAll)
 		local name, _, texture = GetSpellInfo(spellID)
 		local bar = CreateFrame("Frame", nil, parent)
 		bar:SetSize(220, 30)
@@ -489,6 +489,7 @@ function G:SetupBuffIndicator(parent)
 		text:SetWidth(180)
 		text:SetJustifyH("LEFT")
 		if anchor then text:SetTextColor(r, g, b) end
+		if showAll then M.CreateFS(bar, 14, "ALL", false, "RIGHT", -30, 0) end
 
 		sortBars(frameData[index].barList)
 	end
@@ -496,17 +497,18 @@ function G:SetupBuffIndicator(parent)
 	local function addClick(parent, index)
 		local spellID = tonumber(parent.box:GetText())
 		if not spellID or not GetSpellInfo(spellID) then UIErrorsFrame:AddMessage(I.InfoColor..U["Incorrect SpellID"]) return end
-		local anchor, r, g, b
+		local anchor, r, g, b, showAll
 		if index == 1 then
 			if MaoRUIDB["RaidAuraWatch"][spellID] then UIErrorsFrame:AddMessage(I.InfoColor..U["Existing ID"]) return end
 			MaoRUIDB["RaidAuraWatch"][spellID] = true
 		else
 			anchor, r, g, b = parent.dd.Text:GetText(), parent.swatch.tex:GetVertexColor()
+			showAll = parent.showAll:GetChecked() or nil
 			if MaoRUIDB["CornerBuffs"][I.MyClass][spellID] then UIErrorsFrame:AddMessage(I.InfoColor..U["Existing ID"]) return end
 			anchor = decodeAnchor[anchor]
-			MaoRUIDB["CornerBuffs"][I.MyClass][spellID] = {anchor, {r, g, b}}
+			MaoRUIDB["CornerBuffs"][I.MyClass][spellID] = {anchor, {r, g, b}, showAll}
 		end
-		createBar(parent.child, index, spellID, anchor, r, g, b)
+		createBar(parent.child, index, spellID, anchor, r, g, b, showAll)
 		parent.box:SetText("")
 	end
 
@@ -572,14 +574,22 @@ function G:SetupBuffIndicator(parent)
 				scroll.dd.options[i]:HookScript("OnEnter", optionOnEnter)
 				scroll.dd.options[i]:HookScript("OnLeave", M.HideTooltip)
 			end
-			scroll.box:SetPoint("TOPLEFT", scroll.dd, "TOPRIGHT", 25, 0)
+			scroll.box:SetPoint("TOPLEFT", scroll.dd, "TOPRIGHT", 20, 0)
 
 			local swatch = M.CreateColorSwatch(frame, "")
 			swatch:SetPoint("LEFT", scroll.box, "RIGHT", 5, 0)
 			scroll.swatch = swatch
 
+			local showAll = M.CreateCheckBox(frame)
+			showAll:SetPoint("LEFT", swatch, "RIGHT", 2, 0)
+			showAll:SetHitRectInsets(0, 0, 0, 0)
+			showAll.title = U["Tips"]
+			M.AddTooltip(showAll, "ANCHOR_RIGHT", U["ShowAllTip"], "info")
+			scroll.showAll = showAll
+
 			for spellID, value in pairs(MaoRUIDB["CornerBuffs"][I.MyClass]) do
-				createBar(scroll.child, index, spellID, value[1], unpack(value[2]))
+				local r, g, b = unpack(value[2])
+				createBar(scroll.child, index, spellID, value[1], r, g, b, value[3])
 			end
 		end
 	end
@@ -687,7 +697,7 @@ function G:SetupCastbar(parent)
 	local scroll = G:CreateScroll(castbarGUI, 260, 540)
 
 	createOptionTitle(scroll.child, U["Castbar Colors"], -10)
-	createOptionSwatch(scroll.child, "", MaoRUIPerDB["UFs"]["CastingColor"], 40, -40)
+	createOptionSwatch(scroll.child, "", MaoRUIPerDB["UFs"]["CastingColor"], 120, -55)
 
 	local defaultValue = {
 		["Player"] = {300, 20},

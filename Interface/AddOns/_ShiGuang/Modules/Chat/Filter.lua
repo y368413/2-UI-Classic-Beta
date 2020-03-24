@@ -152,7 +152,6 @@ end
 function module:UpdateAddOnBlocker(event, msg, author)
 	local name = Ambiguate(author, "none")
 	if UnitIsUnit(name, "player") then return end
-
 	for _, word in ipairs(addonBlockList) do
 		if strfind(msg, word) then
 			if event == "CHAT_MSG_SAY" or event == "CHAT_MSG_YELL" then
@@ -174,18 +173,8 @@ local function SetChatLinkIcon(link)
     local texture
     if (schema == "item") then texture = select(10, GetItemInfo(tonumber(id)))
     elseif (schema == "spell") then texture = select(3, GetSpellInfo(tonumber(id)))
-    elseif (schema == "achievement") then texture = select(10, GetAchievementInfo(tonumber(id)))
     end
     return GetHyperlink(link, texture)
-end
-
-local function isItemHasGem(link)
-	for index in pairs(GetItemStats(link)) do
-		if strfind(index, "EMPTY_SOCKET_") then
-			return "|TInterface\\ItemSocketingFrame\\UI-EmptySocket-Prismatic:0|t"
-		end
-	end
-	return ""
 end
 
 local itemCache = {}
@@ -193,7 +182,6 @@ local function convertItemLevel(link)
 	if itemCache[link] then return itemCache[link] end
 
 	  local itemLink = strmatch(link, "|H(.-)|h")
-	  local itemLinkGem = strmatch(link, "|Hitem:.-|h")
     local name, _, _, _, _, class, subclass, _, equipSlot = GetItemInfo(itemLink)
     local level = GetDetailedItemLevelInfo(itemLink)
     if (level) then
@@ -201,11 +189,7 @@ local function convertItemLevel(link)
         elseif (class == ARMOR) then level = format("%s(%s)", level, class)
         elseif (subclass and strfind(subclass, RELICSLOT)) then level = format("%s(%s)", level, RELICSLOT)
         end
-        if itemLinkGem then
-        link = gsub(link, "|h%[(.-)%]|h", "|h["..level..isItemHasGem(itemLinkGem)..":"..name.."]|h")
-        else
         link = gsub(link, "|h%[(.-)%]|h", "|h["..level..":"..name.."]|h")
-        end
         itemCache[link] = link
     end
 	return link

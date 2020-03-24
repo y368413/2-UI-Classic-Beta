@@ -1,6 +1,5 @@
 <Ui xmlns="http://www.blizzard.com/wow/ui/">
 	<Include file="Ace\Ace.xml"/>
-	<Script file="GetTotemInfo.lua"/>
 	<Script file="LibAuraTypes.lua"/>
 	<Script file="LibSpellLocks.lua"/>
 	<Script file="LibClassicCasterino.lua"/>
