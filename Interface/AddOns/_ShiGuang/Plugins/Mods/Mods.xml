@@ -71,8 +71,9 @@
 	<Script file="Wardrobe.lua"/>
 	<Script file="HardYards.lua"/>
 	<Script file="WallpaperKit.lua"/>
+	<Script file="QuestBindings.lua"/>
 	<Script file="NeedsFoodBadly.lua"/>
-	<Script file="ReagentCount.lua"/>
+	<!--Script file="ReagentCount.lua"/-->
 	<Script file="ShowActionCount.lua"/>
 	<Script file="MudmenItemColor.lua"/>
 	<Script file="TradeSkillSearch.lua"/>

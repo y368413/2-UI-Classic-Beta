@@ -197,7 +197,7 @@ local SetMrbarMicromenu = {
     { text = "  |cFFBF00FF"..MINIMAP_MENU_QUSETIONANSWER.."|r", func = function() sendCmd("/MrHelp"); end, notCheckable = true},
     { text = "  |cFFBF00FF2 UI"..MINIMAP_MENU_UISETTING.."|r", func = function() sendCmd("/mr"); end, notCheckable = true},
     { text = "|cffff8800 --------------------------|r", isTitle = true, notCheckable = true  },
-    { text = "            |cFFBF00FF"..MINIMAP_MENU_MORE.."|r", func = function() sendCmd("/cbs"); end, notCheckable = true},
+    { text = "            |cFFBF00FF"..MINIMAP_MENU_MORE.."|r", func = function() sendCmd("/feedomatic"); end, notCheckable = true},
     --{ text = "ESC菜单", func = function() ToggleFrame(GameMenuFrame) end, notCheckable = true},
     --{ text = "                       ", isTitle = true, notCheckable = true  },
     --{ text = LOGOUT, func = function() Logout() end, notCheckable = true},

@@ -151,7 +151,7 @@ function module:Chatbar()
 	Voice.Icon:SetAllPoints()
 	Voice.Icon:SetTexture("Interface\\AddOns\\_ShiGuang\\media\\Emotes\\zhuan_push_frame")
 	Voice:RegisterForClicks("AnyUp")
-	Voice:SetScript("OnClick",function(self) M:TogglePanel(VoiceFrame) MaoRUIPerDB["Chat"]["ChatMenu"] = VoiceFrame:IsShown() end)
+	Voice:SetScript("OnClick",function(self) ToggleFrame(VoiceFrame) MaoRUIPerDB["Chat"]["ChatMenu"] = VoiceFrame:IsShown() end)
 
 	Emote_CallButton=CreateFrame("Button","Emote_CallButton",Chatbar)
  	Emote_CallButton:SetSize(16, 16)
