@@ -13,7 +13,6 @@ local UIQuestsandHelp = {
 	 "我缩放完了UI，系统头像位置变了.|cff3399FF          右键解锁挪回去",
 	 "我用的简易头像,右键解锁挪不动啊.|cff3399FF         /bht m",
 	 "为何没有Buff或者Debuff ID显示啊.|cff3399FF         按着你的Shift再看",
-	 "5人小队的框架位置很不习惯.|cff3399FF        按着Shift拖小队的第一个队友框",
 	 "点击聊天框角色名称可实现:|cff3399FF     Shift-密语 Ctrl-邀请工会 Alt-组队邀请",
    "|cFF00DDFF如需改进和反馈，可以回帖或者在讨论组(n9PnFl0o)告诉我，谢谢。",
    "-------------------------------"..GetAddOnMetadata("_ShiGuang", "X-StatsVersion").."----[怀旧]",

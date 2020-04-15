@@ -100,6 +100,8 @@ local defaultSettings = {
 		EnergyTicker = true,
 		UFTextScale = 1,
 		SmoothAmount = .3,
+		ToToT = false,
+		RaidTextScale = 1,
 
 		PlayerWidth = 245,
 		PlayerHeight = 24,
@@ -136,6 +138,7 @@ local defaultSettings = {
 		ChatWidth = 360,
 		ChatHeight = 121,
 		BlockStranger = false,
+		AllowFriends = true,
 		Outline = false,
 	},
 	Map = {
@@ -465,6 +468,10 @@ local function updateUFTextScale()
 	M:GetModule("UnitFrames"):UpdateTextScale()
 end
 
+local function updateRaidTextScale()
+	M:GetModule("UnitFrames"):UpdateRaidTextScale()
+end
+
 local function refreshRaidFrameIcons()
 	M:GetModule("UnitFrames"):RefreshRaidFrameIcons()
 end
@@ -587,15 +594,18 @@ local optionList = {		-- type, key, value, name, horizon, horizon2, doubleline
 		{1, "UFs", "PartyFrame", "|cff00cc4c"..U["UFs PartyFrame"], true, false},
 		{1, "UFs", "PartyPetFrame", "|cff00cc4c"..U["UFs PartyPetFrame"], true, true},
 		--{1, "UFs", "LagString", U["Castbar LagString"], true, false},
-		{1, "UFs", "RaidFrame", "|cff00cc4c"..U["UFs RaidFrame"], false, false, setupRaidFrame, nil, U["RaidFrameTip"]},
+		{1, "UFs", "RaidFrame", "|cff00cc4c"..U["UFs RaidFrame"], false, false, setupRaidFrame},
 		{1, "UFs", "SimpleMode", "|cff00cc4c"..U["Simple RaidFrame"], true},
 		{1, "UFs", "SimpleModeSortByRole", U["SimpleMode SortByRole"], true, true},
 		{1, "UFs", "ShowTeamIndex", U["RaidFrame TeamIndex"]},
-		{1, "UFs", "RaidClassColor", U["ClassColor RaidFrame"], true},
+		--{1, "UFs", "RaidClassColor", U["ClassColor RaidFrame"], true},
 		{1, "UFs", "RaidClickSets", "|cff00cc4c"..U["Enable ClickSets"], true, true, setupClickCast},
 		{1, "UFs", "HorizonParty", U["Horizon PartyFrame"]},
 		{1, "UFs", "HorizonRaid", U["Horizon RaidFrame"], true},		
 		{1, "UFs", "AurasClickThrough", U["RaidAuras ClickThrough"], true, true},
+		{4, "UFs", "RaidHPMode", U["RaidHPMode"].."*", true, {U["DisableRaidHP"], U["RaidHPPercent"], U["RaidHPCurrent"], U["RaidHPLost"]}, updateRaidNameText},
+		{4, "UFs", "RaidHealthColor", U["HealthColor"], nil, {U["Default Dark"], U["ClassColorHP"], U["GradientHP"]}},
+		{3, "UFs", "RaidTextScale", U["UFTextScale"], true, {.8, 1.5, 2}, updateRaidTextScale},
 		{1, "UFs", "InstanceAuras", "|cff00cc4c"..U["Instance Auras"], false, false, setupRaidDebuffs},
 		{1, "UFs", "RaidBuffIndicator", "|cff00cc4c"..U["RaidBuffIndicator"], true, false, setupBuffIndicator, nil, U["RaidBuffIndicatorTip"]},
 		{4, "UFs", "RaidHPMode", U["RaidHPMode"].."*", false, false, {U["DisableRaidHP"], U["RaidHPPercent"], U["RaidHPCurrent"], U["RaidHPLost"]}, updateRaidNameText},

@@ -47,7 +47,7 @@ R.Minimap = {
 
 -- 美化及皮肤
 R.Skins = {
-	MicroMenuPos 	= {"TOPRIGHT", Minimap, "TOPLEFT", -1, -3},			-- 微型菜单默认坐标
+	MicroMenuPos 	= {"TOPRIGHT", Minimap, "TOPLEFT", 1, -3},			-- 微型菜单默认坐标
 	RMPos  			= {"LEFT", UIParent, "BOTTOMLEFT", 3, 330},					-- 团队工具默认坐标
 	PMPos  			= {"TOPLEFT", UIParent, "TOPLEFT", 310, -160},					-- 小队默认坐标
 }

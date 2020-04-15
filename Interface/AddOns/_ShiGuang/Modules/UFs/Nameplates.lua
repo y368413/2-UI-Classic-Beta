@@ -46,7 +46,7 @@ function UF:SetupCVars()
 
 	UF:UpdatePlateScale()
 	SetCVar("nameplateSelectedScale", 1.25)
-	SetCVar("nameplateLargerScale", 1)
+	SetCVar("nameplateLargerScale", 1.25)
 
 	UF:UpdateClickableSize()
 	hooksecurefunc(NamePlateDriverFrame, "UpdateNamePlateOptions", UF.UpdateClickableSize)
