@@ -66,7 +66,7 @@ local defaultSettings = {
 		InstanceAuras = true,
 		RaidDebuffScale = 1,
 		--SpecRaidPos = false,
-		RaidClassColor = true,
+		RaidHealthColor = 2,
 		HorizonRaid = false,
 		HorizonParty = false,
 		SimpleRaidScale = 12,
@@ -464,9 +464,6 @@ local function updatePlayerPlate()
 	M:GetModule("UnitFrames"):ResizePlayerPlate()
 end
 
-local function updateUFTextScale()
-	M:GetModule("UnitFrames"):UpdateTextScale()
-end
 
 local function updateRaidTextScale()
 	M:GetModule("UnitFrames"):UpdateRaidTextScale()
@@ -592,28 +589,26 @@ local optionList = {		-- type, key, value, name, horizon, horizon2, doubleline
 	[3] = {
 		{1, "UFs", "Castbars", "|cff00cc4c"..U["UFs Castbar"], false, false, setupCastbar},
 		{1, "UFs", "PartyFrame", "|cff00cc4c"..U["UFs PartyFrame"], true, false},
-		{1, "UFs", "PartyPetFrame", "|cff00cc4c"..U["UFs PartyPetFrame"], true, true},
+		{4, "UFs", "RaidHealthColor", U["HealthColor"], true, true, {U["Default Dark"], U["ClassColorHP"], U["GradientHP"]}},
 		--{1, "UFs", "LagString", U["Castbar LagString"], true, false},
 		{1, "UFs", "RaidFrame", "|cff00cc4c"..U["UFs RaidFrame"], false, false, setupRaidFrame},
 		{1, "UFs", "SimpleMode", "|cff00cc4c"..U["Simple RaidFrame"], true},
 		{1, "UFs", "SimpleModeSortByRole", U["SimpleMode SortByRole"], true, true},
-		{1, "UFs", "ShowTeamIndex", U["RaidFrame TeamIndex"]},
-		--{1, "UFs", "RaidClassColor", U["ClassColor RaidFrame"], true},
-		{1, "UFs", "RaidClickSets", "|cff00cc4c"..U["Enable ClickSets"], true, true, setupClickCast},
-		{1, "UFs", "HorizonParty", U["Horizon PartyFrame"]},
-		{1, "UFs", "HorizonRaid", U["Horizon RaidFrame"], true},		
-		{1, "UFs", "AurasClickThrough", U["RaidAuras ClickThrough"], true, true},
-		{4, "UFs", "RaidHPMode", U["RaidHPMode"].."*", true, {U["DisableRaidHP"], U["RaidHPPercent"], U["RaidHPCurrent"], U["RaidHPLost"]}, updateRaidNameText},
-		{4, "UFs", "RaidHealthColor", U["HealthColor"], nil, {U["Default Dark"], U["ClassColorHP"], U["GradientHP"]}},
-		{3, "UFs", "RaidTextScale", U["UFTextScale"], true, {.8, 1.5, 2}, updateRaidTextScale},
+		{1, "UFs", "RaidClickSets", "|cff00cc4c"..U["Enable ClickSets"], false, false, setupClickCast},
+		{1, "UFs", "PartyPetFrame", "|cff00cc4c"..U["UFs PartyPetFrame"], true, false},
+		{1, "UFs", "ShowTeamIndex", U["RaidFrame TeamIndex"], true, true},
 		{1, "UFs", "InstanceAuras", "|cff00cc4c"..U["Instance Auras"], false, false, setupRaidDebuffs},
 		{1, "UFs", "RaidBuffIndicator", "|cff00cc4c"..U["RaidBuffIndicator"], true, false, setupBuffIndicator, nil, U["RaidBuffIndicatorTip"]},
+		{1, "UFs", "AurasClickThrough", U["RaidAuras ClickThrough"], true, true},
+		{3, "UFs", "NumGroups", U["Num Groups"], false, false, {4, 8, 0}},
+		{1, "UFs", "HorizonParty", U["Horizon PartyFrame"], true},
+		{1, "UFs", "HorizonRaid", U["Horizon RaidFrame"], true, true},	
 		{4, "UFs", "RaidHPMode", U["RaidHPMode"].."*", false, false, {U["DisableRaidHP"], U["RaidHPPercent"], U["RaidHPCurrent"], U["RaidHPLost"]}, updateRaidNameText},
 		{4, "UFs", "HealthColor", U["HealthColor"], true, false, {U["Default Dark"], U["ClassColorHP"], U["GradientHP"]}},
 		{4, "UFs", "BuffIndicatorType", U["BuffIndicatorType"].."*", true, true, {U["BI_Blocks"], U["BI_Icons"], U["BI_Numbers"]}, refreshRaidFrameIcons},
 		{3, "UFs", "BuffIndicatorScale", U["BuffIndicatorScale"].."*", false, false, {1, 2, 1}, refreshRaidFrameIcons},
 		{3, "UFs", "RaidDebuffScale", U["RaidDebuffScale"].."*", true, false, {1, 2, 1}, refreshRaidFrameIcons},
-		{3, "UFs", "NumGroups", U["Num Groups"], true, true, {4, 8, 0}},
+		{3, "UFs", "RaidTextScale", U["UFTextScale"], true, true, {.8, 1.5, 2}, updateRaidTextScale},
 		--{3, "UFs", "UFTextScale", U["UFTextScale"], true, {.8, 2, 2}, updateUFTextScale},
 	},
 	[4] = {

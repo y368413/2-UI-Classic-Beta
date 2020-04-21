@@ -1,7 +1,5 @@
 <Ui xmlns="http://www.blizzard.com/wow/ui/">
   <Script file="ManaPerc.lua"/>
-  <!--Script file="Castbars.lua"/>
-  <Script file="DialogKey.lua"/-->
   <Script file="FeedOMatic.lua"/>
   <Script file="TrackingEye.lua"/>
   <Include file="DaisyCosp\DaisyCosp.xml"/>

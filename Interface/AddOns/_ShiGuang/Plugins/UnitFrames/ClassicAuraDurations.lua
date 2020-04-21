@@ -12,10 +12,10 @@ end)
 local defaults = {
     portraitIcon = true,
     playerPortraitIcon = true,
-    enemyBuffs = true,
+    enemyBuffs = false,
     hookTargetFrame = true,
     verbosePortraitIcon = false,
-    largePersonalDebuffs = true,
+    largePersonalDebuffs = false,
 }
 
 -- Redefining blizzard consts

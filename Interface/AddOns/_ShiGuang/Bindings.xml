@@ -1,16 +1,16 @@
 ﻿<Bindings>
 	<Binding name="RELOADUI" description="Reloads the UI." header="ACE3" category="BINDING_HEADER_ACE3"> ReloadUI() </Binding>
-	<Binding name="INSPECT" header="TARGETCLASSBUTTON" category="BINDING_HEADER_ACE3"> InspectUnit("target") </Binding>
-	<Binding name="TRADE" category="BINDING_HEADER_ACE3"> InitiateTrade("target") </Binding>
-	<Binding name="WHISPER" category="BINDING_HEADER_ACE3">
+	<Binding name="TARGETCLASSBUTTON_INSPECT" header="TARGETCLASSBUTTON" category="BINDING_HEADER_ACE3"> InspectUnit("target") </Binding>
+	<Binding name="TARGETCLASSBUTTON_TRADE" category="BINDING_HEADER_ACE3"> InitiateTrade("target") </Binding>
+	<Binding name="TARGETCLASSBUTTON_WHISPER" category="BINDING_HEADER_ACE3">
 		local server = nil;
 		local name, server = UnitName("target");
-		local fullname = name;
 		if ( server and (not "target" or UnitRealmRelationship("target") ~= LE_REALM_RELATION_SAME) ) then
-			fullname = name.."-"..server;
+			ChatFrame_SendTell(name.."-"..server);
+		else
+			ChatFrame_SendTell(name);
 		end
-		ChatFrame_SendTell(fullname)
 	</Binding>
-	<Binding name="FOLLOW" category="BINDING_HEADER_ACE3"> FollowUnit("target") </Binding>
-	<Binding name="Invite" category="BINDING_HEADER_ACE3"> InviteUnit("target") </Binding>
+	<Binding name="TARGETCLASSBUTTON_FOLLOW" category="BINDING_HEADER_ACE3"> FollowUnit("target") </Binding>
+	<Binding name="TARGETCLASSBUTTON_INVITE" category="BINDING_HEADER_ACE3"> InviteUnit("target") </Binding>
 </Bindings>

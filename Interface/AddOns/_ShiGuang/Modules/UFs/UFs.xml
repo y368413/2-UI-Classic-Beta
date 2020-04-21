@@ -4,6 +4,6 @@
 	<Script file="Raid.lua"/>
 	<Script file="Nameplates.lua"/>
 	<Script file="Spawns.lua"/>
-	<Script file="OverheadCombo.lua"/>
+	<!--Script file="OverheadCombo.lua"/-->
 	<Script file="BlinkHealthText.lua"/>
 </Ui>

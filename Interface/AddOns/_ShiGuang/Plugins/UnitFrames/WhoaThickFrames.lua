@@ -562,6 +562,4 @@ local function totFrame()
 end
 hooksecurefunc("TargetofTarget_Update", totFrame)
 hooksecurefunc("TargetFrame_CheckClassification", totFrame)
-
-
 --------------------------------------------------------------------------------------whoa end

@@ -1,4 +1,4 @@
---## Version: 1.1.5 ## Author: Bytespire
+--## Version: 1.1.6 ## Author: Bytespire
 local ItemProfConstants = {}
 
 local COOK =    0x001
@@ -32,12 +32,12 @@ local LW_Q =	0x8000000
 local TAIL_Q =	0x10000000
 local DMF =		0x20000000
 
-ItemProfConstants_VENDOR_ITEM_FLAG = VENDOR
-ItemProfConstants_DMF_ITEM_FLAG = DMF
-ItemProfConstants_QUEST_FLAG = Q
-ItemProfConstants_NUM_PROF_FLAGS = 8	-- Num professions tracked
+ItemProfConstants.VENDOR_ITEM_FLAG = VENDOR
+ItemProfConstants.DMF_ITEM_FLAG = DMF
+ItemProfConstants.QUEST_FLAG = Q
+ItemProfConstants.NUM_PROF_FLAGS = 8	-- Num professions tracked
 
-ItemProfConstants_PROF_TEXTURES = {
+ItemProfConstants.PROF_TEXTURES = {
 [ COOK ] = GetSpellTexture( 2550 ),
 [ FAID ] = GetSpellTexture( 3273 ),
 [ ALC ] = GetSpellTexture( 2259 ),
@@ -51,7 +51,7 @@ ItemProfConstants_PROF_TEXTURES = {
 }
 
 -- Mapping the item IDs to texture indices
-ItemProfConstants_ITEM_PROF_FLAGS = {
+ItemProfConstants.ITEM_PROF_FLAGS = {
 [ 118 ] = ALC,
 [ 159 ] = COOK + ENG + VENDOR,
 [ 723 ] = COOK + ALLI,	--q
@@ -159,7 +159,7 @@ ItemProfConstants_ITEM_PROF_FLAGS = {
 [ 3240 ] = DMF,
 [ 3340 ] = ALLI,
 [ 3355 ] = ALC,
-[ 3356 ] = ALC + ENC + LW,
+[ 3356 ] = ALC + ENC + LW + Q,
 [ 3357 ] = ALC + WARRIOR,			--q WARRIOR
 [ 3358 ] = ALC,
 [ 3369 ] = ALC,
@@ -177,7 +177,7 @@ ItemProfConstants_ITEM_PROF_FLAGS = {
 [ 3482 ] = HORDE + BS_Q,			--q BS
 [ 3483 ] = HORDE + BS_Q,			--q BS
 [ 3486 ] = BS + DMF,
-[ 3575 ] = ALC + BS + ENG + HORDE + BS_Q + WARRIOR,	--q WARRIOR BS	****
+[ 3575 ] = ALC + BS + ENG + HORDE + Q + WARRIOR,	--q WARRIOR BS	****
 [ 3577 ] = BS + ENG + TAIL + WARLOCK,				--q WARLOCK SMELTING ****
 [ 3667 ] = COOK,
 [ 3685 ] = COOK,
@@ -202,6 +202,7 @@ ItemProfConstants_ITEM_PROF_FLAGS = {
 [ 3851 ] = HORDE + BS_Q,			--q BS
 [ 3853 ] = Q,						--q BS + MARSH
 [ 3855 ] = BS_Q,					--q BS
+[ 3857 ] = VENDOR + Q,
 [ 3858 ] = ALC,
 [ 3859 ] = BS + ENG,
 [ 3860 ] = ALC + BS + ENG + BS_Q,			--q BS
@@ -210,7 +211,7 @@ ItemProfConstants_ITEM_PROF_FLAGS = {
 [ 4231 ] = LW,
 [ 4232 ] = LW,
 [ 4233 ] = LW,
-[ 4234 ] = BS + ENG + LW + TAIL,
+[ 4234 ] = BS + ENG + LW + TAIL + Q,
 [ 4235 ] = LW,
 [ 4236 ] = LW,
 [ 4239 ] = ALLI + LW_Q,			--q LW ALLIANCE
@@ -434,6 +435,7 @@ ItemProfConstants_ITEM_PROF_FLAGS = {
 [ 10560 ] = ENG + Q,	--q
 [ 10561 ] = ENG + Q,	--q
 [ 10562 ] = Q,
+[ 10575 ] = Q,
 [ 10576 ] = ENG,
 [ 10577 ] = ENG,
 [ 10586 ] = ENG,
@@ -470,9 +472,9 @@ ItemProfConstants_ITEM_PROF_FLAGS = {
 [ 11188 ] = BS + Q,		--q
 [ 11291 ] = ENC + VENDOR,
 [ 11315 ] = Q,			--q BOP?
-[ 11370 ] = WARLOCK,	-- MOUNT QUEST
+[ 11370 ] = Q,	-- MOUNT QUEST
 [ 11371 ] = BS + ENG,
-[ 11382 ] = BS + ENC,
+[ 11382 ] = BS + ENC + Q,
 [ 11404 ] = DMF,
 [ 11407 ] = DMF,
 [ 11477 ] = HORDE,			--q HORDE
@@ -524,12 +526,12 @@ ItemProfConstants_ITEM_PROF_FLAGS = {
 [ 12799 ] = BS + ENG,
 [ 12800 ] = BS + ENG + TAIL + PALADIN + SHAMAN,		--q SHAMAN PALADIN MOUNT? AQ
 [ 12803 ] = ALC + BS + ENC + ENG + LW + TAIL,
-[ 12804 ] = BS + ENG + LW + TAIL,
+[ 12804 ] = ALC + BS + ENG + LW + TAIL,
 [ 12808 ] = ALC + BS + ENC + ENG + TAIL,
 [ 12809 ] = BS + ENC + LW + TAIL,
 [ 12810 ] = BS + ENG + LW + TAIL,
 [ 12811 ] = BS + ENC + TAIL,
-[ 12938 ] = Q,
+[ 12938 ] = ALC + Q,
 --[ 13365 ] = BS + ENG,		-- TYPO SOMETHING IS MISSING
 [ 13180 ] = Q,		-- ALSO PALADIN MOUNT QUEST
 [ 13422 ] = ALC,
@@ -555,7 +557,7 @@ ItemProfConstants_ITEM_PROF_FLAGS = {
 [ 13893 ] = COOK,
 [ 13926 ] = ENC + TAIL,
 [ 14044 ] = LW,
-[ 14047 ] = FAID + BS + ENG + LW + TAIL + PALADIN,	-- REP QUESTS & PALADIN MOUNT
+[ 14047 ] = FAID + BS + ENG + LW + TAIL + Q,	-- REP QUESTS & PALADIN MOUNT
 [ 14048 ] = LW + TAIL + Q,
 [ 14227 ] = ENG + LW + TAIL,
 [ 14256 ] = LW + TAIL + WARLOCK,		--q WARLOCK
@@ -586,9 +588,9 @@ ItemProfConstants_ITEM_PROF_FLAGS = {
 [ 16204 ] = ENC,
 [ 16206 ] = ENC,
 [ 16885 ] = ROGUE,		--q ROGUE
-[ 17010 ] = BS + ENG + LW + TAIL,
-[ 17011 ] = BS + ENG + LW + TAIL,
-[ 17012 ] = BS + LW + TAIL,
+[ 17010 ] = BS + ENG + LW + TAIL + Q,
+[ 17011 ] = BS + ENG + LW + TAIL + Q,
+[ 17012 ] = BS + LW + TAIL + Q,
 [ 17034 ] = ENC + VENDOR,
 [ 17035 ] = ENC + VENDOR,
 [ 17194 ] = COOK + VENDOR,
@@ -597,18 +599,43 @@ ItemProfConstants_ITEM_PROF_FLAGS = {
 [ 18240 ] = LW + TAIL + Q,
 [ 18255 ] = COOK,
 [ 18256 ] = ALC + ENC + VENDOR,
+[ 18329 ] = Q,
+[ 18330 ] = Q,
+[ 18331 ] = Q,
 [ 18332 ] = Q,
 [ 18333 ] = Q,
 [ 18334 ] = Q,
 [ 18335 ] = Q,	--SHAMAN + PALADIN,		--q LIBRAM SHAMAN PALADIN(MOUNT)
 [ 18512 ] = ENC + LW,
 [ 18631 ] = ENG,
+[ 18944 ] = Q,
+[ 18945 ] = Q,
 [ 19441 ] = FAID,
+[ 19698 ] = Q,
+[ 19699 ] = Q,
+[ 19700 ] = Q,
+[ 19701 ] = Q,
+[ 19702 ] = Q,
+[ 19703 ] = Q,
+[ 19704 ] = Q,
+[ 19705 ] = Q,
+[ 19706 ] = Q,
 [ 19726 ] = BS + ENG + LW + TAIL,
 [ 19767 ] = LW,
 [ 19768 ] = LW,
 [ 19774 ] = BS + ENG,
+[ 19813 ] = Q,
+[ 19814 ] = Q,
+[ 19815 ] = Q,
+[ 19816 ] = Q,
+[ 19817 ] = Q,
+[ 19818 ] = Q,
+[ 19819 ] = Q,
+[ 19820 ] = Q,
+[ 19821 ] = Q,
+[ 19858 ] = Q,
 [ 19933 ] = DMF,
+[ 19943 ] = ALC,
 [ 20381 ] = LW,
 [ 20424 ] = COOK,
 [ 20498 ] = LW,
@@ -628,12 +655,12 @@ local previousItemID = -1
 local itemIcons = ""
 local iconSize
 
-local ITEM_VENDOR_FLAG = ItemProfConstants_VENDOR_ITEM_FLAG
-local ITEM_DMF_FLAG = ItemProfConstants_DMF_ITEM_FLAG
-local ITEM_PROF_FLAGS = ItemProfConstants_ITEM_PROF_FLAGS
-local QUEST_FLAG = ItemProfConstants_QUEST_FLAG
-local NUM_PROFS_TRACKED = ItemProfConstants_NUM_PROF_FLAGS
-local PROF_TEXTURES = ItemProfConstants_PROF_TEXTURES
+local ITEM_VENDOR_FLAG = ItemProfConstants.VENDOR_ITEM_FLAG
+local ITEM_DMF_FLAG = ItemProfConstants.DMF_ITEM_FLAG
+local ITEM_PROF_FLAGS = ItemProfConstants.ITEM_PROF_FLAGS
+local QUEST_FLAG = ItemProfConstants.QUEST_FLAG
+local NUM_PROFS_TRACKED = ItemProfConstants.NUM_PROF_FLAGS
+local PROF_TEXTURES = ItemProfConstants.PROF_TEXTURES
 
 local showProfs
 local showQuests
@@ -642,8 +669,8 @@ local questFilter
 local includeVendor
 local showDMF
 
-ItemProfConstants_configTooltipIconsRealm = GetRealmName()
-ItemProfConstants_configTooltipIconsChar = UnitName( "player" )
+ItemProfConstants.configTooltipIconsRealm = GetRealmName()
+ItemProfConstants.configTooltipIconsChar = UnitName( "player" )
 
 local function CreateItemIcons( itemFlags )
 	if not includeVendor then
@@ -753,13 +780,13 @@ end
 
 function ItemProfConstants:ConfigChanged()
 
-	showProfs = ShiGuangDB[ ItemProfConstants_configTooltipIconsRealm ][ ItemProfConstants_configTooltipIconsChar ].showProfs
-	showQuests = ShiGuangDB[ ItemProfConstants_configTooltipIconsRealm ][ ItemProfConstants_configTooltipIconsChar ].showQuests
-	profFilter = ShiGuangDB[ ItemProfConstants_configTooltipIconsRealm ][ ItemProfConstants_configTooltipIconsChar ].profFlags
-	questFilter = ShiGuangDB[ ItemProfConstants_configTooltipIconsRealm ][ ItemProfConstants_configTooltipIconsChar ].questFlags
-	includeVendor = ShiGuangDB[ ItemProfConstants_configTooltipIconsRealm ][ ItemProfConstants_configTooltipIconsChar ].includeVendor
-	iconSize = ShiGuangDB[ ItemProfConstants_configTooltipIconsRealm ][ ItemProfConstants_configTooltipIconsChar ].iconSize
-	showDMF = ShiGuangDB[ ItemProfConstants_configTooltipIconsRealm ][ ItemProfConstants_configTooltipIconsChar ].showDMF
+	showProfs = ShiGuangDB[ ItemProfConstants.configTooltipIconsRealm ][ ItemProfConstants.configTooltipIconsChar ].showProfs
+	showQuests = ShiGuangDB[ ItemProfConstants.configTooltipIconsRealm ][ ItemProfConstants.configTooltipIconsChar ].showQuests
+	profFilter = ShiGuangDB[ ItemProfConstants.configTooltipIconsRealm ][ ItemProfConstants.configTooltipIconsChar ].profFlags
+	questFilter = ShiGuangDB[ ItemProfConstants.configTooltipIconsRealm ][ ItemProfConstants.configTooltipIconsChar ].questFlags
+	includeVendor = ShiGuangDB[ ItemProfConstants.configTooltipIconsRealm ][ ItemProfConstants.configTooltipIconsChar ].includeVendor
+	iconSize = ShiGuangDB[ ItemProfConstants.configTooltipIconsRealm ][ ItemProfConstants.configTooltipIconsChar ].iconSize
+	showDMF = ShiGuangDB[ ItemProfConstants.configTooltipIconsRealm ][ ItemProfConstants.configTooltipIconsChar ].showDMF
 	
 	previousItemID = -1		-- Reset line
 end
@@ -772,7 +799,7 @@ InitFrame()
 
 local frame = CreateFrame( "Frame" )
 frame.name = ITEMTOOLTIPPROFESSION_TITLE
-local NUM_PROFS_TRACKED = ItemProfConstants_NUM_PROF_FLAGS
+local NUM_PROFS_TRACKED = ItemProfConstants.NUM_PROF_FLAGS
 
 local profsCheck
 local questCheck
@@ -906,8 +933,8 @@ end
 
 local function InitVariables()
 	
-	local configRealm = ItemProfConstants_configTooltipIconsRealm
-	local configChar = ItemProfConstants_configTooltipIconsChar
+	local configRealm = ItemProfConstants.configTooltipIconsRealm
+	local configChar = ItemProfConstants.configTooltipIconsChar
 
 	if not ShiGuangDB[ configRealm ] then
 		ShiGuangDB[ configRealm ] = {}

@@ -2,7 +2,6 @@
 	<Script file="IconMarks.lua"/>
 	<Script file="PowerSpark.lua"/>
 	<Script file="PartyFramesStyle.lua"/>
-	<Script file="PetTarget.lua"/>
 	<Script file="UnitFramesStyle.lua"/>
 	<Script file="WhoaThickFrames.lua"/>
 	<Script file="AlternatePowerBar.lua"/>

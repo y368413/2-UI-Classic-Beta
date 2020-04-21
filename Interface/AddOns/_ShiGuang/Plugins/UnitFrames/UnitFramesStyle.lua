@@ -66,11 +66,11 @@ end)]]
 	
 ------------------------------------------------------------------------------- TargetClassButton by 狂飙@cwdg(networm@qq.com) 20120119 DIY by y368413 
 -- Binding Variables
-BINDING_NAME_INSPECT = "    "..INSPECT
-BINDING_NAME_TRADE = "    "..TRADE
-BINDING_NAME_WHISPER = "    "..WHISPER
-BINDING_NAME_FOLLOW = "    "..FOLLOW
-BINDING_NAME_Invite = "    "..CALENDAR_INVITE_PLAYER 
+BINDING_NAME_TARGETCLASSBUTTON_INSPECT = "    "..INSPECT
+BINDING_NAME_TARGETCLASSBUTTON_TRADE = "    "..TRADE
+BINDING_NAME_TARGETCLASSBUTTON_WHISPER = "    "..WHISPER
+BINDING_NAME_TARGETCLASSBUTTON_FOLLOW = "    "..FOLLOW
+BINDING_NAME_TARGETCLASSBUTTON_INVITE = "    "..INVITE 
 
 local targeticon = CreateFrame("Button", "TargetClass", TargetFrame)
 targeticon:Hide()
@@ -91,7 +91,7 @@ icon:SetHeight(21)
 icon:SetPoint("CENTER")
 RaiseFrameLevel(targeticon)
 targeticon:SetScript("OnUpdate", function(self)
-	if (not UnitCanAttack("player","target") and UnitIsPlayer("target") and CheckInteractDistance("target",1)) then
+	if (not UnitCanAttack("player","target") and UnitIsPlayer("target")) then
 		targeticon:Enable()
 		SetDesaturation(TargetClassIcon, false) 	--	TargetClassIcon:SetDesaturated(false)
 	else
@@ -102,21 +102,21 @@ end)
 targeticon:SetScript("OnMouseDown", function(self, button)
 	if (not UnitCanAttack("player","target") and UnitIsPlayer("target")) then
 		if button == "LeftButton" then
-			if CheckInteractDistance("target",1) then InspectUnit("target") end
+			InspectUnit("target")
 		elseif button == "RightButton" then
 			if CheckInteractDistance("target",2) then InitiateTrade("target") end
 		elseif button == "MiddleButton" then  --	StartDuel("target")
 				local server = nil;
 				local name, server = UnitName("target");
-				local fullname = name;			
-				if server then  --if ( server and (not "target" or not UnitIsSameServer("player", "target")) ) then
-					fullname = name.."-"..server;
+				if ( server and (not "target" or UnitRealmRelationship("target") ~= LE_REALM_RELATION_SAME) ) then
+					ChatFrame_SendTell(name.."-"..server);
+				else
+					ChatFrame_SendTell(name);
 				end
-				ChatFrame_SendTell(fullname)
 		elseif button == "Button4" then
 			if CheckInteractDistance("target",4) then FollowUnit("target", 1); end
 		else
-			if CheckInteractDistance("target",1) then InspectAchievements("target") end
+			if CheckInteractDistance("target",1) then InviteUnit(UnitName("target")) end
 		end
 	end
 end)

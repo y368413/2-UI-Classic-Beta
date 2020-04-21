@@ -1,4 +1,4 @@
-﻿--## Author: Peter Getov  ## Version: 3.3.4
+﻿--## Author: Peter Getov  ## Version: 3.5
 -- core - table (namespace) shared between every lua file
 local CharacterStatsClassic = {};
 CharacterStatsClassic.UIConfig = {};
@@ -234,6 +234,9 @@ local CSC_ScanTooltip = CreateFrame("GameTooltip", "CSC_ScanTooltip", nil, "Game
 CSC_ScanTooltip:SetOwner(WorldFrame, "ANCHOR_NONE");
 local CSC_ScanTooltipPrefix = "CSC_ScanTooltip";
 
+local g_lastSeenBaseManaRegen = 0;
+local g_lastSeenCastingManaRegen = 0;
+
 local weaponStringByWeaponId = {
 	[LE_ITEM_WEAPON_AXE1H] 		= CSC_WEAPON_AXE1H_TXT,
 	[LE_ITEM_WEAPON_AXE2H] 		= CSC_WEAPON_AXE2H_TXT,
@@ -375,16 +378,9 @@ local function CSC_GetSkillRankAndModifier(skillHeader, skillName)
 	return skillRank, skillModifier;
 end
 
-local function CSC_GetPlayerMissChances(unit, playerHit)
-	local hitChance = playerHit;
-	local missChanceVsNPC = 5; -- Level 60 npcs with 300 def
-	local missChanceVsBoss = 9;
-	local missChanceVsPlayer = 5; -- Level 60 player def is 300 base
+local function CSC_GetPlayerWeaponSkill(unit)
 	local totalWeaponSkill = nil;
-
 	local mainHandItemId = 16;
-	local unitClassLoc = select(2, UnitClass(unit));
-
 	-- Druid checks
 	local shapeIndex = -1;
 	if (unitClassLoc == "DRUID") then
@@ -409,6 +405,15 @@ local function CSC_GetPlayerMissChances(unit, playerHit)
 			end
 		end
 	end
+
+	return totalWeaponSkill;
+end
+
+local function CSC_GetPlayerMissChances(unit, playerHit, totalWeaponSkill)
+	local hitChance = playerHit;
+	local missChanceVsNPC = 5; -- Level 60 npcs with 300 def
+	local missChanceVsBoss = 9;
+	local missChanceVsPlayer = 5; -- Level 60 player def is 300 base
 
 	if totalWeaponSkill then
 		local bossDefense = 315; -- level 63
@@ -680,7 +685,13 @@ end
 
 -- SECONDARY STATS --
 function CSC_PaperDollFrame_SetCritChance(statFrame, unit, category)
-    local critChance;
+	
+	statFrame:SetScript("OnEnter", CSC_CharacterMeleeCritFrame_OnEnter)
+	statFrame:SetScript("OnLeave", function()
+		GameTooltip:Hide()
+    end)
+	
+	local critChance;
 
     if category == PLAYERSTAT_MELEE_COMBAT then
         critChance = GetCritChance();
@@ -694,7 +705,7 @@ function CSC_PaperDollFrame_SetCritChance(statFrame, unit, category)
     end
 
     CSC_PaperDollFrame_SetLabelAndText(statFrame, STAT_CRITICAL_STRIKE, critChance, true, critChance);
-	statFrame.tooltip = format(PAPERDOLLFRAME_TOOLTIP_FORMAT, STAT_CRITICAL_STRIKE).." "..format("%.2F%%", critChance);
+	statFrame.criticalStrikeTxt = format(PAPERDOLLFRAME_TOOLTIP_FORMAT, STAT_CRITICAL_STRIKE).." "..format("%.2F%%", critChance);
     statFrame:Show();
 end
 
@@ -1079,19 +1090,33 @@ function CSC_PaperDollFrame_SetManaRegen(statFrame, unit)
     end)
 
 	-- There is a bug in GetManaRegen() so I have to manually calculate mp5
-	local base, combat = GetManaRegen();
-	local mp5 = CSC_GetMP5FromGear(unit);
+	-- base == casting always and this is wrong
+	local base, casting = GetManaRegen();
+	
+	-- to avoid the wrongly reported "0" regen after an update
+	if base < 1 then base = g_lastSeenBaseManaRegen end
+	if casting < 1 then casting = g_lastSeenBaseManaRegen end
+	g_lastSeenBaseManaRegen = base;
+	g_lastSeenCastingManaRegen = casting;
+
+	local mp5FromGear = CSC_GetMP5FromGear(unit);
+	local mp5ModifierCasting = CSC_GetMP5ModifierFromTalents(unit);
+	mp5ModifierCasting = mp5ModifierCasting + CSC_GetMP5ModifierFromSetBonus(unit);
 	
 	-- All mana regen stats are displayed as mana/5 sec.
-	base = floor(base * 5.0) + mp5;
-	combat = mp5; --floor(combat * 5.0);
+	local regenWhenNotCasting = floor(base * 5.0) + mp5FromGear;
+	casting = mp5FromGear; -- if GetManaRegen() gets fixed ever, this should be changed
 
-	local baseText = BreakUpLargeNumbers(base);
-	local combatText = BreakUpLargeNumbers(combat);
-	-- Combat mana regen is most important to the player, so we display it as the main value
-	CSC_PaperDollFrame_SetLabelAndText(statFrame, MANA_REGEN, combatText, false, combat);
-	statFrame.mp5Casting = combatText;
-	statFrame.mp5NotCasting = baseText;
+	if mp5ModifierCasting > 0 then
+		casting = casting + base * mp5ModifierCasting * 5.0;
+	end
+
+	local regenWhenNotCastingText = BreakUpLargeNumbers(regenWhenNotCasting);
+	local castingText = BreakUpLargeNumbers(casting);
+	-- While Casting mana regen is most important to the player, so we display it as the main value
+	CSC_PaperDollFrame_SetLabelAndText(statFrame, MANA_REGEN, castingText, false, casting);
+	statFrame.mp5Casting = castingText;
+	statFrame.mp5NotCasting = regenWhenNotCastingText;
 	statFrame:Show();
 end
 
@@ -1162,8 +1187,6 @@ end
 function CSC_CharacterManaRegenFrame_OnEnter(self)
 	GameTooltip:SetOwner(self, "ANCHOR_RIGHT");
 	GameTooltip:SetText(MANA_REGEN_TOOLTIP, HIGHLIGHT_FONT_COLOR.r, HIGHLIGHT_FONT_COLOR.g, HIGHLIGHT_FONT_COLOR.b);
-	GameTooltip:AddDoubleLine("!!! Currently detects MP5 from gear only !!!", "", 1, 0, 0);
-	GameTooltip:AddLine(" "); -- Blank line.
 	GameTooltip:AddDoubleLine(MANA_REGEN.." (While Casting):", self.mp5Casting);
 	GameTooltip:AddDoubleLine(MANA_REGEN.." (While Not Casting):", self.mp5NotCasting);
 	GameTooltip:Show();
@@ -1187,7 +1210,8 @@ end
 function CSC_CharacterHitChanceFrame_OnEnter(self)
 	local hitChance = self.hitChance;
 
-	local missChanceVsNPC, missChanceVsBoss, missChanceVsPlayer, dwMissChanceVsNpc, dwMissChanceVsBoss, dwMissChanceVsPlayer = CSC_GetPlayerMissChances("player", hitChance);
+	local totalWeaponSkill = CSC_GetPlayerWeaponSkill("player");
+	local missChanceVsNPC, missChanceVsBoss, missChanceVsPlayer, dwMissChanceVsNpc, dwMissChanceVsBoss, dwMissChanceVsPlayer = CSC_GetPlayerMissChances("player", hitChance, totalWeaponSkill);
 
 	GameTooltip:SetOwner(self, "ANCHOR_RIGHT");
 	GameTooltip:SetText(STAT_HIT_CHANCE, HIGHLIGHT_FONT_COLOR.r, HIGHLIGHT_FONT_COLOR.g, HIGHLIGHT_FONT_COLOR.b);
@@ -1198,6 +1222,49 @@ function CSC_CharacterHitChanceFrame_OnEnter(self)
 	GameTooltip:AddDoubleLine(format("    Level 60 NPC: %.2F%%", missChanceVsNPC), format("(Dual wield: %.2F%%)", dwMissChanceVsNpc));
 	GameTooltip:AddDoubleLine(format("    Level 60 Player: %.2F%%", missChanceVsPlayer), format("(Dual wield: %.2F%%)", dwMissChanceVsPlayer));
 	GameTooltip:AddDoubleLine(format("    Level 63 NPC/Boss: %.2F%%", missChanceVsBoss), format("(Dual wield: %.2F%%)", dwMissChanceVsBoss));
+	GameTooltip:Show();
+end
+
+function CSC_CharacterMeleeCritFrame_OnEnter(self)
+	local hitChance = GetHitModifier();
+	local totalWeaponSkill = CSC_GetPlayerWeaponSkill("player");
+	local missChanceVsNPC, missChanceVsBoss, missChanceVsPlayer, dwMissChanceVsNpc, dwMissChanceVsBoss, dwMissChanceVsPlayer = CSC_GetPlayerMissChances("player", hitChance, totalWeaponSkill);
+
+	-- no weapon equipped, not supported localization or something else went wrong
+	if not totalWeaponSkill then totalWeaponSkill = 300 end
+
+	local critSuppression = 4.8;
+	local glancingChance = 40;
+
+	local extraWeaponSkill = totalWeaponSkill - 300;
+	local bossDefense = 315; -- level 63
+	local skillBossDelta = bossDefense - totalWeaponSkill;
+	local dodgeChance = 5 + (skillBossDelta * 0.1);	
+	local critCap = 100 - missChanceVsBoss - dodgeChance - glancingChance + critSuppression + (extraWeaponSkill * 0.04);
+
+	GameTooltip:SetOwner(self, "ANCHOR_RIGHT");
+	GameTooltip:SetText(self.criticalStrikeTxt, HIGHLIGHT_FONT_COLOR.r, HIGHLIGHT_FONT_COLOR.g, HIGHLIGHT_FONT_COLOR.b);
+	GameTooltip:AddLine(" "); -- Blank line.
+	GameTooltip:AddLine("Crit cap vs.");
+	
+	local critChance = GetCritChance();
+	local CRITCAP_COLOR_CODE = GREEN_FONT_COLOR_CODE;
+	if critChance > critCap then CRITCAP_COLOR_CODE = ORANGE_FONT_COLOR_CODE end
+	local critCapTxt = CRITCAP_COLOR_CODE..format("%.2F%%", critCap)..FONT_COLOR_CODE_CLOSE;
+
+	local offhandItemId = GetInventoryItemID("player", INVSLOT_OFFHAND);
+	if offhandItemId then
+		local critCapDw = 100 - dwMissChanceVsBoss - dodgeChance - glancingChance + critSuppression + (extraWeaponSkill * 0.04);
+		
+		local DWCRITCAP_COLOR_CODE = GREEN_FONT_COLOR_CODE;
+		if critChance > critCapDw then DWCRITCAP_COLOR_CODE = ORANGE_FONT_COLOR_CODE end
+
+		local critCapDwTxt = DWCRITCAP_COLOR_CODE..format("%.2F%%", critCapDw)..FONT_COLOR_CODE_CLOSE;
+		GameTooltip:AddDoubleLine("    Level 63 NPC/Boss: "..critCapTxt, "(Dual wield: "..critCapDwTxt..")");
+	else
+		GameTooltip:AddDoubleLine("    Level 63 NPC/Boss: "..critCapTxt);
+	end
+
 	GameTooltip:Show();
 end
 -- OnEnter Tooltip functions END
@@ -1323,4 +1390,74 @@ function CSC_GetShapeshiftForm()
 	end
 
 	return shapeIndex;
+end
+
+function CSC_GetMP5ModifierFromTalents(unit)
+    local unitClassId = select(3, UnitClass(unit));
+	local spellRank = 0;
+
+	if unitClassId == 5 then -- Priest
+		-- Meditation
+        spellRank = select(5, GetTalentInfo(1, 8));
+	elseif unitClassId == 8 then -- Mage
+		-- Arcane Meditation
+        spellRank = select(5, GetTalentInfo(1, 12));
+	elseif unitClassId == 11 then -- Druid
+		-- Reflection
+        spellRank = select(5, GetTalentInfo(3, 6));
+	end
+	
+	local modifier = spellRank * 0.05;
+
+    return modifier;
+end
+
+function CSC_GetMP5ModifierFromSetBonus(unit)
+	local unitClassId = select(3, UnitClass(unit));
+	local modifier = 0;
+	
+	-- not Druid (11) or Priest (5)
+	if unitClassId ~= 11 and unitClassId ~= 5 then
+		return modifier;
+	end
+	
+	local firstItemslotIndex = 1;
+	local lastItemslotIndex = 18;
+
+	local vestmentsOfTranscendenceIDs = { [16925] = 16925, 
+										  [16926] = 16926, 
+										  [16919] = 16919, 
+										  [16921] = 16921, 
+										  [16920] = 16920, 
+									   	  [16922] = 16922, 
+										  [16924] = 16924, 
+										  [16923] = 16923
+										};
+
+	local stormrageRaimentIDs = { [16897] = 16897, 
+								  [16898] = 16898, 
+								  [16899] = 16899, 
+								  [16900] = 16900, 
+								  [16901] = 16901, 
+								  [16902] = 16902, 
+								  [16903] = 16903, 
+								  [16904] = 16904
+								};
+
+	local equippedSetItems = 0;
+    for itemSlot = firstItemslotIndex, lastItemslotIndex do
+        local itemId = GetInventoryItemID(unit, itemslot);
+		
+		if (itemId) then
+			if (itemId == vestmentsOfTranscendenceIDs[itemId] or itemId == stormrageRaimentIDs[itemId]) then
+				equippedSetItems = equippedSetItems + 1;
+			end
+		end
+    end
+
+    if equippedSetItems >= 3 then
+        modifier = 0.15;
+	end
+
+    return modifier;
 end
