@@ -97,9 +97,9 @@ function WhisperTable_Set(self, msg)
 		WhisperTable_ShowBotton:ClearAllPoints();
 		--WhisperTable_ShowBotton:SetPoint("BOTTOMLEFT", ChatFrameChannelButton, "TOPLEFT", 2, 12);
 		if GetCVar("portal") == "CN" then
-WhisperTable_ShowBotton:SetPoint("BOTTOMLEFT", UIParent,"BOTTOMLEFT",285, 0)
+WhisperTable_ShowBotton:SetPoint("BOTTOMLEFT", UIParent,"BOTTOMLEFT",285, -2)
 else
-WhisperTable_ShowBotton:SetPoint("BOTTOMLEFT", UIParent,"BOTTOMLEFT",262, 0)
+WhisperTable_ShowBotton:SetPoint("BOTTOMLEFT", UIParent,"BOTTOMLEFT",260, -2)
 end
 	else
 		if (WhisperTable_Main:IsVisible()) then

@@ -1,5 +1,4 @@
-﻿local strfind, strrep, strmatch, pairs, C_Timer_After, ChatTypeInfo = string.find, string.rep, string.match, pairs, C_Timer.After, ChatTypeInfo
---[[--------------------------------------------------------------------
+﻿--[[--------------------------------------------------------------------
 align
 ----------------------------------------------------------------------]]
 SLASH_EA1 = "/align"
@@ -47,7 +46,7 @@ local function AddHistoryLine(self, text)
     if (not text or text == "") then return end
     local type = self:GetAttribute("chatType")
     if (type == "WHISPER") then text = text:gsub("^/%w+%s*%S+%s*", "")
-    elseif (strfind(text, "^/script")) then
+    elseif (string.find(text, "^/script")) then
     else text = text:gsub("^/%w+%s*", "") end
     if (text == "") then return end
     for i, v in ipairs(ChatHistory[self]) do
@@ -140,11 +139,6 @@ SetItemRef = function(link, text, button, chatFrame)
 end
 
 --HACK
-if (CHAT_TIMESTAMP_FORMAT) then
-    if (not string.find(CHAT_TIMESTAMP_FORMAT, "ChatCopy")) then
-        CHAT_TIMESTAMP_FORMAT = "|cff68ccef|HChatCopy|h"..CHAT_TIMESTAMP_FORMAT.."|h|r"
-    end
-end
 local function AddMessage(self, text, ...)
     if (type(text) ~= "string") then
         text = tostring(text)
@@ -157,7 +151,7 @@ local function AddMessage(self, text, ...)
             text = format("|cff68ccef|HChatCopy|h%s|h|r%s", BetterDate(CHAT_TIMESTAMP_FORMAT, time()), text)
         end
     else
-    text = format("|cff68ccef|HChatCopy|h%s|h|r %s", ">", text)
+        text = format("|cff68ccef|HChatCopy|h%s|h|r%s", ">", text)
     end
     self.OrigAddMessage(self, text, ...)
 end

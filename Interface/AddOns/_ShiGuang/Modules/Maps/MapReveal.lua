@@ -148,7 +148,7 @@ function module:MapReveal()
 	local bu = CreateFrame("CheckButton", nil, WorldMapFrame, "OptionsCheckButtonTemplate")
 	bu:SetPoint("TOPLEFT", 3, 0)
 	bu:SetSize(26, 26)
-	M.CreateCB(bu)
+	--M.ReskinCheck(bu)
 	bu:SetChecked(MaoRUIPerDB["Map"]["MapReveal"])
 	bu.text = M.CreateFS(bu, 14, U["Map Reveal"], false, "LEFT", 21, 0)
 

@@ -9,6 +9,9 @@ local format, tostring = string.format, tostring
 local function CreatePlayerStyle(self)
 	self.mystyle = "player"
 	UF:CreateCastBar(self)
+	if not MaoRUIPerDB["Nameplate"]["ShowPlayerPlate"] or MaoRUIPerDB["Nameplate"]["ClassPowerOnly"] then
+		UF:CreateEneryTicker(self)
+	end
 	if MaoRUIPerDB["UFs"]["Castbars"] then
 		UF:ReskinMirrorBars()
 		--UF:ReskinTimerTrakcer(self)
@@ -84,6 +87,7 @@ function UF:OnLogin()
 	local partyWidth, partyHeight = MaoRUIPerDB["UFs"]["PartyWidth"], MaoRUIPerDB["UFs"]["PartyHeight"]
 	local showPartyPetFrame = MaoRUIPerDB["UFs"]["PartyPetFrame"]
 	local petWidth, petHeight = MaoRUIPerDB["UFs"]["PartyPetWidth"], MaoRUIPerDB["UFs"]["PartyPetHeight"]
+	local showTeamIndex = MaoRUIPerDB["UFs"]["ShowTeamIndex"]
 
 	if MaoRUIPerDB["Nameplate"]["Enable"] then
 		self:SetupCVars()
@@ -136,9 +140,10 @@ function UF:OnLogin()
 			oUF:RegisterStyle("Party", CreatePartyStyle)
 			oUF:SetActiveStyle("Party")
 
-			local xOffset, yOffset = 5, 10
+			local xOffset, yOffset = 5, 5
+			local partyFrameHeight = partyHeight + MaoRUIPerDB["UFs"]["PartyPowerHeight"] + R.mult
 			local moverWidth = horizonParty and (partyWidth*5+xOffset*4) or partyWidth
-			local moverHeight = horizonParty and partyHeight or (partyHeight*5+yOffset*4)
+			local moverHeight = horizonParty and partyFrameHeight or (partyFrameHeight*5+yOffset*4)
 			local groupingOrder = horizonParty and "TANK,HEALER,DAMAGER,NONE" or "NONE,DAMAGER,HEALER,TANK"
 
 			local party = oUF:SpawnHeader("oUF_Party", nil, "solo,party",
@@ -156,7 +161,7 @@ function UF:OnLogin()
 			"oUF-initialConfigFunction", ([[
 			self:SetWidth(%d)
 			self:SetHeight(%d)
-			]]):format(partyWidth, partyHeight))
+			]]):format(partyWidth, partyFrameHeight))
 
 			local partyMover = M.Mover(party, U["PartyFrame"], "PartyFrame", {"TOPLEFT", UIParent, 310, -120}, moverWidth, moverHeight)
 			party:ClearAllPoints()
@@ -166,8 +171,9 @@ function UF:OnLogin()
 				oUF:RegisterStyle("PartyPet", CreatePartyPetStyle)
 				oUF:SetActiveStyle("PartyPet")
 
+				local petFrameHeight = petHeight + MaoRUIPerDB["UFs"]["PartyPetPowerHeight"] + R.mult
 				local petMoverWidth = horizonParty and (petWidth*5+xOffset*4) or petWidth
-				local petMoverHeight = horizonParty and petHeight or (petHeight*5+yOffset*4)
+				local petMoverHeight = horizonParty and petFrameHeight or (petFrameHeight*5+yOffset*4)
 
 				local partyPet = oUF:SpawnHeader("oUF_PartyPet", nil, "solo,party",
 				"showPlayer", true,
@@ -182,7 +188,7 @@ function UF:OnLogin()
 				self:SetWidth(%d)
 				self:SetHeight(%d)
 				self:SetAttribute("unitsuffix", "pet")
-				]]):format(petWidth, petHeight))
+				]]):format(petWidth, petFrameHeight))
 
 				local moverAnchor = horizonParty and {"TOPLEFT", partyMover, "BOTTOMLEFT", 0, -20} or {"BOTTOMRIGHT", partyMover, "BOTTOMLEFT", -10, 0}
 				local petMover = M.Mover(partyPet, U["PartyPetFrame"], "PartyPetFrame", moverAnchor, petMoverWidth, petMoverHeight)
@@ -208,7 +214,7 @@ function UF:OnLogin()
 				"showParty", not showPartyFrame,
 				"showRaid", true,
 				"xoffset", 5,
-				"yOffset", -10,
+				"yOffset", -5,
 				"groupFilter", tostring(i),
 				"groupingOrder", groupingOrder,
 				"groupBy", groupBy,
@@ -243,6 +249,8 @@ function UF:OnLogin()
 			local moverHeight = 25*scale*20 + 10*19
 			raidMover = M.Mover(group, U["RaidFrame"], "RaidFrame", {"TOPLEFT", UIParent, 3, -26}, moverWidth, moverHeight)
 		else
+			local raidFrameHeight = raidHeight + MaoRUIPerDB["UFs"]["RaidPowerHeight"] + R.mult
+
 			local function CreateGroup(name, i)
 				local group = oUF:SpawnHeader(name, nil, "solo,party,raid",
 				"showPlayer", true,
@@ -250,7 +258,7 @@ function UF:OnLogin()
 				"showParty", not showPartyFrame,
 				"showRaid", true,
 				"xoffset", 5,
-				"yOffset", -10,
+				"yOffset", -5,
 				"groupFilter", tostring(i),
 				"groupingOrder", "1,2,3,4,5,6,7,8",
 				"groupBy", "GROUP",
@@ -263,7 +271,7 @@ function UF:OnLogin()
 				"oUF-initialConfigFunction", ([[
 				self:SetWidth(%d)
 				self:SetHeight(%d)
-				]]):format(raidWidth, raidHeight))
+				]]):format(raidWidth, raidFrameHeight))
 				return group
 			end
 
@@ -272,19 +280,19 @@ function UF:OnLogin()
 				groups[i] = CreateGroup("oUF_Raid"..i, i)
 				if i == 1 then
 					if horizonRaid then
-						groups[i].mover = M.Mover(groups[i], U["RaidFrame"]..i, "RaidFrame"..i, {"TOPLEFT", UIParent, 35, -50}, (raidWidth+5)*5, raidHeight + raidPowerHeight + 3)
+						groups[i].mover = M.Mover(groups[i], U["RaidFrame"]..i, "RaidFrame"..i, {"TOPLEFT", UIParent, 35, -50}, (raidWidth+5)*5, raidFrameHeight)
 					else
-						groups[i].mover = M.Mover(groups[i], U["RaidFrame"]..i, "RaidFrame"..i, {"TOPLEFT", UIParent, 35, -50}, raidWidth, (raidHeight + raidPowerHeight + 3)*5)
+						groups[i].mover = M.Mover(groups[i], U["RaidFrame"]..i, "RaidFrame"..i, {"TOPLEFT", UIParent, 35, -50}, raidWidth, raidFrameHeight*5)
 					end
 				else
 					if horizonRaid then
-						groups[i].mover = M.Mover(groups[i], U["RaidFrame"]..i, "RaidFrame"..i, {"TOPLEFT", groups[i-1], "BOTTOMLEFT", 0, MaoRUIPerDB["UFs"]["ShowTeamIndex"] and -25 or -15}, (raidWidth+5)*5, raidHeight + raidPowerHeight + 3)
+						groups[i].mover = M.Mover(groups[i], U["RaidFrame"]..i, "RaidFrame"..i, {"TOPLEFT", groups[i-1], "BOTTOMLEFT", 0, showTeamIndex and -25 or -15}, (raidWidth+5)*5, raidFrameHeight)
 					else
-						groups[i].mover = M.Mover(groups[i], U["RaidFrame"]..i, "RaidFrame"..i, {"TOPLEFT", groups[i-1], "TOPRIGHT", 5, 0}, raidWidth, (raidHeight + raidPowerHeight + 3)*5)
+						groups[i].mover = M.Mover(groups[i], U["RaidFrame"]..i, "RaidFrame"..i, {"TOPLEFT", groups[i-1], "TOPRIGHT", 5, 0}, raidWidth, raidFrameHeight*5)
 					end
 				end
 
-				if MaoRUIPerDB["UFs"]["ShowTeamIndex"] then
+				if showTeamIndex then
 					local parent = _G["oUF_Raid"..i.."UnitButton1"]
 					local teamIndex = M.CreateFS(parent, 12, format(GROUP_NUMBER, i))
 					teamIndex:ClearAllPoints()
@@ -292,32 +300,6 @@ function UF:OnLogin()
 					teamIndex:SetTextColor(.6, .8, 1)
 				end
 			end
-		end
-
-		if raidMover then
-			if I.isClassic then return end
-			if not MaoRUIPerDB["UFs"]["SpecRaidPos"] then return end
-
-			local function UpdateSpecPos(event, ...)
-				local unit, _, spellID = ...
-				if (event == "UNIT_SPELLCAST_SUCCEEDED" and unit == "player" and spellID == 200749) or event == "PLAYER_ENTERING_WORLD" then
-					if not GetSpecialization() then return end
-					local specIndex = GetSpecialization()
-					if not MaoRUIPerDB["Mover"]["RaidPos"..specIndex] then
-						MaoRUIPerDB["Mover"]["RaidPos"..specIndex] = {"TOPLEFT", "UIParent", "TOPLEFT", 35, -50}
-					end
-					raidMover:ClearAllPoints()
-					raidMover:SetPoint(unpack(MaoRUIPerDB["Mover"]["RaidPos"..specIndex]))
-				end
-			end
-			M:RegisterEvent("PLAYER_ENTERING_WORLD", UpdateSpecPos)
-			M:RegisterEvent("UNIT_SPELLCAST_SUCCEEDED", UpdateSpecPos)
-
-			raidMover:HookScript("OnDragStop", function()
-				if not GetSpecialization() then return end
-				local specIndex = GetSpecialization()
-				MaoRUIPerDB["Mover"]["RaidPos"..specIndex] = MaoRUIPerDB["Mover"]["RaidFrame"]
-			end)
 		end
 	end
 end

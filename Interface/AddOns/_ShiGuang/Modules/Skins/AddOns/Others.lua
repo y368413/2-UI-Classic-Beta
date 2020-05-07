@@ -3,8 +3,6 @@ local M, R, U, I = unpack(ns)
 local S = M:GetModule("Skins")
 
 function S:CharacterStatsClassic()
-	--if not IsAddOnLoaded("CharacterStatsClassic") then return end
-	--if not F then return end
 
 	local cr, cg, cb = I.r, I.g, I.b
 	if ShiGuangDB.CharacterStatsexpandStat == nil then
@@ -15,11 +13,9 @@ function S:CharacterStatsClassic()
 	for i = 1, CharacterFrame:GetNumChildren() do
 		local child = select(i, CharacterFrame:GetChildren())
 		if child and child.leftStatsDropDown then
-			--F.ReskinDropDown(child.leftStatsDropDown)
 			leftDropDown = child.leftStatsDropDown
 		end
 		if child and child.rightStatsDropDown then
-			--F.ReskinDropDown(child.rightStatsDropDown)
 			rightDropDown = child.rightStatsDropDown
 		end
 	end
@@ -29,9 +25,7 @@ function S:CharacterStatsClassic()
 	local statPanel = CreateFrame("Frame", nil, PaperDollFrame)
 	statPanel:SetSize(200, 422)
 	statPanel:SetPoint("TOPLEFT", PaperDollFrame, "TOPRIGHT", -32, -15-R.mult)
-	M.CreateBD(statPanel)
-	M.CreateSD(statPanel)
-	M.CreateTex(statPanel)
+	M.SetBD(statPanel)
 
 	local scrollFrame = CreateFrame("ScrollFrame", nil, statPanel, "UIPanelScrollFrameTemplate")
 	scrollFrame:SetAllPoints()
@@ -129,7 +123,6 @@ function S:CharacterStatsClassic()
 	bu:SetSize(21, 21)
 	bu:SetPoint("TOPLEFT", PaperDollFrame, "TOPLEFT", 72, -15)
 	bu:SetNormalTexture("Interface\\Buttons\\UI-MinusButton-Up")
-	--F.ReskinExpandOrCollapse(bu)
 	--bu.bg:SetSize(17, 17)
 	bu:SetNormalTexture("Interface\\Buttons\\UI-MinusButton-Up")
 	bu.collapse = not ShiGuangDB.CharacterStatsexpandStat

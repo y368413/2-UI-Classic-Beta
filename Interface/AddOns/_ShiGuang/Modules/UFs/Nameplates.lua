@@ -31,12 +31,6 @@ function UF:UpdatePlateSpacing()
 	SetCVar("nameplateOverlapV", MaoRUIPerDB["Nameplate"]["VerticalSpacing"])
 end
 
-function UF:UpdateClickableSize()
-	if InCombatLockdown() then return end
-	C_NamePlate.SetNamePlateEnemySize(MaoRUIPerDB["Nameplate"]["PlateWidth"], MaoRUIPerDB["Nameplate"]["PlateHeight"]+40)
-	C_NamePlate.SetNamePlateFriendlySize(MaoRUIPerDB["Nameplate"]["PlateWidth"], MaoRUIPerDB["Nameplate"]["PlateHeight"]+40)
-end
-
 function UF:SetupCVars()
 	SetCVar("nameplateOverlapH", .8)
 	UF:UpdatePlateSpacing()
@@ -46,10 +40,7 @@ function UF:SetupCVars()
 
 	UF:UpdatePlateScale()
 	SetCVar("nameplateSelectedScale", 1.25)
-	SetCVar("nameplateLargerScale", 1.25)
-
-	UF:UpdateClickableSize()
-	hooksecurefunc(NamePlateDriverFrame, "UpdateNamePlateOptions", UF.UpdateClickableSize)
+	SetCVar("nameplateLargerScale", 1.1)
 end
 
 function UF:BlockAddons()
@@ -136,9 +127,10 @@ function UF.UpdateColor(element, unit)
 	end
 
 	if (not MaoRUIPerDB["Nameplate"]["TankMode"] or isCustomUnit or isPlayer) and UnitCanAttack(unit, "player") and isTargeting then
-		element.Shadow:SetBackdropBorderColor(1, 0, 0)
+		self.ThreatIndicator:SetBackdropBorderColor(1, 0, 0)
+		self.ThreatIndicator:Show()
 	else
-		element.Shadow:SetBackdropBorderColor(0, 0, 0)
+		self.ThreatIndicator:Hide()
 	end
 end
 
@@ -149,8 +141,11 @@ function UF:UpdateThreatColor(_, unit)
 end
 
 function UF:CreateThreatColor(self)
-	local frame = CreateFrame("Frame", nil, self)
-	self.ThreatIndicator = frame
+	local threatIndicator = M.CreateSD(self, 3, true)
+	threatIndicator:SetOutside(self.Health.backdrop, 3, 3)
+	threatIndicator:Hide()
+
+	self.ThreatIndicator = threatIndicator
 	self.ThreatIndicator.Override = UF.UpdateThreatColor
 end
 
@@ -524,17 +519,6 @@ function UF:MouseoverIndicator(self)
 	self.HighlightUpdater = f
 end
 
--- NazjatarFollowerXP
-function UF:AddFollowerXP(self)
-	local bar = CreateFrame("StatusBar", nil, self)
-	bar:SetSize(MaoRUIPerDB["Nameplate"]["PlateWidth"]*.75, MaoRUIPerDB["Nameplate"]["PlateHeight"])
-	bar:SetPoint("TOP", self.Castbar, "BOTTOM", 0, -5)
-	M.CreateSB(bar, false, 0, .7, 1)
-	bar.progressText = M.CreateFS(bar, 9)
-
-	self.NazjatarFollowerXP = bar
-end
-
 -- Interrupt info on castbars
 local guidToPlate = {}
 function UF:UpdateCastbarInterrupt(...)
@@ -562,10 +546,12 @@ function UF:CreatePlates()
 	self.mystyle = "nameplate"
 	self:SetSize(MaoRUIPerDB["Nameplate"]["PlateWidth"], MaoRUIPerDB["Nameplate"]["PlateHeight"])
 	self:SetPoint("CENTER")
+	self:SetScale(MaoRUIDB["UIScale"])
 
 	local health = CreateFrame("StatusBar", nil, self)
 	health:SetAllPoints()
-	M.CreateSB(health)
+	health:SetStatusBarTexture(I.normTex)
+	health.backdrop = M.CreateBDFrame(health, nil, true) -- don't mess up with libs
 	M:SmoothBar(health)
 	self.Health = health
 	self.Health.frequentUpdates = true
@@ -576,7 +562,7 @@ function UF:CreatePlates()
 	UF:CreateRaidMark(self)
 	UF:CreatePrediction(self)
 	UF:CreateAuras(self)
-	--UF:CreateThreatColor(self)
+	UF:CreateThreatColor(self)
 
 	self.powerText = M.CreateFS(self, 16)
 	self.powerText:ClearAllPoints()
@@ -640,7 +626,6 @@ function UF:RefreshAllPlates()
 		nameplate.healthValue:SetFont(I.Font[1], MaoRUIPerDB["Nameplate"]["HealthTextSize"], I.Font[3])
 		nameplate.healthValue:UpdateTag()
 		nameplate.Auras.showDebuffType = MaoRUIPerDB["Nameplate"]["ColorBorder"]
-		UF:UpdateClickableSize()
 		UF:UpdateTargetIndicator(nameplate)
 	end
 end
@@ -689,12 +674,15 @@ end
 function UF:ResizePlayerPlate()
 	local plate = _G.oUF_PlayerPlate
 	if plate then
-		plate:SetHeight(MaoRUIPerDB["Nameplate"]["PPHeight"])
-		plate.Power:SetHeight(MaoRUIPerDB["Nameplate"]["PPPHeight"])
+		local iconSize, margin = MaoRUIPerDB["Nameplate"]["PPIconSize"], 2
+		local pHeight, ppHeight = MaoRUIPerDB["Nameplate"]["PPHeight"], MaoRUIPerDB["Nameplate"]["PPPHeight"]
+		plate:SetSize(iconSize*5 + margin*4, pHeight + ppHeight + R.mult)
+		plate.Health:SetHeight(pHeight)
+		plate.Power:SetHeight(ppHeight)
 		local bars = plate.ClassPower
 		if bars then
 			for i = 1, 6 do
-				bars[i]:SetHeight(MaoRUIPerDB["Nameplate"]["PPHeight"])
+				bars[i]:SetHeight(pHeight)
 			end
 		end
 	end
@@ -712,10 +700,10 @@ end
 
 function UF:CreatePlayerPlate()
 	self.mystyle = "PlayerPlate"
-	local iconSize, margin = MaoRUIPerDB["Nameplate"]["PPIconSize"], 2
-	self:SetSize(iconSize*5 + margin*4, MaoRUIPerDB["Nameplate"]["PPHeight"])
 	self:EnableMouse(false)
-	self.iconSize = iconSize
+	local iconSize, margin = MaoRUIPerDB["Nameplate"]["PPIconSize"], 2
+	local pHeight, ppHeight = MaoRUIPerDB["Nameplate"]["PPHeight"], MaoRUIPerDB["Nameplate"]["PPPHeight"]
+	self:SetSize(iconSize*5 + margin*4, pHeight + ppHeight + R.mult)
 
 	UF:CreateHealthBar(self)
 	UF:CreatePowerBar(self)

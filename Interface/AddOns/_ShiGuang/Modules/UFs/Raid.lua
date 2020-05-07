@@ -41,11 +41,11 @@ function UF:UpdateTargetBorder()
 end
 
 function UF:CreateTargetBorder(self)
-	local border = M.CreateBG(self, 2)
-	M.CreateBD(border, 0)
-	border:SetBackdropBorderColor(.7, .7, .7)
-	border:SetPoint("BOTTOMRIGHT", self.Power, 2, -2)
+	local border = M.CreateSD(self, 3, true)
+	border:SetOutside(self.Health.backdrop, R.mult+3, R.mult+3, self.Power.backdrop)
+	border:SetBackdropBorderColor(.8, .8, .8)
 	border:Hide()
+	self.Shadow = nil
 
 	self.TargetBorder = border
 	self:RegisterEvent("PLAYER_TARGET_CHANGED", UF.UpdateTargetBorder, true)
@@ -53,17 +53,19 @@ function UF:CreateTargetBorder(self)
 end
 
 local function postUpdateThreat(element, _, status)
-	local self = element.__owner
-	local shadow = self.Health.Shadow
 	if status then
-		shadow:SetBackdropBorderColor(1, 0, 0)
+		element:SetBackdropBorderColor(1, 0, 0)
 	else
-		shadow:SetBackdropBorderColor(0, 0, 0)
+		element:SetBackdropBorderColor(0, 0, 0)
 	end
 end
 
 function UF:CreateThreatBorder(self)
-	local threatIndicator = CreateFrame("Frame", nil, self)
+	local threatIndicator = M.CreateSD(self, 3, true)
+	threatIndicator:SetOutside(self.Health.backdrop, R.mult+3, R.mult+3, self.Power.backdrop)
+	threatIndicator:SetBackdropBorderColor(.7, .7, .7)
+	threatIndicator:SetFrameLevel(0)
+	self.Shadow = nil
 	self.ThreatIndicator = threatIndicator
 	self.ThreatIndicator.PostUpdate = postUpdateThreat
 end
@@ -105,17 +107,21 @@ function UF:CreateRaidDebuffs(self)
 	bu:SetSize(size, size)
 	bu:SetPoint("RIGHT", -15, 0)
 	bu:SetFrameLevel(self:GetFrameLevel() + 3)
-	M.CreateSD(bu, 3, 3)
+	M.CreateSD(bu, 3, true)
+	bu.Shadow:SetFrameLevel(self:GetFrameLevel() + 2)
 	bu:SetScale(scale)
 	bu:Hide()
 
 	bu.icon = bu:CreateTexture(nil, "ARTWORK")
 	bu.icon:SetAllPoints()
 	bu.icon:SetTexCoord(unpack(I.TexCoord))
-	bu.count = M.CreateFS(bu, 12, "", false, "BOTTOMRIGHT", 6, -3)
+
+	local parentFrame = CreateFrame("Frame", nil, bu)
+	parentFrame:SetAllPoints()
+	parentFrame:SetFrameLevel(bu:GetFrameLevel() + 6)
+	bu.count = M.CreateFS(parentFrame, 12, "", false, "BOTTOMRIGHT", 6, -3)
 	bu.timer = M.CreateFS(bu, 12, "", false, "CENTER", 1, 0)
-	bu.glowFrame = M.CreateBG(bu, 4)
-	bu.glowFrame:SetSize(size+8, size+8)
+	bu.glowFrame = M.CreateGlowFrame(bu, size)
 
 	if not MaoRUIPerDB["UFs"]["AurasClickThrough"] then
 		bu:SetScript("OnEnter", buttonOnEnter)
@@ -415,20 +421,19 @@ function UF:CreateBuffIndicator(self)
 	local anchors = {"TOPLEFT", "TOP", "TOPRIGHT", "LEFT", "RIGHT", "BOTTOMLEFT", "BOTTOM", "BOTTOMRIGHT"}
 	local buttons = {}
 	for _, anchor in pairs(anchors) do
-		local bu = CreateFrame("Frame", nil, self)
+		local bu = CreateFrame("Frame", nil, self.Health)
 		bu:SetFrameLevel(self:GetFrameLevel()+10)
 		bu:SetSize(10, 10)
 		bu:SetScale(MaoRUIPerDB["UFs"]["BuffIndicatorScale"])
 		bu:SetPoint(anchor)
 		bu:Hide()
 
-		bu.bg = M.CreateBG(bu)
-		M.CreateBD(bu.bg)
+		bu.bg = M.CreateBDFrame(bu)
 		bu.icon = bu:CreateTexture(nil, "BORDER")
-		bu.icon:SetAllPoints()
+		bu.icon:SetInside(bu.bg)
 		bu.icon:SetTexCoord(unpack(I.TexCoord))
 		bu.cd = CreateFrame("Cooldown", nil, bu, "CooldownFrameTemplate")
-		bu.cd:SetAllPoints()
+		bu.cd:SetInside(bu.bg)
 		bu.cd:SetReverse(true)
 		bu.cd:SetHideCountdownNumbers(true)
 		bu.timer = M.CreateFS(bu, 12, "", false, "CENTER", -counterOffsets[anchor][2][3], 0)
@@ -438,9 +443,6 @@ function UF:CreateBuffIndicator(self)
 		tinsert(buttons, bu)
 
 		UF:RefreshBuffIndicator(bu)
-
-		bu.anchor = anchor
-		tinsert(buttons, bu)
 	end
 
 	self.BuffIndicator = buttons

@@ -1,13 +1,13 @@
 <Ui xmlns="http://www.blizzard.com/wow/ui/">
 	<Script file="Skins.lua"/>
-	<Script file="MicroMenu.lua"/>
-	<Script file="ObjectiveTracker.lua"/>
 	<Script file="Loot.lua"/>
-	<Script file="TradeSkillFrame.lua"/>
+
 	<Script file="AddOns\Bigwigs.lua"/>
 	<Script file="AddOns\DBM.lua"/>
 	<Script file="AddOns\TMW.lua"/>
 	<Script file="AddOns\WeakAuras.lua"/>
 	<Script file="AddOns\Details.lua"/>
+	<Script file="AddOns\ObjectiveTracker.lua"/>
+	<Script file="AddOns\TradeSkillFrame.lua"/>
 	<Script file="AddOns\Others.lua"/>
 </Ui>

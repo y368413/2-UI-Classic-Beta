@@ -32,6 +32,7 @@ local defaultSettings = {
 		Scale = 1,
 		BindType = 1,
 		OverrideWA = false,
+		MicroMenu = true,
 	},
 	Auras = {
 		Reminder = true,
@@ -65,7 +66,6 @@ local defaultSettings = {
 		SimpleModeSortByRole = true,
 		InstanceAuras = true,
 		RaidDebuffScale = 1,
-		--SpecRaidPos = false,
 		RaidHealthColor = 2,
 		HorizonRaid = false,
 		HorizonParty = false,
@@ -195,15 +195,9 @@ local defaultSettings = {
 	},
 	Skins = {
 		DBM = true,
-		MicroMenu = true,
-		--Skada = false,
 		Bigwigs = true,
 		RM = true,
-		RMRune = false,
-		DBMCount = "10",
-		EasyMarking = true,
 		TMW = true,
-		--CastBarstyle = true,
 		WeakAuras = true,
 		BarLine = false,
 		InfobarLine = true,
@@ -217,6 +211,11 @@ local defaultSettings = {
 		ResetRecount = true,
 		ToggleDirection = 1,
 		TradeSkills = true,
+		BlizzardSkins = false,
+		SkinAlpha = .65,
+		FlatMode = true,
+		Loot = true,
+		Shadow = true,
 	},
 	Tooltip = {
 		CombatHide = true,
@@ -269,6 +268,10 @@ local defaultSettings = {
 		TradeTabs = true,
 		InstantDelete = true,
 		CtrlIndicator = true,
+		RMRune = false,
+		DBMCount = "10",
+		EasyMarking = true,
+		BlockInvite = false,
 	},
 	Tutorial = {
 		Complete = false,
@@ -278,7 +281,7 @@ local defaultSettings = {
 local accountSettings = {
 	ChatFilterList = "%*",
 	ChatFilterWhiteList = "",
-	Timestamp = false,
+	TimestampFormat = 0,
 	NameplateFilter = {[1]={}, [2]={}},
 	RaidDebuffs = {},
 	Changelog = {},
@@ -351,6 +354,7 @@ loader:SetScript("OnEvent", function(self, _, addon)
 
 	InitialSettings(defaultSettings, MaoRUIPerDB, true)
 	InitialSettings(accountSettings, MaoRUIDB)
+	M:SetupUIScale(true)
 	I.normTex = textureList[MaoRUIDB["TexStyle"]]
 
 	self:UnregisterAllEvents()
@@ -378,11 +382,6 @@ local function setupNameplateFilter()
 	G:SetupNameplateFilter(guiPage[2])
 end
 
-
-local function setupCastbar()
-	G:SetupCastbar(guiPage[3])
-end
-
 local function setupAuraWatch()
 	f:Hide()
 	SlashCmdList["NDUI_AWCONFIG"]()
@@ -402,10 +401,6 @@ end
 
 local function updateClassColorName()
 	M:GetModule("Chat"):UpdateClassColorName()
-end
-
-local function updateTimestamp()
-	M:GetModule("Chat"):UpdateTimestamp()
 end
 
 local function updateWhisperList()
@@ -504,8 +499,25 @@ end
 local function updateErrorBlocker()
 	M:GetModule("Misc"):UpdateErrorBlocker()
 end
+
+local function updateSkinAlpha()
+	for _, frame in pairs(R.frames) do
+		M:SetBackdropColor(frame, 0, 0, 0, MaoRUIPerDB["Skins"]["SkinAlpha"])
+	end
+end
+
+StaticPopupDialogs["RESET_DETAILS"] = {
+	text = U["Reset Details check"],
+	button1 = YES,
+	button2 = NO,
+	OnAccept = function()
+		MaoRUIDB["ResetDetails"] = true
+		ReloadUI()
+	end,
+	whileDead = 1,
+}
 local function resetDetails()
-	MaoRUIDB["ResetDetails"] = true
+	StaticPopup_Show("RESET_DETAILS")
 end
 -- Config
 local tabList = {
@@ -529,7 +541,7 @@ local optionList = {		-- type, key, value, name, horizon, horizon2, doubleline
 		{1, "Actionbar", "Hotkeys", U["Actionbar Hotkey"]},
 		{1, "Actionbar", "Macro", U["Actionbar Macro"], true},
 		{1, "Actionbar", "Count", U["Actionbar Item Counts"], true, true},
-		{1, "Skins", "MicroMenu", U["Micromenu"]},
+		{1, "Actionbar", "MicroMenu", U["Micromenu"]},
 		{1, "Actionbar", "Bar4Fade", U["Bar4 Fade"], true},
 		{1, "Actionbar", "Bar5Fade", U["Bar5 Fade"], true, true},
 		{1, "UFs", "SwingBar", U["UFs SwingBar"]},
@@ -623,15 +635,16 @@ local optionList = {		-- type, key, value, name, horizon, horizon2, doubleline
 		{1, "UFs", "UFPctText", U["UFPctText"], true, true},
 		{3, "Auras", "BuffSize", U["BuffSize"], false, false, {24, 40, 0}},
 		{3, "Auras", "DebuffSize", U["DebuffSize"], true, false, {24, 40, 0}},
-		{2, "Skins", "DBMCount", U["Countdown Sec"].."*", true, true},
+		{2, "Misc", "DBMCount", U["Countdown Sec"].."*", true, true},
 		{3, "Auras", "BuffsPerRow", U["BuffsPerRow"], false, false, {10, 20, 0}},
 		{3, "Auras", "DebuffsPerRow", U["DebuffsPerRow"], true, false, {10, 16, 0}},
 		{3, "AuraWatch", "IconScale", U["AuraWatch IconScale"], true, true, {.8, 2, 1}},
 	},
 	[5] = {
 		{1, "Chat", "Outline", U["Font Outline"]},
-		{1, "ACCOUNT", "Timestamp", U["Timestamp"], true, false, nil, updateTimestamp},
-		{1, "Chat", "Sticky", U["Chat Sticky"].."*", true, true, nil, updateChatSticky},
+		--{1, "ACCOUNT", "Timestamp", U["Timestamp"], true, false, nil, updateTimestamp},
+		{1, "Chat", "Sticky", U["Chat Sticky"].."*", true, false, nil, updateChatSticky},
+		{4, "ACCOUNT", "TimestampFormat", U["TimestampFormat"].."*", true, true, {DISABLE, "03:27 PM", "03:27:32 PM", "15:27", "15:27:32"}},
 		--{1, "Chat", "WhisperColor", U["Differ WhipserColor"].."*"},
 		--{1, "Chat", "Freedom", U["Language Filter"], true, true},
 		{1, "Chat", "EnableFilter", "|cff00cc4c"..U["Enable Chatfilter"]},
@@ -655,7 +668,8 @@ local optionList = {		-- type, key, value, name, horizon, horizon2, doubleline
 		{1, "ACCOUNT", "DisableInfobars", U["DisableInfobars"]},
 		{1, "Skins", "DBM", U["DBM Skin"], true},
 		{1, "Skins", "Details", U["Details Skin"], true, true, resetDetails},
-		--{1, "Skins", "BarLine", U["Bar Line"]},
+		{1, "Skins", "Shadow", U["Shadow"]},
+		--{3, "Skins", "SkinAlpha", U["SkinAlpha"].."*", true, true, {0, 1, 1}, updateSkinAlpha},
 		--{1, "Skins", "ChatLine", U["Chat Line"]},
 		--{1, "Skins", "MenuLine", U["Menu Line"], true},
 		{1, "Skins", "WeakAuras", U["WeakAuras Skin"]},
@@ -665,6 +679,7 @@ local optionList = {		-- type, key, value, name, horizon, horizon2, doubleline
 		{1, "Skins", "TMW", U["TMW Skin"], true, true},
 		{1, "Skins", "ClassLine", U["ClassColor Line"]},
 	  {1, "Skins", "InfobarLine", U["Bar Line"], true},
+	  {1, "Skins", "FlatMode", U["FlatMode"], true, true},
 		{1, "Tooltip", "CombatHide", U["Hide Tooltip"].."*"},
 		{1, "Tooltip", "Cursor", U["Follow Cursor"].."*", true},
 		{1, "Tooltip", "ClassColor", U["Classcolor Border"].."*", true, true},
@@ -709,7 +724,6 @@ local optionList = {		-- type, key, value, name, horizon, horizon2, doubleline
 		{1, "Misc", "Mail", U["Mail Tool"], true},
 		{1, "Misc", "FasterLoot", U["Faster Loot"], true, true, nil, updateFasterLoot},
 	},
-
 }
 
 local function SelectTab(i)
@@ -826,11 +840,11 @@ local function CreateOption(i)
 			local tip = U["EdieBox Tip"]
 			if tooltip then tip = tooltip.."|n"..tip end
 			M.AddTooltip(eb, "ANCHOR_RIGHT", tip, "info")
-
 			M.CreateFS(eb, 14, name, "system", "CENTER", 0, 25)
 		-- Slider
 		elseif optType == 3 then
 			local min, max, step = unpack(data)
+			local decimal = step > 2 and 2 or step
 			local x, y
 			if horizon2 then
 				x, y = 460, -offset + 32
@@ -845,10 +859,10 @@ local function CreateOption(i)
 			s:SetScript("OnValueChanged", function(_, v)
 				local current = tonumber(format("%."..step.."f", v))
 				NDUI_VARIABLE(key, value, current)
-				s.value:SetText(current)
+				s.value:SetText(format("%."..decimal.."f", current))
 				if callback then callback() end
 			end)
-			s.value:SetText(format("%."..step.."f", NDUI_VARIABLE(key, value)))
+			s.value:SetText(format("%."..decimal.."f", NDUI_VARIABLE(key, value)))
 			if tooltip then
 				s.title = U["Tips"]
 				M.AddTooltip(s, "ANCHOR_RIGHT", tooltip, "info")
@@ -906,10 +920,6 @@ local function CreateOption(i)
 			offset = offset + 32
 		end
 	end
-
-	local footer = CreateFrame("Frame", nil, parent)
-	footer:SetSize(20, 20)
-	footer:SetPoint("TOPLEFT", 25, -offset)
 end
 
 local bloodlustFilter = {
@@ -945,7 +955,7 @@ local function exportData()
 								end
 							end
 						end
-					elseif KEY == "Mover" or KEY == "InternalCD" or KEY == "AuraWatchMover" then
+					elseif KEY == "Mover" or KEY == "RaidClickSets" or KEY == "InternalCD" or KEY == "AuraWatchMover" then
 						text = text..";"..KEY..":"..key
 						for _, v in ipairs(value) do
 							text = text..":"..tostring(v)
@@ -1134,13 +1144,13 @@ local function createDataFrame()
 	dataFrame:SetSize(500, 500)
 	dataFrame:SetFrameStrata("DIALOG")
 	M.CreateMF(dataFrame)
-	M.SetBackground(dataFrame)
+	M.SetBD(dataFrame)
 	dataFrame.Header = M.CreateFS(dataFrame, 16, U["Export Header"], true, "TOP", 0, -5)
 
 	local scrollArea = CreateFrame("ScrollFrame", nil, dataFrame, "UIPanelScrollFrameTemplate")
 	scrollArea:SetPoint("TOPLEFT", 10, -30)
 	scrollArea:SetPoint("BOTTOMRIGHT", -28, 40)
-	M.CreateBD(M.CreateBG(scrollArea), .25)
+	M.CreateBDFrame(scrollArea, .25)
 
 	local editBox = CreateFrame("EditBox", nil, dataFrame)
 	editBox:SetMultiLine(true)
@@ -1191,7 +1201,6 @@ local function createDataFrame()
 end
 
 local function OpenGUI()
-	if InCombatLockdown() then UIErrorsFrame:AddMessage(I.InfoColor..ERR_NOT_IN_COMBAT) return end
 	if f then f:Show() return end
 
 	-- Main Frame
@@ -1214,14 +1223,10 @@ local function OpenGUI()
 	close:SetPoint("TOP", 280, -56)
 	close:SetScript("OnClick", function() f:Hide() end)
 
-	local scaleOld = MaoRUIDB["UIScale"]
 	local ok = M.CreateButton(f, 66, 21, OKAY)
 	ok:SetPoint("BOTTOMRIGHT", -260, 66)
 	ok:SetScript("OnClick", function()
-		local scale = MaoRUIDB["UIScale"]
-		if scale ~= scaleOld then
-			UIParent:SetScale(scale)
-		end
+		M:SetupUIScale()
 		f:Hide()
 		StaticPopup_Show("RELOAD_NDUI")
 	end)
@@ -1308,6 +1313,7 @@ function G:OnLogin()
 	end)
 
 	gui:SetScript("OnClick", function()
+		if InCombatLockdown() then UIErrorsFrame:AddMessage(I.InfoColor..ERR_NOT_IN_COMBAT) return end
 		OpenGUI()
 		HideUIPanel(GameMenuFrame)
 		PlaySound(SOUNDKIT.IG_MAINMENU_OPTION)

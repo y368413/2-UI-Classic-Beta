@@ -6,9 +6,9 @@
 		local server = nil;
 		local name, server = UnitName("target");
 		if ( server and (not "target" or UnitRealmRelationship("target") ~= LE_REALM_RELATION_SAME) ) then
-			ChatFrame_SendTell(name.."-"..server);
+			ChatFrame_SendTell(name.."-"..server)
 		else
-			ChatFrame_SendTell(name);
+			ChatFrame_SendTell(name)
 		end
 	</Binding>
 	<Binding name="TARGETCLASSBUTTON_FOLLOW" category="BINDING_HEADER_ACE3"> FollowUnit("target") </Binding>

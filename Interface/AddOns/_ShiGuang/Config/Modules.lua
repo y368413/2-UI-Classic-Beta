@@ -8,13 +8,6 @@ R.Auras = {
 	BuffPos			= {"TOPRIGHT", Minimap, "TOPLEFT", -21, -3},		-- BUFF默认位置
 	TotemsPos		= {"CENTER", UIParent, "CENTER", 0, -260},		  -- 图腾助手默认位置
 	EnergyPos	= {"CENTER", UIParent, "CENTER", 0, -195},		    -- 职业能量条默认位置
-	ComboPointPos	= {'BOTTOM', UIParent, "CENTER", 16, -210},
-	WarlockPowerPos	= {'BOTTOM', UIParent, "CENTER", 0, -210},
-	PaladinPowerPos	= {'BOTTOM', UIParent, "CENTER", 0, -180},
-	RunePos	= {'BOTTOM', UIParent, "CENTER", 0, -200},
-	MonkHarmonyPos	= {'BOTTOM', UIParent, "CENTER", 90, -190},
-	MonkStaggerPos	= {'BOTTOM', UIParent, "CENTER", 0, -190},
-	MageArcaneChargesPos	= {'BOTTOM', UIParent, "CENTER", 0, -200},
 	
   -- 技能监控各组初始位置
 	PlayerAuraPos	= {"RIGHT", UIParent, "CENTER", -360, -160},	    -- 玩家光环分组

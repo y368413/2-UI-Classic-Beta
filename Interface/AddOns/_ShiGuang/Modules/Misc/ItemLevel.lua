@@ -26,12 +26,11 @@ function MISC:GetSlotAnchor(index)
 end
 
 function MISC:CreateItemTexture(slot, relF, x, y)
-	local icon = slot:CreateTexture(nil, "ARTWORK")
+	local icon = slot:CreateTexture()
 	icon:SetPoint(relF, x, y)
 	icon:SetSize(14, 14)
-	icon:SetTexCoord(unpack(I.TexCoord))
-	icon.bg = M.CreateBG(icon)
-	M.CreateBD(icon.bg)
+	icon.bg = M.ReskinIcon(icon)
+	icon.bg:SetFrameLevel(3)
 	icon.bg:Hide()
 
 	return icon
@@ -40,8 +39,8 @@ end
 function MISC:CreateColorBorder()
 	local frame = CreateFrame("Frame", nil, self)
 	frame:SetAllPoints()
-	frame:SetFrameLevel(5)
-	self.colorBG = M.CreateSD(frame, 4, 4)
+	self.colorBG = M.CreateSD(frame, 4, true)
+	self.colorBG:SetFrameLevel(5)
 end
 
 function MISC:CreateItemString(frame, strType)

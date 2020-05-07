@@ -1,8 +1,7 @@
 ﻿local _, ns = ...
 local M, R, U, I = unpack(ns)
 local module = M:RegisterModule("Settings")
-local pairs, tonumber, wipe = pairs, tonumber, table.wipe
-local min, max, floor = math.min, math.max, floor
+local pairs, wipe = pairs, table.wipe
 
 -- Addon Info
 print("<<<---|cFFFFFF00 2|r|cFFFF0000 UI |r v"..GetAddOnMetadata("_ShiGuang", "Version").." ("..GetAddOnMetadata("_ShiGuang", "X-StatsVersion")..")" .." For "..GetAddOnMetadata("_ShiGuang", "X-Support").." --")
@@ -13,14 +12,11 @@ print("--------------- 有你们的魔兽,才是世界 -->>>")
 local function DefaultSettings()
 	SetCVar("scriptErrors", 1)     --0是屏蔽错误1是不屏蔽错误
 	SetCVar("autoQuestWatch", 1)  
-	SetCVar("alwaysCompareItems", 1)
 	SetCVar("synchronizeSettings", 1)
 	SetCVar("synchronizeMacros", 1)
-	SetCVar("ShowClassColorInNameplate", 1)
 	SetCVar("screenshotQuality", 10)
 	SetCVar("showTutorials", 0)
 	SetCVar("overrideArchive", 0)
-	SetCVar("showTargetOfTarget",1) --目标的目标
 	--setglobal("MAX_EQUIPMENT_SETS_PER_PLAYER",100)
 	SetCVar("chatClassColorOverride", "0")
 	PlayerFrame:SetScale(MaoRUIPerDB["UFs"]["PlayerFrameScale"]) 
@@ -28,14 +24,22 @@ local function DefaultSettings()
 end
 
 local function ForceDefaultSettings()
+  --/console cvar_defaul
+  local PlayerFrame = _G["PlayerFrame"]
+  if (PlayerFrame and not PlayerFrame_IsAnimatedOut(PlayerFrame)) then
   PlayerFrame:ClearAllPoints() PlayerFrame:SetPoint("RIGHT",UIParent,"CENTER", -150, -250) PlayerFrame:SetUserPlaced(true)  --PlayerFrame:SetScale(0.8) 
+  end
+  local TargetFrame = _G["TargetFrame"]
+  if (TargetFrame) then
   TargetFrame:ClearAllPoints() TargetFrame:SetPoint("LEFT",UIParent,"CENTER", 150, -250) TargetFrame:SetUserPlaced(true)  --TargetFrame:SetScale(0.8) 
+  end
   TargetFrameToT:ClearAllPoints() TargetFrameToT:SetPoint("LEFT",TargetFrame,"BOTTOMRIGHT", -43, 21)
   TargetFrameToTTextureFrameName:ClearAllPoints() TargetFrameToTTextureFrameName:SetPoint("LEFT",TargetFrameToT,"Top", -8, -43)
   PetFrameHealthBarText:SetPoint("BOTTOMRIGHT", PetFrame, "LEFT", 3,-6)  
   PetFrameManaBarText:SetPoint("TOPRIGHT", PetFrame, "LEFT", 3, -6)
   PetFrameManaBarText:SetTextColor(0, 1, 1)
 	SetCVar("autoLootDefault", 1)
+	SetCVar("alwaysCompareItems", 1)
 	SetCVar("lootUnderMouse", 1)
 	SetCVar("autoSelfCast", 1)
 	SetCVar("nameplateShowEnemies", 1)
@@ -48,9 +52,13 @@ local function ForceDefaultSettings()
 	SetActionBarToggles(1, 1, 0, 0)
 	SHOW_MULTI_ACTIONBAR_1="1" --左下方动作条 
   SHOW_MULTI_ACTIONBAR_2="1" --右下方动作条 
-  --InterfaceOptions_UpdateMultiActionBars() --刷新动作条
+  SHOW_MULTI_ACTIONBAR_3 = "0" --右动作条1
+  SHOW_MULTI_ACTIONBAR_4 = "0" --右动作条2
+  InterfaceOptions_UpdateMultiActionBars() --刷新动作条
 	SetCVar("enableFloatingCombatText", 0)
 	SetCVar("floatingCombatTextCombatState", 0)
+	SetCVar("showTargetOfTarget",1) --目标的目标
+	SetCVar("ShowClassColorInNameplate", 1)
 	--SetCVar("floatingCombatTextCombatDamage", 0)
 	--SetCVar("floatingCombatTextCombatHealing", 0)
 	SetCVar("floatingCombatTextCombatDamageDirectionalScale", 1)
@@ -75,6 +83,7 @@ local function ForceDefaultSettings()
   SetCVar("floatingCombatTextAuras", 0)   --光環 
 	SetCVar("doNotFlashLowHealthWarning", 1)
 	SetCVar("ffxGlow", 0)
+	SetCVar("Sound_EnableErrorSpeech", 0)								--错误提示音
 	--SetCVar("cameraYawMoveSpeed", 360); -- Maximum in-game: 270
 	SetCVar("statusText",1) --状态文字
 	SetCVar("statusTextDisplay","NUMERIC")--头像状态文字形式："NUMERIC"数值"PERCENT"百分比"BOTH"同时显示
@@ -106,35 +115,6 @@ local function ForceRaidFrame()
   --SetRaidProfileSavedPosition(GetActiveRaidProfile(), false, "TOP", 440, "BOTTOM", 320, "LEFT", 0)	--团队框体位置 
 	CompactUnitFrameProfiles_ApplyCurrentSettings()
 	CompactUnitFrameProfiles_UpdateCurrentPanel()
-end
-
-local function clipScale(scale)
-	return tonumber(format("%.5f", scale))
-end
-
-local function GetPerfectScale()
-	local scale = MaoRUIDB["UIScale"]
-	local bestScale = max(.4, min(1.15, 768 / I.ScreenHeight))
-	local pixelScale = 768 / I.ScreenHeight
-	if MaoRUIDB["LockUIScale"] then scale = clipScale(bestScale) end
-	R.mult = (bestScale / scale) - ((bestScale - pixelScale) / scale)
-
-	return scale
-end
-
-local isScaling = false
-local function SetupUIScale()
-	if isScaling then return end
-	isScaling = true
-
-	local scale = GetPerfectScale()
-	local parentScale = UIParent:GetScale()
-	if scale ~= parentScale then
-		UIParent:SetScale(scale)
-	end
-
-	MaoRUIDB["UIScale"] = clipScale(scale)
-	isScaling = false
 end
 
 local function ForceChatSettings()
@@ -368,15 +348,15 @@ end
 
 -- Tutorial
 local function YesTutor()
-			ForceRaidFrame()
-			ForceChatSettings()
-	  --MaoRUIDB["LockUIScale"] = true
-	  SetupUIScale()
-			MaoRUIDB["DBMRequest"] = true
-			MaoRUIDB["SkadaRequest"] = true
-			MaoRUIDB["BWRequest"] = true
-			ForceAddonSkins()
-			MaoRUIDB["ResetDetails"] = true
+	ForceRaidFrame()
+	ForceChatSettings()
+	MaoRUIDB["LockUIScale"] = true
+	M:SetupUIScale()
+	MaoRUIDB["DBMRequest"] = true
+	MaoRUIDB["SkadaRequest"] = true
+	MaoRUIDB["BWRequest"] = true
+	ForceAddonSkins()
+	MaoRUIDB["ResetDetails"] = true
 	MaoRUIDB["YesTutor"] = false
 end
 
@@ -408,7 +388,8 @@ local function HelloWorld()
 	local BottomBlack = CreateFrame("Frame", nil, welcome) 
 	BottomBlack:SetPoint("TOPLEFT",welcome,"BOTTOMLEFT",0,43)
 	BottomBlack:SetPoint("BOTTOMRIGHT",0,0)
-	M.CreateBD(BottomBlack, 1)
+	--M.CreateBD(BottomBlack, 1)
+	M.CreateBDFrame(BottomBlack, .2)
 	BottomBlackText = M:CreatStyleText(BottomBlack, STANDARD_TEXT_FONT, 16, "OUTLINE", "-----  开袋即食零设置 上手即用懒人包  -----", "BOTTOM",BottomBlack,"BOTTOM",0,16, 0.97,0.75,0) 
 
 	local MadeBy = M:CreatStyleButton(nil, welcome, 210, 21, "BOTTOMRIGHT", BottomBlack, "BOTTOMRIGHT", -8, 31, 10, 1) 
@@ -521,8 +502,6 @@ SLASH_SHIGUANG1 = "/loadmr"
 function module:OnLogin()
 	M.HideOption(Advanced_UseUIScale)
 	M.HideOption(Advanced_UIScaleSlider)
-	SetupUIScale()
-	M:RegisterEvent("UI_SCALE_CHANGED", SetupUIScale)
 	DefaultSettings()
 	ForceAddonSkins()
 	if not MaoRUIPerDB["Tutorial"]["Complete"] then HelloWorld() end

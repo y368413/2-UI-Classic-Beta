@@ -177,11 +177,20 @@ local function SetChatLinkIcon(link)
     return GetHyperlink(link, texture)
 end
 
+local function isItemHasGem(link)
+	for index in pairs(GetItemStats(link)) do
+		if strfind(index, "EMPTY_SOCKET_") then
+			return "|TInterface\\ItemSocketingFrame\\UI-EmptySocket-Prismatic:0|t"
+		end
+	end
+	return ""
+end
 local itemCache = {}
 local function convertItemLevel(link)
 	if itemCache[link] then return itemCache[link] end
 
 	  local itemLink = strmatch(link, "|H(.-)|h")
+	  local itemLinkGem = strmatch(link, "|Hitem:.-|h")
     local name, _, _, _, _, class, subclass, _, equipSlot = GetItemInfo(itemLink)
     local level = GetDetailedItemLevelInfo(itemLink)
     if (level) then
@@ -189,7 +198,11 @@ local function convertItemLevel(link)
         elseif (class == ARMOR) then level = format("%s(%s)", level, class)
         elseif (subclass and strfind(subclass, RELICSLOT)) then level = format("%s(%s)", level, RELICSLOT)
         end
+        if itemLinkGem then
+        link = gsub(link, "|h%[(.-)%]|h", "|h["..level..isItemHasGem(itemLinkGem)..":"..name.."]|h")
+        else
         link = gsub(link, "|h%[(.-)%]|h", "|h["..level..":"..name.."]|h")
+        end
         itemCache[link] = link
     end
 	return link

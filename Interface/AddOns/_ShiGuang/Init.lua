@@ -9,6 +9,8 @@ ShiGuangPerDB = ShiGuangPerDB or {}
 
 local M, R, U, I = unpack(ns)
 local pairs, next, tinsert = pairs, next, table.insert
+local min, max = math.min, math.max
+local CombatLogGetCurrentEventInfo, GetPhysicalScreenSize = CombatLogGetCurrentEventInfo, GetPhysicalScreenSize
 
 -- Events
 local events = {}
@@ -69,7 +71,40 @@ function M:GetModule(name)
 end
 
 -- Init
+local function GetBestScale()
+	return max(.4, min(1.15, 768 / I.ScreenHeight))
+end
+
+function M:SetupUIScale(init)
+	if MaoRUIDB["LockUIScale"] then MaoRUIDB["UIScale"] = GetBestScale() end
+	local scale = MaoRUIDB["UIScale"]
+	if init then
+		local pixel = 1
+		local ratio = 768 / I.ScreenHeight
+		R.mult = (pixel / scale) - ((pixel - ratio) / scale)
+	elseif not InCombatLockdown() then
+		UIParent:SetScale(scale)
+	end
+end
+
+local isScaling = false
+local function UpdatePixelScale(event)
+	if isScaling then return end
+	isScaling = true
+
+	if event == "UI_SCALE_CHANGED" then
+		I.ScreenWidth, I.ScreenHeight = GetPhysicalScreenSize()
+	end
+	M:SetupUIScale(true)
+	M:SetupUIScale()
+
+	isScaling = false
+end
+
 M:RegisterEvent("PLAYER_LOGIN", function()
+	-- Initial
+	M:SetupUIScale()
+	M:RegisterEvent("UI_SCALE_CHANGED", UpdatePixelScale)
 	M:SetSmoothingAmount(MaoRUIPerDB["UFs"]["SmoothAmount"])
 
 	for _, module in next, initQueue do

@@ -48,6 +48,7 @@ function MISC:OnLogin()
 	self:AutoDismount()
 	self:BidPriceHighlight()
 	self:TradeTabs()
+	self:BlockStrangerInvite()
 	self:xMerchant()
 
 	-- Max camera distancee
@@ -457,6 +458,16 @@ function MISC:AutoDismount()
 		end
 	end
 	M:RegisterEvent("UI_ERROR_MESSAGE", updateEvent)
+end
+
+-- Block invite from strangers
+function MISC:BlockStrangerInvite()
+	M:RegisterEvent("PARTY_INVITE_REQUEST", function(_, _, _, _, _, _, _, guid)
+		if MaoRUIPerDB["Misc"]["BlockInvite"] and not (IsGuildMember(guid) or BNGetGameAccountInfoByGUID(guid) or C_FriendList_IsFriend(guid)) then
+			DeclineGroup()
+			StaticPopup_Hide("PARTY_INVITE")
+		end
+	end)
 end
 
 --[[hooksecurefunc("TextStatusBar_UpdateTextStringWithValues",function(self,textString,value,_,maxValue)  ---	Custom status text format.

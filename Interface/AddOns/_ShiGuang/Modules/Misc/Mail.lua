@@ -202,7 +202,7 @@ function MISC:MailBox_ContactList()
 	list:SetSize(210, 421)
 	list:SetPoint("TOPLEFT", MailFrame, "TOPRIGHT", 5, 0)
 	list:SetFrameStrata("Tooltip")
-	M.SetBackground(list)
+	M.SetBD(list)
 	M.CreateFS(list, 14, U["ContactList"], "system", "TOP", 0, -6)
 
 	local editbox = M.CreateEditBox(list, 121, 26)

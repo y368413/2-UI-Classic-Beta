@@ -1,5 +1,9 @@
 local _, ns = ...
 local M, R, U, I = unpack(ns)
+
+local bit_band, bit_bor = bit.band, bit.bor
+local COMBATLOG_OBJECT_AFFILIATION_MINE = COMBATLOG_OBJECT_AFFILIATION_MINE or 0x00000001
+
 I.Version = GetAddOnMetadata("_ShiGuang", "Version")
 I.Support = GetAddOnMetadata("_ShiGuang", "X-Support")
 I.Client = GetLocale()
@@ -10,6 +14,7 @@ I.isClassic = select(4, GetBuildInfo()) < 20000
 I.MyName = UnitName("player")
 I.MyRealm = GetRealmName()
 I.MyClass = select(2, UnitClass("player"))
+I.MyFaction = UnitFactionGroup("player")
 I.ClassList = {}
 for k, v in pairs(LOCALIZED_CLASS_NAMES_MALE) do
 	I.ClassList[v] = k
@@ -43,7 +48,6 @@ I.QualityColors[LE_ITEM_QUALITY_COMMON] = {r = 0, g = 0, b = 0}
 
 -- Fonts
 I.Font = {STANDARD_TEXT_FONT, 12, "OUTLINE"}
-I.TipFont = {GameTooltipText:GetFont(), 14, "OUTLINE"}
 I.LineString = I.GreyColor.."---------------"
 
 -- Textures
@@ -54,9 +58,17 @@ I.normTex = Media.."normTex"
 I.gradTex = Media.."gradTex"
 I.flatTex = Media.."flatTex"
 I.bgTex = Media.."bgTex"
-I.MicroTex = Media.."Hutu\\"
 I.arrowTex = Media.."Modules\\Raid\\textureArrowAbove"
+I.MicroTex = Media.."Hutu\\"
+I.rolesTex = Media.."UI-LFG-ICON-ROLES"
+I.chatLogo = Media.."2UI.blp"
+I.logoTex = Media.."2UI.blp"
 I.sortTex = Media.."SortIcon"
+I.arrowUp = Media.."arrow-up-active"
+I.arrowDown = Media.."arrow-down-active"
+I.arrowLeft = Media.."arrow-left-active"
+I.arrowRight = Media.."arrow-right-active"
+I.EnergyTex = Media.."EnergyTex"
 I.mailTex = "Interface\\Minimap\\Tracking\\Mailbox"
 I.gearTex = "Interface\\WorldMap\\Gear_64"
 I.eyeTex = "Interface\\Minimap\\Raid_Icon"		-- blue: \\Dungeon_Icon
@@ -74,7 +86,6 @@ I.textures = {
 	flash		= Media.."ActionBar\\flash",
 	pushed		= Media.."ActionBar\\pushed",
 	checked		= Media.."ActionBar\\checked",
-	equipped	= Media.."ActionBar\\gloss",
 }
 I.LeftButton = " |TInterface\\TUTORIALFRAME\\UI-TUTORIAL-FRAME:13:11:0:-1:512:512:12:66:230:307|t "
 I.RightButton = " |TInterface\\TUTORIALFRAME\\UI-TUTORIAL-FRAME:13:11:0:-1:512:512:12:66:333:411|t "
@@ -83,38 +94,21 @@ I.AFKTex = "|T"..FRIENDS_TEXTURE_AFK..":14:14:0:0:16:16:1:15:1:15|t"
 I.DNDTex = "|T"..FRIENDS_TEXTURE_DND..":14:14:0:0:16:16:1:15:1:15|t"
 
 -- Flags
-I.MyPetFlags = bit.bor(COMBATLOG_OBJECT_AFFILIATION_MINE, COMBATLOG_OBJECT_REACTION_FRIENDLY, COMBATLOG_OBJECT_CONTROL_PLAYER, COMBATLOG_OBJECT_TYPE_PET)
-I.PartyPetFlags = bit.bor(COMBATLOG_OBJECT_AFFILIATION_PARTY, COMBATLOG_OBJECT_REACTION_FRIENDLY, COMBATLOG_OBJECT_CONTROL_PLAYER, COMBATLOG_OBJECT_TYPE_PET)
-I.RaidPetFlags = bit.bor(COMBATLOG_OBJECT_AFFILIATION_RAID, COMBATLOG_OBJECT_REACTION_FRIENDLY, COMBATLOG_OBJECT_CONTROL_PLAYER, COMBATLOG_OBJECT_TYPE_PET)
-I.GuardianFlags = bit.bor(COMBATLOG_OBJECT_AFFILIATION_MINE, COMBATLOG_OBJECT_REACTION_FRIENDLY, COMBATLOG_OBJECT_CONTROL_PLAYER, COMBATLOG_OBJECT_TYPE_GUARDIAN)
-
---[[ RoleUpdater
-local function CheckRole()
-	local tree = GetSpecialization()
-	if not tree then return end
-	local _, _, _, _, role, stat = GetSpecializationInfo(tree)
-	if role == "TANK" then
-		I.Role = "Tank"
-	elseif role == "HEALER" then
-		I.Role = "Healer"
-	elseif role == "DAMAGER" then
-		if stat == 4 then	--1力量，2敏捷，4智力
-			I.Role = "Caster"
-		else
-			I.Role = "Melee"
-		end
-	end
+function I:IsMyPet(flags)
+	return bit_band(flags, COMBATLOG_OBJECT_AFFILIATION_MINE) > 0
 end
-M:RegisterEvent("PLAYER_LOGIN", CheckRole)
-M:RegisterEvent("CHARACTER_POINTS_CHANGED", CheckRole)]]
+I.PartyPetFlags = bit_bor(COMBATLOG_OBJECT_AFFILIATION_PARTY, COMBATLOG_OBJECT_REACTION_FRIENDLY, COMBATLOG_OBJECT_CONTROL_PLAYER, COMBATLOG_OBJECT_TYPE_PET)
+I.RaidPetFlags = bit_bor(COMBATLOG_OBJECT_AFFILIATION_RAID, COMBATLOG_OBJECT_REACTION_FRIENDLY, COMBATLOG_OBJECT_CONTROL_PLAYER, COMBATLOG_OBJECT_TYPE_PET)
+
+
 
 -- Raidbuff Checklist
 I.BuffList = {
 	[1] = {		-- 合剂
-		251836,	-- 敏捷238
-		251837,	-- 智力238
-		251838,	-- 耐力238
-		251839,	-- 力量238
+		--251836,	-- 敏捷238
+		--251837,	-- 智力238
+		--251838,	-- 耐力238
+		--251839,	-- 力量238
 		298836,	-- 敏捷360
 		298837,	-- 智力360
 		298839,	-- 耐力360

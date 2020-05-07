@@ -61,20 +61,14 @@ function module:SkinChat()
 	eb:ClearAllPoints()
 	eb:SetPoint("BOTTOMLEFT", self, "TOPLEFT", 2, 21)
 	eb:SetPoint("TOPRIGHT", self, "TOPRIGHT", -12, 43)
-	M.CreateBD(eb)
-	M.CreateSD(eb)
-	M.CreateTex(eb)
-	for i = 3, 8 do
-		select(i, eb:GetRegions()):SetAlpha(0)
-	end
+	M.StripTextures(eb)
+	M.SetBD(eb)
 
 	local lang = _G[name.."EditBoxLanguage"]
 	lang:GetRegions():SetAlpha(0)
 	lang:SetPoint("TOPLEFT", eb, "TOPRIGHT", 2, 0)
 	lang:SetPoint("BOTTOMRIGHT", eb, "BOTTOMRIGHT", 21, 0)
-	M.CreateBD(lang)
-	M.CreateSD(lang)
-	M.CreateTex(lang)
+	M.SetBD(lang)
 
 	local tab = _G[name.."Tab"]
 	--tab:SetAlpha(1)
@@ -199,21 +193,11 @@ function module.OnChatWhisper(event, ...)
 	end
 end
 
-function module:WhipserInvite()
+function module:WhisperInvite()
 	if not MaoRUIPerDB["Chat"]["Invite"] then return end
 	self:UpdateWhisperList()
 	M:RegisterEvent("CHAT_MSG_WHISPER", module.OnChatWhisper)
 	M:RegisterEvent("CHAT_MSG_BN_WHISPER", module.OnChatWhisper)
-end
-
--- Timestamp
-function module:UpdateTimestamp()
-	local greyStamp = I.GreyColor.."[%H:%M]|r" --"[%H:%M:%S]|r "
-	if MaoRUIDB["Timestamp"] then
-		SetCVar("showTimestamps", greyStamp)
-	elseif GetCVar("showTimestamps") == greyStamp then
-		SetCVar("showTimestamps", "none")
-	end
 end
 
 -- Classcolor name
@@ -271,14 +255,13 @@ function module:OnLogin()
 	CombatLogQuickButtonFrame_CustomTexture:SetTexture(nil)
 
 	-- Add Elements
-	self:UpdateTimestamp()
 	self:UpdateClassColorName()
 	self:ChatWhisperSticky()
 	self:ChatFilter()
 	self:ChannelRename()
 	self:Chatbar()
 	self:UrlCopy()
-	self:WhipserInvite()
+	self:WhisperInvite()
 
 	-- Lock chatframe
 	if MaoRUIPerDB["Chat"]["Lock"] then
@@ -289,9 +272,12 @@ function module:OnLogin()
 
 	-- ProfanityFilter
 	if not BNFeaturesEnabledAndConnected() then return end
-	if not MaoRUIPerDB["Chat"]["Freedom"] then
-		SetCVar("profanityFilter", 1)
-	else
+	if MaoRUIPerDB["Chat"]["Freedom"] then
+		if GetCVar("portal") == "CN" then
+			ConsoleExec("portal TW")
+		end
 		SetCVar("profanityFilter", 0)
+	else
+		SetCVar("profanityFilter", 1)
 	end
 end

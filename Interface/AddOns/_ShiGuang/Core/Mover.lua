@@ -4,6 +4,32 @@ local MISC = M:RegisterModule("Mover")
 
 local cr, cg, cb = I.r, I.g, I.b
 
+-- Movable Frame
+function M:CreateMF(parent, saved)
+	local frame = parent or self
+	frame:SetMovable(true)
+	frame:SetUserPlaced(true)
+	frame:SetClampedToScreen(true)
+
+	self:EnableMouse(true)
+	self:RegisterForDrag("LeftButton")
+	self:SetScript("OnDragStart", function() frame:StartMoving() end)
+	self:SetScript("OnDragStop", function()
+		frame:StopMovingOrSizing()
+		if not saved then return end
+		local orig, _, tar, x, y = frame:GetPoint()
+		MaoRUIPerDB["TempAnchor"][frame:GetName()] = {orig, "UIParent", tar, x, y}
+	end)
+end
+
+function M:RestoreMF()
+	local name = self:GetName()
+	if name and MaoRUIPerDB["TempAnchor"][name] then
+		self:ClearAllPoints()
+		self:SetPoint(unpack(MaoRUIPerDB["TempAnchor"][name]))
+	end
+end
+
 -- Frame Mover
 local MoverList, f = {}
 local updater
@@ -15,9 +41,7 @@ function M:Mover(text, value, anchor, width, height, isAuraWatch)
 	local mover = CreateFrame("Frame", nil, UIParent)
 	mover:SetWidth(width or self:GetWidth())
 	mover:SetHeight(height or self:GetHeight())
-	M.CreateBD(mover)
-	M.CreateSD(mover)
-	M.CreateTex(mover)
+	mover.bg = M.SetBD(mover)
 	mover:Hide()
 	mover.text = M.CreateFS(mover, I.Font[2], text)
 	mover.text:SetWordWrap(true)
@@ -128,12 +152,12 @@ function MISC:Mover_OnClick(btn)
 end
 
 function MISC:Mover_OnEnter()
-	self:SetBackdropBorderColor(cr, cg, cb)
+	self.bg:SetBackdropBorderColor(cr, cg, cb)
 	self.text:SetTextColor(1, .8, 0)
 end
 
 function MISC:Mover_OnLeave()
-	self:SetBackdropBorderColor(0, 0, 0)
+	self.bg:SetBackdropBorderColor(0, 0, 0)
 	self.text:SetTextColor(1, 1, 1)
 end
 
@@ -195,9 +219,7 @@ local function CreateConsole()
 	f = CreateFrame("Frame", nil, UIParent)
 	f:SetPoint("TOP", 0, -150)
 	f:SetSize(212, 80)
-	M.CreateBD(f)
-	M.CreateSD(f)
-	M.CreateTex(f)
+	M.SetBD(f)
 	M.CreateFS(f, 15, U["Mover Console"], "system", "TOP", 0, -8)
 	local bu, text = {}, {LOCK, U["Grids"], U["AuraWatch"], RESET}
 	for i = 1, 4 do
@@ -246,9 +268,7 @@ local function CreateConsole()
 	local frame = CreateFrame("Frame", nil, f)
 	frame:SetSize(212, 73)
 	frame:SetPoint("TOP", f, "BOTTOM", 0, -2)
-	M.CreateBD(frame)
-	M.CreateSD(frame)
-	M.CreateTex(frame)
+	M.SetBD(frame)
 	f.__trimText = M.CreateFS(frame, 12, NONE, "system", "BOTTOM", 0, 5)
 
 	local xBox = M.CreateEditBox(frame, 60, 22)

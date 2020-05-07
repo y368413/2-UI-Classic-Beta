@@ -19,7 +19,7 @@ local function createExtraGUI(parent, name, title, bgFrame)
 	local frame = CreateFrame("Frame", name, parent)
 	frame:SetSize(300, 600)
 	frame:SetPoint("LEFT", parent:GetParent(), "RIGHT", -92, -16)
-	M.SetBackground(frame)
+	M.SetBD(frame)
 	parent:HookScript("OnHide", function()
 		if frame:IsShown() then frame:Hide() end
 	end)
@@ -42,7 +42,7 @@ end
 local function toggleExtraGUI(name)
 	for _, frame in next, extraGUIs do
 		if frame:GetName() == name then
-			ToggleFrame(frame)
+			M:TogglePanel(frame)
 		else
 			frame:Hide()
 		end
@@ -555,6 +555,7 @@ function G:SetupBuffIndicator(parent)
 		scroll.add:SetScript("OnClick", function()
 			addClick(scroll, index)
 		end)
+
 		scroll.reset = M.CreateButton(frame, 45, 25, RESET)
 		scroll.reset:SetPoint("RIGHT", scroll.add, "LEFT", -5, 0)
 		scroll.reset:SetScript("OnClick", function()
@@ -650,10 +651,16 @@ function G:SetupRaidFrame(parent)
 		for _, frame in pairs(ns.oUF.objects) do
 			if frame.mystyle == "raid" and not frame.isPartyFrame and not frame.isPartyPet then
 				if MaoRUIPerDB["UFs"]["SimpleMode"] then
-					frame:SetSize(100*MaoRUIPerDB["UFs"]["SimpleRaidScale"]/10, 20*MaoRUIPerDB["UFs"]["SimpleRaidScale"]/10)
+					local scale = MaoRUIPerDB["UFs"]["SimpleRaidScale"]/10
+					local frameWidth = 100*scale
+					local frameHeight = 20*scale
+					local powerHeight = 2*scale
+					local healthHeight = frameHeight - powerHeight
+					frame:SetSize(frameWidth, frameHeight)
+					frame.Health:SetHeight(healthHeight)
+					frame.Power:SetHeight(powerHeight)
 				else
-					frame:SetSize(MaoRUIPerDB["UFs"]["RaidWidth"], MaoRUIPerDB["UFs"]["RaidHeight"])
-					frame.Power:SetHeight(MaoRUIPerDB["UFs"]["RaidPowerHeight"])
+					SetUnitFrameSize(frame, "Raid")
 				end
 			end
 		end
@@ -664,8 +671,7 @@ function G:SetupRaidFrame(parent)
 	local function resizePartyFrame()
 		for _, frame in pairs(ns.oUF.objects) do
 			if frame.isPartyFrame then
-				frame:SetSize(MaoRUIPerDB["UFs"]["PartyWidth"], MaoRUIPerDB["UFs"]["PartyHeight"])
-				frame.Power:SetHeight(MaoRUIPerDB["UFs"]["PartyPowerHeight"])
+				SetUnitFrameSize(frame, "Party")
 			end
 		end
 	end
@@ -674,8 +680,7 @@ function G:SetupRaidFrame(parent)
 	local function resizePartyPetFrame()
 		for _, frame in pairs(ns.oUF.objects) do
 			if frame.isPartyPet then
-				frame:SetSize(MaoRUIPerDB["UFs"]["PartyPetWidth"], MaoRUIPerDB["UFs"]["PartyPetHeight"])
-				frame.Power:SetHeight(MaoRUIPerDB["UFs"]["PartyPetPowerHeight"])
+				SetUnitFrameSize(frame, "PartyPet")
 			end
 		end
 	end

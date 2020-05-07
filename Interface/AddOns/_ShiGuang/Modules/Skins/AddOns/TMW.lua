@@ -4,7 +4,9 @@ local S = M:GetModule("Skins")
 
 local function ReskinTMW()
 	TMW.Classes.Icon:PostHookMethod("OnNewInstance", function(self)
-		M.CreateSD(self, 2, 2)
+		if not self.bg then
+			self.bg = M.SetBD(self)
+		end
 	end)
 
 	TMW.Classes.IconModule_Texture:PostHookMethod("OnNewInstance", function(self)

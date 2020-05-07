@@ -1,7 +1,7 @@
 if WOW_PROJECT_ID == WOW_PROJECT_MAINLINE then return end
 
 local major = "LibHealComm-4.0"
-local minor = 89
+local minor = 90
 assert(LibStub, format("%s requires LibStub.", major))
 
 local HealComm = LibStub:NewLibrary(major, minor)
@@ -393,37 +393,40 @@ function HealComm:GetGUIDUnitMapTable()
 end
 
 -- Gets the next heal landing on someone using the passed filters
-function HealComm:GetNextHealAmount(guid, bitFlag, time, ignoreGUID)
+function HealComm:GetNextHealAmount(guid, bitFlag, time, ignoreGUID, srcGUID)
 	local healTime, healAmount, healFrom
 	local currentTime = GetTime()
 
 	for _, tbl in pairs({pendingHeals, pendingHots}) do
 		for casterGUID, spells in pairs(tbl) do
-			if( not ignoreGUID or ignoreGUID ~= casterGUID ) then
+			if( not ignoreGUID or ignoreGUID ~= casterGUID ) and (not srcGUID or srcGUID == casterGUID) then
 				for _, pending in pairs(spells) do
 					if( pending.bitType and bit.band(pending.bitType, bitFlag) > 0 ) then
 						for i=1, #(pending), 5 do
-							local amount = pending[i + 1]
-							local stack = pending[i + 2]
-							local endTime = pending[i + 3]
-							endTime = endTime > 0 and endTime or pending.endTime
+							local targetGUID = pending[i]
+							if(not guid or targetGUID == guid) then
+								local amount = pending[i + 1]
+								local stack = pending[i + 2]
+								local endTime = pending[i + 3]
+								endTime = endTime > 0 and endTime or pending.endTime
 
-							-- Direct heals are easy, if they match the filter then return them
-							if( ( pending.bitType == DIRECT_HEALS or pending.bitType == BOMB_HEALS ) and ( not time or endTime <= time ) ) then
-								if( not healTime or endTime < healTime ) then
-									healTime = endTime
-									healAmount = amount * stack
-									healFrom = casterGUID
-								end
+								-- Direct heals are easy, if they match the filter then return them
+								if( ( pending.bitType == DIRECT_HEALS or pending.bitType == BOMB_HEALS ) and ( not time or endTime <= time ) ) then
+									if( not healTime or endTime < healTime ) then
+										healTime = endTime
+										healAmount = amount * stack
+										healFrom = casterGUID
+									end
 
-							-- Channeled heals and hots, have to figure out how many times it'll tick within the given time band
-							elseif( ( pending.bitType == CHANNEL_HEALS or pending.bitType == HOT_HEALS ) ) then
-								local secondsLeft = time and time - currentTime or endTime - currentTime
-								local nextTick = currentTime + (secondsLeft % pending.tickInterval)
-								if( not healTime or nextTick < healTime ) then
-									healTime = nextTick
-									healAmount = amount * stack
-									healFrom = casterGUID
+								-- Channeled heals and hots, have to figure out how many times it'll tick within the given time band
+								elseif( ( pending.bitType == CHANNEL_HEALS or pending.bitType == HOT_HEALS ) ) then
+									local secondsLeft = time and time - currentTime or endTime - currentTime
+									local nextTick = currentTime + (secondsLeft % pending.tickInterval)
+									if( not healTime or nextTick < healTime ) then
+										healTime = nextTick
+										healAmount = amount * stack
+										healFrom = casterGUID
+									end
 								end
 							end
 						end
@@ -628,28 +631,56 @@ function HealComm:GetHealAmountEx(dstGUID, dstBitFlag, dstTime, srcGUID, srcBitF
 	return dstAmount1, dstAmount2, srcAmount1, srcAmount2
 end
 
+-- Get the number of direct heals on a target
+function HealComm:GetNumHeals(filterGUID, time)
+	local numHeals = 0
+
+	for _, spells in pairs(pendingHeals) do
+		if spells then
+			for _, pending in pairs(spells) do
+				for i = 1, #(pending), 5 do
+					local guid = pending[i]
+					if( guid == filterGUID ) then
+						local endTime = pending[i + 3]
+						endTime = endTime > 0 and endTime or pending.endTime
+
+						if( pending.bitType == DIRECT_HEALS and ( not time or endTime <= time ) ) then
+							numHeals = numHeals + 1
+						end
+					end
+				end
+			end
+		end
+	end
+
+	return numHeals
+end
+
 -- Healing class data
 -- Thanks to Gagorian (DrDamage) for letting me steal his formulas and such
 local playerCurrentRelic
 local guidToUnit, guidToGroup = HealComm.guidToUnit, HealComm.guidToGroup
 
--- UnitBuff priortizes our buffs over everyone elses when there is a name conflict, so yay for that
+local unitHasAura
+
 do
-	local function SpellIdPredicate(spellIdToFind, _, _, _, _, _, _, _, _, _, _, _, spellId)
-		return spellIdToFind == spellId;
+	local findAura = AuraUtil.FindAura
+	local findAuraByName = AuraUtil.FindAuraByName
+
+	local function spellIdPredicate(spellIdToFind, _, _, _, _, _, _, _, _, _, _, _, spellId)
+		return spellIdToFind == spellId
 	end
 
-	function AuraUtil.FindAuraBySpellId(spellId, unit, filter)
-		return AuraUtil.FindAura(SpellIdPredicate, unit, filter, spellId);
+	local function findAuraBySpellId(spellId, unit, filter)
+		return findAura(spellIdPredicate, unit, filter, spellId)
 	end
-end
 
- -- UnitBuff priortizes our buffs over everyone elses when there is a name conflict, so yay for that
-local function unitHasAura(unit, name)
-	if type(name) == "number" then
-		return AuraUtil.FindAuraBySpellId(name, unit)
-	else
-		return AuraUtil.FindAuraByName(name, unit)
+	function unitHasAura(unit, name)
+		if type(name) == "number" then
+			return findAuraBySpellId(name, unit)
+		else
+			return findAuraByName(name, unit)
+		end
 	end
 end
 
@@ -709,7 +740,7 @@ end
 	Or if you need to set specific healing values for one GUID it should be
 	"compressedGUID1,healthAmount1,compressedGUID2,healAmount2,compressedGUID3,healAmount3", -1
 
-	The latter is for cases like Glyph of Healing Wave where you need a heal for 1,000 on A and a heal for 200 on the player for M without sending 2 events.
+	The latter is for cases like Glyph of Healing Wave where you need a heal for 1,000 on A and a heal for 200 on the player for B without sending 2 events.
 	The -1 tells the library to look in the GUId list for the heal amounts
 
 	**NOTE** Any GUID returned from GetHealTargets must be compressed through a call to compressGUID[guid]
@@ -954,7 +985,7 @@ if( playerClass == "PALADIN" ) then
 
 			for auraID, values in pairs(blessings) do
 				if unitHasAura(unit, auraID) then
-					healAmount = calculateGeneralAmount(spellData[spellName].levels[spellRank], healAmount, values[spellName], 1, 1)
+					healAmount = calculateGeneralAmount(spellData[spellName].levels[spellRank], healAmount, values[spellName], healModifier, 1)
 					break
 				end
 			end
@@ -1258,13 +1289,13 @@ HealComm.healingModifiers = HealComm.healingModifiers or {
 	[17547] = 0.50, -- Mortal Strike
 	[19643] = 0.50, -- Mortal Strike
 	[24573] = 0.50, -- Mortal Strike
-	[26652] = 0.50, -- Mortal Strike
 	[12294] = 0.50, -- Mortal Strike (Rank 1)
 	[21551] = 0.50, -- Mortal Strike (Rank 2)
 	[21552] = 0.50, -- Mortal Strike (Rank 3)
 	[21553] = 0.50, -- Mortal Strike (Rank 4)
 	[23169] = 0.50, -- Brood Affliction: Green
 	[22859] = 0.50, -- Mortal Cleave
+	[7068] = 0.25, -- Veil of Shadow
 	[17820] = 0.25, -- Veil of Shadow
 	[22687] = 0.25, -- Veil of Shadow
 	[23224] = 0.25, -- Veil of Shadow
@@ -1272,7 +1303,6 @@ HealComm.healingModifiers = HealComm.healingModifiers or {
 	[28440] = 0.25, -- Veil of Shadow
 	[13583] = 0.50, -- Curse of the Deadwood
 	[23230] = 0.50, -- Blood Fury
-	[10060] = 1.20, -- Power Infusion
 }
 
 HealComm.healingStackMods = HealComm.healingStackMods or {
@@ -1388,6 +1418,10 @@ function HealComm:UNIT_AURA(unit)
 	wipe(alreadyAdded)
 
 	if( unit == "player" ) then
+		if unitHasAura("player", 10060) then -- Power Infusion
+			playerIncrease = playerIncrease * 1.20
+		end
+
 		playerHealModifier = playerIncrease * playerDecrease
 	end
 
@@ -1448,7 +1482,7 @@ end
 local function loadHealList(pending, amount, stack, endTime, ticksLeft, ...)
 	wipe(tempPlayerList)
 
-	-- For the sake of consistency, even a heal doesn't have multiple end times like a hot, it'll be treated as such in the I
+	-- For the sake of consistency, even a heal doesn't have multiple end times like a hot, it'll be treated as such in the DB
 	if( amount ~= -1 and amount ~= "-1" ) then
 		amount = not pending.hasVariableTicks and amount or loadHealAmount(strsplit("@", amount))
 
@@ -1702,8 +1736,8 @@ function HealComm:CHAT_MSG_ADDON(prefix, message, channel, sender)
 	-- New direct heal - D:<extra>:<spellID>:<amount>:target1,target2...
 	if( commType == "D" and arg1 and arg2 ) then
 		parseDirectHeal(casterGUID, spellID, tonumber(arg1), extraArg, strsplit(",", arg2))
-	-- New channel heal - R:<extra>:<spellID>:<amount>:<totalTicks>:target1,target2...
-	elseif( commType == "R" and arg1 and arg3 ) then
+	-- New channel heal - C:<extra>:<spellID>:<amount>:<totalTicks>:target1,target2...
+	elseif( commType == "C" and arg1 and arg3 ) then
 		parseChannelHeal(casterGUID, spellID, tonumber(arg1), tonumber(arg2), strsplit(",", arg3))
 	-- New hot - H:<totalTicks>:<spellID>:<amount>:<isMulti>:<tickInterval>:target1,target2...
 	elseif( commType == "H" and arg1 and arg4 ) then
@@ -1855,7 +1889,7 @@ function HealComm:COMBAT_LOG_EVENT_UNFILTERED(...)
 					local ticksLeft = min(floor((endTime - GetTime() + 0.001) / tickInterval), totalTicks)
 					if ticksLeft > 0 then
 						parseChannelHeal(sourceGUID, spellID, amt, ticksLeft, strsplit(",", targets))
-						sendMessage(format("R::%d:%d:%s:%s", spellID, amt, ticksLeft, targets))
+						sendMessage(format("C::%d:%d:%s:%s", spellID, amt, ticksLeft, targets))
 					end
 				end
 			end
@@ -1895,7 +1929,7 @@ local castGUIDs, guidPriorities = {}, {}
 
 -- Deals with the fact that functions are called differently
 -- Why a table when you can only cast one spell at a time you ask? When you factor in lag and mash clicking it's possible to:
--- cast A, interrupt it, cast M and have A fire SUCEEDED before M does, the tables keeps it from bugging out
+-- cast A, interrupt it, cast B and have A fire SUCEEDED before B does, the tables keeps it from bugging out
 local function setCastData(priority, name, guid)
 	if( not guid or not lastSentID ) then return end
 	if( guidPriorities[lastSentID] and guidPriorities[lastSentID] >= priority ) then return end

@@ -1,7 +1,7 @@
 ﻿<Ui xmlns="http://www.blizzard.com/wow/ui/">
-<Script file="ChatMod.lua" />
-<Script file="WhisperTable.lua" />
-<Script file="ChatCopy.lua" />
+<Script file="ChatMod.lua"/>
+<Script file="WhisperTable.lua"/>
+<Script file="ChatCopy.lua"/>
 <!--模板-->
 <!--名字按钮-->
 <Button name="WhisperTable_TextBottonTemplate" hidden="true" virtual="true">
@@ -66,7 +66,7 @@
 <!--召唤按钮-->
 <Button name="WhisperTable_ShowBotton" parent="UIParent" hidden="false" movable="true" alpha="0.7">
 	<Size>
-		<AbsDimension x="24" y="24" />
+		<AbsDimension x="20" y="20" />
 	</Size>
 	<NormalTexture file="Interface\FriendsFrame\broadcast-normal"/>
 	<HighlightTexture alphaMode="ADD" file="Interface\FriendsFrame\broadcast-hover"/>
@@ -80,7 +80,7 @@
 	<Anchors>
 		<Anchor point="BOTTOMLEFT" relativeTo="UIParent" relativePoint="BOTTOMLEFT">
 			<Offset>
-				<AbsDimension x="285" y="0"/>
+				<AbsDimension x="280" y="-3"/>
 			</Offset>
 		</Anchor>
 	</Anchors>
@@ -112,7 +112,7 @@
 			if IsControlKeyDown() and (button == "LeftButton") then
 				if (not InCombatLockdown()) then
 					self:ClearAllPoints();
-					self:SetPoint("BOTTOMLEFT", UIParent, "BOTTOMLEFT", 285, 2);
+					self:SetPoint("BOTTOMLEFT", UIParent, "BOTTOMLEFT", 280, -2);
 				end
 			elseif (button == "RightButton") then
 				WhisperTable_Clear()
@@ -128,9 +128,9 @@
 		<AbsDimension x="140" y="230"/>
 	</Size>
 	<Anchors>
-		<Anchor point="BOTTOMRIGHT">
+		<Anchor point="BOTTOMLEFT">
 			<Offset>
-				<AbsDimension x="-125" y="100"/>
+				<AbsDimension x="21" y="160"/>
 			</Offset>
 		</Anchor>
 	</Anchors>

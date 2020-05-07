@@ -49,7 +49,7 @@ for spellID in pairs(spellBlackList) do
 end
 
 function MISC:IsAllyPet(sourceFlags)
-	if sourceFlags == I.MyPetFlags or (not MaoRUIPerDB["Misc"]["OwnInterrupt"] and (sourceFlags == I.PartyPetFlags or sourceFlags == I.RaidPetFlags)) then
+	if I:IsMyPet(sourceFlags) or (not MaoRUIPerDB["Misc"]["OwnInterrupt"] and (sourceFlags == I.PartyPetFlags or sourceFlags == I.RaidPetFlags)) then
 		return true
 	end
 end

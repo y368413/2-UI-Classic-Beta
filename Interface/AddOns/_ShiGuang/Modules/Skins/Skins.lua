@@ -2,6 +2,38 @@ local _, ns = ...
 local M, R, U, I = unpack(ns)
 local S = M:RegisterModule("Skins")
 
+local pairs, wipe = pairs, wipe
+local IsAddOnLoaded = IsAddOnLoaded
+
+R.defaultThemes = {}
+R.themes = {}
+
+function S:LoadDefaultSkins()
+	if IsAddOnLoaded("AuroraClassic") or IsAddOnLoaded("Aurora") then return end
+
+	-- Reskin Blizzard UIs
+	for _, func in pairs(R.defaultThemes) do
+		func()
+	end
+	wipe(R.defaultThemes)
+
+	for addonName, func in pairs(R.themes) do
+		local isLoaded, isFinished = IsAddOnLoaded(addonName)
+		if isLoaded and isFinished then
+			func()
+			R.themes[addonName] = nil
+		end
+	end
+
+	M:RegisterEvent("ADDON_LOADED", function(_, addonName)
+		local func = R.themes[addonName]
+		if func then
+			func()
+			R.themes[addonName] = nil
+		end
+	end)
+end
+
 function S:OnLogin()
 	local cr, cg, cb = 0, 0, 0
 	if MaoRUIPerDB["Skins"]["ClassLine"] then cr, cg, cb = I.r, I.g, I.b end
@@ -48,8 +80,8 @@ function S:OnLogin()
    Bottomline:SetBackdropColor(I.r, I.g, I.b, 0.8)
    end
 
+	self:LoadDefaultSkins()
 	-- Add Skins
-	self:MicroMenu()
 	self:QuestTracker()
 	self:TradeSkillSkin()
 	self:DBMSkin()
@@ -60,15 +92,19 @@ function S:OnLogin()
 	local media = LibStub and LibStub("LibSharedMedia-3.0", true)
 	if media then
 		media:Register("statusbar", "normTex", I.normTex)
-		media:Register("statusbar", "ShiGuang",		[[Interface\Addons\_ShiGuang\Media\Modules\Raid\ColorBar]])
-		media:Register("statusbar", "HalfStyle",		[[Interface\Addons\_ShiGuang\Media\Modules\Skada\YaSkada05]])
-		media:Register("statusbar", "AtlzSkada",		[[Interface\Addons\_ShiGuang\Media\Modules\Skada\AtlzSkada]])
-		media:Register("statusbar", "Yaskada",		[[Interface\Addons\_ShiGuang\Media\Modules\Skada\Yaskada]])
-		media:Register("statusbar", "Yaskada02",		[[Interface\Addons\_ShiGuang\Media\Modules\Skada\Yaskada02]])
-		media:Register("statusbar", "Yaskada03",		[[Interface\Addons\_ShiGuang\Media\Modules\Skada\Yaskada03]])
-		media:Register("statusbar", "Yaskada04",		[[Interface\Addons\_ShiGuang\Media\Modules\Skada\Yaskada04]])
-		media:Register("statusbar", "None",		[[Interface\Addons\_ShiGuang\Media\backdrop]])
-		media:Register("font", "Vera Serif",			[[Interface\Addons\_ShiGuang\Media\Fonts\Pixel.ttf]])
+		media:Register("statusbar", "ShiGuang", [[Interface\Addons\_ShiGuang\Media\Modules\Raid\ColorBar]])
+		media:Register("statusbar", "HalfStyle", [[Interface\Addons\_ShiGuang\Media\Modules\Skada\YaSkada05]])
+		media:Register("statusbar", "AtlzSkada", [[Interface\Addons\_ShiGuang\Media\Modules\Skada\AtlzSkada]])
+		media:Register("statusbar", "Yaskada", [[Interface\Addons\_ShiGuang\Media\Modules\Skada\Yaskada]])
+		media:Register("statusbar", "Yaskada02", [[Interface\Addons\_ShiGuang\Media\Modules\Skada\Yaskada02]])
+		media:Register("statusbar", "Yaskada03", [[Interface\Addons\_ShiGuang\Media\Modules\Skada\Yaskada03]])
+		media:Register("statusbar", "Yaskada04", [[Interface\Addons\_ShiGuang\Media\Modules\Skada\Yaskada04]])
+		media:Register("statusbar", "Rainbow", [[Interface\Addons\_ShiGuang\Media\Modules\Skada\Rainbow]])
+		media:Register("statusbar", "Fire", [[Interface\Addons\_ShiGuang\Media\Modules\Skada\Fire]])
+		media:Register("statusbar", "Cold", [[Interface\Addons\_ShiGuang\Media\Modules\Skada\Cold]])
+		media:Register("statusbar", "RainowCat", [[Interface\Addons\_ShiGuang\Media\Modules\Skada\RainowCat]])
+		media:Register("statusbar", "None",	[[Interface\Addons\_ShiGuang\Media\backdrop]])
+		media:Register("font", "Vera Serif", [[Interface\Addons\_ShiGuang\Media\Fonts\Pixel.ttf]])
 	end
 end
 
@@ -87,15 +123,19 @@ end
 
 local toggleFrames = {}
 
+local function CreateToggleButton(parent)
+	local bu = CreateFrame("Button", nil, parent)
+	bu:SetSize(20, 80)
+	bu.text = M.CreateFS(bu, 18, nil, true)
+
+	return bu
+end
+
 function S:CreateToggle(frame)
-	local close = M.CreateButton(frame, 20, 80, ">", 18)
-	M.CreateSD(close)
-	M.CreateTex(close)
+	local close = CreateToggleButton(frame)
 	frame.closeButton = close
 
-	local open = M.CreateButton(UIParent, 20, 80, "<", 18)
-	M.CreateSD(open)
-	M.CreateTex(open)
+	local open = CreateToggleButton(UIParent)
 	open:Hide()
 	frame.openButton = open
 

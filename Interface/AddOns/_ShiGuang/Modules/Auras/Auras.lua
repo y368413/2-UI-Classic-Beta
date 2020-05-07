@@ -123,9 +123,9 @@ function A:UpdateAuras(button, index)
 
 		if filter == "HARMFUL" then
 			local color = DebuffTypeColor[debuffType or "none"]
-			button.Shadow:SetBackdropBorderColor(color.r, color.g, color.b)
+			button:SetBackdropBorderColor(color.r, color.g, color.b)
 		else
-			button.Shadow:SetBackdropBorderColor(0, 0, 0)
+			button:SetBackdropBorderColor(0, 0, 0)
 		end
 
 		button.icon:SetTexture(texture)
@@ -245,7 +245,7 @@ function A:CreateAuraIcon(button)
 	local fontSize = floor(cfg.size/30*14 + .5)
 
 	button.icon = button:CreateTexture(nil, "BORDER")
-	button.icon:SetAllPoints()
+	button.icon:SetInside()
 	button.icon:SetTexCoord(unpack(I.TexCoord))
 
 	button.count = button:CreateFontString(nil, "ARTWORK")
@@ -258,10 +258,10 @@ function A:CreateAuraIcon(button)
 
 	button.highlight = button:CreateTexture(nil, "HIGHLIGHT")
 	button.highlight:SetColorTexture(1, 1, 1, .25)
-	button.highlight:SetAllPoints(button.icon)
+	button.highlight:SetInside()
 
-	local bg = M.CreateBG(button)
-	button.Shadow = M.CreateSD(bg)
+	M.CreateBD(button, .25)
+	M.CreateSD(button)
 
 	button:SetScript("OnAttributeChanged", A.OnAttributeChanged)
 end

@@ -165,6 +165,8 @@ local ignoreGossipNPC = {
 	[143925] = true, -- Dark Iron Mole Machine (Dark Iron Dwarf racial)
 	[155101] = true, -- 元素精华融合器
 	[155261] = true, -- 肖恩·维克斯，斯坦索姆
+	[150122] = true, -- 荣耀堡法师
+	[150131] = true, -- 萨尔玛法师
 }
 
 local rogueClassHallInsignia = {

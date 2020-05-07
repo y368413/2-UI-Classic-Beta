@@ -226,10 +226,6 @@ characterStatsClassicEventFrame:SetScript("OnEvent",
     Util functions that wrap my interface and the Blizzard's WoW Classic lua API code for ease of use
 ]]
 
-local function DebugBreakPrint()
-    print("ERROR");
-end
-
 local CSC_ScanTooltip = CreateFrame("GameTooltip", "CSC_ScanTooltip", nil, "GameTooltipTemplate");
 CSC_ScanTooltip:SetOwner(WorldFrame, "ANCHOR_NONE");
 local CSC_ScanTooltipPrefix = "CSC_ScanTooltip";
@@ -838,16 +834,37 @@ function CSC_PaperDollFrame_SetRangedHitChance(statFrame, unit)
 end
 
 function CSC_PaperDollFrame_SetSpellHitChance(statFrame, unit)
+	
+	statFrame:SetScript("OnEnter", CSC_CharacterSpellHitChanceFrame_OnEnter)
+	statFrame:SetScript("OnLeave", function()
+		GameTooltip:Hide()
+	end)
+
 	local hitChance = GetSpellHitModifier();
 	
 	if not hitChance then
 		hitChance = 0;
 	end
 
+	local additionalHit = 0;
+	local unitClassId = select(3, UnitClass(unit));
+
+	if unitClassId == CSC_MAGE_CLASS_ID then
+		local arcaneHit, frostFireHit = CSC_GetMageSpellHitFromTalents();
+		additionalHit = max(arcaneHit, frostFireHit);
+		statFrame.arcaneHit = arcaneHit;
+		statFrame.frostHit = frostFireHit;
+		statFrame.fireHit = frostFireHit;
+	elseif unitClassId == CSC_WARLOCK_CLASS_ID then
+		additionalHit = CSC_GetWarlockSpellHitFromTalents();
+		statFrame.afflictionHit = additionalHit;
+	end
+
+	hitChance = hitChance + additionalHit;
+
 	local hitChanceText = hitChance;
 	CSC_PaperDollFrame_SetLabelAndText(statFrame, STAT_HIT_CHANCE, hitChanceText, true, hitChance);
-	statFrame.tooltip = STAT_HIT_CHANCE.." "..hitChanceText;
-	statFrame.tooltip2 = format(CR_HIT_SPELL_TOOLTIP, UnitLevel(unit), hitChance);
+	statFrame.unitClassId = unitClassId;
 	statFrame:Show();
 end
 
@@ -1115,6 +1132,7 @@ function CSC_PaperDollFrame_SetManaRegen(statFrame, unit)
 	local castingText = BreakUpLargeNumbers(casting);
 	-- While Casting mana regen is most important to the player, so we display it as the main value
 	CSC_PaperDollFrame_SetLabelAndText(statFrame, MANA_REGEN, castingText, false, casting);
+	statFrame.mp5FromGear = BreakUpLargeNumbers(mp5FromGear);
 	statFrame.mp5Casting = castingText;
 	statFrame.mp5NotCasting = regenWhenNotCastingText;
 	statFrame:Show();
@@ -1187,6 +1205,7 @@ end
 function CSC_CharacterManaRegenFrame_OnEnter(self)
 	GameTooltip:SetOwner(self, "ANCHOR_RIGHT");
 	GameTooltip:SetText(MANA_REGEN_TOOLTIP, HIGHLIGHT_FONT_COLOR.r, HIGHLIGHT_FONT_COLOR.g, HIGHLIGHT_FONT_COLOR.b);
+	GameTooltip:AddDoubleLine(MANA_REGEN.." (From Gear):", self.mp5FromGear);
 	GameTooltip:AddDoubleLine(MANA_REGEN.." (While Casting):", self.mp5Casting);
 	GameTooltip:AddDoubleLine(MANA_REGEN.." (While Not Casting):", self.mp5NotCasting);
 	GameTooltip:Show();
@@ -1222,6 +1241,22 @@ function CSC_CharacterHitChanceFrame_OnEnter(self)
 	GameTooltip:AddDoubleLine(format("    Level 60 NPC: %.2F%%", missChanceVsNPC), format("(Dual wield: %.2F%%)", dwMissChanceVsNpc));
 	GameTooltip:AddDoubleLine(format("    Level 60 Player: %.2F%%", missChanceVsPlayer), format("(Dual wield: %.2F%%)", dwMissChanceVsPlayer));
 	GameTooltip:AddDoubleLine(format("    Level 63 NPC/Boss: %.2F%%", missChanceVsBoss), format("(Dual wield: %.2F%%)", dwMissChanceVsBoss));
+	GameTooltip:Show();
+end
+
+function CSC_CharacterSpellHitChanceFrame_OnEnter(self)
+	GameTooltip:SetOwner(self, "ANCHOR_RIGHT");
+	GameTooltip:SetText("Total spell hit chance\nfrom gear and talents.", HIGHLIGHT_FONT_COLOR.r, HIGHLIGHT_FONT_COLOR.g, HIGHLIGHT_FONT_COLOR.b);
+
+	if self.unitClassId == CSC_MAGE_CLASS_ID then
+		GameTooltip:AddLine(" "); -- Blank line.
+		GameTooltip:AddDoubleLine("Arcane Spell Hit", self.arcaneHit);
+		GameTooltip:AddDoubleLine("Fire Spell Hit", self.fireHit);
+		GameTooltip:AddDoubleLine("Frost Spell Hit", self.frostHit);
+	elseif self.unitClassId == CSC_WARLOCK_CLASS_ID then
+		GameTooltip:AddLine(" "); -- Blank line.
+		GameTooltip:AddDoubleLine("Affliction Spell Hit", self.afflictionHit);
+	end
 	GameTooltip:Show();
 end
 
@@ -1274,6 +1309,20 @@ end
     Util functions specific for Classes
 ]]
 
+-- Class ids
+CSC_WARRIOR_CLASS_ID 		= 1;
+CSC_PALADIN_CLASS_ID 		= 2;
+CSC_HUNTER_CLASS_ID 		= 3;
+CSC_ROGUE_CLASS_ID 			= 4;
+CSC_PRIEST_CLASS_ID 		= 5;
+CSC_DEATHKNIGHT_CLASS_ID 	= 6;
+CSC_SHAMAN_CLASS_ID 		= 7;
+CSC_MAGE_CLASS_ID 			= 8;
+CSC_WARLOCK_CLASS_ID 		= 9;
+CSC_MONK_CLASS_ID 			= 10;
+CSC_DRUID_CLASS_ID 			= 11;
+CSC_DEMONHUNTER_CLASS_ID 	= 12;
+
 -- returns additional crit % stats from Arcane instability and Critical Mass if any
 function CSC_GetMageCritStatsFromTalents()
 
@@ -1295,6 +1344,33 @@ function CSC_GetMageCritStatsFromTalents()
     end
 
 	return arcaneInstabilityCrit, criticalMassCrit;
+end
+
+-- returns the spell hit from Arcane Focus and Elemental Precision talents
+function CSC_GetMageSpellHitFromTalents()
+	local arcaneHit = 0;
+	local frostFireHit = 0;
+
+	-- Arcane Focus
+	local spellRank = select(5, GetTalentInfo(1, 2));
+	arcaneHit = spellRank * 2; -- 2% for each point
+
+	-- Elemental Precision
+	spellRank = select(5, GetTalentInfo(3, 3));
+	frostFireHit = spellRank * 2; -- 2% for each point
+
+	return arcaneHit, frostFireHit;
+end
+
+-- returns the spell hit from Suppression talent
+function CSC_GetWarlockSpellHitFromTalents()
+	local afflictionHit = 0;
+
+	-- Suppression
+	local spellRank = select(5, GetTalentInfo(1, 1));
+	afflictionHit = spellRank * 2; -- 2% for each point
+
+	return afflictionHit;
 end
 
 -- returns the combined crit stats from Holy Specialization and Force of Will
@@ -1396,13 +1472,13 @@ function CSC_GetMP5ModifierFromTalents(unit)
     local unitClassId = select(3, UnitClass(unit));
 	local spellRank = 0;
 
-	if unitClassId == 5 then -- Priest
+	if unitClassId == CSC_PRIEST_CLASS_ID then
 		-- Meditation
         spellRank = select(5, GetTalentInfo(1, 8));
-	elseif unitClassId == 8 then -- Mage
+	elseif unitClassId == CSC_MAGE_CLASS_ID then
 		-- Arcane Meditation
-        spellRank = select(5, GetTalentInfo(1, 12));
-	elseif unitClassId == 11 then -- Druid
+		spellRank = select(5, GetTalentInfo(1, 12));
+	elseif unitClassId == CSC_DRUID_CLASS_ID then
 		-- Reflection
         spellRank = select(5, GetTalentInfo(3, 6));
 	end
@@ -1416,8 +1492,8 @@ function CSC_GetMP5ModifierFromSetBonus(unit)
 	local unitClassId = select(3, UnitClass(unit));
 	local modifier = 0;
 	
-	-- not Druid (11) or Priest (5)
-	if unitClassId ~= 11 and unitClassId ~= 5 then
+	-- not Druid or Priest
+	if unitClassId ~= CSC_DRUID_CLASS_ID and unitClassId ~= CSC_PRIEST_CLASS_ID then
 		return modifier;
 	end
 	
@@ -1446,7 +1522,7 @@ function CSC_GetMP5ModifierFromSetBonus(unit)
 
 	local equippedSetItems = 0;
     for itemSlot = firstItemslotIndex, lastItemslotIndex do
-        local itemId = GetInventoryItemID(unit, itemslot);
+        local itemId = GetInventoryItemID(unit, itemSlot);
 		
 		if (itemId) then
 			if (itemId == vestmentsOfTranscendenceIDs[itemId] or itemId == stormrageRaimentIDs[itemId]) then

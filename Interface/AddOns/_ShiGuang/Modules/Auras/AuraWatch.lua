@@ -210,24 +210,24 @@ local function BuildICON(iconSize)
 
 	local frame = CreateFrame("Frame", nil, PetBattleFrameHider)
 	frame:SetSize(iconSize, iconSize)
-	M.CreateSD(frame, 3, 3)
+	frame.bg = M.SetBD(frame)
 
 	frame.Icon = frame:CreateTexture(nil, "ARTWORK")
-	frame.Icon:SetAllPoints()
+	frame.Icon:SetInside(frame.bg)
 	frame.Icon:SetTexCoord(unpack(I.TexCoord))
 
 	frame.Cooldown = CreateFrame("Cooldown", nil, frame, "CooldownFrameTemplate")
-	frame.Cooldown:SetAllPoints()
+	frame.Cooldown:SetInside(frame.bg)
 	frame.Cooldown:SetReverse(true)
 
 	local parentFrame = CreateFrame("Frame", nil, frame)
 	parentFrame:SetAllPoints()
-	parentFrame:SetFrameLevel(frame:GetFrameLevel() + 5)
+	parentFrame:SetFrameLevel(frame:GetFrameLevel() + 6)
 
 	frame.Spellname = M.CreateFS(parentFrame, 12, "", false, "BOTTOM", 0, -3)
 	frame.Count = M.CreateFS(parentFrame, iconSize*.55, "", false, "BOTTOMRIGHT", 6, -3)
-	frame.glowFrame = M.CreateBG(frame, 4)
-	frame.glowFrame:SetSize(iconSize+8, iconSize+8)
+
+	frame.glowFrame = M.CreateGlowFrame(frame, iconSize)
 
 	if not MaoRUIPerDB["AuraWatch"]["ClickThrough"] then enableTooltip(frame) end
 
@@ -238,7 +238,6 @@ end
 local function BuildTEXT(iconSize)
 	local frame = CreateFrame("Frame", nil, PetBattleFrameHider)
 	frame:SetSize(iconSize, iconSize)
-	--M.CreateSD(Frame, 3, 3)
 
 	frame.Icon = frame:CreateTexture(nil, "ARTWORK")
 	frame.Icon:SetAllPoints()
@@ -256,7 +255,7 @@ end
 local function BuildBAR(barWidth, iconSize)
 	local frame = CreateFrame("Frame", nil, PetBattleFrameHider)
 	frame:SetSize(iconSize, iconSize)
-	M.CreateSD(frame, 2, 2)
+	M.SetBD(frame)
 
 	frame.Icon = frame:CreateTexture(nil, "ARTWORK")
 	frame.Icon:SetAllPoints()
@@ -283,7 +282,8 @@ end
 local function BuildBAR2(barWidth, iconSize)
 	local frame = CreateFrame("Frame", nil, PetBattleFrameHider)
 	frame:SetSize(iconSize, iconSize)
-	M.CreateSD(frame, 2, 2)
+	--M.CreateSD(frame, 2, 2)
+	M.SetBD(frame)
 
 	frame.Icon = frame:CreateTexture(nil, "ARTWORK")
 	frame.Icon:SetAllPoints()
@@ -439,8 +439,7 @@ function A:AuraWatch_UpdateCD()
 					if group.Mode:lower() == "icon" then name = nil end
 					if charges and maxCharges and maxCharges > 1 and charges < maxCharges then
 						A:AuraWatch_SetupCD(KEY, name, icon, chargeStart, chargeDuration, true, 1, value.SpellID, charges)
-					--elseif start and duration > 1.5 then
-					elseif start and duration > 3 then -- FOR CLASSIC WOW
+					elseif start and duration > 3 then
 						A:AuraWatch_SetupCD(KEY, name, icon, start, duration, true, 1, value.SpellID)
 					end
 				elseif value.ItemID then
@@ -659,7 +658,7 @@ local eventList = {
 }
 
 local function checkPetFlags(sourceFlags, all)
-	if sourceFlags == I.MyPetFlags or (all and (sourceFlags == I.PartyPetFlags or sourceFlags == I.RaidPetFlags)) then
+	if I:IsMyPet(sourceFlags) or (all and (sourceFlags == I.PartyPetFlags or sourceFlags == I.RaidPetFlags)) then
 		return true
 	end
 end
@@ -755,16 +754,6 @@ end
 updater:SetScript("OnUpdate", A.AuraWatch_OnUpdate)
 
 -- Mover
-StaticPopupDialogs["RESET_AURAWATCH_MOVER"] = {
-	text = U["Reset AuraWatch Mover Confirm"],
-	button1 = OKAY,
-	button2 = CANCEL,
-	OnAccept = function()
-		wipe(MaoRUIPerDB["AuraWatchMover"])
-		ReloadUI()
-	end,
-}
-
 SlashCmdList.AuraWatch = function(msg)
 	if msg:lower() == "move" then
 		updater:SetScript("OnUpdate", nil)

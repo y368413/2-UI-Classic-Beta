@@ -11,16 +11,16 @@ local C_Timer_After, IsShiftKeyDown, InCombatLockdown, CanMerchantRepair = C_Tim
 local repairCostString = gsub(REPAIR_COST, HEADER_COLON, ":")
 
 local localSlots = {
-	[1] = {1, HEADSLOT, 1000},
-		[2] = {3, SHOULDERSLOT, 1000},
-		[3] = {5, CHESTSLOT, 1000},
-		[4] = {6, WAISTSLOT, 1000},
-		[5] = {9, WRISTSLOT, 1000},
-		[6] = {10, HANDSSLOT, 1000},
-		[7] = {7, LEGSSLOT, 1000},
-		[8] = {8, FEETSLOT, 1000},
-		[9] = {16, MAINHANDSLOT, 1000},
-		[10] = {17, SECONDARYHANDSLOT, 1000},
+	[1] = {1, INVTYPE_HEAD, 1000},
+	[2] = {3, INVTYPE_SHOULDER, 1000},
+	[3] = {5, INVTYPE_CHEST, 1000},
+	[4] = {6, INVTYPE_WAIST, 1000},
+	[5] = {9, INVTYPE_WRIST, 1000},
+	[6] = {10, U["Hands"], 1000},
+	[7] = {7, INVTYPE_LEGS, 1000},
+	[8] = {8, U["Feet"], 1000},
+	[9] = {16, INVTYPE_WEAPONMAINHAND, 1000},
+	[10] = {17, INVTYPE_WEAPONOFFHAND, 1000},
 	[11] = {18, INVTYPE_RANGED, 1000}
 }
 
