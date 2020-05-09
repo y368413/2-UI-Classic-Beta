@@ -1,7 +1,7 @@
 <Ui xmlns="http://www.blizzard.com/wow/ui/">
 	<Include file="Chat\Chat.xml"/>
-	<Include file="Mods\Mods.xml"/>
+	<Include file="Modify\Modify.xml"/>
 	<Include file="DamageEx\DamageEx.xml"/>
 	<Include file="UnitFrames\UnitFrames.xml"/>
-	<Include file="Aces\Aces.xml"/>
+	<Include file="AceExtensions\AceExtensions.xml"/>
 </Ui>

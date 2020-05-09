@@ -39,8 +39,8 @@ function UF:SetupCVars()
 	SetCVar("nameplateSelectedAlpha", 1)
 
 	UF:UpdatePlateScale()
-	SetCVar("nameplateSelectedScale", 1.25)
-	SetCVar("nameplateLargerScale", 1.1)
+	--SetCVar("nameplateSelectedScale", 1.25)
+	--SetCVar("nameplateLargerScale", 1.1)
 end
 
 function UF:BlockAddons()

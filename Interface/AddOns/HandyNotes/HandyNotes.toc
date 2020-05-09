@@ -1,6 +1,6 @@
 ## Interface: 11304
 ## Author: Xinhuan + Revel of Pagle
-## Version: v1.5.9 +1.17
+## Version: v1.5.10 +1.17
 ## Title: HandyNotes_NPCs
 ## Title-zhCN:|cff0080ff[地图]|rNPC坐标
 ## Title-zhTW:|cff0080ff[地图]|rNPC坐标

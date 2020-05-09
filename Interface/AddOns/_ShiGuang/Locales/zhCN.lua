@@ -91,6 +91,13 @@ CSC_WEAPON_SWORD2H_TXT      = "双手剑";
 CSC_WEAPON_STAFF_TXT        = "法杖";
 CSC_WEAPON_UNARMED_TXT      = "拳套";
 CSC_WEAPON_DAGGER_TXT       = "匕首";
+CSC_SPELL_HIT_TOOLTIP_TXT       = "Spell Hit chance from gear: %d%%";
+CSC_SPELL_HIT_SUBTOOLTIP_TXT    = "Spell Hit chance (Gear + Talents):";
+CSC_ARCANE_SPELL_HIT_TXT        = "Arcane Spell Hit";
+CSC_FIRE_SPELL_HIT_TXT          = "Fire Spell Hit";
+CSC_FROST_SPELL_HIT_TXT         = "Frost Spell Hit";
+CSC_DESTRUCTION_SPELL_HIT_TXT   = "Destruction Spell Hit";
+CSC_AFFLICTION_SPELL_HIT_TXT    = "Affliction Spell Hit";
 ----------------Gear----------------------
 GEAR_AHHELPER_AUTOSELL="-- |cFF00DDFFAlt+右键 |r直接上货/出价--";
 MAIL_RECEIVELETTERS="收信";

@@ -38,7 +38,7 @@ local function AddLootIcons(self, event, message, ...)
 	message = message:gsub("(\124c%x+\124Hitem:.-\124h\124r)", Icon)
 	return false, message, ...
 end
-ChatFrame_AddMessageEventFilter("CHAT_MSG_LOOT", AddLootIcons)]]
+ChatFrame_AddMessageEventFilter("CHAT_MSG_LOOT", AddLootIcons)
 	
 --------------------------------------- 支持上下箭頭選取历史-- Author:M-------------------------------------
 local ChatHistory = {}
@@ -80,7 +80,7 @@ for i = 1, NUM_CHAT_WINDOWS do
     editbox:HookScript("OnEditFocusLost", ResetHistoryIndex)
     editbox:HookScript("OnArrowPressed", GetHistoryLine)
     hooksecurefunc(editbox, "AddHistoryLine", AddHistoryLine)
-end
+end]]
 
 --------------------------------------- 聊天信息複製-- Author:M-------------------------------------
 local CHAT_WHISPER_GET = CHAT_WHISPER_GET or ">>%s:"
@@ -107,38 +107,41 @@ local rules = {
     { pat = "^%s+",                         repl = "" },    --去掉空格
 }
 --替換字符
-local function clearMessage(msg, button)
+local function ClearMessage(msg, button)
     for _, rule in ipairs(rules) do
         if (not rule.button or rule.button == button) then msg = msg:gsub(rule.pat, rule.repl) end
     end
     return msg
 end
 --顯示信息
-local function showMessage(msg, button)
+local function ShowMessage(msg, button)
     local editBox = ChatEdit_ChooseBoxForSend()
-    msg = clearMessage(msg, button)
+    msg = ClearMessage(msg, button)
     ChatEdit_ActivateChat(editBox)
     editBox:SetText(editBox:GetText() .. msg)
     editBox:HighlightText()
 end
 --獲取複製的信息
-local function getMessage(...)
+local function GetMessage(...)
+    local object
     for i = 1, select("#", ...) do
-        if (select(i, ...):IsObjectType("FontString") and MouseIsOver(select(i, ...))) then return select(i, ...):GetText() end
+        object = select(i, ...)
+        if (object:IsObjectType("FontString") and MouseIsOver(object)) then
+            return object:GetText()
+        end
     end
     return ""
 end
 --HACK
 local _SetItemRef = SetItemRef
 SetItemRef = function(link, text, button, chatFrame)
-    if (link:sub(1,8) == "ChatCopy") then
-        local msg = getMessage(chatFrame.FontStringContainer:GetRegions())
-        return showMessage(msg, button)
+    if (chatFrame and link:sub(1,8) == "ChatCopy") then
+        local msg = GetMessage(chatFrame.FontStringContainer:GetRegions())
+        return ShowMessage(msg, button)
     end
     _SetItemRef(link, text, button, chatFrame)
 end
 
---HACK
 local function AddMessage(self, text, ...)
     if (type(text) ~= "string") then
         text = tostring(text)
