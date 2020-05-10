@@ -281,7 +281,7 @@ local defaultSettings = {
 local accountSettings = {
 	ChatFilterList = "%*",
 	ChatFilterWhiteList = "",
-	TimestampFormat = 0,
+	TimestampFormat = 1,
 	NameplateFilter = {[1]={}, [2]={}},
 	RaidDebuffs = {},
 	Changelog = {},
