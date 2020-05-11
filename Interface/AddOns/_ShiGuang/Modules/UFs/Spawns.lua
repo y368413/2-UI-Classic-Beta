@@ -9,9 +9,9 @@ local format, tostring = string.format, tostring
 local function CreatePlayerStyle(self)
 	self.mystyle = "player"
 	UF:CreateCastBar(self)
-	if not MaoRUIPerDB["Nameplate"]["ShowPlayerPlate"] or MaoRUIPerDB["Nameplate"]["ClassPowerOnly"] then
-		UF:CreateEneryTicker(self)
-	end
+	--if not MaoRUIPerDB["Nameplate"]["ShowPlayerPlate"] or MaoRUIPerDB["Nameplate"]["ClassPowerOnly"] then
+		--UF:CreateEneryTicker(self)
+	--end
 	if MaoRUIPerDB["UFs"]["Castbars"] then
 		UF:ReskinMirrorBars()
 		--UF:ReskinTimerTrakcer(self)

@@ -361,6 +361,9 @@ loader:SetScript("OnEvent", function(self, _, addon)
 end)
 
 -- Callbacks
+local function setupCastbar()
+	G:SetupCastbar(guiPage[3])
+end
 
 local function setupRaidFrame()
 	G:SetupRaidFrame(guiPage[3])
