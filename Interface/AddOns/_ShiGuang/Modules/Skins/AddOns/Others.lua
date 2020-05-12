@@ -176,11 +176,8 @@ function S:RecountSkin()
 
 	local frame = Recount_MainWindow
 	M.StripTextures(frame)
-	local bg = M.CreateBG(frame)
+	local bg = M.SetBD(frame)
 	bg:SetPoint("TOPLEFT", 0, -10)
-	M.CreateBD(bg)
-	M.CreateSD(bg)
-	M.CreateTex(bg)
 	frame.bg = bg
 
 	local open, close = S:CreateToggle(frame)
