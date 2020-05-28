@@ -5,7 +5,7 @@ if not R.Infobar.Spec then return end
 local module = M:GetModule("Infobar")
 local info = module:RegisterInfobar("Spec", R.Infobar.SpecPos)
 info.text:SetFont(unpack(R.Infobar.TTFonts))
-local format, wipe, select, next, strsub = string.format, table.wipe, select, next, strsub
+local format, strsub = string.format, strsub
 local TALENT, SHOW_SPEC_LEVEL, FEATURE_BECOMES_AVAILABLE_AT_LEVEL, NONE = TALENT, SHOW_SPEC_LEVEL, FEATURE_BECOMES_AVAILABLE_AT_LEVEL, NONE
 local UnitLevel, ToggleTalentFrame, UnitCharacterPoints = UnitLevel, ToggleTalentFrame, UnitCharacterPoints
 local talentString = "%s (%s)"

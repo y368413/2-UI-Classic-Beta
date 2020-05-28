@@ -11,9 +11,8 @@ local cr, cg, cb = I.r, I.g, I.b
 function module:CreatePulse()
 	if not MaoRUIPerDB["Map"]["CombatPulse"] then return end
 
-	local MBG = M.CreateBG(Minimap, 1)
-	M.CreateSD(MBG)
-	local anim = MBG:CreateAnimationGroup()
+	local bg = M.CreateBDFrame(Minimap, nil, true)
+	local anim = bg:CreateAnimationGroup()
 	anim:SetLooping("BOUNCE")
 	anim.fader = anim:CreateAnimation("Alpha")
 	anim.fader:SetFromAlpha(.8)
@@ -23,15 +22,15 @@ function module:CreatePulse()
 
 	local function updateMinimapAnim(event)
 		if event == "PLAYER_REGEN_DISABLED" then
-			MBG.Shadow:SetBackdropBorderColor(1, 0, 0)
+			bg:SetBackdropBorderColor(1, 0, 0)
 			anim:Play()
 		elseif not InCombatLockdown() then
 			if MiniMapMailFrame:IsShown() then
-				MBG.Shadow:SetBackdropBorderColor(1, 1, 0)
+				bg:SetBackdropBorderColor(1, 1, 0)
 				anim:Play()
 			else
 				anim:Stop()
-				MBG.Shadow:SetBackdropBorderColor(0, 0, 0)
+				bg:SetBackdropBorderColor(0, 0, 0)
 			end
 		end
 	end
@@ -42,7 +41,7 @@ function module:CreatePulse()
 	MiniMapMailFrame:HookScript("OnHide", function()
 		if InCombatLockdown() then return end
 		anim:Stop()
-		MBG.Shadow:SetBackdropBorderColor(0, 0, 0)
+		bg:SetBackdropBorderColor(0, 0, 0)
 	end)
 end
 
@@ -53,8 +52,7 @@ function module:ReskinRegions()
 	MiniMapTrackingFrame:SetPoint("TOPLEFT", Minimap, 0, 3)
 	MiniMapTrackingBorder:Hide()
 	MiniMapTrackingIcon:SetTexCoord(unpack(I.TexCoord))
-	local bg = M.CreateBG(MiniMapTrackingIcon)
-	M.CreateBD(bg)
+	local bg = M.CreateBDFrame(MiniMapTrackingIcon)
 	bg:SetBackdropBorderColor(cr, cg, cb)]]
 
 	-- Mail icon

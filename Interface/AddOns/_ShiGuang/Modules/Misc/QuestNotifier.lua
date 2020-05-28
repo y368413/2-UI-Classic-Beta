@@ -6,7 +6,7 @@ local completedQuest, initComplete = {}
 local strmatch, strfind, gsub, format = string.match, string.find, string.gsub, string.format
 local mod, tonumber, pairs, floor = mod, tonumber, pairs, math.floor
 local soundKitID = SOUNDKIT.ALARM_CLOCK_WARNING_3
-local QUEST_COMPLETE, LE_QUEST_TAG_TYPE_PROFESSION, LE_QUEST_FREQUENCY_DAILY = QUEST_COMPLETE, LE_QUEST_TAG_TYPE_PROFESSION, LE_QUEST_FREQUENCY_DAILY
+local QUEST_COMPLETE, LE_QUEST_FREQUENCY_DAILY = QUEST_COMPLETE, LE_QUEST_FREQUENCY_DAILY
 
 local function acceptText(link, daily)
 	if daily then
@@ -70,7 +70,7 @@ function MISC:FindQuestProgress(_, msg)
 	end
 end
 
-function MISC:FindQuestAccept(questLogIndex, questID)
+function MISC:FindQuestAccept(questLogIndex)
 	local name, _, _, _, _, _, frequency = GetQuestLogTitle(questLogIndex)
 	if name then
 		sendQuestMsg(acceptText(name, frequency == LE_QUEST_FREQUENCY_DAILY))
@@ -92,14 +92,15 @@ end
 
 function MISC:QuestNotifier()
 	if MaoRUIPerDB["Misc"]["QuestNotifier"] then
-		self:FindQuestComplete()
-		M:RegisterEvent("QUEST_ACCEPTED", self.FindQuestAccept)
-		M:RegisterEvent("QUEST_LOG_UPDATE", self.FindQuestComplete)
-		M:RegisterEvent("UI_INFO_MESSAGE", self.FindQuestProgress)
+		MISC:FindQuestComplete()
+		M:RegisterEvent("QUEST_ACCEPTED", MISC.FindQuestAccept)
+		M:RegisterEvent("QUEST_LOG_UPDATE", MISC.FindQuestComplete)
+		M:RegisterEvent("UI_INFO_MESSAGE", MISC.FindQuestProgress)
 	else
 		wipe(completedQuest)
-		M:UnregisterEvent("QUEST_ACCEPTED", self.FindQuestAccept)
-		M:UnregisterEvent("QUEST_LOG_UPDATE", self.FindQuestComplete)
-		M:UnregisterEvent("UI_INFO_MESSAGE", self.FindQuestProgress)
+		M:UnregisterEvent("QUEST_ACCEPTED", MISC.FindQuestAccept)
+		M:UnregisterEvent("QUEST_LOG_UPDATE", MISC.FindQuestComplete)
+		M:UnregisterEvent("UI_INFO_MESSAGE", MISC.FindQuestProgress)
 	end
 end
+MISC:RegisterMisc("QuestNotifier", MISC.QuestNotifier)

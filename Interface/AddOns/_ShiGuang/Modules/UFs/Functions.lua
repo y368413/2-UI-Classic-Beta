@@ -4,7 +4,7 @@ local M, R, U, I = unpack(ns)
 local oUF = ns.oUF or oUF
 local UF = M:RegisterModule("UnitFrames")
 
-local format, floor, abs, min = string.format, math.floor, math.abs, math.min
+local format, floor = string.format, math.floor
 local pairs, next = pairs, next
 
 -- Custom colors
@@ -156,7 +156,7 @@ function UF:CreateHealthText(self)
 		self:Tag(name, "[nplevel][color][name]")
 	end
 
-	local hpval = M.CreateFS(textFrame, retVal(self, 14, 13, 13, MaoRUIPerDB["Nameplate"]["HealthTextSize"]), "", false, "RIGHT", -3, -1)
+	local hpval = M.CreateFS(textFrame, retVal(self, 14, 13, 13, 13, MaoRUIPerDB["Nameplate"]["HealthTextSize"]), "", false, "RIGHT", -3, -1)
 	if mystyle == "raid" then
 		self:Tag(hpval, "[raidhp]")
 		if self.isPartyPet then
@@ -315,17 +315,6 @@ function UF:CreatePortrait(self)
 	self.Health.bg:SetPoint("BOTTOMLEFT", self.Health:GetStatusBarTexture(), "BOTTOMRIGHT", 0, 0)
 	self.Health.bg:SetPoint("TOPRIGHT", self.Health)
 	self.Health.bg:SetParent(self)
-end
-
-local roleTexCoord = {
-	["TANK"] = {.5, .75, 0, 1},
-	["HEALER"] = {.75, 1, 0, 1},
-	["DAMAGER"] = {.25, .5, 0, 1},
-}
-local function postUpdateRole(element, role)
-	if element:IsShown() then
-		element:SetTexCoord(unpack(roleTexCoord[role]))
-	end
 end
 
 function UF:CreateIcons(self)
@@ -759,7 +748,7 @@ end
 local margin = R.UFs.BarMargin
 local barWidth, barHeight = unpack(R.UFs.BarSize)
 
-function UF.PostUpdateClassPower(element, cur, max, diff, powerType)
+function UF.PostUpdateClassPower(element, cur, max, diff)
 	if not cur or cur == 0 then
 		for i = 1, 6 do
 			element[i].bg:Hide()
@@ -849,38 +838,8 @@ function UF:CreateClassPower(self)
 		end
 	end
 
-	if I.MyClass == "DEATHKNIGHT" then
-		bars.colorSpec = true
-		bars.sortOrder = "asc"
-		bars.PostUpdate = UF.PostUpdateRunes
-		self.Runes = bars
-	else
-		bars.PostUpdate = UF.PostUpdateClassPower
-		self.ClassPower = bars
-	end
-end
-
-function UF:StaggerBar(self)
-	if I.MyClass ~= "MONK" then return end
-
-	local stagger = CreateFrame("StatusBar", nil, self.Health)
-	stagger:SetSize(barWidth, barHeight)
-	stagger:SetPoint(unpack(R.UFs.BarPoint))
-	stagger:SetStatusBarTexture(I.normTex)
-	stagger:SetFrameLevel(self:GetFrameLevel() + 5)
-	M.CreateBDFrame(stagger, 0, true)
-
-	local bg = stagger:CreateTexture(nil, "BACKGROUND")
-	bg:SetAllPoints()
-	bg:SetTexture(I.normTex)
-	bg.multiplier = .25
-
-	local text = M.CreateFS(stagger, 13)
-	text:SetPoint("CENTER", stagger, "TOP")
-	self:Tag(text, "[monkstagger]")
-
-	self.Stagger = stagger
-	self.Stagger.bg = bg
+	bars.PostUpdate = UF.PostUpdateClassPower
+	self.ClassPower = bars
 end
 
 function UF.PostUpdateAltPower(element, _, cur, _, max)

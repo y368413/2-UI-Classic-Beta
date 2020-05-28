@@ -5,17 +5,17 @@ if not R.Infobar.Guild then return end
 local module = M:GetModule("Infobar")
 local info = module:RegisterInfobar("Guild", R.Infobar.GuildPos)
 
-local wipe, sort, format, select, strfind = table.wipe, table.sort, format, select, strfind
+local wipe, sort, format, select = table.wipe, table.sort, format, select
 local CLASS_ICON_TCOORDS, SELECTED_DOCK_FRAME = CLASS_ICON_TCOORDS, SELECTED_DOCK_FRAME
-local LEVEL_ABBR, CLASS_ABBR, NAME, ZONE, RANK, GUILDINFOTAB_APPLICANTS, REMOTE_CHAT = LEVEL_ABBR, CLASS_ABBR, NAME, ZONE, RANK, GUILDINFOTAB_APPLICANTS, REMOTE_CHAT
-local IsAltKeyDown, IsShiftKeyDown, InviteToGroup, C_Timer_After, GetTime, Ambiguate, MouseIsOver = IsAltKeyDown, IsShiftKeyDown, InviteToGroup, C_Timer.After, GetTime, Ambiguate, MouseIsOver
+local LEVEL_ABBR, CLASS_ABBR, NAME, ZONE, RANK, REMOTE_CHAT = LEVEL_ABBR, CLASS_ABBR, NAME, ZONE, RANK, REMOTE_CHAT
+local IsAltKeyDown, IsShiftKeyDown, InviteToGroup, C_Timer_After, Ambiguate, MouseIsOver = IsAltKeyDown, IsShiftKeyDown, InviteToGroup, C_Timer.After, Ambiguate, MouseIsOver
 local MailFrameTab_OnClick, MailFrame, SendMailNameEditBox = MailFrameTab_OnClick, MailFrame, SendMailNameEditBox
 local ChatEdit_ChooseBoxForSend, ChatEdit_ActivateChat, ChatFrame_OpenChat, ChatFrame_GetMobileEmbeddedTexture = ChatEdit_ChooseBoxForSend, ChatEdit_ActivateChat, ChatFrame_OpenChat, ChatFrame_GetMobileEmbeddedTexture
-local GetNumGuildMembers, GetGuildInfo, GetNumGuildApplicants, GetGuildRosterInfo, IsInGuild = GetNumGuildMembers, GetGuildInfo, GetNumGuildApplicants, GetGuildRosterInfo, IsInGuild
+local GetNumGuildMembers, GetGuildInfo, GetGuildRosterInfo, IsInGuild = GetNumGuildMembers, GetGuildInfo, GetGuildRosterInfo, IsInGuild
 local GetQuestDifficultyColor, GetRealZoneText, UnitInRaid, UnitInParty = GetQuestDifficultyColor, GetRealZoneText, UnitInRaid, UnitInParty
 
 local r, g, b = I.r, I.g, I.b
-local infoFrame, gName, gOnline, gRank, applyData, prevTime
+local infoFrame, gName, gOnline, gRank, applyData
 
 local function scrollBarHook(self, delta)
 	local scrollBar = self.ScrollBar
@@ -60,7 +60,6 @@ local function setupInfoFrame()
 
 	gName = M.CreateFS(infoFrame, 16, "Guild", true, "TOPLEFT", 15, -10)
 	gOnline = M.CreateFS(infoFrame, 13, "Online", false, "TOPLEFT", 15, -35)
-	--gApps = M.CreateFS(infoFrame, 13, "Applications", false, "TOPRIGHT", -15, -35)
 	gRank = M.CreateFS(infoFrame, 13, "Rank", false, "TOPLEFT", 15, -51)
 
 	local bu = {}
@@ -182,7 +181,6 @@ local function refreshData()
 
 	gName:SetText("|cff0099ff<"..(guildName or "")..">")
 	gOnline:SetText(format(I.InfoColor.."%s:".." %d/%d", GUILD_ONLINE_LABEL, online, total))
-	--gApps:SetText(format(I.InfoColor..GUILDINFOTAB_APPLICANTS, GetNumGuildApplicants()))
 	gRank:SetText(I.InfoColor..RANK..": "..(guildRank or ""))
 
 	for i = 1, total do

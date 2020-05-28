@@ -6,17 +6,14 @@ local module = M:GetModule("Infobar")
 local info = module:RegisterInfobar("Time", R.Infobar.TimePos)
 local date = date
 info.text:SetFont(unpack(R.Infobar.TimeFonts))
-local format, floor = string.format, math.floor
-local mod, tonumber, pairs, select = mod, tonumber, pairs, select
-local C_Map_GetMapInfo = C_Map.GetMapInfo
-local C_AreaPoiInfo_GetAreaPOISecondsLeft = C_AreaPoiInfo.GetAreaPOISecondsLeft
+local format = string.format
+local tonumber = tonumber
 local TIMEMANAGER_TICKER_24HOUR, TIMEMANAGER_TICKER_12HOUR = TIMEMANAGER_TICKER_24HOUR, TIMEMANAGER_TICKER_12HOUR
 local FULLDATE, CALENDAR_WEEKDAY_NAMES, CALENDAR_FULLDATE_MONTH_NAMES = FULLDATE, CALENDAR_WEEKDAY_NAMES, CALENDAR_FULLDATE_MONTH_NAMES
-local PLAYER_DIFFICULTY_TIMEWALKER, RAID_INFO_WORLD_BOSS, DUNGEON_DIFFICULTY3 = PLAYER_DIFFICULTY_TIMEWALKER, RAID_INFO_WORLD_BOSS, DUNGEON_DIFFICULTY3
-local DUNGEONS, RAID_INFO, QUESTS_LABEL, ISLANDS_HEADER, QUEST_COMPLETE, LFG_LIST_LOADING, QUEUE_TIME_UNAVAILABLE = DUNGEONS, RAID_INFO, QUESTS_LABEL, ISLANDS_HEADER, QUEST_COMPLETE, LFG_LIST_LOADING, QUEUE_TIME_UNAVAILABLE
-local RequestRaidInfo, UnitLevel, GetNumSavedWorldBosses, GetSavedWorldBossInfo = RequestRaidInfo, UnitLevel, GetNumSavedWorldBosses, GetSavedWorldBossInfo
+local DUNGEONS, RAID_INFO, DUNGEON_DIFFICULTY3 = DUNGEONS, RAID_INFO, DUNGEON_DIFFICULTY3
+local RequestRaidInfo = RequestRaidInfo
 local GetCVarBool, GetGameTime, GameTime_GetLocalTime, GameTime_GetGameTime, SecondsToTime = GetCVarBool, GetGameTime, GameTime_GetLocalTime, GameTime_GetGameTime, SecondsToTime
-local GetNumSavedInstances, GetSavedInstanceInfo, IsQuestFlaggedCompleted, GetQuestObjectiveInfo = GetNumSavedInstances, GetSavedInstanceInfo, IsQuestFlaggedCompleted, GetQuestObjectiveInfo
+local GetNumSavedInstances, GetSavedInstanceInfo = GetNumSavedInstances, GetSavedInstanceInfo
 
 local function updateTimerFormat(color, hour, minute)
 	if GetCVarBool("timeMgrUseMilitaryTime") then
@@ -91,14 +88,12 @@ info.onEnter = function(self)
 
 	-- Help Info
 	GameTooltip:AddDoubleLine(" ", I.LineString)
-	GameTooltip:AddDoubleLine(" ",U["Toggle Calendar"].."|cffFF0000--|r"..U["Toggle Clock"],1,1,1,.6,.8,1)
+	GameTooltip:AddDoubleLine(" ",U["Toggle Clock"],1,1,1,.6,.8,1)
 	GameTooltip:Show()
 end
 
 info.onLeave = M.HideTooltip
 
 info.onMouseUp = function(_, btn)
-	if btn == "RightButton" then
 		ToggleFrame(TimeManagerFrame)
-	end
 end

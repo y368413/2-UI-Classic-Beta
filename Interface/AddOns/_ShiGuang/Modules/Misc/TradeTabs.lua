@@ -173,3 +173,4 @@ function MISC:TradeTabs()
 
 	M:RegisterEvent("ADDON_LOADED", MISC.TradeTabs_OnEvent)
 end
+MISC:RegisterMisc("TradeTabs", MISC.TradeTabs)

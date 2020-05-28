@@ -30,15 +30,6 @@ local function GetNPCID()
 	return M.GetNPCID(UnitGUID("npc"))
 end
 
-local function IsTrackingHidden()
-	for index = 1, GetNumTrackingTypes() do
-		local name, _, active = GetTrackingInfo(index)
-		if(name == (MINIMAP_TRACKING_TRIVIAL_QUESTS or MINIMAP_TRACKING_HIDDEN_QUESTS)) then
-			return active
-		end
-	end
-end
-
 local ignoreQuestNPC = {
 	[14847] = true,		-- DarkMoon
 	[43929] = true,		-- 4000
@@ -67,6 +58,7 @@ local ignoreQuestNPC = {
 	[141584] = true,	-- 祖尔温
 	[142063] = true,	-- 特兹兰
 	[143388] = true,	-- 德鲁扎	
+	[143555] = true,	-- 山德·希尔伯曼，祖达萨PVP军需官
 	[154534] = true,	-- 大杂院阿畅
 	[150987] = true,	-- 肖恩·维克斯，斯坦索姆
 	[150563] = true,	-- 斯卡基特，麦卡贡订单日常

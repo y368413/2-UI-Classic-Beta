@@ -4,7 +4,7 @@ local Bar = M:GetModule("Actionbar")
 
 -- Texture credit: 胡里胡涂
 local _G = getfenv(0)
-local tinsert, pairs, type = table.insert, pairs, type
+local tinsert, pairs = table.insert, pairs
 local buttonList = {}
 
 function Bar:MicroButton_SetupTexture(icon, texture)

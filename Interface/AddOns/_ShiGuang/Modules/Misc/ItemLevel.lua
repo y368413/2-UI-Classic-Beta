@@ -4,9 +4,7 @@ local MISC = M:GetModule("Misc")
 
 local pairs, select, next, wipe = pairs, select, next, wipe
 local UnitGUID, GetItemInfo = UnitGUID, GetItemInfo
-local GetContainerItemLink, GetInventoryItemLink = GetContainerItemLink, GetInventoryItemLink
-local EquipmentManager_UnpackLocation, EquipmentManager_GetItemInfoByLocation = EquipmentManager_UnpackLocation, EquipmentManager_GetItemInfoByLocation
-local C_Timer_After = C_Timer.After
+local GetInventoryItemLink = GetInventoryItemLink
 
 local inspectSlots = {
 	"Head", "Neck", "Shoulder", "Shirt", "Chest", "Waist", "Legs", "Feet", "Wrist", "Hands", "Finger0", "Finger1", "Trinket0", "Trinket1", "Back", "MainHand", "SecondaryHand", "Ranged",
@@ -169,10 +167,11 @@ function MISC:ShowItemLevel()
 	M:RegisterEvent("PLAYER_EQUIPMENT_CHANGED", MISC.ItemLevel_UpdatePlayer)
 
 	-- iLvl on InspectFrame
-	M:RegisterEvent("INSPECT_READY", self.ItemLevel_UpdateInspect)
+	M:RegisterEvent("INSPECT_READY", MISC.ItemLevel_UpdateInspect)
 
 	-- Update item quality
 	MISC.QualityUpdater = CreateFrame("Frame")
 	MISC.QualityUpdater:Hide()
 	MISC.QualityUpdater:SetScript("OnUpdate", MISC.RefreshButtonInfo)
 end
+MISC:RegisterMisc("GearInfo", MISC.ShowItemLevel)

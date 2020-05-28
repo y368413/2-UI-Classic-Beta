@@ -3,14 +3,13 @@ local M, R, U, I = unpack(ns)
 local UF = M:GetModule("UnitFrames")
 
 local _G = getfenv(0)
-local strmatch, tonumber, pairs, type, unpack, next, rad = string.match, tonumber, pairs, type, unpack, next, math.rad
-local UnitThreatSituation, UnitIsTapDenied, UnitPlayerControlled, UnitIsUnit = UnitThreatSituation, UnitIsTapDenied, UnitPlayerControlled, UnitIsUnit
+local strmatch, tonumber, pairs, unpack, rad = string.match, tonumber, pairs, unpack, math.rad
+local UnitIsTapDenied, UnitPlayerControlled, UnitIsUnit = UnitIsTapDenied, UnitPlayerControlled, UnitIsUnit
 local UnitReaction, UnitIsConnected, UnitIsPlayer, UnitSelectionColor = UnitReaction, UnitIsConnected, UnitIsPlayer, UnitSelectionColor
-local GetInstanceInfo, UnitClassification, UnitExists, InCombatLockdown = GetInstanceInfo, UnitClassification, UnitExists, InCombatLockdown
-local C_NamePlate_GetNamePlates = C_NamePlate.GetNamePlates
+local UnitClassification, UnitExists, InCombatLockdown = UnitClassification, UnitExists, InCombatLockdown
 local UnitGUID, GetPlayerInfoByGUID, Ambiguate, UnitName = UnitGUID, GetPlayerInfoByGUID, Ambiguate, UnitName
 local SetCVar, UIFrameFadeIn, UIFrameFadeOut = SetCVar, UIFrameFadeIn, UIFrameFadeOut
-local UNKNOWN, INTERRUPTED = UNKNOWN, INTERRUPTED
+local INTERRUPTED = INTERRUPTED
 
 -- Init
 function UF:UpdatePlateScale()
@@ -553,6 +552,7 @@ function UF:CreatePlates()
 	health:SetStatusBarTexture(I.normTex)
 	health.backdrop = M.CreateBDFrame(health, nil, true) -- don't mess up with libs
 	M:SmoothBar(health)
+
 	self.Health = health
 	self.Health.frequentUpdates = true
 	self.Health.UpdateColor = UF.UpdateColor
@@ -708,7 +708,6 @@ function UF:CreatePlayerPlate()
 	UF:CreateHealthBar(self)
 	UF:CreatePowerBar(self)
 	UF:CreateClassPower(self)
-	UF:StaggerBar(self)
 	if MaoRUIPerDB["Auras"]["ClassAuras"] and not I.isClassic then auras:CreateLumos(self) end
 	if not MaoRUIPerDB["Nameplate"]["ClassPowerOnly"] then UF:CreateEneryTicker(self) end
 

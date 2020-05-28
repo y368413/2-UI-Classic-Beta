@@ -159,5 +159,35 @@ I.ReminderBuffs = {
 			instance = true,
 			pvp = true,
 		},
+		{	spells = {	-- 心灵之火
+				[588] = true,
+			},
+			depend = 588,
+			combat = true,
+			instance = true,
+			pvp = true,
+		},
+	},
+	DRUID = {
+		{	spells = {	-- 野性印记
+				[1126] = true,
+				[21849] = true, -- 野性赐福
+			},
+			depend = 1126,
+			combat = true,
+			instance = true,
+			pvp = true,
+		},
+	},
+	WARRIOR = {
+		{	spells = {	-- 战斗怒吼
+				[6673] = true,
+				[25289] = true,
+			},
+			depend = 6673,
+			combat = true,
+			instance = true,
+			pvp = true,
+		},
 	},
 }

@@ -3,11 +3,10 @@ local M, R, U, I = unpack(ns)
 local MISC = M:GetModule("Misc")
 
 local _G = getfenv(0)
-local ipairs, tremove = ipairs, table.remove
 local UIParent = _G.UIParent
 local GroupLootContainer = _G.GroupLootContainer
 
-local POSITION, ANCHOR_POINT, YOFFSET = "TOP", "BOTTOM", -10
+local POSITION, YOFFSET = "TOP", -10
 local parentFrame
 
 function MISC:GroupLootContainer_UpdateAnchor()
@@ -15,11 +14,9 @@ function MISC:GroupLootContainer_UpdateAnchor()
 	local screenHeight = UIParent:GetTop()
 	if y > screenHeight/2 then
 		POSITION = "TOP"
-		ANCHOR_POINT = "BOTTOM"
 		YOFFSET = -10
 	else
 		POSITION = "BOTTOM"
-		ANCHOR_POINT = "TOP"
 		YOFFSET = 10
 	end
 
@@ -59,3 +56,4 @@ function MISC:AlertFrame_Setup()
 	hooksecurefunc("GroupLootFrame_OpenNewFrame", MISC.GroupLootContainer_UpdateAnchor)
 	hooksecurefunc("GroupLootContainer_Update", MISC.UpdatGroupLootContainer)
 end
+MISC:RegisterMisc("AlertFrame", MISC.AlertFrame_Setup)

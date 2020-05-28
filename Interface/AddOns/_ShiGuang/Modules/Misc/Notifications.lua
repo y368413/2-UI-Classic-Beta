@@ -3,19 +3,13 @@ local M, R, U, I = unpack(ns)
 local MISC = M:GetModule("Misc")
 
 local format, gsub, strsplit = string.format, string.gsub, string.split
-local pairs, tonumber, wipe, select = pairs, tonumber, wipe, select
-local GetInstanceInfo, GetAtlasInfo, PlaySound = GetInstanceInfo, GetAtlasInfo, PlaySound
+local pairs, tonumber = pairs, tonumber
 local IsInRaid, IsInGroup, IsInInstance, IsInGuild = IsInRaid, IsInGroup, IsInInstance, IsInGuild
 local UnitInRaid, UnitInParty, SendChatMessage = UnitInRaid, UnitInParty, SendChatMessage
 local UnitName, Ambiguate, GetTime = UnitName, Ambiguate, GetTime
 local GetSpellLink, GetSpellInfo = GetSpellLink, GetSpellInfo
 local C_ChatInfo_SendAddonMessage = C_ChatInfo.SendAddonMessage
 local C_ChatInfo_RegisterAddonMessagePrefix = C_ChatInfo.RegisterAddonMessagePrefix
-
-function MISC:AddAlerts()
-	self:InterruptAlert()
-	self:PlacedItemAlert()
-end
 
 --[[
 	闭上你的嘴！
@@ -139,3 +133,10 @@ function MISC:PlacedItemAlert()
 	M:RegisterEvent("GROUP_LEFT", self.ItemAlert_CheckGroup)
 	M:RegisterEvent("GROUP_JOINED", self.ItemAlert_CheckGroup)
 end
+
+-- Init
+function MISC:AddAlerts()
+	MISC:InterruptAlert()
+	MISC:PlacedItemAlert()
+end
+MISC:RegisterMisc("Alerts", MISC.AddAlerts)
