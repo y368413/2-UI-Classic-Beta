@@ -85,7 +85,6 @@ I.textures = {
 	normal		= Media.."ActionBar\\gloss",
 	flash		= Media.."ActionBar\\flash",
 	pushed		= Media.."ActionBar\\pushed",
-	checked		= Media.."ActionBar\\checked",
 }
 I.LeftButton = " |TInterface\\TUTORIALFRAME\\UI-TUTORIAL-FRAME:13:11:0:-1:512:512:12:66:230:307|t "
 I.RightButton = " |TInterface\\TUTORIALFRAME\\UI-TUTORIAL-FRAME:13:11:0:-1:512:512:12:66:333:411|t "
@@ -174,6 +173,14 @@ I.ReminderBuffs = {
 				[21849] = true, -- 野性赐福
 			},
 			depend = 1126,
+			combat = true,
+			instance = true,
+			pvp = true,
+		},
+		{	spells = {	--- 荆棘术
+				[467] = true,
+			},
+			depend = 467,
 			combat = true,
 			instance = true,
 			pvp = true,

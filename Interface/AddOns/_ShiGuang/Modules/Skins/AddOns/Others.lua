@@ -164,10 +164,18 @@ function S:ResetRecount()
 	Recount:BarsChanged()
 
 	Recount.db.profile.BarTexture = "normTex"
-	Recount.db.profile.Font = DEFAULT
+	Recount.db.profile.Font = nil
 	Recount:UpdateBarTextures()
 
 	MaoRUIPerDB["Skins"]["ResetRecount"] = false
+end
+
+function S:ResetRocountFont()
+	for _, row in pairs(Recount.MainWindow.Rows) do
+		local font, fontSize = row.LeftText:GetFont()
+		row.LeftText:SetFont(font, fontSize, I.Font[3])
+		row.RightText:SetFont(font, fontSize, I.Font[3])
+	end
 end
 
 function S:RecountSkin()
@@ -192,6 +200,15 @@ function S:RecountSkin()
 	if MaoRUIPerDB["Skins"]["ResetRecount"] then S:ResetRecount() end
 	hooksecurefunc(Recount, "ResetPositions", S.ResetRecount)
 
+	S:ResetRocountFont()
+	hooksecurefunc(Recount, "BarsChanged", S.ResetRocountFont)
+
+	--M.ReskinArrow(frame.LeftButton, "left")
+	--M.ReskinArrow(frame.RightButton, "right")
+	--M.ReskinClose(frame.CloseButton, "TOPRIGHT", frame.bg, "TOPRIGHT", -2, -2)
+
+	-- Force to show window on init
+	Recount.MainWindow:Show()
 end
 
 function S:LoadOtherSkins()

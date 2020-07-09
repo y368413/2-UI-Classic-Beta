@@ -47,6 +47,7 @@ function MISC:OnLogin()
 	self:BidPriceHighlight()
 	self:BlockStrangerInvite()
 	self:xMerchant()
+	self:SorasThreat()
 
 	-- Max camera distancee
 	if tonumber(GetCVar("cameraDistanceMaxZoomFactor")) <= 2.6 then

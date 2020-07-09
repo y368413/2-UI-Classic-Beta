@@ -35,6 +35,13 @@ function MISC:ExpBar_Update()
 	else
 		self:Hide()
 	end
+	if UnitLevel("player") < MAX_PLAYER_LEVEL then
+		local function showIfResting() if (IsResting("player") or FALSE) then return "+" end return "" end
+  	local function showRestAmount() if (GetXPExhaustion("player") or FALSE) then return math.ceil(100*(GetXPExhaustion("player")/UnitXPMax("player"))) end return "0" end
+		self.ArtifactText:SetText(UnitLevel("player").."  "..math.floor(100*(UnitXP("player")/UnitXPMax("player"))) .. "%".."  |c00FF68CC"..showRestAmount().."%"..showIfResting().."|r")
+	else
+		self.ArtifactText:SetText("")
+	end
 end
 
 function MISC:ExpBar_UpdateTooltip()
@@ -110,11 +117,17 @@ end
 function MISC:Expbar()
 	if not MaoRUIPerDB["Misc"]["ExpRep"] then return end
 
-	local bar = CreateFrame("StatusBar", nil, Minimap)
-	bar:SetPoint("TOP", Minimap, "BOTTOM", 0, 0)
-	bar:SetSize(Minimap:GetWidth()-2, 3)
+	local bar = CreateFrame("StatusBar", nil, MinimapCluster)
+	bar:SetPoint("TOPLEFT", Minimap, "BOTTOMLEFT", 0, 0)
+	bar:SetPoint("TOPRIGHT", Minimap, "BOTTOMRIGHT", 0, 0)
+	bar:SetHeight(3)
 	bar:SetHitRectInsets(0, 0, 0, -10)
+	bar:SetFrameLevel(bar:GetFrameLevel() + 8)
 	M.CreateSB(bar)
+	
+    bar.ArtifactText=bar:CreateFontString("ShowArtifactText", "OVERLAY")
+    bar.ArtifactText:SetFont("Interface\\AddOns\\_ShiGuang\\Media\\Fonts\\Infinity.ttf", 11, "OUTLINE")  --STANDARD_TEXT_FONT
+    bar.ArtifactText:SetPoint("BOTTOMRIGHT", bar,"BOTTOMRIGHT",2, 2)  
 
 	local rest = CreateFrame("StatusBar", nil, bar)
 	rest:SetAllPoints()

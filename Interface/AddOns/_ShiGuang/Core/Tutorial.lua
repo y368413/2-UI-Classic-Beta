@@ -94,6 +94,7 @@ local function ForceDefaultSettings()
 end
 
 local function ForceRaidFrame()
+	if InCombatLockdown() then return end
 	CompactRaidFrameContainer:SetScale(0.85)
 	if not CompactUnitFrameProfiles then return end
 	SetRaidProfileOption(CompactUnitFrameProfiles.selectedProfile, "useClassColors", true) --显示职业颜色

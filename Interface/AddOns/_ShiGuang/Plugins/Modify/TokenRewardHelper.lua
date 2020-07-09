@@ -1,5 +1,6 @@
+--## Author: Tyrnar ## Version: v1.6.3
 --------------------------------------------------------------
----- Data  ## Author: Tyrnar ## Version: v1.5.1
+---- Data
 --------------------------------------------------------------
 local TOKEN_DATA = {}
 
@@ -150,6 +151,85 @@ TOKEN_DATA:addReward(20886, 21404, CLASS.ROGUE)
 TOKEN_DATA:addReward(20886, 21398, CLASS.SHAMAN)
 TOKEN_DATA:addReward(20886, 21401, CLASS.HUNTER)
 TOKEN_DATA:addReward(20886, 21392, CLASS.WARRIOR)
+
+--- AQ40 Items
+-- Eye of C'thun
+TOKEN_DATA:addToken(21221)
+TOKEN_DATA:addReward(21221, 21709, CLASS.NONE)
+TOKEN_DATA:addReward(21221, 21710, CLASS.NONE)
+TOKEN_DATA:addReward(21221, 21712, CLASS.NONE)
+-- Imperial Qiraji Regalia
+TOKEN_DATA:addToken(21237)
+TOKEN_DATA:addReward(21237, 21273, CLASS.NONE)
+TOKEN_DATA:addReward(21237, 21275, CLASS.NONE)
+TOKEN_DATA:addReward(21237, 21268, CLASS.NONE)
+-- Imperial Qiraji Armaments
+TOKEN_DATA:addToken(21232)
+TOKEN_DATA:addReward(21232, 21242, CLASS.NONE)
+TOKEN_DATA:addReward(21232, 21272, CLASS.NONE)
+TOKEN_DATA:addReward(21232, 21244, CLASS.NONE)
+TOKEN_DATA:addReward(21232, 21269, CLASS.NONE)
+-- Qiraji Bindings of Command
+TOKEN_DATA:addToken(20928)
+TOKEN_DATA:addReward(20928, 21333, CLASS.WARRIOR)
+TOKEN_DATA:addReward(20928, 21330, CLASS.WARRIOR)
+TOKEN_DATA:addReward(20928, 21359, CLASS.ROGUE)
+TOKEN_DATA:addReward(20928, 21361, CLASS.ROGUE)
+TOKEN_DATA:addReward(20928, 21349, CLASS.PRIEST)
+TOKEN_DATA:addReward(20928, 21350, CLASS.PRIEST)
+TOKEN_DATA:addReward(20928, 21365, CLASS.HUNTER)
+TOKEN_DATA:addReward(20928, 21367, CLASS.HUNTER)
+-- Qiraji Bindings of Dominance
+TOKEN_DATA:addToken(20932)
+TOKEN_DATA:addReward(20932, 21388, CLASS.PALADIN)
+TOKEN_DATA:addReward(20932, 21391, CLASS.PALADIN)
+TOKEN_DATA:addReward(20932, 21338, CLASS.WARLOCK)
+TOKEN_DATA:addReward(20932, 21335, CLASS.WARLOCK)
+TOKEN_DATA:addReward(20932, 21344, CLASS.MAGE)
+TOKEN_DATA:addReward(20932, 21345, CLASS.MAGE)
+TOKEN_DATA:addReward(20932, 21355, CLASS.DRUID)
+TOKEN_DATA:addReward(20932, 21354, CLASS.DRUID)
+TOKEN_DATA:addReward(20932, 21373, CLASS.SHAMAN)
+TOKEN_DATA:addReward(20932, 21376, CLASS.SHAMAN)
+-- Vek'lor's Diadem
+TOKEN_DATA:addToken(20930)
+TOKEN_DATA:addReward(20930, 21387, CLASS.PALADIN)
+TOKEN_DATA:addReward(20930, 21360, CLASS.ROGUE)
+TOKEN_DATA:addReward(20930, 21353, CLASS.DRUID)
+TOKEN_DATA:addReward(20930, 21372, CLASS.SHAMAN)
+TOKEN_DATA:addReward(20930, 21366, CLASS.HUNTER)
+-- Vek'nilash's Circlet
+TOKEN_DATA:addToken(20926)
+TOKEN_DATA:addReward(20926, 21329, CLASS.WARRIOR)
+TOKEN_DATA:addReward(20926, 21337, CLASS.WARLOCK)
+TOKEN_DATA:addReward(20926, 21347, CLASS.MAGE)
+TOKEN_DATA:addReward(20926, 21348, CLASS.PRIEST)
+-- Ouro's Intact Hide
+TOKEN_DATA:addToken(20927)
+TOKEN_DATA:addReward(20927, 21332, CLASS.WARRIOR)
+TOKEN_DATA:addReward(20927, 21362, CLASS.ROGUE)
+TOKEN_DATA:addReward(20927, 21346, CLASS.MAGE)
+TOKEN_DATA:addReward(20927, 21352, CLASS.PRIEST)
+-- Skin of the Great Sandworm
+TOKEN_DATA:addToken(20931)
+TOKEN_DATA:addReward(20931, 21390, CLASS.PALADIN)
+TOKEN_DATA:addReward(20931, 21336, CLASS.WARLOCK)
+TOKEN_DATA:addReward(20931, 21356, CLASS.DRUID)
+TOKEN_DATA:addReward(20931, 21375, CLASS.SHAMAN)
+TOKEN_DATA:addReward(20931, 21368, CLASS.HUNTER)
+-- Carapace of the Old God
+TOKEN_DATA:addToken(20929)
+TOKEN_DATA:addReward(20929, 21389, CLASS.PALADIN)
+TOKEN_DATA:addReward(20929, 21331, CLASS.WARRIOR)
+TOKEN_DATA:addReward(20929, 21364, CLASS.ROGUE)
+TOKEN_DATA:addReward(20929, 21374, CLASS.SHAMAN)
+TOKEN_DATA:addReward(20929, 21370, CLASS.HUNTER)
+-- Husk of the Old God
+TOKEN_DATA:addToken(20933)
+TOKEN_DATA:addReward(20933, 21334, CLASS.WARLOCK)
+TOKEN_DATA:addReward(20933, 21343, CLASS.MAGE)
+TOKEN_DATA:addReward(20933, 21357, CLASS.DRUID)
+TOKEN_DATA:addReward(20933, 21351, CLASS.PRIEST)
 
 local ALIGNMENT = {
   BOTTOM = 1,
@@ -320,47 +400,47 @@ end
 
 -- handler for item link tooltips
 local function OnRefTooltipSetItem(self)
-  -- tooltip order from left to right: 1 - 2 - 3 - 4 - 5
-  local refTooltips = { RewardRefTooltip1, RewardRefTooltip2, RewardRefTooltip3, RewardRefTooltip4, RewardRefTooltip5 }
-  local tooltipOwner = { self, RewardRefTooltip1, RewardRefTooltip2, RewardRefTooltip3, RewardRefTooltip4}
-  local tooltipAttachmentInner = { "TOPLEFT" , "TOPLEFT" , "TOPLEFT" , "TOPLEFT" , "TOPLEFT" }
-  local tooltipAttachmentOuter = { "TOPRIGHT", "TOPRIGHT", "TOPRIGHT", "TOPRIGHT", "TOPRIGHT" }
+  -- tooltip order from left to right: 1 - 2 - 3 - 4 - 5 - 6 - 7 - 8 - 9 - 10
+  local refTooltips = { RewardRefTooltip1, RewardRefTooltip2, RewardRefTooltip3, RewardRefTooltip4, RewardRefTooltip5, RewardRefTooltip6, RewardRefTooltip7, RewardRefTooltip8, RewardRefTooltip9, RewardRefTooltip10 }
+  local tooltipOwner = { self, RewardRefTooltip1, RewardRefTooltip2, RewardRefTooltip3, RewardRefTooltip4, RewardRefTooltip5, RewardRefTooltip6, RewardRefTooltip7, RewardRefTooltip8, RewardRefTooltip9 }
+  local tooltipAttachmentInner = { "TOPLEFT" , "TOPLEFT" , "TOPLEFT" , "TOPLEFT" , "TOPLEFT" , "TOPLEFT" , "TOPLEFT" , "TOPLEFT" , "TOPLEFT" , "TOPLEFT" }
+  local tooltipAttachmentOuter = { "TOPRIGHT", "TOPRIGHT", "TOPRIGHT", "TOPRIGHT", "TOPRIGHT", "TOPRIGHT", "TOPRIGHT", "TOPRIGHT", "TOPRIGHT", "TOPRIGHT" }
   return attachRewardTooltips(self, refTooltips, tooltipOwner, tooltipAttachmentInner, tooltipAttachmentOuter)
 end
 
 -- handler for mouse over tooltips
 local function OnNormalTooltipSetItem(self)
-  local tooltips = { RewardTooltip1, RewardTooltip2, RewardTooltip3, RewardTooltip4, RewardTooltip5 }
+  local tooltips = { RewardTooltip1, RewardTooltip2, RewardTooltip3, RewardTooltip4, RewardTooltip5, RewardTooltip6, RewardTooltip7, RewardTooltip8, RewardTooltip9, RewardTooltip10 }
   local tooltipOwner, tooltipAttachmentInner, tooltipAttachmentOuter
   if (ShiGuangDB["alignment"] == ALIGNMENT.BOTTOM) then
-  -- tooltip order from left to right: 5 - 3 - 1 - 2 - 4
-    tooltipOwner = { self, RewardTooltip1, RewardTooltip1, RewardTooltip2, RewardTooltip3}
-    tooltipAttachmentInner = { "TOPLEFT"   , "TOPLEFT" , "TOPRIGHT", "TOPLEFT" , "TOPRIGHT" }
-    tooltipAttachmentOuter = { "BOTTOMLEFT", "TOPRIGHT", "TOPLEFT" , "TOPRIGHT", "TOPLEFT" }
+  -- tooltip order from left to right: 9 - 7 - 5 - 3 - 1 - 2 - 4 - 6 - 8 - 10
+    tooltipOwner = { self, RewardTooltip1, RewardTooltip1, RewardTooltip2, RewardTooltip3, RewardTooltip4, RewardTooltip5, RewardTooltip6, RewardTooltip7, RewardTooltip8}
+    tooltipAttachmentInner = { "TOPLEFT"   , "TOPLEFT" , "TOPRIGHT", "TOPLEFT" , "TOPRIGHT", "TOPLEFT" , "TOPRIGHT", "TOPLEFT" , "TOPRIGHT", "TOPLEFT" }
+    tooltipAttachmentOuter = { "BOTTOMLEFT", "TOPRIGHT", "TOPLEFT" , "TOPRIGHT", "TOPLEFT" , "TOPRIGHT", "TOPLEFT" , "TOPRIGHT", "TOPLEFT" , "TOPRIGHT" }
   elseif (ShiGuangDB["alignment"] == ALIGNMENT.LEFT) then
     -- TODO
-  -- tooltip order from left to right: 5 - 4 - 3 - 2 - 1
-    tooltipOwner = { self, RewardTooltip1, RewardTooltip2, RewardTooltip3, RewardTooltip4}
-    tooltipAttachmentInner = { "TOPRIGHT" , "TOPRIGHT" , "TOPRIGHT", "TOPRIGHT" , "TOPRIGHT" }
-    tooltipAttachmentOuter = { "TOPLEFT", "TOPLEFT", "TOPLEFT" , "TOPLEFT", "TOPLEFT" }
+  -- tooltip order from left to right: 10 - 9 - 8 - 7 - 6 - 5 - 4 - 3 - 2 - 1
+    tooltipOwner = { self, RewardTooltip1, RewardTooltip2, RewardTooltip3, RewardTooltip4, RewardTooltip5, RewardTooltip6, RewardTooltip7, RewardTooltip8, RewardTooltip9}
+    tooltipAttachmentInner = { "TOPRIGHT", "TOPRIGHT", "TOPRIGHT", "TOPRIGHT", "TOPRIGHT", "TOPRIGHT", "TOPRIGHT", "TOPRIGHT", "TOPRIGHT", "TOPRIGHT" }
+    tooltipAttachmentOuter = { "TOPLEFT", "TOPLEFT", "TOPLEFT", "TOPLEFT", "TOPLEFT", "TOPLEFT", "TOPLEFT", "TOPLEFT", "TOPLEFT", "TOPLEFT" }
   elseif (ShiGuangDB["alignment"] == ALIGNMENT.RIGHT) then
     -- TODO
-  -- tooltip order from left to right: 1 - 2 - 3 - 4 - 5
-    tooltipOwner = { self, RewardTooltip1, RewardTooltip2, RewardTooltip3, RewardTooltip4}
-    tooltipAttachmentInner = { "TOPLEFT"   , "TOPLEFT" , "TOPLEFT", "TOPLEFT" , "TOPLEFT" }
-    tooltipAttachmentOuter = { "TOPRIGHT", "TOPRIGHT", "TOPRIGHT" , "TOPRIGHT", "TOPRIGHT" }
+  -- tooltip order from left to right: 1 - 2 - 3 - 4 - 5 - 6 - 7 - 8 - 9 - 10
+    tooltipOwner = { self, RewardTooltip1, RewardTooltip2, RewardTooltip3, RewardTooltip4, RewardTooltip5, RewardTooltip6, RewardTooltip7, RewardTooltip8, RewardTooltip9}
+    tooltipAttachmentInner = { "TOPLEFT", "TOPLEFT", "TOPLEFT", "TOPLEFT", "TOPLEFT", "TOPLEFT", "TOPLEFT", "TOPLEFT", "TOPLEFT", "TOPLEFT" }
+    tooltipAttachmentOuter = { "TOPRIGHT", "TOPRIGHT", "TOPRIGHT", "TOPRIGHT", "TOPRIGHT", "TOPRIGHT", "TOPRIGHT", "TOPRIGHT", "TOPRIGHT", "TOPRIGHT" }
   else
-  -- tooltip order from left to right: 5 - 3 - 1 - 2 - 4
+  -- tooltip order from left to right: 9 - 7 - 5 - 3 - 1 - 2 - 4 - 6 - 8 - 10
     tooltipOwner = { self, RewardTooltip1, RewardTooltip1, RewardTooltip2, RewardTooltip3}
-    tooltipAttachmentInner = { "BOTTOMLEFT", "TOPLEFT" , "TOPRIGHT", "TOPLEFT" , "TOPRIGHT" }
-    tooltipAttachmentOuter = { "TOPLEFT"   , "TOPRIGHT", "TOPLEFT" , "TOPRIGHT", "TOPLEFT" }
+    tooltipAttachmentInner = { "BOTTOMLEFT", "TOPLEFT" , "TOPRIGHT", "TOPLEFT" , "TOPRIGHT", "TOPLEFT" , "TOPRIGHT", "TOPLEFT" , "TOPRIGHT", "TOPLEFT" }
+    tooltipAttachmentOuter = { "TOPLEFT"   , "TOPRIGHT", "TOPLEFT" , "TOPRIGHT", "TOPLEFT" , "TOPRIGHT", "TOPLEFT" , "TOPRIGHT", "TOPLEFT" , "TOPRIGHT" }
   end
   return attachRewardTooltips(self, tooltips, tooltipOwner, tooltipAttachmentInner, tooltipAttachmentOuter)
 end
 
 -- hide all reward tooltips
 local function HideTooltips()
-  local tooltips = { RewardTooltip1, RewardTooltip2, RewardTooltip3, RewardTooltip4, RewardTooltip5 }
+  local tooltips = { RewardTooltip1, RewardTooltip2, RewardTooltip3, RewardTooltip4, RewardTooltip5, RewardTooltip6, RewardTooltip7, RewardTooltip8, RewardTooltip9, RewardTooltip10 }
   for i = 1, #tooltips do
     tooltips[i]:Hide()
   end
@@ -368,7 +448,7 @@ end
 
 -- hide all reward refTooltips
 local function HideRefTooltips()
-  local refTooltips = { RewardRefTooltip1, RewardRefTooltip2, RewardRefTooltip3, RewardRefTooltip4, RewardRefTooltip5 }
+  local refTooltips = { RewardRefTooltip1, RewardRefTooltip2, RewardRefTooltip3, RewardRefTooltip4, RewardRefTooltip5, RewardRefTooltip6, RewardRefTooltip7, RewardRefTooltip8, RewardRefTooltip9, RewardRefTooltip10 }
   for i = 1, #refTooltips do
     refTooltips[i]:Hide()
   end
@@ -424,14 +504,14 @@ local function InitializeTooltips()
   for itemId, _ in pairs(TOKEN_DATA) do
     getItemLink(itemId)
   end
-  local tooltips = { RewardTooltip1, RewardTooltip2, RewardTooltip3, RewardTooltip4, RewardTooltip5 }
+  local tooltips = { RewardTooltip1, RewardTooltip2, RewardTooltip3, RewardTooltip4, RewardTooltip5, RewardTooltip6, RewardTooltip7, RewardTooltip8, RewardTooltip9, RewardTooltip10 }
   for i = 1, #tooltips do
     tooltips[i]:SetOwner(GameTooltip, "ANCHOR_NONE")
     -- calling SetHyperlink here seems to cause lua errors
     -- tooltips[i]:SetHyperlink(getItemLink(18422))
     tooltips[i]:SetClampedToScreen(false)
   end
-  local refTooltips = { RewardRefTooltip1, RewardRefTooltip2, RewardRefTooltip3, RewardRefTooltip4, RewardRefTooltip5 }
+  local refTooltips = { RewardRefTooltip1, RewardRefTooltip2, RewardRefTooltip3, RewardRefTooltip4, RewardRefTooltip5, RewardRefTooltip6, RewardRefTooltip7, RewardRefTooltip8, RewardRefTooltip9, RewardRefTooltip10 }
   for i = 1, #refTooltips do
     refTooltips[i]:SetOwner(ItemRefTooltip, "ANCHOR_NONE")
     -- calling SetHyperlink here seems to cause lua errors

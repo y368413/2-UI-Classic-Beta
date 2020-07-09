@@ -1,8 +1,8 @@
 <Ui xmlns="http://www.blizzard.com/wow/ui/">
   <Script file="ManaPerc.lua"/>
+  <Script file="DaisyCosp.lua"/>
   <Script file="FeedOMatic.lua"/>
   <Script file="TrackingEye.lua"/>
-  <Include file="DaisyCosp\DaisyCosp.xml"/>
 	<Script file="InboxMailBag.lua"/>
 	<Texture name="Mailbag-Slot-BG" file="Interface\Buttons\UI-Slot-Background" virtual="true">
 		<Size x="39" y="39"/>
