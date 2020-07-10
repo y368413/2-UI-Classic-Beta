@@ -34142,7 +34142,7 @@ nodes[1435] = {
 	[45405500] = {
 		name = L["Mailbox"],
 		category = "mailboxes",
-		faction = "Neutral",
+		faction = "Horde",
 	},
 	[45005020] = {
 		name = L["Grimnal"],
@@ -72478,7 +72478,7 @@ local icons = {
 	innkeepers = "Interface\\MINIMAP\\TRACKING\\Innkeeper",
 	mailboxes = "Interface\\MINIMAP\\TRACKING\\Mailbox",
 	repair = "Interface\\MINIMAP\\TRACKING\\Repair",
-	spirithealers = "Interface\\MINIMAP\\TRACKING\\Focus", -- TODO: Find a better icon
+	spirithealers = "Interface\\RaidFrame\\Raid-Icon-Rez", -- Credit to Cydile for finding this
 	stablemasters = "Interface\\MINIMAP\\TRACKING\\StableMaster",
 	trainers = "Interface\\MINIMAP\\TRACKING\\Profession",
 	vendors = "Interface\\MINIMAP\\TRACKING\\Food",
@@ -74092,7 +74092,7 @@ function Search:UpdateListNPCDistances()
 end
 
 
-local HandyNotes_NPCs_Altrecipes = HandyNotes_NPCs_Main:NewModule("AltRecipes", "AceConsole-3.0", "AceEvent-3.0", "AceHook-3.0")
+local HandyNotes_NPCs_Options = HandyNotes_NPCs_Main:NewModule("AltRecipes", "AceConsole-3.0", "AceEvent-3.0", "AceHook-3.0")
 local teachesToItemID = { }
 do
 	for k, v in pairs(data["items"]) do
@@ -74102,7 +74102,7 @@ do
 	end
 end
 
-function HandyNotes_NPCs_Altrecipes:OnInitialize()
+function HandyNotes_NPCs_Options:OnInitialize()
 	local defaults = {
 		realm = {
 			['*'] = {
@@ -74120,7 +74120,7 @@ function HandyNotes_NPCs_Altrecipes:OnInitialize()
 	self:SetEnabledState(HandyNotes_NPCs_Main.db.profile.showAltRecipes)
 end
 
-function HandyNotes_NPCs_Altrecipes:OnEnable()
+function HandyNotes_NPCs_Options:OnEnable()
 	self.playerName = UnitName("player")
 	self:RegisterEvent("SKILL_LINES_CHANGED")
 	self:RegisterEvent("TRADE_SKILL_SHOW", "ScanTradeSkill") -- GetNumTradeSkills usually returns 0 here
@@ -74130,12 +74130,12 @@ function HandyNotes_NPCs_Altrecipes:OnEnable()
 	self:HookScript(GameTooltip, "OnTooltipCleared", "OnTooltipCleared")
 end
 
-function HandyNotes_NPCs_Altrecipes:OnDisable()
+function HandyNotes_NPCs_Options:OnDisable()
 	self:UnregisterAllEvents()
 	self:UnhookAll()
 end
 
-function HandyNotes_NPCs_Altrecipes:Toggle()
+function HandyNotes_NPCs_Options:Toggle()
 	if HandyNotes_NPCs_Main.db.profile.showAltRecipes then
 		self:Enable()
 	else
@@ -74144,7 +74144,7 @@ function HandyNotes_NPCs_Altrecipes:Toggle()
 end
 
 local lineAdded = false
-function HandyNotes_NPCs_Altrecipes:OnTooltipSetItem(tooltip, ...)
+function HandyNotes_NPCs_Options:OnTooltipSetItem(tooltip, ...)
 	if (lineAdded) then return end
 
 	local itemName, itemLink = tooltip:GetItem()
@@ -74153,11 +74153,11 @@ function HandyNotes_NPCs_Altrecipes:OnTooltipSetItem(tooltip, ...)
 	self:CheckIfLearned(tonumber(itemID), tooltip)
 end
 
-function HandyNotes_NPCs_Altrecipes:OnTooltipCleared(tooltip, ...)
+function HandyNotes_NPCs_Options:OnTooltipCleared(tooltip, ...)
 	lineAdded = false
 end
 
-function HandyNotes_NPCs_Altrecipes:CheckIfLearned(itemID, tooltip)
+function HandyNotes_NPCs_Options:CheckIfLearned(itemID, tooltip)
 	if not data["items"][itemID] or not data["items"][itemID].profession then return end
 
 	for k, v in pairs(self.db.realm) do -- Look through all the alts on realm
@@ -74178,7 +74178,7 @@ function HandyNotes_NPCs_Altrecipes:CheckIfLearned(itemID, tooltip)
 	tooltip:Show()
 end
 
-function HandyNotes_NPCs_Altrecipes:SKILL_LINES_CHANGED() -- We do this in the main part too but seems easier to just leave it here also
+function HandyNotes_NPCs_Options:SKILL_LINES_CHANGED() -- We do this in the main part too but seems easier to just leave it here also
 	table.wipe(self.db.realm[self.playerName].professions)
 	for i = 1, GetNumSkillLines() do
 		local skillName, _, _, skillLevel = GetSkillLineInfo(i)
@@ -74188,7 +74188,7 @@ function HandyNotes_NPCs_Altrecipes:SKILL_LINES_CHANGED() -- We do this in the m
 	end
 end
 
-function HandyNotes_NPCs_Altrecipes:ScanTradeSkill(event)
+function HandyNotes_NPCs_Options:ScanTradeSkill(event)
 	if event == "TRADE_SKILL_SHOW" or event == "TRADE_SKILL_CLOSE" then
 	for i = 1, GetNumTradeSkills() do
 		local skillName, skillType = GetTradeSkillInfo(i)

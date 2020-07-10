@@ -133,7 +133,7 @@ function BlinkHealth:CreateAnchorFrame()
 	self.anchor:SetHeight(80);
 	self.anchor:EnableMouse(true);
 	self.anchor:SetMovable(true);
-	self.anchor:SetPoint("BOTTOM", UIParent, "BOTTOM", 0, 235);
+	self.anchor:SetPoint("CENTER", UIParent, "CENTER", 0, -200);
 	local backdrop = {
 		bgFile = "Interface\\ChatFrame\\ChatFrameBackground",
 		edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border",

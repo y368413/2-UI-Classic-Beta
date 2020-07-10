@@ -1,4 +1,4 @@
-## Interface: 11303
+## Interface: 11305
 ## Title: |cff7fff7f[LR]|rFloAspectBar
 ## Author: Floraline
 ## Notes: Add an aspect bar similar to the paladin's aura bar
