@@ -15,7 +15,7 @@ A default texture will be applied if the widget is a Texture and doesn't have a 
 ## Options
 
 .feedbackUnit - The unit whose threat situation is being requested. If defined, it'll be passed as the first argument to
-                [UnitThreatSituation](https://wow.gamepedia.com/API_UnitThreatSituation).
+                [GetThreatStatusColor](http://wowprogramming.com/docs/api/UnitThreatSituation.html).
 
 ## Examples
 
@@ -34,6 +34,20 @@ local Private = oUF.Private
 
 local unitExists = Private.unitExists
 
+if not GetThreatStatusColor then
+	function GetThreatStatusColor(status)
+		if status == 3 then
+			return 1, 0, 0
+		elseif status == 2 then
+			return 1, .6, 0
+		elseif status == 1 then
+			return 1, 1, .47
+		else
+			return .69, .69, .69
+		end
+	end
+end
+
 local function Update(self, event, unit)
 	if(unit ~= self.unit) then return end
 
@@ -46,28 +60,25 @@ local function Update(self, event, unit)
 	--]]
 	if(element.PreUpdate) then element:PreUpdate(unit) end
 
+	local feedbackUnit = element.feedbackUnit
 	unit = unit or self.unit
 
 	local status
-
-	if(unitExists(unit) and UnitIsFriend("player", unit)) then
-		if(UnitIsUnit(unit, "targettarget") and UnitCanAttack("player", "target")) then
-			status = true
-		end
-		if(IsInGroup() and not status) then
-			for i=1,GetNumGroupMembers() do
-				local target = IsInRaid() and "raid"..i.."target" or "party"..i.."target"
-				if(UnitIsUnit(unit, target.."target") and UnitCanAttack("player", target)) then
-					status = true
-					break
-				end
-			end
+	-- BUG: Non-existent '*target' or '*pet' units cause UnitThreatSituation() errors
+	if(unitExists(unit)) then
+		if(feedbackUnit and feedbackUnit ~= unit and unitExists(feedbackUnit)) then
+			status = UnitThreatSituation(feedbackUnit, unit)
+		else
+			status = UnitThreatSituation(unit)
 		end
 	end
 
-	if(status) then
+	local r, g, b
+	if(status and status > 0) then
+		r, g, b = GetThreatStatusColor(status)
+
 		if(element.SetVertexColor) then
-			element:SetVertexColor(1, 0, 0)
+			element:SetVertexColor(r, g, b)
 		end
 
 		element:Show()
@@ -86,7 +97,7 @@ local function Update(self, event, unit)
 	* b      - the blue color component based on the unit's threat status (number?)[0-1]
 	--]]
 	if(element.PostUpdate) then
-		return element:PostUpdate(unit, status, 1, 0, 0)
+		return element:PostUpdate(unit, status, r, g, b)
 	end
 end
 
@@ -111,18 +122,9 @@ local function Enable(self)
 		element.__owner = self
 		element.ForceUpdate = ForceUpdate
 
-		--self:RegisterEvent("UNIT_TARGET", Path)
-		if(self.unit == "targettarget" or self.unit == "targettargettarget") then
-			self:RegisterEvent("UNIT_TARGET", Path)
-		else
-			self.elapsed = 0.2
-			self:SetScript("OnUpdate", function(self, elapsed)
-				self.elapsed = self.elapsed - elapsed
-				if(self.elapsed > 0) then return end
-				self.elapsed = 0.2
-				ForceUpdate(element)
-			end)
-		end
+		self:RegisterEvent('UNIT_THREAT_SITUATION_UPDATE', Path)
+		self:RegisterEvent('UNIT_THREAT_LIST_UPDATE', Path)
+
 		if(element:IsObjectType('Texture') and not element:GetTexture()) then
 			element:SetTexture([[Interface\RAIDFRAME\UI-RaidFrame-Threat]])
 		end
@@ -135,11 +137,9 @@ local function Disable(self)
 	local element = self.ThreatIndicator
 	if(element) then
 		element:Hide()
-		if(self.unit == "targettarget" or "targettargettarget") then
-			self:UnregisterEvent("UNIT_TARGET", Path)
-		else
-			self:SetScript("OnUpdate", nil)
-		end
+
+		self:UnregisterEvent('UNIT_THREAT_SITUATION_UPDATE', Path)
+		self:UnregisterEvent('UNIT_THREAT_LIST_UPDATE', Path)
 	end
 end
 

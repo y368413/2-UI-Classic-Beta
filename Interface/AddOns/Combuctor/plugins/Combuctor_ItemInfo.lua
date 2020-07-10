@@ -111,8 +111,10 @@ end
 local Cache_GetItemLevel = function(button)
 	local ItemLevel = GetPluginContainter(button):CreateFontString()
 	ItemLevel:SetDrawLayer("ARTWORK", 1)
-	ItemLevel:SetPoint("TOPLEFT", 2, -2)
-	ItemLevel:SetFontObject(_G.NumberFont_Outline_Large or _G.NumberFontNormal) 
+	ItemLevel:SetPoint("TOPRIGHT", 2, 0)
+	--ItemLevel:SetFontObject(_G.NumberFont_Outline_Large or _G.NumberFontNormal) 
+	ItemLevel:SetFont("Interface\\Addons\\_ShiGuang\\Media\\Fonts\\Loli.ttf", 14, "OUTLINE");
+	ItemLevel:SetTextColor(1, 0.65, 0.16);
 	ItemLevel:SetShadowOffset(1, -1)
 	ItemLevel:SetShadowColor(0, 0, 0, .5)
 

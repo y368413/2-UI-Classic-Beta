@@ -28,7 +28,7 @@ function UF:CreateRaidIcons(self)
 
 	local role = parent:CreateTexture(nil, "OVERLAY")
 	role:SetSize(12, 12)
-	role:SetPoint("TOPLEFT", 12, 8)
+	role:SetPoint("TOPRIGHT", self, 5, 5)
 	self.RaidRoleIndicator = role
 end
 
@@ -43,7 +43,7 @@ end
 function UF:CreateTargetBorder(self)
 	local border = M.CreateSD(self, 3, true)
 	border:SetOutside(self.Health.backdrop, R.mult+3, R.mult+3, self.Power.backdrop)
-	border:SetBackdropBorderColor(.8, .8, .8)
+	border:SetBackdropBorderColor(1, 1, 1)
 	border:Hide()
 	self.Shadow = nil
 
@@ -52,11 +52,18 @@ function UF:CreateTargetBorder(self)
 	self:RegisterEvent("GROUP_ROSTER_UPDATE", UF.UpdateTargetBorder, true)
 end
 
-local function postUpdateThreat(element, _, status)
-	if status then
-		element:SetBackdropBorderColor(1, 0, 0)
+function UF:UpdateThreatBorder(_, unit)
+	if unit ~= self.unit then return end
+
+	local element = self.ThreatIndicator
+	local status = UnitThreatSituation(unit)
+
+	if status and status > 1 then
+		local r, g, b = GetThreatStatusColor(status)
+		element:SetBackdropBorderColor(r, g, b)
+		element:Show()
 	else
-		element:SetBackdropBorderColor(0, 0, 0)
+		element:Hide()
 	end
 end
 
@@ -67,7 +74,7 @@ function UF:CreateThreatBorder(self)
 	threatIndicator:SetFrameLevel(0)
 	self.Shadow = nil
 	self.ThreatIndicator = threatIndicator
-	self.ThreatIndicator.PostUpdate = postUpdateThreat
+	self.ThreatIndicator.Override = UF.UpdateThreatBorder
 end
 
 local debuffList = {}

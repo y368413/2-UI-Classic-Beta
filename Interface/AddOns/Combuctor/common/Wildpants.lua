@@ -55,7 +55,8 @@ local FrameDefaults = {
 		'equip', 'equip/armor', 'equip/weapon', 'equip/trinket',
 		'use', 'use/consume', 'use/enhance',
 		'trade', 'trade/goods', 'trade/gem', 'trade/glyph', 'trade/recipe',
-		'quest', 'misc',
+		'quest', 
+		'misc',
 	}),
 }
 
