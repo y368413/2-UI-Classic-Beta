@@ -69,7 +69,7 @@ function S:OnLogin()
 	Rinfobar2:SetPoint("TOP", Rinfobar, "BOTTOM")
 	M.CreateGF(Rinfobar2, 520, R.mult, "Horizontal", cr, cg, cb, 0, .8)
    ----BOTTOM
-   if MaoRUIPerDB["Skins"]["InfobarLine"] then
+   if MaoRUIPerDB["Skins"]["ClassLine"] then
    local Bottomline = CreateFrame("Frame", nil, UIParent) 
    Bottomline:SetFrameLevel(0) 
    Bottomline:SetFrameStrata("BACKGROUND")
