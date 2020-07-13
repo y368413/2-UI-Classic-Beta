@@ -2,7 +2,7 @@
 -- GFWUtils.lua
 -- Useful utility / debug functions
 ------------------------------------------------------
-GFWUTILS_THIS_VERSION = 11;
+GFWUTILS_THIS_VERSION = 12;
 -- Shortcuts for common text color codes
 function GFWUtils_temp_HiliteText(text)
 	if (text == nil) then return nil; end

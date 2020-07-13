@@ -162,8 +162,8 @@ local SetMrbarMicromenu = {
     { text = "|cFF00DDFF ------- "..MINIMAP_MENU_ONOFF.." -------|r", isTitle = true, notCheckable = true},
     { text = MINIMAP_MENU_DAMAGESTYLE, icon = 'Interface\\PaperDollInfoFrame\\UI-EquipmentManager-Toggle',
         func = function() sendCmd("/dex"); end, notCheckable = true },
-    --{ text = MINIMAP_MENU_INTERRUPT, icon = 'Interface\\MINIMAP\\TRACKING\\BattleMaster',
-        --func = function() sendCmd("/esi"); end, notCheckable = true},
+    { text = MINIMAP_MENU_STATS, icon = 'Interface\\MINIMAP\\TRACKING\\BattleMaster',
+        func = function() sendCmd("/sinstats"); end, notCheckable = true},
     {text = MINIMAP_MENU_DISTANCE, hasArrow = true, notCheckable = true,
         menuList={  
             { text = YES, func = function() sendCmd("/hardyards sho") end, notCheckable = true},
