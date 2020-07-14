@@ -714,6 +714,7 @@ local optionList = {		-- type, key, value, name, horizon, horizon2, doubleline
 		{1, "Tooltip", "SpecLevelByShift", U["Show SpecLevelByShift"].."*", true, true},
 		{1, "Tooltip", "TargetBy", U["Show TargetedBy"].."*"},
 		{1, "Tooltip", "HideAllID", "|cff00cc4c"..U["HideAllID"], true},
+		{1, "Misc", "SorasThreat", U["SorasThreat"], true, true},
 		{1, "Map", "Coord", U["Map Coords"]},
 		{1, "Map", "MapFader", U["MapFader"].."*", true, false, nil, updateMapFader},
 		--{1, "Map", "Clock", U["Minimap Clock"], true, true, nil, showMinimapClock},

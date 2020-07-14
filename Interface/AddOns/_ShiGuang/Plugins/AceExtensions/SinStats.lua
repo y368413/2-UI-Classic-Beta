@@ -648,14 +648,14 @@ SinStats:SetScript("OnEvent", function (self, event, ...)
             if ShiGuangDB.SinLockVar == nil then ShiGuangDB.SinLockVar = true end
             if ShiGuangDB.SinHideVar == nil then ShiGuangDB.SinHideVar = false end
             if ShiGuangDB.Stats == nil then ShiGuangDB.Stats = {
-                        AP = true,
-                        Crit = true,
+                        AP = false,
+                        Crit = false,
                         RangedCrit = false,
                         SpellCrit = false,
-                        Hit = true,
+                        Hit = false,
                         RangedHit = false,
                         SpellHit = false,
-                        DMG = true,
+                        DMG = false,
 						RDMG = false,
                         Healing = false,
 						ManaRegen = false,
@@ -671,9 +671,9 @@ SinStats:SetScript("OnEvent", function (self, event, ...)
                         Dodge = false,
                         Parry = false,
                         Block = false,
-                        Speed = true,
+                        Speed = false,
 						RAP = false,
-						Durability = true,
+						Durability = false,
                     } end
                 --}
             --end

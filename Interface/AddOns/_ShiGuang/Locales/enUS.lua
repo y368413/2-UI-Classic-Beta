@@ -411,7 +411,7 @@ FOM_WORM						= "Worm";               	-- WotLK exotic
     
 U["Damage"] = "Damage"    
 
-  
+U["SorasThreat"] = "Threat bar"
 U["Lock UIScale"] = "Lock UIScale"
 U["Lock Chat"] = "Lock Chat"
 U["Minimap Clock"] = "Minimap Clock"

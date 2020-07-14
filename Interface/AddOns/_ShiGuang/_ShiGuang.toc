@@ -2,13 +2,13 @@
 ## Title:-|cFFFFFF00 2|r|cFFFF0000 UI |r Classic -
 ## Author: ShiGuang、TuTu、Siweia
 ## Notes: Time Flies...
-## Version: 0.5.6
+## Version: 0.5.7
 ## SavedVariables: MaoRUIDB,ShiGuangDB,CastbarsDB,DialogKeyDB,GFW_FeedOMatic_DB,FOM_Cooking,WhisperTableDB
 ## SavedVariablesPerCharacter: MaoRUIPerDB,ShiGuangPerDB,DEX_SAVE,WhisperTablePlayer
 
 ## X-Support: Classic
 ## X-Repple: 2 UI
-## X-StatsVersion: 20200711
+## X-StatsVersion: 20200714
 ## X-LoadOn-Always: Delayed
 ## X-Website: https://github.com/y368413/2-UI-Classic
 ## X-Credits: abin, ape47, Coolkid, Elv, Freebaser, Haleth, Haste, Loshine, Monolit, Neal, Neavo, p3lim, Qulight, Ray, superk, Tukz, Tuller, Warbaby, yleaf, Zork, EK, Rubgrsch, siweia & "PaoPao"...
