@@ -40,7 +40,7 @@ end
 
 function Events:BAG_UPDATE_DELAYED()
 	self:UpdateBags()
-	
+
 	if self.queue[BACKPACK_CONTAINER] then
 		self:UpdateContent(BACKPACK_CONTAINER)
 	end
@@ -76,9 +76,13 @@ end
 
 function Events:UpdateBags()
 	for bag = 1, NUM_BAG_SLOTS do
-		if not self:UpdateSize(bag) and not self:UpdateType(bag) and self.queue[bag] then
-			self:UpdateContent(bag)
+		if not self:UpdateSize(bag) then
+			self:UpdateType(bag)
 		end
+	end
+
+	for bag in pairs(self.queue) do
+		self:UpdateContent(bag)
 	end
 end
 
