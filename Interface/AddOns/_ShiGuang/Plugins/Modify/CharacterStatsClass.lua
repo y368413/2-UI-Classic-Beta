@@ -1,4 +1,105 @@
-﻿--## Author: Peter Getov  ## Version: 3.5.5
+﻿--## Author: Peter Getov  ## Version: 3.6
+-- Class ids
+CSC_WARRIOR_CLASS_ID 		= 1;
+CSC_PALADIN_CLASS_ID 		= 2;
+CSC_HUNTER_CLASS_ID 		= 3;
+CSC_ROGUE_CLASS_ID 			= 4;
+CSC_PRIEST_CLASS_ID 		= 5;
+CSC_DEATHKNIGHT_CLASS_ID 	= 6;
+CSC_SHAMAN_CLASS_ID 		= 7;
+CSC_MAGE_CLASS_ID 			= 8;
+CSC_WARLOCK_CLASS_ID 		= 9;
+CSC_MONK_CLASS_ID 			= 10;
+CSC_DRUID_CLASS_ID 			= 11;
+CSC_DEMONHUNTER_CLASS_ID 	= 12;
+
+g_WeaponStringByWeaponId = {
+	[LE_ITEM_WEAPON_AXE1H] 		= CSC_WEAPON_AXE1H_TXT,
+	[LE_ITEM_WEAPON_AXE2H] 		= CSC_WEAPON_AXE2H_TXT,
+	[LE_ITEM_WEAPON_MACE1H] 	= CSC_WEAPON_MACE1H_TXT,
+	[LE_ITEM_WEAPON_MACE2H] 	= CSC_WEAPON_MACE2H_TXT,
+	[LE_ITEM_WEAPON_POLEARM] 	= CSC_WEAPON_POLEARM_TXT,
+	[LE_ITEM_WEAPON_SWORD1H] 	= CSC_WEAPON_SWORD1H_TXT,
+	[LE_ITEM_WEAPON_SWORD2H] 	= CSC_WEAPON_SWORD2H_TXT,
+	[LE_ITEM_WEAPON_STAFF] 		= CSC_WEAPON_STAFF_TXT,
+	[LE_ITEM_WEAPON_UNARMED] 	= CSC_WEAPON_UNARMED_TXT,
+	[LE_ITEM_WEAPON_DAGGER] 	= CSC_WEAPON_DAGGER_TXT
+};
+
+-- Class set items IDs
+g_BattlegearOfMightIds = { 
+    [16861] = 16861, 
+    [16862] = 16862, 
+    [16863] = 16863, 
+    [16864] = 16864, 
+    [16865] = 16865, 
+    [16866] = 16866, 
+    [16867] = 16867, 
+    [16868] = 16868
+};
+
+g_VestmentsOfTranscendenceIds = {
+    [16925] = 16925, 
+    [16926] = 16926, 
+    [16919] = 16919, 
+    [16921] = 16921, 
+    [16920] = 16920, 
+    [16922] = 16922, 
+    [16924] = 16924, 
+    [16923] = 16923,
+};
+
+g_StormrageRaimentIds = {
+    [16897] = 16897, 
+    [16898] = 16898, 
+    [16899] = 16899, 
+    [16900] = 16900, 
+    [16901] = 16901, 
+    [16902] = 16902, 
+    [16903] = 16903, 
+    [16904] = 16904,
+};
+
+g_TheTenStormsIds = {
+    [16943] = 16943, 
+    [16944] = 16944, 
+    [16945] = 16945, 
+    [16946] = 16946, 
+    [16947] = 16947, 
+    [16948] = 16948, 
+    [16949] = 16949, 
+    [16950] = 16950
+};
+
+g_AuraIdToMp5 = {
+	-- BOW
+	[19742] = 10,
+	[19850] = 15,
+	[19852] = 20,
+	[19853] = 25,
+	[19854] = 30,
+	[25290] = 33,
+	-- GBOW
+	[25894] = 30,
+	[25918] = 33,
+	-- Mana Spring Totem
+	[5675] = 10,
+	[10495] = 15,
+	[10496] = 20,
+	[10497] = 25,
+	-- Mageblood potion
+	[24363] = 12,
+	--Nightfin Soup
+	[18194] = 8
+};
+  
+g_CombatManaRegenSpellIdToModifier = {
+    -- Mage Armor
+    [6117] = 0.3,
+    [22782] = 0.3,
+    [22783] = 0.3
+};
+                                -- Namespaces
 -- core - table (namespace) shared between every lua file
 local CharacterStatsClassic = {};
 CharacterStatsClassic.UIConfig = {};
@@ -233,19 +334,6 @@ local CSC_ScanTooltipPrefix = "CSC_ScanTooltip";
 local g_lastSeenBaseManaRegen = 0;
 local g_lastSeenCastingManaRegen = 0;
 
-local weaponStringByWeaponId = {
-	[LE_ITEM_WEAPON_AXE1H] 		= CSC_WEAPON_AXE1H_TXT,
-	[LE_ITEM_WEAPON_AXE2H] 		= CSC_WEAPON_AXE2H_TXT,
-	[LE_ITEM_WEAPON_MACE1H] 	= CSC_WEAPON_MACE1H_TXT,
-	[LE_ITEM_WEAPON_MACE2H] 	= CSC_WEAPON_MACE2H_TXT,
-	[LE_ITEM_WEAPON_POLEARM] 	= CSC_WEAPON_POLEARM_TXT,
-	[LE_ITEM_WEAPON_SWORD1H] 	= CSC_WEAPON_SWORD1H_TXT,
-	[LE_ITEM_WEAPON_SWORD2H] 	= CSC_WEAPON_SWORD2H_TXT,
-	[LE_ITEM_WEAPON_STAFF] 		= CSC_WEAPON_STAFF_TXT,
-	[LE_ITEM_WEAPON_UNARMED] 	= CSC_WEAPON_UNARMED_TXT,
-	[LE_ITEM_WEAPON_DAGGER] 	= CSC_WEAPON_DAGGER_TXT
-};
-
 -- GENERAL UTIL FUNCTIONS --
 local function CSC_GetAppropriateDamage(unit, category)
 	if category == PLAYERSTAT_MELEE_COMBAT then
@@ -374,23 +462,25 @@ local function CSC_GetSkillRankAndModifier(skillHeader, skillName)
 	return skillRank, skillModifier;
 end
 
-local function CSC_GetPlayerWeaponSkill(unit)
+function CSC_GetPlayerWeaponSkill(unit)
 	local totalWeaponSkill = nil;
 	local mainHandItemId = 16;
+
+	local unitClassId = select(3, UnitClass(unit));
 	-- Druid checks
 	local shapeIndex = -1;
-	if (unitClassLoc == "DRUID") then
+	if (unitClassId == CSC_DRUID_CLASS_ID) then
 		shapeIndex = CSC_GetShapeshiftForm();
 	end
 
-	if (unitClassLoc == "DRUID") and (shapeIndex > 0) then
+	if (unitClassId == CSC_DRUID_CLASS_ID) and (shapeIndex > 0) then
 		totalWeaponSkill = UnitLevel(unit) * 5;
 	else
 		local itemId = GetInventoryItemID(unit, mainHandItemId);
 		if (itemId) then
 			local itemSubtypeId = select(7, GetItemInfoInstant(itemId));
 			if itemSubtypeId then
-				local weaponString = weaponStringByWeaponId[itemSubtypeId];
+				local weaponString = g_WeaponStringByWeaponId[itemSubtypeId];
 				if weaponString then
 					local skillRank, skillModifier = CSC_GetSkillRankAndModifier(CSC_WEAPON_SKILLS_HEADER, weaponString);
 					if skillRank and skillModifier then
@@ -405,7 +495,7 @@ local function CSC_GetPlayerWeaponSkill(unit)
 	return totalWeaponSkill;
 end
 
-local function CSC_GetPlayerMissChances(unit, playerHit, totalWeaponSkill)
+function CSC_GetPlayerMissChances(unit, playerHit, totalWeaponSkill)
 	local hitChance = playerHit;
 	local missChanceVsNPC = 5; -- Level 60 npcs with 300 def
 	local missChanceVsBoss = 9;
@@ -1010,7 +1100,7 @@ function CSC_PaperDollFrame_SetParry(statFrame, unit)
 	statFrame:Show();
 end
 
-local function CSC_GetBlockValue(unit)
+function CSC_GetBlockValue(unit)
 	CSC_ScanTooltip:ClearLines();
 
 	local blockValueFromItems = 0;
@@ -1018,23 +1108,13 @@ local function CSC_GetBlockValue(unit)
 	local lastItemslotIndex = 18;
 
 	local blockValueIDs = { ITEM_MOD_BLOCK_RATING_SHORT, ITEM_MOD_BLOCK_RATING, ITEM_MOD_BLOCK_VALUE };
-
 	local equippedMightSetItems = 0;
-	local battlegearOfMightIDs = { [16861] = 16861, 
-								   [16862] = 16862, 
-								   [16863] = 16863, 
-								   [16864] = 16864, 
-								   [16865] = 16865, 
-								   [16866] = 16866, 
-								   [16867] = 16867, 
-								   [16868] = 16868
-								};
 
 	for itemslot=firstItemslotIndex, lastItemslotIndex do
 		local hasItem = CSC_ScanTooltip:SetInventoryItem(unit, itemslot);
 		if hasItem then
 			local itemId = GetInventoryItemID(unit, itemslot);
-			if (itemId == battlegearOfMightIDs[itemId]) then
+			if (itemId == g_BattlegearOfMightIds[itemId]) then
 				equippedMightSetItems = equippedMightSetItems + 1;
 			else
 				local maxLines = CSC_ScanTooltip:NumLines();
@@ -1110,6 +1190,26 @@ function CSC_PaperDollFrame_SetSpellPower(statFrame, unit)
 	statFrame:Show();
 end
 
+local function CSC_GetMP5FromAuras()
+	local mp5FromAuras = 0;
+	local mp5CombatModifier = 0;
+
+	for i = 0, 40 do
+		--local name = select(1, UnitAura("player", i, "HELPFUL", "PLAYER"));
+		local spellId = select(10, UnitAura("player", i, "HELPFUL", "PLAYER"));
+		if spellId then
+			if g_AuraIdToMp5[spellId] then
+				mp5FromAuras = mp5FromAuras + g_AuraIdToMp5[spellId];
+			elseif g_CombatManaRegenSpellIdToModifier[spellId] then
+				mp5CombatModifier = mp5CombatModifier + g_CombatManaRegenSpellIdToModifier[spellId];
+			end
+			--print(name.." "..spellId);
+		end
+	end
+
+	return mp5FromAuras, mp5CombatModifier;
+end
+
 function CSC_PaperDollFrame_SetManaRegen(statFrame, unit)
 
 	if ( not UnitHasMana(unit) ) then
@@ -1137,10 +1237,15 @@ function CSC_PaperDollFrame_SetManaRegen(statFrame, unit)
 	local mp5FromGear = CSC_GetMP5FromGear(unit);
 	local mp5ModifierCasting = CSC_GetMP5ModifierFromTalents(unit);
 	mp5ModifierCasting = mp5ModifierCasting + CSC_GetMP5ModifierFromSetBonus(unit);
+
+	local mp5FromAuras, mp5CombatModifier = CSC_GetMP5FromAuras();
+	if mp5CombatModifier > 0 then
+		mp5ModifierCasting = mp5ModifierCasting + mp5CombatModifier;
+	end
 	
 	-- All mana regen stats are displayed as mana/5 sec.
-	local regenWhenNotCasting = floor(base * 5.0) + mp5FromGear;
-	casting = mp5FromGear; -- if GetManaRegen() gets fixed ever, this should be changed
+	local regenWhenNotCasting = floor(base * 5.0) + mp5FromGear + mp5FromAuras;
+	casting = mp5FromGear + mp5FromAuras; -- if GetManaRegen() gets fixed ever, this should be changed
 
 	if mp5ModifierCasting > 0 then
 		casting = casting + base * mp5ModifierCasting * 5.0;
@@ -1163,6 +1268,229 @@ function CSC_PaperDollFrame_SetHealing(statFrame, unit)
 	statFrame.tooltip = STAT_SPELLHEALING.." "..healing;
 	statFrame.tooltip2 = STAT_SPELLHEALING_TOOLTIP;
 	statFrame:Show();
+end
+
+--[[
+    Util functions specific for Classes
+]]
+
+-- returns additional crit % stats from Arcane instability and Critical Mass if any
+function CSC_GetMageCritStatsFromTalents()
+
+	local arcaneInstabilityCrit = 0;
+	local criticalMassCrit = 0;
+
+	-- Arcane Instability (1, 2, 3)%
+	local arcaneInstabilityTable = { 1, 2, 3 };
+	local spellRank = select(5, GetTalentInfo(1, 15));
+	if (spellRank > 0) and (spellRank <= 3) then
+		arcaneInstabilityCrit = arcaneInstabilityTable[spellRank];
+	end
+
+	-- Critical Mass (2, 4, 6)%
+	local criticalMassTable = { 2, 4, 6 };
+	spellRank = select(5, GetTalentInfo(2, 13));
+	if (spellRank > 0) and (spellRank <= 3) then
+		criticalMassCrit = criticalMassTable[spellRank];
+    end
+
+	return arcaneInstabilityCrit, criticalMassCrit;
+end
+
+-- returns the spell hit from Arcane Focus and Elemental Precision talents
+function CSC_GetMageSpellHitFromTalents()
+	local arcaneHit = 0;
+	local frostFireHit = 0;
+
+	-- Arcane Focus
+	local spellRank = select(5, GetTalentInfo(1, 2));
+	arcaneHit = spellRank * 2; -- 2% for each point
+
+	-- Elemental Precision
+	spellRank = select(5, GetTalentInfo(3, 3));
+	frostFireHit = spellRank * 2; -- 2% for each point
+
+	return arcaneHit, frostFireHit;
+end
+
+-- returns the spell hit from Suppression talent
+function CSC_GetWarlockSpellHitFromTalents()
+	local afflictionHit = 0;
+
+	-- Suppression
+	local spellRank = select(5, GetTalentInfo(1, 1));
+	afflictionHit = spellRank * 2; -- 2% for each point
+
+	return afflictionHit;
+end
+
+-- returns the spell crit from Devastation talent
+function CSC_GetWarlockCritStatsFromTalents()
+	-- the spell rank is equal to the value
+	local devastationCrit = select(5, GetTalentInfo(3, 7));
+
+	return devastationCrit;
+end
+
+-- returns the combined crit stats from Holy Specialization and Force of Will
+function CSC_GetPriestCritStatsFromTalents()
+	
+	local holySpecializationCrit = 0;
+	local forceOfWillCrit = 0;
+
+	local critTable = { 1, 2, 3, 4, 5 };
+	-- Holy Specialization (1, 2, 3, 4, 5)%
+	local spellRank = select(5, GetTalentInfo(2, 3));
+	if (spellRank > 0) and (spellRank <= 5) then
+		holySpecializationCrit = critTable[spellRank];
+	end
+
+	-- Force of Will (1, 2, 3, 4, 5)%
+	spellRank = select(5, GetTalentInfo(1, 14));
+	if (spellRank > 0) and (spellRank <= 5) then
+		forceOfWillCrit = critTable[spellRank];
+	end
+
+    local critCombined = holySpecializationCrit + forceOfWillCrit;
+	return critCombined;
+end
+
+-- returns the crit bonus from Holy Power
+function CSC_GetPaladinCritStatsFromTalents()
+	-- Holy Power (1, 2, 3, 4, 5)%
+	local spellRank = select(5, GetTalentInfo(1, 13));
+
+	return spellRank;
+end
+
+-- returns the defense bonus from the Anticipation Prot talent
+local function CSC_GetPaladinDefenseFromTalents()
+
+    local defense = 0;
+    local defenseTable = { 2, 4, 6, 8, 10 };
+
+    -- Anticipation (2, 4, 6, 8, 10)%
+    local spellRank = select(5, GetTalentInfo(2, 9));
+    if (spellRank > 0) and (spellRank <=5) then
+        defense = defenseTable[spellRank];
+    end
+
+    return defense;
+end
+
+-- returns the defense bonus from the Anticipation Prot talent
+local function CSC_GetWarriorDefenseFromTalents()
+    
+    local defense = 0;
+    local defenseTable = { 2, 4, 6, 8, 10 };
+
+    -- Anticipation (2, 4, 6, 8, 10)%
+    local spellRank = select(5, GetTalentInfo(3, 2));
+    if (spellRank > 0) and (spellRank <=5) then
+		defense = defenseTable[spellRank];
+	end
+
+    return defense;
+end
+
+function CSC_GetDefenseFromTalents(unit)
+    
+	local defense = 0;
+	local unitClassId = select(3, UnitClass(unit));
+
+    if (unitClassId == CSC_PALADIN_CLASS_ID) then
+        defense = CSC_GetPaladinDefenseFromTalents();
+    elseif (unitClassId == CSC_WARRIOR_CLASS_ID) then
+        defense = CSC_GetWarriorDefenseFromTalents();
+    end
+
+    return defense;
+end
+
+-- returns the shapeshift form index for druids
+function CSC_GetShapeshiftForm()
+	local shapeIndex = 0;
+
+	for possibleForm=1, GetNumShapeshiftForms() do
+		if select(2, GetShapeshiftFormInfo(possibleForm)) then
+			shapeIndex = possibleForm;
+		end
+	end
+
+	return shapeIndex;
+end
+
+function CSC_GetMP5ModifierFromTalents(unit)
+    local unitClassId = select(3, UnitClass(unit));
+	local spellRank = 0;
+
+	if unitClassId == CSC_PRIEST_CLASS_ID then
+		-- Meditation
+        spellRank = select(5, GetTalentInfo(1, 8));
+	elseif unitClassId == CSC_MAGE_CLASS_ID then
+		-- Arcane Meditation
+		spellRank = select(5, GetTalentInfo(1, 12));
+	elseif unitClassId == CSC_DRUID_CLASS_ID then
+		-- Reflection
+        spellRank = select(5, GetTalentInfo(3, 6));
+	end
+	
+	local modifier = spellRank * 0.05;
+
+    return modifier;
+end
+
+function CSC_GetMP5ModifierFromSetBonus(unit)
+	local unitClassId = select(3, UnitClass(unit));
+	local modifier = 0;
+	
+	-- not Druid or Priest
+	if unitClassId ~= CSC_DRUID_CLASS_ID and unitClassId ~= CSC_PRIEST_CLASS_ID then
+		return modifier;
+	end
+	
+	local firstItemslotIndex = 1;
+	local lastItemslotIndex = 18;
+
+	local equippedSetItems = 0;
+    for itemSlot = firstItemslotIndex, lastItemslotIndex do
+        local itemId = GetInventoryItemID(unit, itemSlot);
+		
+		if (itemId) then
+			if (itemId == g_VestmentsOfTranscendenceIds[itemId] or itemId == g_StormrageRaimentIds[itemId]) then
+				equippedSetItems = equippedSetItems + 1;
+			end
+		end
+    end
+
+    if equippedSetItems >= 3 then
+        modifier = 0.15;
+	end
+
+    return modifier;
+end
+
+function CSC_GetShamanT2SpellCrit(unit)
+	local spellCritFromSet = 0;
+	local firstItemslotIndex = 1;
+	local lastItemslotIndex = 18;
+
+	local equippedSetItems = 0;
+    for itemSlot = firstItemslotIndex, lastItemslotIndex do
+        local itemId = GetInventoryItemID(unit, itemSlot);
+		
+		if (itemId) then
+			if (itemId == g_TheTenStormsIds[itemId]) then
+				equippedSetItems = equippedSetItems + 1;
+			end
+		end
+    end
+
+    if equippedSetItems >= 5 then
+        spellCritFromSet = 3;
+	end
+
+    return spellCritFromSet;
 end
 
 -- OnEnter Tooltip functions
@@ -1326,277 +1654,3 @@ function CSC_CharacterMeleeCritFrame_OnEnter(self)
 end
 -- OnEnter Tooltip functions END
 
-
---[[
-    Util functions specific for Classes
-]]
-
--- Class ids
-CSC_WARRIOR_CLASS_ID 		= 1;
-CSC_PALADIN_CLASS_ID 		= 2;
-CSC_HUNTER_CLASS_ID 		= 3;
-CSC_ROGUE_CLASS_ID 			= 4;
-CSC_PRIEST_CLASS_ID 		= 5;
-CSC_DEATHKNIGHT_CLASS_ID 	= 6;
-CSC_SHAMAN_CLASS_ID 		= 7;
-CSC_MAGE_CLASS_ID 			= 8;
-CSC_WARLOCK_CLASS_ID 		= 9;
-CSC_MONK_CLASS_ID 			= 10;
-CSC_DRUID_CLASS_ID 			= 11;
-CSC_DEMONHUNTER_CLASS_ID 	= 12;
-
--- returns additional crit % stats from Arcane instability and Critical Mass if any
-function CSC_GetMageCritStatsFromTalents()
-
-	local arcaneInstabilityCrit = 0;
-	local criticalMassCrit = 0;
-
-	-- Arcane Instability (1, 2, 3)%
-	local arcaneInstabilityTable = { 1, 2, 3 };
-	local spellRank = select(5, GetTalentInfo(1, 15));
-	if (spellRank > 0) and (spellRank <= 3) then
-		arcaneInstabilityCrit = arcaneInstabilityTable[spellRank];
-	end
-
-	-- Critical Mass (2, 4, 6)%
-	local criticalMassTable = { 2, 4, 6 };
-	spellRank = select(5, GetTalentInfo(2, 13));
-	if (spellRank > 0) and (spellRank <= 3) then
-		criticalMassCrit = criticalMassTable[spellRank];
-    end
-
-	return arcaneInstabilityCrit, criticalMassCrit;
-end
-
--- returns the spell hit from Arcane Focus and Elemental Precision talents
-function CSC_GetMageSpellHitFromTalents()
-	local arcaneHit = 0;
-	local frostFireHit = 0;
-
-	-- Arcane Focus
-	local spellRank = select(5, GetTalentInfo(1, 2));
-	arcaneHit = spellRank * 2; -- 2% for each point
-
-	-- Elemental Precision
-	spellRank = select(5, GetTalentInfo(3, 3));
-	frostFireHit = spellRank * 2; -- 2% for each point
-
-	return arcaneHit, frostFireHit;
-end
-
--- returns the spell hit from Suppression talent
-function CSC_GetWarlockSpellHitFromTalents()
-	local afflictionHit = 0;
-
-	-- Suppression
-	local spellRank = select(5, GetTalentInfo(1, 1));
-	afflictionHit = spellRank * 2; -- 2% for each point
-
-	return afflictionHit;
-end
-
--- returns the spell crit from Devastation talent
-function CSC_GetWarlockCritStatsFromTalents()
-	-- the spell rank is equal to the value
-	local devastationCrit = select(5, GetTalentInfo(3, 7));
-
-	return devastationCrit;
-end
-
--- returns the combined crit stats from Holy Specialization and Force of Will
-function CSC_GetPriestCritStatsFromTalents()
-	
-	local holySpecializationCrit = 0;
-	local forceOfWillCrit = 0;
-
-	local critTable = { 1, 2, 3, 4, 5 };
-	-- Holy Specialization (1, 2, 3, 4, 5)%
-	local spellRank = select(5, GetTalentInfo(2, 3));
-	if (spellRank > 0) and (spellRank <= 5) then
-		holySpecializationCrit = critTable[spellRank];
-	end
-
-	-- Force of Will (1, 2, 3, 4, 5)%
-	spellRank = select(5, GetTalentInfo(1, 14));
-	if (spellRank > 0) and (spellRank <= 5) then
-		forceOfWillCrit = critTable[spellRank];
-	end
-
-    local critCombined = holySpecializationCrit + forceOfWillCrit;
-	return critCombined;
-end
-
--- returns the crit bonus from Holy Power
-function CSC_GetPaladinCritStatsFromTalents()
-
-	local holyPowerCrit = 0;
-	local critTable = { 1, 2, 3, 4, 5 };
-
-	-- Holy Power (1, 2, 3, 4, 5)%
-	local spellRank = select(5, GetTalentInfo(1, 13));
-	if (spellRank > 0) and (spellRank <= 5) then
-		holyPowerCrit = critTable[spellRank];
-    end
-
-	return holyPowerCrit;
-end
-
--- returns the defense bonus from the Anticipation Prot talent
-local function CSC_GetPaladinDefenseFromTalents()
-
-    local defense = 0;
-    local defenseTable = { 2, 4, 6, 8, 10 };
-
-    -- Anticipation (2, 4, 6, 8, 10)%
-    local spellRank = select(5, GetTalentInfo(2, 9));
-    if (spellRank > 0) and (spellRank <=5) then
-        defense = defenseTable[spellRank];
-    end
-
-    return defense;
-end
-
--- returns the defense bonus from the Anticipation Prot talent
-local function CSC_GetWarriorDefenseFromTalents()
-    
-    local defense = 0;
-    local defenseTable = { 2, 4, 6, 8, 10 };
-
-    -- Anticipation (2, 4, 6, 8, 10)%
-    local spellRank = select(5, GetTalentInfo(3, 2));
-    if (spellRank > 0) and (spellRank <=5) then
-		defense = defenseTable[spellRank];
-	end
-
-    return defense;
-end
-
-function CSC_GetDefenseFromTalents(unit)
-    
-    local defense = 0;
-    local unitClassLoc = select(2, UnitClass(unit));
-
-    if (unitClassLoc == "PALADIN") then
-        defense = CSC_GetPaladinDefenseFromTalents();
-    elseif (unitClassLoc == "WARRIOR") then
-        defense = CSC_GetWarriorDefenseFromTalents();
-    end
-
-    return defense;
-end
-
--- returns the shapeshift form index for druids
-function CSC_GetShapeshiftForm()
-	local shapeIndex = 0;
-
-	for possibleForm=1, GetNumShapeshiftForms() do
-		if select(2, GetShapeshiftFormInfo(possibleForm)) then
-			shapeIndex = possibleForm;
-		end
-	end
-
-	return shapeIndex;
-end
-
-function CSC_GetMP5ModifierFromTalents(unit)
-    local unitClassId = select(3, UnitClass(unit));
-	local spellRank = 0;
-
-	if unitClassId == CSC_PRIEST_CLASS_ID then
-		-- Meditation
-        spellRank = select(5, GetTalentInfo(1, 8));
-	elseif unitClassId == CSC_MAGE_CLASS_ID then
-		-- Arcane Meditation
-		spellRank = select(5, GetTalentInfo(1, 12));
-	elseif unitClassId == CSC_DRUID_CLASS_ID then
-		-- Reflection
-        spellRank = select(5, GetTalentInfo(3, 6));
-	end
-	
-	local modifier = spellRank * 0.05;
-
-    return modifier;
-end
-
-function CSC_GetMP5ModifierFromSetBonus(unit)
-	local unitClassId = select(3, UnitClass(unit));
-	local modifier = 0;
-	
-	-- not Druid or Priest
-	if unitClassId ~= CSC_DRUID_CLASS_ID and unitClassId ~= CSC_PRIEST_CLASS_ID then
-		return modifier;
-	end
-	
-	local firstItemslotIndex = 1;
-	local lastItemslotIndex = 18;
-
-	local vestmentsOfTranscendenceIDs = { [16925] = 16925, 
-										  [16926] = 16926, 
-										  [16919] = 16919, 
-										  [16921] = 16921, 
-										  [16920] = 16920, 
-									   	  [16922] = 16922, 
-										  [16924] = 16924, 
-										  [16923] = 16923
-										};
-
-	local stormrageRaimentIDs = { [16897] = 16897, 
-								  [16898] = 16898, 
-								  [16899] = 16899, 
-								  [16900] = 16900, 
-								  [16901] = 16901, 
-								  [16902] = 16902, 
-								  [16903] = 16903, 
-								  [16904] = 16904
-								};
-
-	local equippedSetItems = 0;
-    for itemSlot = firstItemslotIndex, lastItemslotIndex do
-        local itemId = GetInventoryItemID(unit, itemSlot);
-		
-		if (itemId) then
-			if (itemId == vestmentsOfTranscendenceIDs[itemId] or itemId == stormrageRaimentIDs[itemId]) then
-				equippedSetItems = equippedSetItems + 1;
-			end
-		end
-    end
-
-    if equippedSetItems >= 3 then
-        modifier = 0.15;
-	end
-
-    return modifier;
-end
-
-function CSC_GetShamanT2SpellCrit(unit)
-	local spellCritFromSet = 0;
-	local firstItemslotIndex = 1;
-	local lastItemslotIndex = 18;
-
-	local theTenStormsIDs = { [16943] = 16943, 
-							  [16944] = 16944, 
-							  [16945] = 16945, 
-							  [16946] = 16946, 
-							  [16947] = 16947, 
-							  [16948] = 16948, 
-							  [16949] = 16949, 
-							  [16950] = 16950
-						};
-
-	local equippedSetItems = 0;
-    for itemSlot = firstItemslotIndex, lastItemslotIndex do
-        local itemId = GetInventoryItemID(unit, itemSlot);
-		
-		if (itemId) then
-			if (itemId == theTenStormsIDs[itemId]) then
-				equippedSetItems = equippedSetItems + 1;
-			end
-		end
-    end
-
-    if equippedSetItems >= 5 then
-        spellCritFromSet = 3;
-	end
-
-    return spellCritFromSet;
-end
