@@ -232,10 +232,10 @@ end
 function Bar:Bind_Deactivate(save)
 	if save == true then
 		AttemptToSaveBindings(MaoRUIPerDB["Actionbar"]["BindType"])
-		print("|cff0080ffNDui|r: |cff00ff00"..U["Save keybinds"].."|r")
+		print("|cff00ff00"..U["Save keybinds"].."|r")
 	else
 		LoadBindings(MaoRUIPerDB["Actionbar"]["BindType"])
-		print("|cff0080ffNDui|r: |cffffff00"..U["Discard keybinds"].."|r")
+		print("|cffffff00"..U["Discard keybinds"].."|r")
 	end
 
 	Bar:Bind_HideFrame()
