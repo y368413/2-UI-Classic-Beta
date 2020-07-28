@@ -483,6 +483,8 @@ FOM_WATER_STRIDER				= "水黾";					-- Mists exotic
     
 U["Damage"] = "伤害"
 U["SorasThreat"] = "仇恨条"
+U["SorasThreatFramewight"] = "仇恨条宽"
+U["SorasThreatFramehight"] = "仇恨条高"
 U["PlayerFrame Scale"] = "头像缩放"
 U["Map Scale"] = "世界地图缩放"
 U["Map Coords"] = "显示世界地图坐标"

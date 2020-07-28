@@ -430,6 +430,8 @@ FOM_WATER_STRIDER               = "水黾";                  -- Mists exotic
 U["Damage"] = "傷害"  
 
 U["SorasThreat"] = "仇恨条"
+U["SorasThreatFramewight"] = "仇恨条宽"
+U["SorasThreatFramehight"] = "仇恨条高"
 U["Lock UIScale"] = "鎖定推薦UI縮放值"
 U["Lock Chat"] = "鎖定聊天視窗設置"
 U["Minimap Clock"] = "小地圖時間"
