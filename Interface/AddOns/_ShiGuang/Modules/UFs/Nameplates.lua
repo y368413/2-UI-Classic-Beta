@@ -674,6 +674,7 @@ end
 
 -- Player Nameplate
 local auras = M:GetModule("Auras")
+local margin = R.UFs.BarMargin
 
 function UF:PlateVisibility(event)
 	if (event == "PLAYER_REGEN_DISABLED" or InCombatLockdown()) and UnitIsUnit("player", self.unit) then
@@ -692,9 +693,10 @@ end
 function UF:ResizePlayerPlate()
 	local plate = _G.oUF_PlayerPlate
 	if plate then
-		local iconSize, margin = MaoRUIPerDB["Nameplate"]["PPIconSize"], 2
+		local pWidth = MaoRUIPerDB["Nameplate"]["PPWidth"]
 		local pHeight, ppHeight = MaoRUIPerDB["Nameplate"]["PPHeight"], MaoRUIPerDB["Nameplate"]["PPPHeight"]
-		plate:SetSize(iconSize*5 + margin*4, pHeight + ppHeight + R.mult)
+		plate:SetSize(pWidth, pHeight + ppHeight + R.mult)
+		plate.mover:SetSize(pWidth, pHeight + ppHeight + R.mult)
 		plate.Health:SetHeight(pHeight)
 		plate.Power:SetHeight(ppHeight)
 		local bars = plate.ClassPower
@@ -719,9 +721,8 @@ end
 function UF:CreatePlayerPlate()
 	self.mystyle = "PlayerPlate"
 	self:EnableMouse(false)
-	local iconSize, margin = MaoRUIPerDB["Nameplate"]["PPIconSize"], 2
 	local pHeight, ppHeight = MaoRUIPerDB["Nameplate"]["PPHeight"], MaoRUIPerDB["Nameplate"]["PPPHeight"]
-	self:SetSize(iconSize*5 + margin*4, pHeight + ppHeight + R.mult)
+	self:SetSize(MaoRUIPerDB["Nameplate"]["PPWidth"], pHeight + ppHeight + R.mult)
 
 	UF:CreateHealthBar(self)
 	UF:CreatePowerBar(self)

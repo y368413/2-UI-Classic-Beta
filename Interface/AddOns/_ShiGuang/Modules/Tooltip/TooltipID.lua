@@ -71,11 +71,14 @@ function TT:AddLineForID(id, linkType, noadd)
 		elseif bagCount > 0 then
 			self:AddDoubleLine(BAGSLOT..":", I.InfoColor..bagCount)
 		end]]
-		local itemStackCount = select(8, GetItemInfo(id))
+		local name, _, _, itemLevel, _, _, _, itemStackCount = GetItemInfo(id)
 			if itemStackCount and itemStackCount > 1 then
 				if IsShiftKeyDown() or IsControlKeyDown() or IsAltKeyDown() then
 					self:AddDoubleLine(U["Stack Cap"]..":", I.InfoColor..itemStackCount)
 				end
+				end
+		if name and itemLevel and itemLevel > 1 then
+			self:AddDoubleLine(U["ItemLevel"]..":", I.InfoColor..itemLevel)
 			end
 	end
 

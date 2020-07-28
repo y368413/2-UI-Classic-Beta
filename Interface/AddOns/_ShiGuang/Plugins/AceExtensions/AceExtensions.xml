@@ -1,7 +1,7 @@
 <Ui xmlns="http://www.blizzard.com/wow/ui/">
   <Script file="ManaPerc.lua"/>
-  <Script file="SinStats.lua"/>
-  <Script file="DaisyCosp.lua"/>
+  <!--Script file="SinStats.lua"/>
+  <Script file="DaisyCosp.lua"/-->
   <Script file="FeedOMatic.lua"/>
   <Script file="TrackingEye.lua"/>
 	<Script file="InboxMailBag.lua"/>

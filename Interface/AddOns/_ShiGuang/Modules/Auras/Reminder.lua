@@ -22,9 +22,24 @@ function A:Reminder_ConvertToName(cfg)
 	end
 end
 
+function A:Reminder_CheckMeleeSpell()
+	for _, cfg in pairs(groups) do
+		local depends = cfg.depends
+		if depends then
+			for _, spellID in pairs(depends) do
+				if IsPlayerSpell(spellID) then
+					cfg.dependsKnown = true
+					break
+				end
+			end
+		end
+	end
+end
+
 function A:Reminder_Update(cfg)
 	local frame = cfg.frame
 	local depend = cfg.depend
+	local depends = cfg.depends
 	local combat = cfg.combat
 	local instance = cfg.instance
 	local pvp = cfg.pvp
@@ -32,6 +47,7 @@ function A:Reminder_Update(cfg)
 	local inInst, instType = IsInInstance()
 
 	if depend and not IsPlayerSpell(depend) then isPlayerSpell = false end
+	if depends and not cfg.dependsKnown then isPlayerSpell = false end
 	if combat and InCombatLockdown() then isInCombat = true end
 	if instance and inInst and (instType == "scenario" or instType == "party" or instType == "raid") then isInInst = true end
 	if pvp and (instType == "pvp" or GetZonePVPInfo() == "combat") then isInPVP = true end
@@ -101,6 +117,9 @@ function A:InitReminder()
 		end
 		parentFrame:Show()
 
+		A:Reminder_CheckMeleeSpell()
+		M:RegisterEvent("LEARNED_SPELL_IN_TAB", A.Reminder_CheckMeleeSpell)
+
 		A:Reminder_OnEvent()
 		M:RegisterEvent("UNIT_AURA", A.Reminder_OnEvent, "player")
 		M:RegisterEvent("PLAYER_REGEN_ENABLED", A.Reminder_OnEvent)
@@ -110,6 +129,7 @@ function A:InitReminder()
 	else
 		if parentFrame then
 			parentFrame:Hide()
+			M:UnregisterEvent("LEARNED_SPELL_IN_TAB", A.Reminder_CheckMeleeSpell)
 			M:UnregisterEvent("UNIT_AURA", A.Reminder_OnEvent)
 			M:UnregisterEvent("PLAYER_REGEN_ENABLED", A.Reminder_OnEvent)
 			M:UnregisterEvent("PLAYER_REGEN_DISABLED", A.Reminder_OnEvent)

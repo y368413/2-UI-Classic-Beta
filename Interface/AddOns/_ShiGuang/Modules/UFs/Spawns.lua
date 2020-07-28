@@ -104,7 +104,7 @@ function UF:OnLogin()
 		oUF:RegisterStyle("PlayerPlate", UF.CreatePlayerPlate)
 		oUF:SetActiveStyle("PlayerPlate")
 		local plate = oUF:Spawn("player", "oUF_PlayerPlate", true)
-		M.Mover(plate, U["PlayerNP"], "PlayerPlate", R.UFs.PlayerPlate, plate:GetWidth(), 21)
+		plate.mover = M.Mover(plate, U["PlayerNP"], "PlayerPlate", R.UFs.PlayerPlate)
 
 		UF:TogglePlayerPlateElements()
 	end
