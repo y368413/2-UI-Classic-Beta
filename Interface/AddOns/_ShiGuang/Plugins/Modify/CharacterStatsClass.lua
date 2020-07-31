@@ -294,7 +294,6 @@ dbLoader:RegisterEvent("PLAYER_LOGOUT");
 -- Therefore I have to call any setup-functions dependent on the DB after the event (UIConfig:SetupDropdown())
 function dbLoader:OnEvent(event, arg1)
     if (event == "ADDON_LOADED" and arg1 == "_ShiGuang") then
-
         UIConfig:CreateMenu();
     end
 end

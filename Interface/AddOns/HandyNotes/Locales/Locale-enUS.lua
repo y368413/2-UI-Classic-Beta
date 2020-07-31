@@ -5013,7 +5013,7 @@ L["Zul'Farrak"] = true
 L["Zul'Gurub"] = true
 
 --config.options
-L["HandyNotes: TravelGuide (Classic)"] = true
+L["HandyNotes: TravelGuide"] = true
 L["Icon settings"] = true
 L["These settings control the look and feel of the icon."] = true
 L["Icon Scale"] = true
@@ -5047,7 +5047,7 @@ L["Show all nodes that you manually hid by right-clicking on them and choosing \
 
 --Handler
 L["Shows the boat and zepplin locations on the World Map and the MiniMap."] = true
-L["TravelGuide (Classic)"] = true
+L["TravelGuide"] = true
 
 --DB
 L["Eastern Kingdoms"] = true

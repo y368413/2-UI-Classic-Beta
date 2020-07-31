@@ -72475,7 +72475,7 @@ local nodes = HandyNotes_NPCsClassicData["nodes"]
 
 local icons = {
 	flightmasters = "Interface\\MINIMAP\\TRACKING\\FlightMaster",
-	flightmastersUndiscovered = "Interface\\Addons\\HandyNotes_NPCs\\Icons\\flightmaster_undiscovered.tga",
+	flightmastersUndiscovered = "Interface\\Addons\\HandyNotes\\Icons\\flightmaster_undiscovered.tga",
 	auctioneers = "Interface\\MINIMAP\\TRACKING\\Auctioneer",
 	bankers = "Interface\\MINIMAP\\TRACKING\\Banker",
 	guildmasters = "Interface\\MINIMAP\\TRACKING\\POIArrow", -- TODO: Find a better icon

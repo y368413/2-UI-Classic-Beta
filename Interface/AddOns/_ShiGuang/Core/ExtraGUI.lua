@@ -17,21 +17,26 @@ end
 local extraGUIs = {}
 local function createExtraGUI(parent, name, title, bgFrame)
 	local frame = CreateFrame("Frame", name, parent)
-	frame:SetSize(300, 600)
-	frame:SetPoint("LEFT", parent:GetParent(), "RIGHT", -92, -16)
-	M.SetBD(frame)
+		 local bgTexture = frame:CreateTexture("name", "BACKGROUND")
+    bgTexture:SetTexture("Interface\\Destiny\\EndscreenBG");  --FontStyles\\FontStyleGarrisons
+    --bgTexture:SetTexCoord(740,950,0,600/1024);
+    bgTexture:SetAllPoints();
+    bgTexture:SetAlpha(1)
+	frame:SetSize(300, 580)
+	frame:SetPoint("LEFT", parent:GetParent(), "RIGHT", -330, -16)
+	--M.SetBD(frame)
 	parent:HookScript("OnHide", function()
 		if frame:IsShown() then frame:Hide() end
 	end)
 
 	if title then
-		M.CreateFS(frame, 14, title, "system", "TOPLEFT", 20, -25)
+		M.CreateFS(frame, 14, title, "system", "TOPLEFT", 20, -5)
 	end
 
 	if bgFrame then
 		frame.bg = CreateFrame("Frame", nil, frame)
 		frame.bg:SetSize(280, 540)
-		frame.bg:SetPoint("TOPLEFT", 10, -50)
+		frame.bg:SetPoint("TOPLEFT", 10, -30)
 		M.CreateBD(frame.bg, .3)
 	end
 
@@ -377,8 +382,8 @@ function G:SetupNameplateFilter(parent)
 	plateGUI = createExtraGUI(parent, "NDuiGUI_NameplateFilter")
 
 	local frameData = {
-		[1] = {text = U["WhiteList"].."*", offset = -25, barList = {}},
-		[2] = {text = U["BlackList"].."*", offset = -315, barList = {}},
+		[1] = {text = U["WhiteList"].."*", offset = -5, barList = {}},
+		[2] = {text = U["BlackList"].."*", offset = -295, barList = {}},
 	}
 
 	local function createBar(parent, index, spellID)
@@ -449,8 +454,8 @@ function G:SetupBuffIndicator(parent)
 	buffIndicatorGUI:SetScript("OnHide", refreshNameList)
 
 	local frameData = {
-		[1] = {text = U["RaidBuffWatch"].."*", offset = -25, width = 160, barList = {}},
-		[2] = {text = U["BuffIndicator"].."*", offset = -315, width = 50, barList = {}},
+		[1] = {text = U["RaidBuffWatch"].."*", offset = -5, width = 160, barList = {}},
+		[2] = {text = U["BuffIndicator"].."*", offset = -295, width = 50, barList = {}},
 	}
 	local decodeAnchor = {
 		["TL"] = "TOPLEFT",
@@ -752,42 +757,4 @@ local function createOptionCheck(parent, offset, text)
 	box:SetPoint("TOPLEFT", 10, -offset)
 	M.CreateFS(box, 14, text, false, "LEFT", 30, 0)
 	return box
-end
-
-function G:SetupBagFilter(parent)
-	toggleExtraGUI("NDuiGUI_BagFilterSetup")
-	if bagFilterGUI then return end
-
-	bagFilterGUI = createExtraGUI(parent, "NDuiGUI_BagFilterSetup", U["BagFilterSetup"].."*")
-
-	local scroll = G:CreateScroll(bagFilterGUI, 260, 540)
-
-	local filterOptions = {
-		[1] = "FilterJunk",
-		[2] = "FilterConsumble",
-		[3] = "FilterAmmo",
-		[4] = "FilterEquipment",
-		[5] = "FilterLegendary",
-		[6] = "FilterFavourite",
-		[7] = "FilterGoods",
-		[8] = "FilterQuest",
-	}
-
-	local Bags = M:GetModule("Bags")
-	local function filterOnClick(self)
-		local value = self.__value
-		MaoRUIPerDB["Bags"][value] = not MaoRUIPerDB["Bags"][value]
-		self:SetChecked(MaoRUIPerDB["Bags"][value])
-		Bags:UpdateAllBags()
-	end
-
-	local offset = 10
-	for _, value in ipairs(filterOptions) do
-		local box = createOptionCheck(scroll, offset, U[value])
-		box:SetChecked(MaoRUIPerDB["Bags"][value])
-		box.__value = value
-		box:SetScript("OnClick", filterOnClick)
-
-		offset = offset + 35
-	end
 end

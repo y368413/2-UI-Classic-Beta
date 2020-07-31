@@ -109,7 +109,7 @@ L["Zul'Farrak"] = "祖爾法拉克"
 L["Zul'Gurub"] = "祖爾格拉布"
 
 --config.options
-L["HandyNotes: TravelGuide (Classic)"] = true --"HandyNotes: 船和飞艇"
+L["HandyNotes: TravelGuide"] = true --"HandyNotes: 船和飞艇"
 L["Icon settings"] = "图标设置"
 L["These settings control the look and feel of the icon."] = "控制图标的外观及风格"
 L["Icon Scale"] = "图标缩放"
@@ -140,7 +140,7 @@ L["Show all nodes that you manually hid by right-clicking on them and choosing \
 
 --Handler
 L["Shows the boat and zepplin locations on the World Map and the MiniMap."] = "在世界地图和小地图上显示船和飞艇的位置"
-L["TravelGuide (Classic)"] = true --"船和飞艇"
+L["TravelGuide"] = true --"船和飞艇"
 
 --DB
 L["Eastern Kingdoms"] = "东部王国"

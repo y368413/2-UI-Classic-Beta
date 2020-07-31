@@ -48,9 +48,9 @@ local AceDB = LibStub("AceDB-3.0")
 local HandyNotes = LibStub("AceAddon-3.0"):GetAddon("HandyNotes")
 local HandyNotes_TravelGuide = LibStub("AceAddon-3.0"):NewAddon("HandyNotes_TravelGuide", "AceEvent-3.0")
 
-HandyNotes_TravelGuide.descName = L["HandyNotes: TravelGuide (Classic)"]
+HandyNotes_TravelGuide.descName = L["HandyNotes: TravelGuide"]
 HandyNotes_TravelGuide.description = L["Shows the boat and zepplin locations on the World Map and the MiniMap."]
-HandyNotes_TravelGuide.pluginName = L["TravelGuide (Classic)"]
+HandyNotes_TravelGuide.pluginName = L["TravelGuide"]
 
 _G.HandyNotes_TravelGuide = HandyNotes_TravelGuide;
 

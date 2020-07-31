@@ -8,7 +8,7 @@ local tinsert, pairs = table.insert, pairs
 local buttonList = {}
 
 function Bar:MicroButton_SetupTexture(icon, texture)
-	--icon:SetOutside(nil, 3, 3)
+	icon:SetOutside(nil, 1, 1)
 	icon:SetTexture("Interface\\BUTTONS\\"..texture)
 	icon:SetVertexColor(1, 1, 1)
 end

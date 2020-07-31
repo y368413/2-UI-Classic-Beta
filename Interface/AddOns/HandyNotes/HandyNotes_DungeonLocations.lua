@@ -331,7 +331,7 @@ Addon:RegisterEvent("PLAYER_LOGIN")
 Addon:SetScript("OnEvent", function(self, event, ...) return self[event](self, ...) end)
 
 local function updateStuff()
-	HandyNotes:SendMessage("HandyNotes_NotifyUpdate", "DungeonLocations_Classic")
+	HandyNotes:SendMessage("HandyNotes_NotifyUpdate", "DungeonLocations")
 end
 
 function Addon:PLAYER_ENTERING_WORLD()
@@ -344,10 +344,10 @@ end
 function Addon:PLAYER_LOGIN()
  local options = {
  type = "group",
- name = "DungeonLocations_Classic",
+ name = "DungeonLocations",
  desc = "Locations of dungeon and raid entrances.",
  get = function(info) return db[info[#info]] end,
- set = function(info, v) db[info[#info]] = v HandyNotes:SendMessage("HandyNotes_NotifyUpdate", "DungeonLocations_Classic") end,
+ set = function(info, v) db[info[#info]] = v HandyNotes:SendMessage("HandyNotes_NotifyUpdate", "DungeonLocations") end,
  args = {
   desc = {
    name = L["These settings control the look and feel of the icon."],
@@ -405,7 +405,7 @@ function Addon:PLAYER_LOGIN()
    desc = L["Show dungeon locations on the map"],
    order = 24.1,
    get = function() return db.show["Dungeon"] end,
-   set = function(info, v) db.show["Dungeon"] = v self:FullUpdate() HandyNotes:SendMessage("HandyNotes_NotifyUpdate", "DungeonLocations_Classic") end,
+   set = function(info, v) db.show["Dungeon"] = v self:FullUpdate() HandyNotes:SendMessage("HandyNotes_NotifyUpdate", "DungeonLocations") end,
   },
   showRaids = {
    type = "toggle",
@@ -413,7 +413,7 @@ function Addon:PLAYER_LOGIN()
    desc = L["Show raid locations on the map"],
    order = 24.2,
    get = function() return db.show["Raid"] end,
-   set = function(info, v) db.show["Raid"] = v self:FullUpdate() HandyNotes:SendMessage("HandyNotes_NotifyUpdate", "DungeonLocations_Classic") end,
+   set = function(info, v) db.show["Raid"] = v self:FullUpdate() HandyNotes:SendMessage("HandyNotes_NotifyUpdate", "DungeonLocations") end,
   },
   showMixed = {
    type = "toggle",
@@ -421,7 +421,7 @@ function Addon:PLAYER_LOGIN()
    desc = L["Show mixed (dungeons + raids) locations on the map"],
    order = 24.2,
    get = function() return db.show["Mixed"] end,
-   set = function(info, v) db.show["Mixed"] = v self:FullUpdate() HandyNotes:SendMessage("HandyNotes_NotifyUpdate", "DungeonLocations_Classic") end,
+   set = function(info, v) db.show["Mixed"] = v self:FullUpdate() HandyNotes:SendMessage("HandyNotes_NotifyUpdate", "DungeonLocations") end,
   },
   lockoutheader = {
    type = "header",
@@ -463,7 +463,7 @@ function Addon:PLAYER_LOGIN()
 }
 
 
- HandyNotes:RegisterPluginDB("DungeonLocations_Classic", pluginHandler, options)
+ HandyNotes:RegisterPluginDB("DungeonLocations", pluginHandler, options)
  self.db = LibStub("AceDB-3.0"):New("HandyNotes_DungeonLocationsDB", defaults, true)
  db = self.db.profile
  
