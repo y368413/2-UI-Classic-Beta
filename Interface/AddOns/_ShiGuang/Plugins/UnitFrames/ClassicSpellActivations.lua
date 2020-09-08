@@ -1,9 +1,9 @@
 --## Author: d87
 local ClassicSpellActivations = {}
 
-local f = CreateFrame("Frame", "ClassicSpellActivations") --, UIParent)
+local ClassicSpellActivationsFrame = CreateFrame("Frame", "ClassicSpellActivations") --, UIParent)
 
-f:SetScript("OnEvent", function(self, event, ...)
+ClassicSpellActivationsFrame:SetScript("OnEvent", function(self, event, ...)
 	return self[event](self, event, ...)
 end)
 
@@ -79,8 +79,8 @@ local spellNamesByID = {
     [24239] = "HammerOfWrath",
 }
 
-f:RegisterEvent("PLAYER_LOGIN")
-function f:PLAYER_LOGIN()
+ClassicSpellActivationsFrame:RegisterEvent("PLAYER_LOGIN")
+function ClassicSpellActivationsFrame:PLAYER_LOGIN()
 
     if class == "WARRIOR" or class == "ROGUE" or class == "HUNTER" or class == "WARLOCK" or class == "PALADIN" then
         self:RegisterEvent("SPELLS_CHANGED")
@@ -133,7 +133,7 @@ local function FindAura(unit, spellID, filter)
 end
 
 local hadShadowTrance
-function f:SPELLS_CHANGED()
+function ClassicSpellActivationsFrame:SPELLS_CHANGED()
     if class == "WARRIOR" then
         self:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
         self:SetScript("OnUpdate", self.timerOnUpdate)
@@ -214,9 +214,9 @@ function f:SPELLS_CHANGED()
                 local haveShadowTrance = name ~= nil
                 if hadShadowTrance ~= haveShadowTrance then
                     if haveShadowTrance then
-                        f:Activate("ShadowBolt", duration, true)
+                        ClassicSpellActivationsFrame:Activate("ShadowBolt", duration, true)
                     else
-                        f:Deactivate("ShadowBolt")
+                        ClassicSpellActivationsFrame:Deactivate("ShadowBolt")
                     end
                     hadShadowTrance = haveShadowTrance
                 end
@@ -228,7 +228,7 @@ function f:SPELLS_CHANGED()
     end
 end
 
-function f:RegisterForActivations(frame)
+function ClassicSpellActivationsFrame:RegisterForActivations(frame)
     registeredFrames[frame] = true
     -- registeredFrames:GetScript("OnEvent")
 end
@@ -272,10 +272,12 @@ function ClassicSpellActivations.LAB_UpdateOverlayGlow(self)
 	end
 end
 
-function f:FanoutEvent(event, ...)
+function ClassicSpellActivationsFrame:FanoutEvent(event, ...)
     for frame, _ in pairs(registeredFrames) do
         local eventHandler = frame:GetScript("OnEvent")
-        eventHandler(frame, event, ...)
+        if eventHandler then
+            eventHandler(frame, event, ...)
+        end
     end
 end
 
@@ -297,7 +299,7 @@ function ClassicSpellActivations.findHighestRank(spellName)
 end
 local findHighestRank = ClassicSpellActivations.findHighestRank
 
-function f:Activate(spellName, duration, keepExpiration)
+function ClassicSpellActivationsFrame:Activate(spellName, duration, keepExpiration)
     local state = activations[spellName]
     if not state then
         activations[spellName] = {}
@@ -313,7 +315,7 @@ function f:Activate(spellName, duration, keepExpiration)
         state.expirationTime = duration and GetTime() + duration
     end
 end
-function f:Deactivate(spellName)
+function ClassicSpellActivationsFrame:Deactivate(spellName)
     local state = activations[spellName]
     if state and state.active == true then
         state.active = false
@@ -326,7 +328,7 @@ end
 
 local _OnUpdateCounter = 0
 local periodicCheck = nil
-function f.timerOnUpdate(self, elapsed)
+function ClassicSpellActivationsFrame.timerOnUpdate(self, elapsed)
     _OnUpdateCounter = _OnUpdateCounter + elapsed
     if _OnUpdateCounter < 0.2 then return end
     _OnUpdateCounter = 0
@@ -339,12 +341,12 @@ function f.timerOnUpdate(self, elapsed)
     local now = GetTime()
     for spellName, state in pairs(activations) do
         if state.expirationTime and now >= state.expirationTime then
-            f:Deactivate(spellName)
+            ClassicSpellActivationsFrame:Deactivate(spellName)
         end
     end
 end
 
-function f:COMBAT_LOG_EVENT_UNFILTERED(event)
+function ClassicSpellActivationsFrame:COMBAT_LOG_EVENT_UNFILTERED(event)
     local timestamp, eventType, hideCaster,
     srcGUID, srcName, srcFlags, srcFlags2,
     dstGUID, dstName, dstFlags, dstFlags2,
@@ -367,12 +369,12 @@ function ClassicSpellActivations.ExecuteCheck(self, event, unit)
         local executeID = ClassicSpellActivations.findHighestRank("Execute")
 
         if h > 0 and (h/hm < 0.2 or IsUsableSpell(executeID)) then
-            f:Activate("Execute", 10)
+            ClassicSpellActivationsFrame:Activate("Execute", 10)
         else
-            f:Deactivate("Execute")
+            ClassicSpellActivationsFrame:Deactivate("Execute")
         end
     else
-        f:Deactivate("Execute")
+        ClassicSpellActivationsFrame:Deactivate("Execute")
     end
 end
 
@@ -386,7 +388,7 @@ function ClassicSpellActivations.CheckOverpower(eventType, isSrcPlayer, isDstPla
                 missedType = select(4, ...)
             end
             if missedType == "DODGE" then
-                f:Activate("Overpower", 5)
+                ClassicSpellActivationsFrame:Activate("Overpower", 5)
             end
 
         end
@@ -394,7 +396,7 @@ function ClassicSpellActivations.CheckOverpower(eventType, isSrcPlayer, isDstPla
         if eventType == "SPELL_CAST_SUCCESS" then
             local spellName = select(2, ...)
             if spellName == LocalizedOverpower then
-                f:Deactivate("Overpower")
+                ClassicSpellActivationsFrame:Deactivate("Overpower")
             end
         end
     end
@@ -410,13 +412,13 @@ function ClassicSpellActivations.CheckRevenge(eventType, isSrcPlayer, isDstPlaye
                 missedType = select(4, ...)
             end
             if missedType == "BLOCK" or missedType == "DODGE" or missedType == "PARRY" then
-                f:Activate("Revenge", 5)
+                ClassicSpellActivationsFrame:Activate("Revenge", 5)
             end
         end
         if eventType == "SWING_DAMAGE" then
             local blocked = select(5, ...)
             if blocked then
-                f:Activate("Revenge", 5)
+                ClassicSpellActivationsFrame:Activate("Revenge", 5)
             end
         end
     end
@@ -424,7 +426,7 @@ function ClassicSpellActivations.CheckRevenge(eventType, isSrcPlayer, isDstPlaye
     if isSrcPlayer and eventType == "SPELL_CAST_SUCCESS" then
         local spellName = select(2, ...)
         if spellName == LocalizedRevenge then
-            f:Deactivate("Revenge")
+            ClassicSpellActivationsFrame:Deactivate("Revenge")
         end
     end
 end
@@ -443,7 +445,7 @@ function ClassicSpellActivations.CheckRiposte(eventType, isSrcPlayer, isDstPlaye
                 missedType = select(4, ...)
             end
             if missedType == "PARRY" then
-                f:Activate("Riposte", 5)
+                ClassicSpellActivationsFrame:Activate("Riposte", 5)
             end
         end
     end
@@ -451,7 +453,7 @@ function ClassicSpellActivations.CheckRiposte(eventType, isSrcPlayer, isDstPlaye
     if isSrcPlayer and eventType == "SPELL_CAST_SUCCESS" then
         local spellName = select(2, ...)
         if spellName == LocalizedRiposte then -- Riposte
-            f:Deactivate("Riposte")
+            ClassicSpellActivationsFrame:Deactivate("Riposte")
         end
     end
 end
@@ -470,7 +472,7 @@ function ClassicSpellActivations.CheckCounterattack(eventType, isSrcPlayer, isDs
                 missedType = select(4, ...)
             end
             if missedType == "PARRY" then
-                f:Activate("Counterattack", 5)
+                ClassicSpellActivationsFrame:Activate("Counterattack", 5)
             end
         end
     end
@@ -478,7 +480,7 @@ function ClassicSpellActivations.CheckCounterattack(eventType, isSrcPlayer, isDs
     if isSrcPlayer and eventType == "SPELL_CAST_SUCCESS" then
         local spellName = select(2, ...)
         if spellName == LocalizedCounterattack then
-            f:Deactivate("Counterattack", 5)
+            ClassicSpellActivationsFrame:Deactivate("Counterattack", 5)
         end
     end
 end
@@ -493,7 +495,7 @@ function ClassicSpellActivations.CheckMongooseBite(eventType, isSrcPlayer, isDst
                 missedType = select(4, ...)
             end
             if missedType == "DODGE" then
-                f:Activate("MongooseBite", 5)
+                ClassicSpellActivationsFrame:Activate("MongooseBite", 5)
             end
         end
     end
@@ -501,7 +503,7 @@ function ClassicSpellActivations.CheckMongooseBite(eventType, isSrcPlayer, isDst
     if isSrcPlayer and eventType == "SPELL_CAST_SUCCESS" then
         local spellName = select(2, ...)
         if spellName == LocalizedMongooseBite then
-            f:Deactivate("MongooseBite", 5)
+            ClassicSpellActivationsFrame:Deactivate("MongooseBite", 5)
         end
     end
 end
@@ -547,9 +549,9 @@ do
 
         if newState ~= exorcismCooldownState then
             if newState == false then
-                f:Activate("Exorcism", 5)
+                ClassicSpellActivationsFrame:Activate("Exorcism", 5)
             else
-                f:Deactivate("Exorcism")
+                ClassicSpellActivationsFrame:Deactivate("Exorcism")
             end
         end
         exorcismCooldownState = newState
@@ -561,7 +563,7 @@ do
             exorcismTickerFunc()
             periodicCheck = exorcismTickerFunc
         else
-            f:Deactivate("Exorcism")
+            ClassicSpellActivationsFrame:Deactivate("Exorcism")
             periodicCheck = nil
         end
     end
@@ -572,11 +574,11 @@ function ClassicSpellActivations.HOWCheck(self, event, unit)
         local h = UnitHealth("target")
         local hm = UnitHealthMax("target")
         if h > 0 and h/hm <= 0.2 then
-            f:Activate("HammerOfWrath", 10)
+            ClassicSpellActivationsFrame:Activate("HammerOfWrath", 10)
         else
-            f:Deactivate("HammerOfWrath")
+            ClassicSpellActivationsFrame:Deactivate("HammerOfWrath")
         end
     else
-        f:Deactivate("HammerOfWrath")
+        ClassicSpellActivationsFrame:Deactivate("HammerOfWrath")
     end
 end

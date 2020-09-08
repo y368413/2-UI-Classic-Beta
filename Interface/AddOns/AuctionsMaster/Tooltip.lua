@@ -386,11 +386,11 @@ function AuctionLite:SetAuctionLiteTooltip(widget, shift, link, count)
     else
       assert(false);
     end
-      GameTooltip:SetHyperlink(link);
-      if GameTooltip:NumLines() > 0 then
-        self:AddTooltipData(GameTooltip, link, count);
-      end
-      self:SetHyperlinkTooltips(true);
+    GameTooltip:SetHyperlink(link);
+    if GameTooltip:NumLines() > 0 then
+      self:AddTooltipData(GameTooltip, link, count);
+    end
+    self:SetHyperlinkTooltips(true);
   end
 end
 
