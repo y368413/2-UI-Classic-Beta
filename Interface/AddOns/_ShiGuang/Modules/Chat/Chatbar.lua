@@ -91,22 +91,28 @@ local function Chatemotefilter(self, event, msg, ...)
     return false, msg, ...
 end
 
-local function ChatFrameFilter()
-	ChatFrame_AddMessageEventFilter("CHAT_MSG_CHANNEL", Chatemotefilter)
-	ChatFrame_AddMessageEventFilter("CHAT_MSG_SAY", Chatemotefilter)
-	ChatFrame_AddMessageEventFilter("CHAT_MSG_YELL", Chatemotefilter)
-	ChatFrame_AddMessageEventFilter("CHAT_MSG_WHISPER", Chatemotefilter)
-	ChatFrame_AddMessageEventFilter("CHAT_MSG_WHISPER_INFORM", Chatemotefilter)
-	ChatFrame_AddMessageEventFilter("CHAT_MSG_RAID", Chatemotefilter)
-	ChatFrame_AddMessageEventFilter("CHAT_MSG_RAID_LEADER", Chatemotefilter)
-	ChatFrame_AddMessageEventFilter("CHAT_MSG_PARTY", Chatemotefilter)
-	ChatFrame_AddMessageEventFilter("CHAT_MSG_PARTY_LEADER", Chatemotefilter)
-	ChatFrame_AddMessageEventFilter("CHAT_MSG_GUILD", Chatemotefilter)
-	ChatFrame_AddMessageEventFilter("CHAT_MSG_BATTLEGROUND", Chatemotefilter)
-	ChatFrame_AddMessageEventFilter("CHAT_MSG_EMOTE", Chatemotefilter)
-end
+local chatEvents = {
+	"CHAT_MSG_BATTLEGROUND",
+	"CHAT_MSG_BATTLEGROUND_LEADER",
+	"CHAT_MSG_BN_CONVERSATION",
+	"CHAT_MSG_BN_WHISPER",
+	"CHAT_MSG_BN_WHISPER_INFORM",
+	"CHAT_MSG_CHANNEL",
+	"CHAT_MSG_GUILD",
+	"CHAT_MSG_INSTANCE_CHAT",
+	"CHAT_MSG_INSTANCE_CHAT_LEADER",
+	"CHAT_MSG_OFFICER",
+	"CHAT_MSG_PARTY",
+	"CHAT_MSG_PARTY_LEADER",
+	"CHAT_MSG_RAID",
+	"CHAT_MSG_RAID_LEADER",
+	"CHAT_MSG_RAID_WARNING",
+	"CHAT_MSG_SAY",
+	"CHAT_MSG_WHISPER",
+	"CHAT_MSG_WHISPER_INFORM",
+	"CHAT_MSG_YELL",
+}
 
-  ------------------------聊天表情--以下是界面部分------------------------
   local function EmoteButton_OnClick(self, button)
     local editBox = ChatEdit_ChooseBoxForSend()
     ChatEdit_ActivateChat(editBox)
@@ -118,11 +124,12 @@ end
 function module:Chatbar()
 	if not MaoRUIPerDB["Chat"]["Chatbar"] then return end
 
-	ChatFrameFilter()
+	for _, v in pairs(chatEvents) do
+		ChatFrame_AddMessageEventFilter(v, Chatemotefilter)
+	end
 	local chatFrame = SELECTED_DOCK_FRAME
 	local editBox = chatFrame.editBox
 	local width, height, padding, buttonList = 16, 18, 6, {}
-	local tinsert, pairs = table.insert, pairs
 	
 	local Chatbar = CreateFrame("Frame", nil, UIParent)
 	Chatbar:SetSize(width, height)
@@ -130,17 +137,17 @@ function module:Chatbar()
 
 	-- Custom ChatMenu
 	VoiceFrame = CreateFrame("Frame", nil, UIParent)
-	VoiceFrame:SetSize(26, 100)
-	VoiceFrame:SetPoint("TOPRIGHT", _G.ChatFrame1, 22, 0)
+	VoiceFrame:SetSize(100, 21)
+	if GetCVar("portal") == "CN" then
+	  VoiceFrame:SetPoint("LEFT", Chatbar, "LEFT", 265, -2)
+	else
+	  VoiceFrame:SetPoint("LEFT", Chatbar, "LEFT", 240, -2)
+	end
 	VoiceFrame:SetShown(MaoRUIPerDB["Chat"]["ChatMenu"])
 	
-	_G.ChatFrameMenuButton:ClearAllPoints()
-	_G.ChatFrameMenuButton:SetPoint("TOP", VoiceFrame)	
-	_G.ChatFrameMenuButton:SetParent(VoiceFrame)
 	_G.ChatFrameChannelButton:ClearAllPoints()
-	_G.ChatFrameChannelButton:SetPoint("TOP", _G.ChatFrameMenuButton, "BOTTOM", 0, -2)
+	_G.ChatFrameChannelButton:SetPoint("TOP", VoiceFrame)
 	_G.ChatFrameChannelButton:SetParent(VoiceFrame)
-	_G.ChatAlertFrame:SetClampedToScreen(true)
 	_G.ChatAlertFrame:ClearAllPoints()
 	_G.ChatAlertFrame:SetPoint("BOTTOMLEFT", _G.ChatFrame1Tab, "TOPLEFT", 6, 21)
 
@@ -151,11 +158,17 @@ function module:Chatbar()
 	Voice.Icon:SetAllPoints()
 	Voice.Icon:SetTexture("Interface\\AddOns\\_ShiGuang\\media\\Emotes\\zhuan_push_frame")
 	Voice:RegisterForClicks("AnyUp")
-	Voice:SetScript("OnClick",function(self) ToggleFrame(VoiceFrame) MaoRUIPerDB["Chat"]["ChatMenu"] = VoiceFrame:IsShown() end)
-
+	Voice:SetScript("OnClick",function(self, btn) if btn == "RightButton" then SenduiCmd("/whisperpop") else M:TogglePanel(VoiceFrame) MaoRUIPerDB["Chat"]["ChatMenu"] = VoiceFrame:IsShown() end end)
+	
+	_G.ChatFrameMenuButton:ClearAllPoints()
+	_G.ChatFrameMenuButton:SetSize(21, 21)
+	--_G.ChatFrameMenuButton:SetScale(0.6)
+	_G.ChatFrameMenuButton:SetPoint("LEFT", Voice, "RIGHT", 0, -1)	
+	--_G.ChatFrameMenuButton:SetParent(VoiceFrame)
+	
 	Emote_CallButton=CreateFrame("Button","Emote_CallButton",Chatbar)
  	Emote_CallButton:SetSize(16, 16)
- 	Emote_CallButton:SetPoint("LEFT", Voice, "RIGHT", 3, 0)
+ 	Emote_CallButton:SetPoint("LEFT", Voice, "RIGHT", 21, 0)
  	Emote_CallButton:SetNormalTexture("Interface\\AddOns\\_ShiGuang\\media\\Emotes\\suprise")
 	Emote_CallButton:SetParent(Chatbar)
  	Emote_CallButton:RegisterForClicks("AnyUp")
@@ -178,7 +191,7 @@ function module:Chatbar()
     Emote_IconPanel:SetBackdropColor(0,0,0)
     Emote_IconPanel:SetClampedToScreen(true)
     Emote_IconPanel:SetFrameStrata("DIALOG")
-    Emote_IconPanel:SetPoint("BOTTOMLEFT",Emote_CallButton,"TOPLEFT",-23,0)
+    Emote_IconPanel:SetPoint("BOTTOMLEFT",Emote_CallButton,"TOPLEFT",-43,0)
     for _, v in ipairs(emotes) do
         Emote_button = CreateFrame("Button", nil, Emote_IconPanel)
         Emote_button.emote = "{" .. (v[GetLocale()] or v.key) .. "}"
@@ -316,40 +329,55 @@ function module:Chatbar()
 	end
 
 -------------------------- 處理聊天氣泡------------------------
-    if (GetCVarBool("chatBubbles")) then
-    local frame = CreateFrame("Frame", nil, UIParent)
-    --替換文字為表情
     local function TextToEmote(text)
         text = text:gsub("%{.-%}", ReplaceEmote)
         return text
     end
-    --找出氣泡框
-    local function FindAndReplaceBubble(self)
-        local b, v, f
-        for i = 2, WorldFrame:GetNumChildren() do
-            v = select(i, WorldFrame:GetChildren())
-            if (v:IsForbidden()) then return end
-            b = v:GetBackdrop()
-            if (v:IsShown() and b and b.bgFile == "Interface\\Tooltips\\ChatBubble-Background") then
-                for j = 1, v:GetNumRegions() do
-                    f = select(j, v:GetRegions())
-                    if f:GetObjectType() == "FontString" then
-                        local text = f:GetText() or ""
-                        local after = TextToEmote(text)
-                        if (after ~= text) then
-                            f:SetText(after)
-                        end
-                    end
-                end
-            end
-        end
-    end
-    frame:SetScript("OnUpdate", function(self, elapsed)
-        self.timer = (self.timer or 0) + elapsed
-        if (not self.paused and self.timer > 0.16) then
-            self.timer = 0
-            FindAndReplaceBubble(self)
-        end
-    end)
-    end
+    
+	local function findChatBubble(msg)
+		local chatbubbles = C_ChatBubbles.GetAllChatBubbles()
+		for index = 1, #chatbubbles do
+			local chatbubble = chatbubbles[index]
+			for i = 1, chatbubble:GetNumRegions() do
+				local region = select(i, chatbubble:GetRegions())
+				if region:GetObjectType() == "FontString" and region:GetText() == msg then
+					local text = region:GetText() or ""
+					local after = TextToEmote(text)
+					if (after ~= text) then
+						region:SetText(after)
+					end
+				end
+			end
+		end
+	end
+
+	local events = {
+		CHAT_MSG_SAY = "chatBubbles",
+		CHAT_MSG_YELL = "chatBubbles",
+		CHAT_MSG_MONSTER_SAY = "chatBubbles",
+		CHAT_MSG_MONSTER_YELL = "chatBubbles",
+		CHAT_MSG_PARTY = "chatBubblesParty",
+		CHAT_MSG_PARTY_LEADER = "chatBubblesParty",
+		CHAT_MSG_MONSTER_PARTY = "chatBubblesParty",
+	}
+
+	local bubbleHook = CreateFrame("Frame")
+	for event in next, events do
+		bubbleHook:RegisterEvent(event)
+	end
+	bubbleHook:SetScript("OnEvent", function(self, event, msg)
+		if GetCVarBool(events[event]) then
+			self.elapsed = 0
+			self.msg = msg
+			self:Show()
+		end
+	end)
+	bubbleHook:SetScript("OnUpdate", function(self, elapsed)
+		self.elapsed = self.elapsed + elapsed
+		if self.elapsed > .1 then
+			findChatBubble(self.msg)
+			self:Hide()
+		end
+	end)
+	bubbleHook:Hide()
 end

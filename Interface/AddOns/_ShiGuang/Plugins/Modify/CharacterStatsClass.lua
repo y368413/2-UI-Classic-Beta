@@ -1,4 +1,4 @@
-﻿--## Author: Peter Getov  ## Version: 3.6
+﻿--## Author: Peter Getov  ## Version: 3.6.2
 -- Class ids
 CSC_WARRIOR_CLASS_ID 		= 1;
 CSC_PALADIN_CLASS_ID 		= 2;
@@ -23,7 +23,10 @@ g_WeaponStringByWeaponId = {
 	[LE_ITEM_WEAPON_SWORD2H] 	= CSC_WEAPON_SWORD2H_TXT,
 	[LE_ITEM_WEAPON_STAFF] 		= CSC_WEAPON_STAFF_TXT,
 	[LE_ITEM_WEAPON_UNARMED] 	= CSC_WEAPON_UNARMED_TXT,
-	[LE_ITEM_WEAPON_DAGGER] 	= CSC_WEAPON_DAGGER_TXT
+    [LE_ITEM_WEAPON_DAGGER] 	= CSC_WEAPON_DAGGER_TXT,
+    [LE_ITEM_WEAPON_BOWS]       = CSC_WEAPON_BOW_TXT,
+    [LE_ITEM_WEAPON_CROSSBOW]   = CSC_WEAPON_CROSSBOW_TXT,
+    [LE_ITEM_WEAPON_GUNS]       = CSC_WEAPON_GUN_TXT
 };
 
 -- Class set items IDs
@@ -99,6 +102,12 @@ g_CombatManaRegenSpellIdToModifier = {
     [22782] = 0.3,
     [22783] = 0.3
 };
+
+CSC_SYMBOL_TAB   = "    "; -- for some reason "\t" doesn't work
+CSC_SYMBOL_SPACE = " ";
+                                
+                                
+                                
                                 -- Namespaces
 -- core - table (namespace) shared between every lua file
 local CharacterStatsClassic = {};
@@ -185,13 +194,13 @@ function UIConfig:SetCharacterStats(statsTable, category)
         CSC_PaperDollFrame_SetDamage(statsTable[1], "player", category);
         CSC_PaperDollFrame_SetMeleeAttackPower(statsTable[2], "player");
         CSC_PaperDollFrame_SetAttackSpeed(statsTable[3], "player");
-        CSC_PaperDollFrame_SetCritChance(statsTable[4], "player", category);
+        CSC_PaperDollFrame_SetCritChance(statsTable[4], "player");
         CSC_PaperDollFrame_SetHitChance(statsTable[5], "player");
     elseif category == PLAYERSTAT_RANGED_COMBAT then
         CSC_PaperDollFrame_SetDamage(statsTable[1], "player", category);
         CSC_PaperDollFrame_SetRangedAttackPower(statsTable[2], "player");
         CSC_PaperDollFrame_SetRangedAttackSpeed(statsTable[3], "player");
-        CSC_PaperDollFrame_SetCritChance(statsTable[4], "player", category);
+        CSC_PaperDollFrame_SetRangedCritChance(statsTable[4], "player");
         CSC_PaperDollFrame_SetRangedHitChance(statsTable[5], "player");
     elseif category == PLAYERSTAT_SPELL_COMBAT then
         -- bonus dmg, bonus healing, crit chance, mana regen, hit
@@ -366,9 +375,10 @@ local function CSC_GetAppropriateAttackRaiting(unit, category)
 	return attackWithModifier;
 end
 
-local function CSC_PaperDollFrame_SetLabelAndText(statFrame, label, text, isPercentage, numericValue)
+local function CSC_PaperDollFrame_SetLabelAndText(statFrame, label, text, isPercentage, numericValue, precision)
 	if ( isPercentage ) then
-		statFrame.Value:SetText(format("%.1F%%", numericValue));
+		precision = precision or "%.1F%%";
+		statFrame.Value:SetText(format(precision, numericValue));
 	else
 		statFrame.Value:SetText(text);
 	end
@@ -461,9 +471,8 @@ local function CSC_GetSkillRankAndModifier(skillHeader, skillName)
 	return skillRank, skillModifier;
 end
 
-function CSC_GetPlayerWeaponSkill(unit)
+function CSC_GetPlayerWeaponSkill(unit, weaponSlotId)
 	local totalWeaponSkill = nil;
-	local mainHandItemId = 16;
 
 	local unitClassId = select(3, UnitClass(unit));
 	-- Druid checks
@@ -475,7 +484,7 @@ function CSC_GetPlayerWeaponSkill(unit)
 	if (unitClassId == CSC_DRUID_CLASS_ID) and (shapeIndex > 0) then
 		totalWeaponSkill = UnitLevel(unit) * 5;
 	else
-		local itemId = GetInventoryItemID(unit, mainHandItemId);
+		local itemId = GetInventoryItemID(unit, weaponSlotId);
 		if (itemId) then
 			local itemSubtypeId = select(7, GetItemInfoInstant(itemId));
 			if itemSubtypeId then
@@ -782,28 +791,32 @@ function CSC_PaperDollFrame_SetRangedAttackPower(statFrame, unit)
 end
 
 -- SECONDARY STATS --
-function CSC_PaperDollFrame_SetCritChance(statFrame, unit, category)
+function CSC_PaperDollFrame_SetCritChance(statFrame, unit)
 	
 	statFrame:SetScript("OnEnter", CSC_CharacterMeleeCritFrame_OnEnter)
 	statFrame:SetScript("OnLeave", function()
 		GameTooltip:Hide()
     end)
 	
-	local critChance;
-
-    if category == PLAYERSTAT_MELEE_COMBAT then
-        critChance = GetCritChance();
-	elseif category == PLAYERSTAT_RANGED_COMBAT then
-		if not IsRangedWeapon() then
-			CSC_PaperDollFrame_SetLabelAndText(statFrame, STAT_CRITICAL_STRIKE, NOT_APPLICABLE, false, 0);
-			statFrame:Show();
-			return;
-		end
-        critChance = GetRangedCritChance();
-    end
+	local critChance = GetCritChance();
 
     CSC_PaperDollFrame_SetLabelAndText(statFrame, STAT_CRITICAL_STRIKE, critChance, true, critChance);
 	statFrame.criticalStrikeTxt = format(PAPERDOLLFRAME_TOOLTIP_FORMAT, STAT_CRITICAL_STRIKE).." "..format("%.2F%%", critChance);
+    statFrame:Show();
+end
+
+function CSC_PaperDollFrame_SetRangedCritChance(statFrame, unit)
+
+	if not IsRangedWeapon() then
+		CSC_PaperDollFrame_SetLabelAndText(statFrame, STAT_CRITICAL_STRIKE, NOT_APPLICABLE, false, 0);
+		statFrame:Show();
+		return;
+	end
+
+	local critChance = GetRangedCritChance();
+
+    CSC_PaperDollFrame_SetLabelAndText(statFrame, STAT_CRITICAL_STRIKE, critChance, true, critChance);
+	statFrame.tooltip = format(PAPERDOLLFRAME_TOOLTIP_FORMAT, STAT_CRITICAL_STRIKE).." "..format("%.2F%%", critChance);
     statFrame:Show();
 end
 
@@ -852,6 +865,8 @@ function CSC_PaperDollFrame_SetSpellCritChance(statFrame, unit)
 		end
 	elseif (unitClassId == CSC_PRIEST_CLASS_ID) then
 		local priestHolyCrit = CSC_GetPriestCritStatsFromTalents();
+		priestHolyCrit = priestHolyCrit + CSC_GetHolyCritFromBenediction(unit);
+		
 		if (priestHolyCrit > 0) then
 			statFrame.holyCrit = statFrame.holyCrit + priestHolyCrit;
 			-- set the new maximum
@@ -865,13 +880,6 @@ function CSC_PaperDollFrame_SetSpellCritChance(statFrame, unit)
 			local tmpMax = max(statFrame.shadowCrit, statFrame.fireCrit);
 			-- set the new maximum
 			maxSpellCrit = max(maxSpellCrit, tmpMax);
-		end
-	elseif (unitClassId == CSC_SHAMAN_CLASS_ID) then
-		local natureCritFromSet = CSC_GetShamanT2SpellCrit(unit);
-		if (natureCritFromSet > 0) then
-			statFrame.natureCrit = statFrame.natureCrit + natureCritFromSet;
-			-- set the new maximum
-			maxSpellCrit = max(maxSpellCrit, statFrame.natureCrit);
 		end
 	end
 
@@ -910,7 +918,7 @@ local function CSC_GetHitFromBiznicksAccurascope(unit)
 		local itemId, enchantId = itemLink:match("item:(%d+):(%d*)");
 		if enchantId then
 			if tonumber(enchantId) == 2523 then
-				hitFromScope = hitFromScope + 3;
+				hitFromScope = 3;
 			end
 		end
 	end
@@ -925,6 +933,11 @@ function CSC_PaperDollFrame_SetRangedHitChance(statFrame, unit)
 		statFrame:Show();
 		return;
 	end
+
+	statFrame:SetScript("OnEnter", CSC_CharacterRangedHitChanceFrame_OnEnter)
+	statFrame:SetScript("OnLeave", function()
+		GameTooltip:Hide()
+	end)
 	
 	local hitChance = GetHitModifier();
 	
@@ -939,8 +952,7 @@ function CSC_PaperDollFrame_SetRangedHitChance(statFrame, unit)
 
 	local hitChanceText = hitChance;
 	CSC_PaperDollFrame_SetLabelAndText(statFrame, STAT_HIT_CHANCE, hitChanceText, true, hitChance);
-	statFrame.tooltip = STAT_HIT_CHANCE.." "..hitChanceText;
-	statFrame.tooltip2 = format(CR_HIT_RANGED_TOOLTIP, UnitLevel(unit), hitChance);
+	statFrame.hitChance = hitChance;
 	statFrame:Show();
 end
 
@@ -1078,14 +1090,14 @@ function CSC_PaperDollFrame_SetDefense(statFrame, unit)
 	statFrame.tooltip = tooltipText;
 	tooltipText = format(DEFAULT_STATDEFENSE_TOOLTIP, valueNum, 0, valueNum*0.04, valueNum*0.04);
 	tooltipText = tooltipText:gsub('.-\n', '', 1);
-	tooltipText = tooltipText:gsub('%b()', '');
+	tooltipText = tooltipText:gsub('\n|cff888888%b()|r', '');
 	statFrame.tooltip2 = tooltipText;
 	statFrame:Show();
 end
 
 function CSC_PaperDollFrame_SetDodge(statFrame, unit)
 	local chance = GetDodgeChance();
-	CSC_PaperDollFrame_SetLabelAndText(statFrame, STAT_DODGE, chance, true, chance);
+	CSC_PaperDollFrame_SetLabelAndText(statFrame, STAT_DODGE, chance, true, chance, "%.2F%%");
 	statFrame.tooltip = format(PAPERDOLLFRAME_TOOLTIP_FORMAT, DODGE_CHANCE).." "..string.format("%.2F", chance).."%";
 	--statFrame.tooltip2 = format(CR_DODGE_TOOLTIP, GetCombatRating(CR_DODGE), GetCombatRatingBonus(CR_DODGE));
 	statFrame:Show();
@@ -1093,7 +1105,7 @@ end
 
 function CSC_PaperDollFrame_SetParry(statFrame, unit)
 	local chance = GetParryChance();
-	CSC_PaperDollFrame_SetLabelAndText(statFrame, STAT_PARRY, chance, true, chance);
+	CSC_PaperDollFrame_SetLabelAndText(statFrame, STAT_PARRY, chance, true, chance, "%.2F%%");
 	statFrame.tooltip = format(PAPERDOLLFRAME_TOOLTIP_FORMAT, PARRY_CHANCE).." "..string.format("%.2F", chance).."%";
 	--statFrame.tooltip2 = format(CR_PARRY_TOOLTIP, GetCombatRating(CR_PARRY), GetCombatRatingBonus(CR_PARRY));
 	statFrame:Show();
@@ -1161,7 +1173,7 @@ function CSC_PaperDollFrame_SetBlock(statFrame, unit)
 	end)
 	
 	local blockChance = GetBlockChance();
-	CSC_PaperDollFrame_SetLabelAndText(statFrame, STAT_BLOCK, blockChance, true, blockChance);
+	CSC_PaperDollFrame_SetLabelAndText(statFrame, STAT_BLOCK, blockChance, true, blockChance, "%.2F%%");
 
 	statFrame.blockChance = string.format("%.2F", blockChance).."%";
 	statFrame:Show();
@@ -1492,6 +1504,18 @@ function CSC_GetShamanT2SpellCrit(unit)
     return spellCritFromSet;
 end
 
+function CSC_GetHolyCritFromBenediction(unit)
+	local benedictionCrit = 0;
+	local itemId = GetInventoryItemID(unit, INVSLOT_MAINHAND);
+
+	if itemId == 18608 then
+		benedictionCrit = 2;
+	end
+
+	return benedictionCrit;
+end
+
+
 -- OnEnter Tooltip functions
 function CSC_CharacterDamageFrame_OnEnter(self)
 	-- Main hand weapon
@@ -1503,7 +1527,7 @@ function CSC_CharacterDamageFrame_OnEnter(self)
 	GameTooltip:AddDoubleLine(ATTACK_TOOLTIP..":", self.attackRating, NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b, HIGHLIGHT_FONT_COLOR.r, HIGHLIGHT_FONT_COLOR.g, HIGHLIGHT_FONT_COLOR.b);
 	-- Check for offhand weapon
 	if ( self.offhandAttackSpeed ) then
-		GameTooltip:AddLine(" "); -- Blank line.
+		GameTooltip:AddLine(CSC_SYMBOL_SPACE); -- Blank line.
 		GameTooltip:AddLine(INVTYPE_WEAPONOFFHAND, HIGHLIGHT_FONT_COLOR.r, HIGHLIGHT_FONT_COLOR.g, HIGHLIGHT_FONT_COLOR.b);
 		GameTooltip:AddDoubleLine(ATTACK_SPEED_COLON, format("%.2F", self.offhandAttackSpeed), NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b, HIGHLIGHT_FONT_COLOR.r, HIGHLIGHT_FONT_COLOR.g, HIGHLIGHT_FONT_COLOR.b);
 		GameTooltip:AddDoubleLine(DAMAGE_COLON, self.offhandDamage, NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b, HIGHLIGHT_FONT_COLOR.r, HIGHLIGHT_FONT_COLOR.g, HIGHLIGHT_FONT_COLOR.b);
@@ -1524,7 +1548,7 @@ function CSC_CharacterSpellDamageFrame_OnEnter(self)
 	GameTooltip:SetOwner(self, "ANCHOR_RIGHT");
 	GameTooltip:SetText(STAT_SPELLPOWER, HIGHLIGHT_FONT_COLOR.r, HIGHLIGHT_FONT_COLOR.g, HIGHLIGHT_FONT_COLOR.b);
 	GameTooltip:AddDoubleLine(STAT_SPELLPOWER_TOOLTIP);
-	GameTooltip:AddLine(" "); -- Blank line.
+	GameTooltip:AddLine(CSC_SYMBOL_SPACE); -- Blank line.
 	GameTooltip:AddDoubleLine(SPELL_SCHOOL1_CAP.." "..DAMAGE..": ", format("%.2F", self.holyDmg), NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b, HIGHLIGHT_FONT_COLOR.r, HIGHLIGHT_FONT_COLOR.g, HIGHLIGHT_FONT_COLOR.b);
 	GameTooltip:AddDoubleLine(SPELL_SCHOOL2_CAP.." "..DAMAGE..": ", format("%.2F", self.fireDmg), NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b, HIGHLIGHT_FONT_COLOR.r, HIGHLIGHT_FONT_COLOR.g, HIGHLIGHT_FONT_COLOR.b);
 	GameTooltip:AddDoubleLine(SPELL_SCHOOL4_CAP.." "..DAMAGE..": ", format("%.2F", self.frostDmg), NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b, HIGHLIGHT_FONT_COLOR.r, HIGHLIGHT_FONT_COLOR.g, HIGHLIGHT_FONT_COLOR.b);
@@ -1537,7 +1561,7 @@ end
 function CSC_CharacterSpellCritFrame_OnEnter(self)
 	GameTooltip:SetOwner(self, "ANCHOR_RIGHT");
 	GameTooltip:SetText(STAT_CRITICAL_STRIKE, HIGHLIGHT_FONT_COLOR.r, HIGHLIGHT_FONT_COLOR.g, HIGHLIGHT_FONT_COLOR.b);
-	GameTooltip:AddLine(" "); -- Blank line.
+	GameTooltip:AddLine(CSC_SYMBOL_SPACE); -- Blank line.
 	GameTooltip:AddDoubleLine(SPELL_SCHOOL1_CAP.." "..CRIT_ABBR..": ", format("%.2F", self.holyCrit).."%", NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b, HIGHLIGHT_FONT_COLOR.r, HIGHLIGHT_FONT_COLOR.g, HIGHLIGHT_FONT_COLOR.b);
 	GameTooltip:AddDoubleLine(SPELL_SCHOOL2_CAP.." "..CRIT_ABBR..": ", format("%.2F", self.fireCrit).."%", NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b, HIGHLIGHT_FONT_COLOR.r, HIGHLIGHT_FONT_COLOR.g, HIGHLIGHT_FONT_COLOR.b);
 	GameTooltip:AddDoubleLine(SPELL_SCHOOL4_CAP.." "..CRIT_ABBR..": ", format("%.2F", self.frostCrit).."%", NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b, HIGHLIGHT_FONT_COLOR.r, HIGHLIGHT_FONT_COLOR.g, HIGHLIGHT_FONT_COLOR.b);
@@ -1574,44 +1598,61 @@ end
 function CSC_CharacterHitChanceFrame_OnEnter(self)
 	local hitChance = self.hitChance;
 
-	local totalWeaponSkill = CSC_GetPlayerWeaponSkill("player");
+	local totalWeaponSkill = CSC_GetPlayerWeaponSkill("player", INVSLOT_MAINHAND);
 	local missChanceVsNPC, missChanceVsBoss, missChanceVsPlayer, dwMissChanceVsNpc, dwMissChanceVsBoss, dwMissChanceVsPlayer = CSC_GetPlayerMissChances("player", hitChance, totalWeaponSkill);
 
 	GameTooltip:SetOwner(self, "ANCHOR_RIGHT");
 	GameTooltip:SetText(STAT_HIT_CHANCE, HIGHLIGHT_FONT_COLOR.r, HIGHLIGHT_FONT_COLOR.g, HIGHLIGHT_FONT_COLOR.b);
 	GameTooltip:AddLine("Reduces your chance to miss.");
 
-	GameTooltip:AddLine(" "); -- Blank line.
+	GameTooltip:AddLine(CSC_SYMBOL_SPACE); -- Blank line.
 	GameTooltip:AddLine("Miss Chance vs.");
-	GameTooltip:AddDoubleLine(format("    Level 60 NPC: %.2F%%", missChanceVsNPC), format("(Dual wield: %.2F%%)", dwMissChanceVsNpc));
-	GameTooltip:AddDoubleLine(format("    Level 60 Player: %.2F%%", missChanceVsPlayer), format("(Dual wield: %.2F%%)", dwMissChanceVsPlayer));
-	GameTooltip:AddDoubleLine(format("    Level 63 NPC/Boss: %.2F%%", missChanceVsBoss), format("(Dual wield: %.2F%%)", dwMissChanceVsBoss));
+	GameTooltip:AddDoubleLine(format(CSC_SYMBOL_TAB.."Level 60 NPC: %.2F%%", missChanceVsNPC), format("(Dual wield: %.2F%%)", dwMissChanceVsNpc));
+	GameTooltip:AddDoubleLine(format(CSC_SYMBOL_TAB.."Level 60 Player: %.2F%%", missChanceVsPlayer), format("(Dual wield: %.2F%%)", dwMissChanceVsPlayer));
+	GameTooltip:AddDoubleLine(format(CSC_SYMBOL_TAB.."Level 63 NPC/Boss: %.2F%%", missChanceVsBoss), format("(Dual wield: %.2F%%)", dwMissChanceVsBoss));
+	GameTooltip:Show();
+end
+
+function CSC_CharacterRangedHitChanceFrame_OnEnter(self)
+	local hitChance = self.hitChance;
+
+	local totalWeaponSkill = CSC_GetPlayerWeaponSkill("player", INVSLOT_RANGED);
+	local missChanceVsNPC, missChanceVsBoss, missChanceVsPlayer, _, _, _ = CSC_GetPlayerMissChances("player", hitChance, totalWeaponSkill);
+
+	GameTooltip:SetOwner(self, "ANCHOR_RIGHT");
+	GameTooltip:SetText(STAT_HIT_CHANCE, HIGHLIGHT_FONT_COLOR.r, HIGHLIGHT_FONT_COLOR.g, HIGHLIGHT_FONT_COLOR.b);
+	GameTooltip:AddLine("Reduces your chance to miss.");
+
+	GameTooltip:AddLine(CSC_SYMBOL_SPACE); -- Blank line.
+	GameTooltip:AddLine("Miss Chance vs.");
+	GameTooltip:AddLine(format(CSC_SYMBOL_TAB.."Level 60 NPC: %.2F%%", missChanceVsNPC));
+	GameTooltip:AddLine(format(CSC_SYMBOL_TAB.."Level 60 Player: %.2F%%", missChanceVsPlayer));
+	GameTooltip:AddLine(format(CSC_SYMBOL_TAB.."Level 63 NPC/Boss: %.2F%%", missChanceVsBoss));
 	GameTooltip:Show();
 end
 
 function CSC_CharacterSpellHitChanceFrame_OnEnter(self)
 	GameTooltip:SetOwner(self, "ANCHOR_RIGHT");
 	GameTooltip:SetText(format(CSC_SPELL_HIT_TOOLTIP_TXT, self.hitChance), HIGHLIGHT_FONT_COLOR.r, HIGHLIGHT_FONT_COLOR.g, HIGHLIGHT_FONT_COLOR.b);
-	local tabSymbol = "    "; -- for some reason "\t" doesn't work
 
 	if self.unitClassId == CSC_MAGE_CLASS_ID then
-		GameTooltip:AddLine(" "); -- Blank line.
+		GameTooltip:AddLine(CSC_SYMBOL_SPACE); -- Blank line.
 		GameTooltip:AddLine(CSC_SPELL_HIT_SUBTOOLTIP_TXT);
-		GameTooltip:AddDoubleLine(tabSymbol..CSC_ARCANE_SPELL_HIT_TXT, (self.arcaneHit + self.hitChance).."%");
-		GameTooltip:AddDoubleLine(tabSymbol..CSC_FIRE_SPELL_HIT_TXT, (self.fireHit + self.hitChance).."%");
-		GameTooltip:AddDoubleLine(tabSymbol..CSC_FROST_SPELL_HIT_TXT, (self.frostHit + self.hitChance).."%");
+		GameTooltip:AddDoubleLine(CSC_SYMBOL_TAB..CSC_ARCANE_SPELL_HIT_TXT, (self.arcaneHit + self.hitChance).."%");
+		GameTooltip:AddDoubleLine(CSC_SYMBOL_TAB..CSC_FIRE_SPELL_HIT_TXT, (self.fireHit + self.hitChance).."%");
+		GameTooltip:AddDoubleLine(CSC_SYMBOL_TAB..CSC_FROST_SPELL_HIT_TXT, (self.frostHit + self.hitChance).."%");
 	elseif self.unitClassId == CSC_WARLOCK_CLASS_ID then
-		GameTooltip:AddLine(" "); -- Blank line.
+		GameTooltip:AddLine(CSC_SYMBOL_SPACE); -- Blank line.
 		GameTooltip:AddLine(CSC_SPELL_HIT_SUBTOOLTIP_TXT);
-		GameTooltip:AddDoubleLine(tabSymbol..CSC_DESTRUCTION_SPELL_HIT_TXT, self.hitChance.."%");
-		GameTooltip:AddDoubleLine(tabSymbol..CSC_AFFLICTION_SPELL_HIT_TXT, (self.afflictionHit + self.hitChance).."%");
+		GameTooltip:AddDoubleLine(CSC_SYMBOL_TAB..CSC_DESTRUCTION_SPELL_HIT_TXT, self.hitChance.."%");
+		GameTooltip:AddDoubleLine(CSC_SYMBOL_TAB..CSC_AFFLICTION_SPELL_HIT_TXT, (self.afflictionHit + self.hitChance).."%");
 	end
 	GameTooltip:Show();
 end
 
 function CSC_CharacterMeleeCritFrame_OnEnter(self)
 	local hitChance = GetHitModifier();
-	local totalWeaponSkill = CSC_GetPlayerWeaponSkill("player");
+	local totalWeaponSkill = CSC_GetPlayerWeaponSkill("player", INVSLOT_MAINHAND);
 	local missChanceVsNPC, missChanceVsBoss, missChanceVsPlayer, dwMissChanceVsNpc, dwMissChanceVsBoss, dwMissChanceVsPlayer = CSC_GetPlayerMissChances("player", hitChance, totalWeaponSkill);
 
 	-- no weapon equipped, not supported localization or something else went wrong
@@ -1628,7 +1669,7 @@ function CSC_CharacterMeleeCritFrame_OnEnter(self)
 
 	GameTooltip:SetOwner(self, "ANCHOR_RIGHT");
 	GameTooltip:SetText(self.criticalStrikeTxt, HIGHLIGHT_FONT_COLOR.r, HIGHLIGHT_FONT_COLOR.g, HIGHLIGHT_FONT_COLOR.b);
-	GameTooltip:AddLine(" "); -- Blank line.
+	GameTooltip:AddLine(CSC_SYMBOL_SPACE); -- Blank line.
 	GameTooltip:AddLine("Crit cap vs.");
 	
 	local critChance = GetCritChance();
@@ -1644,9 +1685,9 @@ function CSC_CharacterMeleeCritFrame_OnEnter(self)
 		if critChance > critCapDw then DWCRITCAP_COLOR_CODE = ORANGE_FONT_COLOR_CODE end
 
 		local critCapDwTxt = DWCRITCAP_COLOR_CODE..format("%.2F%%", critCapDw)..FONT_COLOR_CODE_CLOSE;
-		GameTooltip:AddDoubleLine("    Level 63 NPC/Boss: "..critCapTxt, "(Dual wield: "..critCapDwTxt..")");
+		GameTooltip:AddDoubleLine(CSC_SYMBOL_TAB.."Level 63 NPC/Boss: "..critCapTxt, "(Dual wield: "..critCapDwTxt..")");
 	else
-		GameTooltip:AddDoubleLine("    Level 63 NPC/Boss: "..critCapTxt);
+		GameTooltip:AddDoubleLine(CSC_SYMBOL_TAB.."Level 63 NPC/Boss: "..critCapTxt);
 	end
 
 	GameTooltip:Show();

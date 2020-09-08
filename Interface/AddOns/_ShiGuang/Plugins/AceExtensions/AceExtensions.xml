@@ -5,6 +5,7 @@
   <Script file="FeedOMatic.lua"/>
   <Script file="TrackingEye.lua"/>
 	<Script file="InboxMailBag.lua"/>
+	<Include file="CurrencyTracking\CurrencyTracking.xml"/>
 	<Texture name="Mailbag-Slot-BG" file="Interface\Buttons\UI-Slot-Background" virtual="true">
 		<Size x="39" y="39"/>
 		<Anchors>

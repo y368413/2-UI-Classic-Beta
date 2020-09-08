@@ -45,6 +45,3 @@ History.lua
 Tooltip.lua
 
 Util.lua
-
-AdvSearch.xml
-AdvSearch.lua

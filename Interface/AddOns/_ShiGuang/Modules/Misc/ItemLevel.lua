@@ -55,12 +55,12 @@ function MISC:CreateItemString(frame, strType)
 			slotFrame.enchantText:ClearAllPoints()
 			slotFrame.enchantText:SetPoint(relF, slotFrame, x-1, y-16)
 			slotFrame.enchantText:SetTextColor(0, 1, 0)
-			for i = 1, 5 do
-				local offset = (i-1)*18 + 5
-				local iconX = x > 0 and x+offset or x-offset
-				local iconY = index > 15 and 20 or 2
-				slotFrame["textureIcon"..i] = MISC:CreateItemTexture(slotFrame, relF, iconX, iconY)
-			end
+		--	for i = 1, 5 do
+		--		local offset = (i-1)*18 + 5
+		--		local iconX = x > 0 and x+offset or x-offset
+		--		local iconY = index > 15 and 20 or 2
+		--		slotFrame["textureIcon"..i] = MISC:CreateItemTexture(slotFrame, relF, iconX, iconY)
+		--	end
 			MISC.CreateColorBorder(slotFrame)
 		end
 	end
@@ -116,11 +116,11 @@ function MISC:ItemLevel_SetupLevel(frame, strType, unit)
 			local slotFrame = _G[strType..slot.."Slot"]
 			slotFrame.iLvlText:SetText("")
 			slotFrame.enchantText:SetText("")
-			for i = 1, 5 do
-				local texture = slotFrame["textureIcon"..i]
-				texture:SetTexture(nil)
-				texture.bg:Hide()
-			end
+		--	for i = 1, 5 do
+		--		local texture = slotFrame["textureIcon"..i]
+		--		texture:SetTexture(nil)
+		--		texture.bg:Hide()
+		--	end
 			MISC:ItemBorderSetColor(slotFrame, 0, 0, 0)
 
 			local itemTexture = GetInventoryItemTexture(unit, index)

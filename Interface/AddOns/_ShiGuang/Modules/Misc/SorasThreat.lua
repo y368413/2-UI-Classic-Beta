@@ -140,7 +140,7 @@ end
 local function CreateThreatFrame()
 	local ThreatFrame = CreateFrame("Frame", "SorasThreat", UIParent)
 	ThreatFrame:SetSize(MaoRUIPerDB["Misc"]["SorasThreatFramew"], MaoRUIPerDB["Misc"]["SorasThreatFrameh"])  --主框体宽度
-	M.Mover(ThreatFrame, "ThreatFrame", "ThreatFrame", {"RIGHT", UIParent, "RIGHT", -210, 210})
+	M.Mover(ThreatFrame, U["SorasThreat"], "ThreatFrame", {"RIGHT", UIParent, "RIGHT", -210, 210})
 	ThreatFrame:SetAlpha(0)
 	ThreatFrame.threatUnit = ThreatFrame:CreateFontString(nil, 'OVERLAY')
 	ThreatFrame.threatUnit:SetFont(STANDARD_TEXT_FONT,9,"OUTLINE")

@@ -1,5 +1,3 @@
-local _, ns = ...
-local M, R, U, I = unpack(ns)
 -------------------------------------------------------------------------------
 -- 文件: SimpleInfo.lua ver 1.0  日期: 2010-12-11  作者: dugu@wowbox
 -- 描述: 在屏幕中下方显示玩家(宠物)和目标(ToT)的基本信息  版权所有@多玩游戏网
@@ -429,8 +427,8 @@ function BlinkHealth:ConstructFrame(unit)
      RightClickPlayer:SetPoint("TOPLEFT",0,0)
      RightClickPlayer:SetPoint("BOTTOMRIGHT",0,-16)
      RightClickPlayer:SetScript("OnMouseDown", function(self, button)
-		    --if button == "LeftButton" then sendCmd("/click PlayerFrame LeftButton")
-		    if button == "RightButton" then sendCmd("/click PlayerFrame RightButton") 
+		    --if button == "LeftButton" then SenduiCmd("/click PlayerFrame LeftButton")
+		    if button == "RightButton" then SenduiCmd("/click PlayerFrame RightButton") 
 		    end
     end)
 -------------------------------------------------------------
@@ -444,7 +442,7 @@ function BlinkHealth:ConstructFrame(unit)
     --if button == "LeftButton" then
 		  --if CheckInteractDistance("target",1) then InspectUnit("target") end
 		if button == "RightButton" then
-        sendCmd("/click TargetFrame RightButton")
+        SenduiCmd("/click TargetFrame RightButton")
 		elseif button == "MiddleButton" then
 			--if CheckInteractDistance("target",2) then InitiateTrade("target") end
 			if CheckInteractDistance("target",1) then InspectUnit("target") end
@@ -461,19 +459,19 @@ end
 function BlinkHealth:ShowAnchor() self.anchor:Show(); end
 
 function BlinkHealth_SlashHandler(msg)
-	local BHT_1 = "输入 /bht on 或 /bht off 开关插件\n";
-	local BHT_2 = "输入 /bht m 调整位置\n";
-	local cmdtype, para1 = strsplit(" ", string.lower(msg))
-	local listSec = 0;
-	if para1 ~= nil then
-		listSec = tonumber(para1);
-	end
-	if (cmdtype == "on") then BlinkHealth:OnEnable();
-	elseif (cmdtype == "off") then BlinkHealth:OnDisable();
-	elseif (cmdtype == "move" or cmdtype == "m") then
+	--local BHT_1 = "输入 /bht on 或 /bht off 开关插件\n";
+	--local BHT_2 = "输入 /bht m 调整位置\n";
+	--local cmdtype, para1 = strsplit(" ", string.lower(msg))
+	--local listSec = 0;
+	--if para1 ~= nil then
+		--listSec = tonumber(para1);
+	--end
+	if (msg == "on") then BlinkHealth:OnEnable();
+	elseif (msg == "off") then BlinkHealth:OnDisable();
+	else--if (cmdtype == "move" or cmdtype == "m") then
 			BlinkHealth:ShowAnchor();
-	else 
-		DEFAULT_CHAT_FRAME:AddMessage(BHT_1..BHT_2);
+	--else 
+		--DEFAULT_CHAT_FRAME:AddMessage(BHT_1..BHT_2);
 	end
 end
 
@@ -485,9 +483,9 @@ local function PowerTypeAscending()
 end
 
 local function AutoHidePlayerFrame(self,event, ...)
-	if (not MaoRUIPerDB["UFs"]["UFFade"]) or (ShiGuangPerDB.BHT == true) then return end
-	if (event == nil) then event = "TargetFrame or CharacterModelFrame toggled" end
-	if (UnitHealth("player") < UnitHealthMax("player") * 0.99) or (PowerTypeAscending() and UnitPower("player", "Mana") < UnitPowerMax("player", "SPELL_POWER_MANA") * 0.99) or (TargetFrame:IsShown()) or (UnitAffectingCombat("player")) or (CharacterFrame:IsShown())  then
+	if (not MaoRUIPerDB["UFs"]["UFFade"]) or (ShiGuangPerDB["BHT"] == true) then return end
+	--if (event == nil) then event = "TargetFrame or CharacterModelFrame toggled" end
+	if UnitHealth("player") < UnitHealthMax("player") * 0.99 or (powerTypeAscending and UnitPower("player") <= UnitPowerMax("player") * 0.99) or TargetFrame:IsShown() or UnitAffectingCombat("player") or CharacterFrame:IsShown() or ContainerFrame1:IsShown() then
 		if (not PlayerFrame:IsShown()) then
 			if (not InCombatLockdown()) then
 				local returnState, returnMessage = pcall(PlayerFrame.Show, PlayerFrame)
@@ -516,9 +514,11 @@ iPlayerFrame:RegisterEvent("UNIT_SPELLCAST_START")
 iPlayerFrame:RegisterEvent("PLAYER_REGEN_DISABLED")
 iPlayerFrame:RegisterEvent("PLAYER_REGEN_ENABLED")
 iPlayerFrame:RegisterEvent("UNIT_MAXPOWER")
-iPlayerFrame:RegisterEvent("UNIT_MODEL_CHANGED")
+--iPlayerFrame:RegisterEvent("UNIT_MODEL_CHANGED")
 iPlayerFrame:SetScript("OnEvent", AutoHidePlayerFrame)
-TargetFrame:SetScript("OnShow", AutoHidePlayerFrame)
-TargetFrame:SetScript("OnHide", AutoHidePlayerFrame)
-CharacterModelFrame:SetScript("OnShow", AutoHidePlayerFrame)
-CharacterModelFrame:SetScript("OnHide", AutoHidePlayerFrame)
+TargetFrame:HookScript("OnShow", AutoHidePlayerFrame)
+TargetFrame:HookScript("OnHide", AutoHidePlayerFrame)
+CharacterModelFrame:HookScript("OnShow", AutoHidePlayerFrame)
+CharacterModelFrame:HookScript("OnHide", AutoHidePlayerFrame)
+ContainerFrame1:HookScript("OnShow", AutoHidePlayerFrame)
+ContainerFrame1:HookScript("OnHide", AutoHidePlayerFrame)

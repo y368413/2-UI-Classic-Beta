@@ -62,7 +62,7 @@ function UF:CreateHealthBar(self)
 	health:SetPoint("TOPRIGHT", self)
 	local healthHeight
 	if mystyle == "PlayerPlate" then
-		healthHeight = MaoRUIPerDB["Nameplate"]["PPHeight"]
+		healthHeight = MaoRUIPerDB["Nameplate"]["PPHealthHeight"]
 	elseif mystyle == "raid" then
 		if self.isPartyFrame then
 			healthHeight = MaoRUIPerDB["UFs"]["PartyHeight"]
@@ -227,7 +227,7 @@ function UF:CreatePowerBar(self)
 	power:SetPoint("BOTTOMRIGHT", self)
 	local powerHeight
 	if mystyle == "PlayerPlate" then
-		powerHeight = MaoRUIPerDB["Nameplate"]["PPPHeight"]
+		powerHeight = MaoRUIPerDB["Nameplate"]["PPPowerHeight"]
 	elseif mystyle == "raid" then
 		if self.isPartyFrame then
 			powerHeight = MaoRUIPerDB["UFs"]["PartyPowerHeight"]
@@ -327,9 +327,12 @@ end
 function UF:CreateIcons(self)
 	local mystyle = self.mystyle
 
-	local phase = self:CreateTexture(nil, "OVERLAY")
-	phase:SetPoint("TOP", self, 0, 12)
-	phase:SetSize(22, 22)
+	local parentFrame = CreateFrame("Frame", nil, self)
+	parentFrame:SetAllPoints()
+	parentFrame:SetFrameLevel(5)
+	local phase = parentFrame:CreateTexture(nil, "OVERLAY")
+	phase:SetPoint("CENTER", self.Health)
+	phase:SetSize(24, 24)
 	self.PhaseIndicator = phase
 
 	local li = self:CreateTexture(nil, "OVERLAY")
@@ -381,9 +384,11 @@ function UF:CreateCastBar(self)
 	M.CreateSB(cb, true, .2, .8, 1)
 
 	if mystyle == "player" then
+		cb:SetFrameLevel(10)
 		cb:SetSize(MaoRUIPerDB["UFs"]["PlayerCBWidth"], MaoRUIPerDB["UFs"]["PlayerCBHeight"])
 		createBarMover(cb, U["Player Castbar"], "PlayerCB", R.UFs.Playercb)
 	elseif mystyle == "target" then
+		cb:SetFrameLevel(10)
 		cb:SetSize(MaoRUIPerDB["UFs"]["TargetCBWidth"], MaoRUIPerDB["UFs"]["TargetCBHeight"])
 		createBarMover(cb, U["Target Castbar"], "TargetCB", R.UFs.Targetcb)
 	elseif mystyle == "nameplate" then
@@ -597,7 +602,9 @@ function UF.CustomFilter(element, unit, button, name, _, _, _, _, _, caster, isS
 			return (button.isPlayer or caster == "pet") and R.CornerBuffsByName[name] or R.RaidBuffs["ALL"][name]
 		end
 	elseif style == "nameplate" then
-		if MaoRUIDB["NameplateFilter"][2][spellID] or R.BlackList[spellID] then
+		if element.__owner.isNameOnly then
+			return MaoRUIDB["NameplateFilter"][1][spellID] or R.WhiteList[spellID]
+		elseif MaoRUIDB["NameplateFilter"][2][spellID] or R.BlackList[spellID] then
 			return false
 		elseif element.showStealableBuffs and isStealable and not UnitIsPlayer(unit) then
 			return true
@@ -715,10 +722,9 @@ function UF:CreateDebuffs(self)
 end
 
 -- Class Powers
-local margin = R.UFs.BarMargin
 local barWidth, barHeight = unpack(R.UFs.BarSize)
 
-function UF.PostUpdateClassPower(element, cur, max, diff)
+function UF.PostUpdateClassPower(element, cur, max, diff, powerType)
 	if not cur or cur == 0 then
 		for i = 1, 6 do
 			element[i].bg:Hide()
@@ -731,50 +737,31 @@ function UF.PostUpdateClassPower(element, cur, max, diff)
 
 	if diff then
 		for i = 1, max do
-			element[i]:SetWidth((barWidth - (max-1)*margin)/max)
+			element[i]:SetWidth((barWidth - (max-1)*R.margin)/max)
 		end
 		for i = max + 1, 6 do
 			element[i].bg:Hide()
 		end
 	end
-end
 
-function UF:OnUpdateRunes(elapsed)
-	local duration = self.duration + elapsed
-	self.duration = duration
-	self:SetValue(duration)
-
-	if self.timer then
-		local remain = self.runeDuration - duration
-		if remain > 0 then
-			self.timer:SetText(M.FormatTime(remain))
-		else
-			self.timer:SetText(nil)
+	element.thisColor = cur == max and 1 or 2
+	if not element.prevColor or element.prevColor ~= element.thisColor then
+		local r, g, b = 1, 0, 0
+		if element.thisColor == 2 then
+			local color = element.__owner.colors.power[powerType]
+			r, g, b = color[1], color[2], color[3]
 		end
-	end
-end
-
-function UF.PostUpdateRunes(element, runemap)
-	for index, runeID in next, runemap do
-		local rune = element[index]
-		local start, duration, runeReady = GetRuneCooldown(runeID)
-		if rune:IsShown() then
-			if runeReady then
-				rune:SetAlpha(1)
-				rune:SetScript("OnUpdate", nil)
-				if rune.timer then rune.timer:SetText(nil) end
-			elseif start then
-				rune:SetAlpha(.6)
-				rune.runeDuration = duration
-				rune:SetScript("OnUpdate", UF.OnUpdateRunes)
-			end
+		for i = 1, #element do
+			element[i]:SetStatusBarColor(r, g, b)
 		end
+		element.prevColor = element.thisColor
 	end
 end
 
 function UF:CreateClassPower(self)
 	if self.mystyle == "PlayerPlate" then
-		barWidth, barHeight = self:GetWidth(), self.Health:GetHeight()
+		barWidth = MaoRUIPerDB["Nameplate"]["NameplateClassPower"] and MaoRUIPerDB["Nameplate"]["PlateWidth"] or MaoRUIPerDB["Nameplate"]["PPWidth"]
+		barHeight = MaoRUIPerDB["Nameplate"]["PPBarHeight"]
 		R.UFs.BarPoint = {"BOTTOMLEFT", self, "TOPLEFT", 0, 3}
 	end
 
@@ -786,26 +773,20 @@ function UF:CreateClassPower(self)
 	for i = 1, 6 do
 		bars[i] = CreateFrame("StatusBar", nil, bar)
 		bars[i]:SetHeight(barHeight)
-		bars[i]:SetWidth((barWidth - 5*margin) / 6)
+		bars[i]:SetWidth((barWidth - 5*R.margin) / 6)
 		bars[i]:SetStatusBarTexture(I.normTex)
 		bars[i]:SetFrameLevel(self:GetFrameLevel() + 5)
 		M.CreateBDFrame(bars[i], 0, true)
 		if i == 1 then
 			bars[i]:SetPoint("BOTTOMLEFT")
 		else
-			bars[i]:SetPoint("LEFT", bars[i-1], "RIGHT", margin, 0)
+			bars[i]:SetPoint("LEFT", bars[i-1], "RIGHT", R.margin, 0)
 		end
 
 		bars[i].bg = bar:CreateTexture(nil, "BACKGROUND")
 		bars[i].bg:SetAllPoints(bars[i])
 		bars[i].bg:SetTexture(I.normTex)
 		bars[i].bg.multiplier = .25
-
-		if MaoRUIPerDB["Nameplate"]["ShowPlayerPlate"] then
-			bars[i].glow = CreateFrame("Frame", nil, bars[i])
-			bars[i].glow:SetPoint("TOPLEFT", -3, 2)
-			bars[i].glow:SetPoint("BOTTOMRIGHT", 3, -2)
-		end
 	end
 
 	bars.PostUpdate = UF.PostUpdateClassPower
@@ -850,7 +831,7 @@ function UF:CreatePrediction(self)
 	myBar:SetPoint("BOTTOM", self.Health, "BOTTOM")
 	myBar:SetPoint("LEFT", self.Health:GetStatusBarTexture(), "RIGHT")
 	myBar:SetStatusBarTexture(I.normTex)
-	myBar:SetStatusBarColor(0, 1, .5, .5)
+	myBar:SetStatusBarColor(0, 1, 0, .5)
 	myBar:Hide()
 
 	local otherBar = CreateFrame("StatusBar", nil, self)
@@ -859,7 +840,7 @@ function UF:CreatePrediction(self)
 	otherBar:SetPoint("BOTTOM", self.Health, "BOTTOM")
 	otherBar:SetPoint("LEFT", myBar:GetStatusBarTexture(), "RIGHT")
 	otherBar:SetStatusBarTexture(I.normTex)
-	otherBar:SetStatusBarColor(0, 1, 0, .5)
+	otherBar:SetStatusBarColor(0, 1, 1, .5)
 	otherBar:Hide()
 
 	self.HealthPrediction = {

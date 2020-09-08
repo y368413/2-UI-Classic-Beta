@@ -237,7 +237,7 @@ local function CreateConsole()
 	bu[1]:SetScript("OnClick", MISC.LockElements)
 	-- Grids
 	bu[2]:SetScript("OnClick", function()
-		sendCmd("/align") --SlashCmdList["TOGGLEGRID"]("64")
+		SenduiCmd("/align") --SlashCmdList["TOGGLEGRID"]("64")
 	end)
 	-- Cancel
 	bu[3]:SetScript("OnClick", function(self)
@@ -257,13 +257,9 @@ local function CreateConsole()
 	header:SetSize(212, 30)
 	header:SetPoint("TOP")
 	M.CreateMF(header, f)
-	local tips = I.InfoColor.."|nCTRL +"..I.RightButton..U["Reset anchor"].."|nSHIFT +"..I.RightButton..U["Hide panel"]
-	header.title = U["Tips"]
-	M.AddTooltip(header, "ANCHOR_TOP", tips)
-	local tex = header:CreateTexture()
-	tex:SetSize(40, 40)
-	tex:SetPoint("TOPRIGHT", 2, 5)
-	tex:SetTexture("Interface\\Common\\Help-i")
+
+	local helpInfo = M.CreateHelpInfo(header, "|nCTRL +"..I.RightButton..U["Reset anchor"].."|nSHIFT +"..I.RightButton..U["Hide panel"])
+	helpInfo:SetPoint("TOPRIGHT", 2, 5)
 
 	local frame = CreateFrame("Frame", nil, f)
 	frame:SetSize(212, 73)

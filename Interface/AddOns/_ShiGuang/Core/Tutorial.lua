@@ -4,9 +4,9 @@ local module = M:RegisterModule("Settings")
 local pairs, wipe = pairs, table.wipe
 
 -- Addon Info
-print("<<<---|cFFFFFF00 2|r|cFFFF0000 UI |r v"..GetAddOnMetadata("_ShiGuang", "Version").." ("..GetAddOnMetadata("_ShiGuang", "X-StatsVersion")..")" .." For "..GetAddOnMetadata("_ShiGuang", "X-Support").." --")
+print("<<<--|cFFFFFF00 2|r|cFFFF0000 UI|r v"..GetAddOnMetadata("_ShiGuang", "Version").."["..GetAddOnMetadata("_ShiGuang", "X-StatsVersion").."]" .." For "..GetAddOnMetadata("_ShiGuang", "X-Support").." --")
 print("  ---|cffC495DD 特别感谢|r|cff3399ffSiweia|r|cffC495DD,向他学到了好多.|r---  ")
-print("--------------- 有你们的魔兽,才是世界 -->>>")
+print("----------------- 有你们的魔兽,才是世界 -->>>")
 
 -- Tuitorial
 local function DefaultSettings()
@@ -95,8 +95,9 @@ end
 
 local function ForceRaidFrame()
 	if InCombatLockdown() then return end
-	CompactRaidFrameContainer:SetScale(0.85)
 	if not CompactUnitFrameProfiles then return end
+	CompactRaidFrameContainer:SetScale(0.85)
+	--SetRaidProfileOption(GetActiveRaidProfile(), "healthText", "none")
 	SetRaidProfileOption(CompactUnitFrameProfiles.selectedProfile, "useClassColors", true) --显示职业颜色
 	SetRaidProfileOption(CompactUnitFrameProfiles.selectedProfile, "displayPowerBar", false) --显示能量条 
 	SetRaidProfileOption(CompactUnitFrameProfiles.selectedProfile, "displayBorder", false) --显示边框
@@ -272,7 +273,7 @@ local function ForceBigwigs()
 						["outline"] = I.Font[3],
 						["fontSize"] = 12,
 						["BigWigsAnchor_y"] = 336,
-						["BigWigsAnchor_x"] = 20,
+						["BigWigsAnchor_x"] = 16,
 						["BigWigsAnchor_width"] = 175,
 						["growup"] = true,
 						["interceptMouse"] = false,
@@ -283,7 +284,7 @@ local function ForceBigwigs()
 						["font"] = I.Font[1],
 						["onlyInterceptOnKeypress"] = true,
 						["emphasizeMultiplier"] = 1,
-						["BigWigsEmphasizeAnchor_x"] = 836,
+						["BigWigsEmphasizeAnchor_x"] = 810,
 						["BigWigsEmphasizeAnchor_y"] = 350,
 						["BigWigsEmphasizeAnchor_width"] = 220,
 						["emphasizeGrowup"] = true,
@@ -414,8 +415,8 @@ local function HelloWorld()
 	LeftPic:SetScript("OnClick", function()
 		welcome:Hide()
 		if MaoRUIDB["YesTutor"] then YesTutor() end
-		MaoRUIPerDB["Tutorial"]["Complete"] = true
 		ShiGuangPerDB["BHT"] = true
+		MaoRUIPerDB["Tutorial"]["Complete"] = true
 		ForceDefaultSettings()
 		ReloadUI()
 	end)
@@ -435,8 +436,8 @@ local function HelloWorld()
 	RightPic:SetScript("OnClick", function()
 		welcome:Hide()
 		if MaoRUIDB["YesTutor"] then YesTutor() end
-		MaoRUIPerDB["Tutorial"]["Complete"] = true
 		ShiGuangPerDB["BHT"] = false
+		MaoRUIPerDB["Tutorial"]["Complete"] = true
 		ForceDefaultSettings()
 		ReloadUI()
   end)
@@ -508,5 +509,5 @@ function module:OnLogin()
 	DefaultSettings()
 	ForceAddonSkins()
 	if not MaoRUIPerDB["Tutorial"]["Complete"] then HelloWorld() end
-	if (ShiGuangPerDB["BHT"] == true) then sendCmd("/bht on") else sendCmd("/bht off") end
+	if (ShiGuangPerDB["BHT"] == true) then SenduiCmd("/bht on") else SenduiCmd("/bht off") end
 end

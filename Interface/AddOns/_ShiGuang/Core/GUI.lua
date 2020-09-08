@@ -26,7 +26,7 @@ local defaultSettings = {
 		Classcolor = false,
 		Cooldown = true,
 		DecimalCD = true,
-		Style = 6,
+		Style = 8,
 		Bar4Fade = false,
 		Bar5Fade = false,
 		Scale = 1,
@@ -108,11 +108,11 @@ local defaultSettings = {
 
 		PlayerWidth = 245,
 		PlayerHeight = 24,
-		PlayerPowerHeight = 4,
+		PlayerPowerHeight = 6,
 		PlayerPowerOffset = 2,
-		PetWidth = 120,
-		PetHeight = 18,
-		PetPowerHeight = 3,
+		PetWidth = 100,
+		PetHeight = 16,
+		PetPowerHeight = 2,
 
 		CastingColor = {r=.8, g=.6, b=.1},  --r=.3, g=.7, b=1
 		PlayerCBWidth = 240,
@@ -135,7 +135,7 @@ local defaultSettings = {
 		EnableFilter = true,
 		Matches = 1,
 		BlockAddonAlert = true,
-		ChatMenu = true,
+		ChatMenu = false,
 		WhisperColor = true,
 		ChatItemLevel = true,
 		Chatbar = true,
@@ -149,14 +149,14 @@ local defaultSettings = {
 		Coord = true,
 		Clock = false,
 		CombatPulse = false,
-		MapScale = 0.75,
+		MapScale = 0.85,
 		MinimapScale = 1,
 		ShowRecycleBin = false,
 		WhoPings = true,
 		MapReveal = false,
 		MapFader = false,
 		zrMMbordersize = 2,
-		zrMMbuttonsize = 16,
+		zrMMbuttonsize = 18,
 		zrMMbuttonpos = "Bottom",
 		zrMMcustombuttons = {},
 	},
@@ -170,8 +170,8 @@ local defaultSettings = {
 		TankMode = false,
 		TargetIndicator = 3,
 		Distance = 42,
-		PlateWidth = 121,
-		PlateHeight = 6,
+		PlateWidth = 168,
+		PlateHeight = 9,
 		CustomUnitColor = true,
 		CustomColor = {r=0, g=.8, b=.3},
 		UnitList = "",
@@ -179,8 +179,9 @@ local defaultSettings = {
 		VerticalSpacing = .6,
 		ShowPlayerPlate = true,
 		PPWidth = 175,
-		PPHeight = 1,
-		PPPHeight = 8,
+		PPBarHeight = 6,
+		PPHealthHeight = 0.1,
+		PPPowerHeight = 6,
 		PPPowerText = true,
 		FullHealth = false,
 		SecureColor = {r=1, g=0, b=1},
@@ -188,7 +189,7 @@ local defaultSettings = {
 		InsecureColor = {r=1, g=0, b=0},
 		--OffTankColor = {r=.2, g=.7, b=.5},
 		--DPSRevertThreat = false,
-		PPHideOOC = true,
+		PPFadeout = true,
 		NameplateClassPower = false,
 		NameTextSize = 14,
 		HealthTextSize = 16,
@@ -197,6 +198,7 @@ local defaultSettings = {
 		ColorBorder = true,
 		QuestIndicator = true,
 		ClassPowerOnly = false,
+		NameOnlyMode = false,
 	},
 	Skins = {
 		DBM = true,
@@ -207,7 +209,6 @@ local defaultSettings = {
 		ClassLine = true,
 		ChatLine = false,
 		MenuLine = true,
-		Details = true,
 		QuestLogEx = true,
 		QuestTracker = true,
 		Recount = true,
@@ -297,7 +298,6 @@ local accountSettings = {
 	GuildSortBy = 1,
 	GuildSortOrder = true,
 	DetectVersion = I.Version,
-	ResetDetails = true,
 	LockUIScale = false,
 	UIScale = .71,
 	NumberFormat = 2,
@@ -400,6 +400,24 @@ local function updateActionbarScale()
 	M:GetModule("Actionbar"):UpdateAllScale()
 end
 
+local function updateCustomBar()
+	M:GetModule("Actionbar"):UpdateCustomBar()
+end
+
+local function updateBuffFrame()
+	local A = M:GetModule("Auras")
+	A:UpdateOptions()
+	A:UpdateHeader(A.BuffFrame)
+	A.BuffFrame.mover:SetSize(A.BuffFrame:GetSize())
+end
+
+local function updateDebuffFrame()
+	local A = M:GetModule("Auras")
+	A:UpdateOptions()
+	A:UpdateHeader(A.DebuffFrame)
+	A.DebuffFrame.mover:SetSize(A.DebuffFrame:GetSize())
+end
+
 local function updateReminder()
 	M:GetModule("Auras"):InitReminder()
 end
@@ -452,6 +470,14 @@ local function refreshNameplates()
 	M:GetModule("UnitFrames"):RefreshAllPlates()
 end
 
+local function togglePlatePower()
+	M:GetModule("UnitFrames"):TogglePlatePower()
+end
+
+local function togglePlateVisibility()
+	M:GetModule("UnitFrames"):TogglePlateVisibility()
+end
+
 local function updatePlateScale()
 	M:GetModule("UnitFrames"):UpdatePlateScale()
 end
@@ -464,10 +490,9 @@ local function updateRaidNameText()
 	M:GetModule("UnitFrames"):UpdateRaidNameText()
 end
 
-local function updatePlayerPlate()
-	M:GetModule("UnitFrames"):ResizePlayerPlate()
+local function updateUFTextScale()
+	M:GetModule("UnitFrames"):UpdateTextScale()
 end
-
 
 local function updateRaidTextScale()
 	M:GetModule("UnitFrames"):UpdateRaidTextScale()
@@ -526,19 +551,6 @@ local function updateSkinAlpha()
 	end
 end
 
-StaticPopupDialogs["RESET_DETAILS"] = {
-	text = U["Reset Details check"],
-	button1 = YES,
-	button2 = NO,
-	OnAccept = function()
-		MaoRUIDB["ResetDetails"] = true
-		ReloadUI()
-	end,
-	whileDead = 1,
-}
-local function resetDetails()
-	StaticPopup_Show("RESET_DETAILS")
-end
 -- Config
 local tabList = {
 	U["Actionbar"],
@@ -554,7 +566,7 @@ local optionList = {		-- type, key, value, name, horizon, horizon2, doubleline
 	[1] = {
 		{1, "Actionbar", "Enable", "|cff00cc4c"..U["Enable Actionbar"]},
 		{1, "Actionbar", "Classcolor", U["ClassColor BG"], true},
-		{4, "Actionbar", "Style", U["Actionbar Style"], true, true, {"-- 2*(3+12+3) --", "-- 2*(6+12+6) --", "-- 2*6+3*12+2*6 --", "-- 3*12 --", "-- 2*(12+6) --", "-- MR --", "-- PVP --", "-- 3*(4+12+4) --", "-- PVP2 --", "-- JK --"}},
+		{4, "Actionbar", "Style", U["Actionbar Style"], true, true, {"-- 2*(3+12+3) --", "-- 2*(6+12+6) --", "-- 2*6+3*12+2*6 --", "-- 3*12 --", "-- 2*(12+6) --", "-- 3*(4+12+4) --", "-- What --", "-- MR --", "-- PVP2 --", "-- Cool --", "-- JK --"}},
 		{1, "Actionbar", "Cooldown", "|cff00cc4c"..U["Show Cooldown"]},
 		{1, "Actionbar", "DecimalCD", U["Decimal Cooldown"].."*", true},
 		{1, "Actionbar", "OverrideWA", U["HideCooldownOnWA"], true, true},
@@ -664,9 +676,9 @@ local optionList = {		-- type, key, value, name, horizon, horizon2, doubleline
 		{3, "Auras", "BuffsPerRow", U["BuffsPerRow"], false, false, {10, 20, 1}},
 		{3, "Auras", "DebuffsPerRow", U["DebuffsPerRow"], true, false, {10, 16, 1}},
 		{3, "AuraWatch", "IconScale", U["AuraWatch IconScale"], true, true, {.8, 2, .1}},
-		{3, "Nameplate", "PPHeight", U["PlayerPlate HPHeight"].."*", false, false, {5, 15, 1}, updatePlayerPlate},
-		{3, "Nameplate", "PPPHeight", U["PlayerPlate MPHeight"].."*", true, false, {5, 15, 1}, updatePlayerPlate},
-		{3, "Nameplate", "PPWidth", U["PlayerPlate HPWidth"], true, true, {120, 310, 1}, updatePlayerPlate},
+		{3, "Nameplate", "PPWidth", U["PlayerPlate HPWidth"].."*", false, false, {120, 310, 1}, refreshNameplates},
+		{3, "Nameplate", "PPHealthHeight", U["PlayerPlate HPHeight"].."*", true, false, {0, 16, .1}, refreshNameplates},
+		{3, "Nameplate", "PPPowerHeight", U["PlayerPlate MPHeight"].."*", true, true, {1, 16, 1}, refreshNameplates},
 	},
 	[5] = {
 		{1, "Chat", "Outline", U["Font Outline"]},
@@ -696,7 +708,6 @@ local optionList = {		-- type, key, value, name, horizon, horizon2, doubleline
 		--{1, "ACCOUNT", "DisableInfobars", U["DisableInfobars"]},
 		{1, "Misc", "CtrlIndicator", "Shift/Alt/Ctrl卡住提示"},
 		{1, "Skins", "DBM", U["DBM Skin"], true},
-		{1, "Skins", "Details", U["Details Skin"], true, true, resetDetails},
 		{1, "Skins", "Shadow", U["Shadow"]},
 		{1, "Skins", "ClassLine", U["ClassColor Line"], true},
 		{1, "Skins", "FlatMode", U["FlatMode"], true, true},
@@ -719,8 +730,9 @@ local optionList = {		-- type, key, value, name, horizon, horizon2, doubleline
 		{1, "Tooltip", "SpecLevelByShift", U["Show SpecLevelByShift"].."*", true, true},
 		{1, "Tooltip", "TargetBy", U["Show TargetedBy"].."*"},
 		{1, "Tooltip", "HideAllID", "|cff00cc4c"..U["HideAllID"], true},
-		{1, "Misc", "SorasThreat", U["SorasThreat"]},
-		{3, "Misc", "SorasThreatFramew", U["SorasThreatFramewight"].."*", true, false, {100, 310, 1}},
+		{1, "Misc", "SorasThreat", U["SorasThreat"], true, true},
+		--{},--blank
+		{3, "Misc", "SorasThreatFramew", U["SorasThreatFramewight"].."*", false, false, {100, 310, 1}},
 		{3, "Misc", "SorasThreatFrameh", U["SorasThreatFramehight"].."*", true, true, {3, 12, 1}},
 		--{1, "Map", "Clock", U["Minimap Clock"], true, true, nil, showMinimapClock},
 		--{1, "Map", "CombatPulse", U["Minimap Pulse"]},
@@ -867,7 +879,7 @@ local function CreateOption(i)
 				if callback then callback() end
 			end)
 			eb.title = U["Tips"]
-			local tip = U["EdieBox Tip"]
+			local tip = U["EditBox Tip"]
 			if tooltip then tip = tooltip.."|n"..tip end
 			M.AddTooltip(eb, "ANCHOR_RIGHT", tip, "info")
 			M.CreateFS(eb, 14, name, "system", "CENTER", 0, 25)

@@ -540,7 +540,8 @@ local autoOpenItems = {
 	[163611] = true,	-- Seafarer's Coin Pouch
 	[163612] = true,	-- Wayfinder's Satchel
 	[163613] = true,	-- Sack of Plunder
-
+	[173312] = true,	-- 
+	[174959] = true,	-- 
 }
 
 local autoOpenItemsSalvage = {

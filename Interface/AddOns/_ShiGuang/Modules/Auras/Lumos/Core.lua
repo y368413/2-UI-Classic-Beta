@@ -153,12 +153,11 @@ local function TurnOff(self)
 	UpdateVisibility(self)
 end
 
-local margin = R.UFs.BarMargin
 function A:CreateLumos(self)
 	if not A.ChantLumos then return end
 
 	self.bu = {}
-	local iconSize = (MaoRUIPerDB["Nameplate"]["PPWidth"] - margin*4)/5
+	local iconSize = (MaoRUIPerDB["Nameplate"]["PPWidth"] - R.margin*4)/5
 	for i = 1, 5 do
 		local bu = CreateFrame("Frame", nil, self.Health)
 		bu:SetSize(iconSize, iconSize)
@@ -172,7 +171,7 @@ function A:CreateLumos(self)
 		if i == 1 then
 			bu:SetPoint("TOPLEFT", self.Power, "BOTTOMLEFT", 0, -5)
 		else
-			bu:SetPoint("LEFT", self.bu[i-1], "RIGHT", margin, 0)
+			bu:SetPoint("LEFT", self.bu[i-1], "RIGHT", R.margin, 0)
 		end
 
 		self.bu[i] = bu
