@@ -42,10 +42,6 @@ function A:OnLogin()
 	self.DebuffFrame:ClearAllPoints()
 	self.DebuffFrame:SetPoint("TOPRIGHT", debuffAnchor)
 
-	-- Elements
-	if I.MyClass == "SHAMAN" then
-		self:Totems()
-	end
 	self:InitReminder()
 end
 

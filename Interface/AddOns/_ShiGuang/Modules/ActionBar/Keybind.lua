@@ -3,13 +3,12 @@ local M, R, U, I = unpack(ns)
 local Bar = M:GetModule("Actionbar")
 
 local _G = _G
-local pairs, tonumber, print, strfind, strupper = pairs, tonumber, print, strfind, strupper
+local tonumber, print, strfind, strupper = tonumber, print, strfind, strupper
+local EnumerateFrames = EnumerateFrames
 local InCombatLockdown = InCombatLockdown
 local GetSpellBookItemName, GetMacroInfo = GetSpellBookItemName, GetMacroInfo
 local IsAltKeyDown, IsControlKeyDown, IsShiftKeyDown = IsAltKeyDown, IsControlKeyDown, IsShiftKeyDown
-local GetBindingKey, SetBinding, AttemptToSaveBindings, LoadBindings = GetBindingKey, SetBinding, AttemptToSaveBindings, LoadBindings
-local MAX_ACCOUNT_MACROS = MAX_ACCOUNT_MACROS
-local NOT_BOUND = NOT_BOUND
+local GetBindingKey, SetBinding, SaveBindings, LoadBindings = GetBindingKey, SetBinding, SaveBindings, LoadBindings
 
 -- Button types
 local function hookActionButton(self)
@@ -29,17 +28,18 @@ local function hookSpellButton(self)
 end
 
 function Bar:Bind_RegisterButton(button)
+	local action = ActionButton1:GetScript("OnClick")
 	local stance = StanceButton1:GetScript("OnClick")
 	local pet = PetActionButton1:GetScript("OnClick")
 
 	if button.IsProtected and button.IsObjectType and button.GetScript and button:IsObjectType("CheckButton") and button:IsProtected() then
 		local script = button:GetScript("OnClick")
-		if script == stance then
+		if script == action then
+			button:HookScript("OnEnter", hookActionButton)
+		elseif script == stance then
 			button:HookScript("OnEnter", hookStanceButton)
 		elseif script == pet then
 			button:HookScript("OnEnter", hookPetButton)
-		else
-			button:HookScript("OnEnter", hookActionButton)
 		end
 	end
 end
@@ -61,25 +61,21 @@ function Bar:Bind_Create()
 	frame:EnableMouse(true)
 	frame:EnableKeyboard(true)
 	frame:EnableMouseWheel(true)
-	M.CreateBD(frame, 1)
-	frame:SetBackdropColor(1, .8, 0, .25)
-	frame:SetBackdropBorderColor(1, .8, 0)
+	M.CreateBD(frame, .5)
 	frame:Hide()
 
 	frame:SetScript("OnEnter", function()
 		GameTooltip:SetOwner(frame, "ANCHOR_NONE")
 		GameTooltip:SetPoint("BOTTOM", frame, "TOP", 0, 2)
-		GameTooltip:AddLine(frame.name, .6,.8,1)
+		GameTooltip:AddLine(frame.name, 1,1,1)
 
 		if #frame.bindings == 0 then
-			GameTooltip:AddLine(NOT_BOUND, 1,0,0)
-			GameTooltip:AddLine(U["PressToBind"])
+			GameTooltip:AddLine(U["No key set"], .6,.6,.6)
 		else
 			GameTooltip:AddDoubleLine(U["KeyIndex"], U["KeyBinding"], .6,.6,.6, .6,.6,.6)
 			for i = 1, #frame.bindings do
-				GameTooltip:AddDoubleLine(i, frame.bindings[i], 1,1,1, 0,1,0)
+				GameTooltip:AddDoubleLine(i, frame.bindings[i])
 			end
-			GameTooltip:AddLine(U["UnbindTip"], 1,.8,0, 1)
 		end
 		GameTooltip:Show()
 	end)
@@ -94,8 +90,10 @@ function Bar:Bind_Create()
 		end
 	end)
 
-	for _, button in pairs(Bar.buttons) do
+	local button = EnumerateFrames()
+	while button do
 		Bar:Bind_RegisterButton(button)
+		button = EnumerateFrames(button)
 	end
 
 	for i = 1, 12 do
@@ -129,7 +127,7 @@ function Bar:Bind_Update(button, spellmacro)
 	elseif spellmacro == "MACRO" then
 		frame.id = frame.button:GetID()
 		local colorIndex = M:Round(select(2, MacroFrameTab1Text:GetTextColor()), 1)
-		if colorIndex == .8 then frame.id = frame.id + MAX_ACCOUNT_MACROS end
+		if colorIndex == .8 then frame.id = frame.id + 36 end
 		frame.name = GetMacroInfo(frame.id)
 		frame.bindings = {GetBindingKey(spellmacro.." "..frame.name)}
 	elseif spellmacro == "STANCE" or spellmacro == "PET" then
@@ -148,7 +146,7 @@ function Bar:Bind_Update(button, spellmacro)
 		if not frame.name then return end
 
 		frame.action = tonumber(button.action)
-		if button.isCustomButton or not frame.action or frame.action < 1 or frame.action > 168 then
+		if not frame.action or frame.action < 1 or frame.action > 132 then
 			frame.bindstring = "CLICK "..frame.name..":LeftButton"
 		else
 			local modact = 1+(frame.action-1)%12
@@ -168,9 +166,6 @@ function Bar:Bind_Update(button, spellmacro)
 		end
 		frame.bindings = {GetBindingKey(frame.bindstring)}
 	end
-
-	-- Refresh tooltip
-	frame:GetScript("OnEnter")(self)
 end
 
 local ignoreKeys = {
@@ -196,6 +191,8 @@ function Bar:Bind_Listener(key)
 		print(format(U["Clear binds"], frame.name))
 
 		Bar:Bind_Update(frame.button, frame.spellmacro)
+		if frame.spellmacro ~= "MACRO" and not GameTooltip:IsForbidden() then GameTooltip:Hide() end
+
 		return
 	end
 
@@ -255,18 +252,9 @@ function Bar:Bind_CreateDialog()
 	frame:SetSize(320, 100)
 	frame:SetPoint("TOP", 0, -135)
 	M.SetBD(frame)
-	M.CreateFS(frame, 16, U["QuickKeybindMode"], false, "TOP", 0, -10)
-
-	local helpInfo = M.CreateHelpInfo(frame, "|n"..U["QuickKeybindDescription"])
-	helpInfo:SetPoint("TOPRIGHT", 2, -2)
+	M.CreateFS(frame, 16, KEY_BINDING, false, "TOP", 0, -10)
 
 	local text = M.CreateFS(frame, 14, CHARACTER_SPECIFIC_KEYBINDINGS, "system", "TOP", 0, -40)
-	local box = M.CreateCheckBox(frame)
-	box:SetChecked(MaoRUIPerDB["Actionbar"]["BindType"] == 2)
-	box:SetPoint("RIGHT", text, "LEFT", -5, -0)
-	box:SetScript("OnClick", function(self)
-		MaoRUIPerDB["Actionbar"]["BindType"] = self:GetChecked() and 2 or 1
-	end)
 
 	local button1 = M.CreateButton(frame, 120, 25, APPLY, 14)
 	button1:SetPoint("BOTTOMLEFT", 25, 10)
@@ -277,6 +265,12 @@ function Bar:Bind_CreateDialog()
 	button2:SetPoint("BOTTOMRIGHT", -25, 10)
 	button2:SetScript("OnClick", function()
 		Bar:Bind_Deactivate()
+	end)
+	local box = M.CreateCheckBox(frame)
+	box:SetChecked(MaoRUIPerDB["Actionbar"]["BindType"] == 2)
+	box:SetPoint("RIGHT", text, "LEFT", -5, -0)
+	box:SetScript("OnClick", function(self)
+		MaoRUIPerDB["Actionbar"]["BindType"] = self:GetChecked() and 2 or 1
 	end)
 
 	Bar.keybindDialog = frame
